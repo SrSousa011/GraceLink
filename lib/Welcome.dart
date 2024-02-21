@@ -12,7 +12,13 @@ class Welcome extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(),
       body: Container(
-        color: Colors.lightBlue[100], // Cor de pele
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+                'assets/background_image.jpg'), // Caminho relativo da imagem de fundo
+            fit: BoxFit.cover,
+          ),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
