@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:churchapp/HomePage.dart';
 import 'package:churchapp/SignUp.dart'; // Importa a tela de SignUp
 
 class Login extends StatelessWidget {
@@ -32,7 +33,11 @@ class Login extends StatelessWidget {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      // Perform login authentication
+                      // Navigate para a tela de SignUp
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomePage()),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       primary: Colors.white, // Cor de fundo branca
@@ -54,8 +59,9 @@ class Login extends StatelessWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Color.fromARGB(255, 90, 175, 249),
-                      onPrimary: Colors.white,
+                      primary: Color.fromARGB(
+                          255, 90, 175, 249), // Cor de fundo azul
+                      onPrimary: Colors.white, // Cor do texto branco
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0),
                       ),
