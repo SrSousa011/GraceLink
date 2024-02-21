@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         colorScheme:
-            ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 255, 255, 255)),
+            ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 90, 175, 249)),
         useMaterial3: true,
       ),
       home: Welcome(title: 'GraceLink'),
