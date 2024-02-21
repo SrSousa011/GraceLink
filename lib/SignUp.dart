@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:churchapp/HomePage.dart';
 
 class SignUp extends StatelessWidget {
   @override
@@ -34,7 +35,11 @@ class SignUp extends StatelessWidget {
               SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
-                  // Perform registration logic
+                  // Navigate para a tela de SignUp
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomePage()),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   primary: Color.fromARGB(255, 90, 175, 249),
