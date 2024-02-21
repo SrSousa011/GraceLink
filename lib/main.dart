@@ -1,81 +1,29 @@
-import 'package:flutter/material.dart';
 import 'package:churchapp/Login.dart';
 import 'package:churchapp/SignUp.dart';
+import 'package:flutter/material.dart';
+import 'package:churchapp/Welcome.dart';
 
-class Welcome extends StatelessWidget {
-  const Welcome({Key? key}) : super(key: key);
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        color: Colors.lightBlue[100], // Cor de pele
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                'Resplandecendo',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'as',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Naçoes - Athus',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 20), // Espaçamento entre o texto e os botões
-              Container(
-                color: Colors.white, // Faixa branca
-                padding: EdgeInsets.all(20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Login()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.white, // Cor de fundo branca
-                        onPrimary: Color(0xFF1E88E5), // Cor do texto azul
-                        side:
-                            BorderSide(color: Color(0xFF1E88E5)), // Borda azul
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                      ),
-                      child: Text('Login'),
-                    ),
-                    SizedBox(width: 20), // Espaçamento entre os botões
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => SignUp()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: Color.fromARGB(
-                            255, 90, 175, 249), // Cor de fundo azul
-                        onPrimary: Colors.white, // Cor do texto branco
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                      ),
-                      child: Text('Sign Up'),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+    return MaterialApp(
+      theme: ThemeData(
+        colorScheme:
+            ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 255, 255, 255)),
+        useMaterial3: true,
       ),
+      home: Welcome(title: 'GraceLink'),
+      routes: {
+        '/Login': (context) => Login(),
+        '/SignUp': (context) => SignUp(),
+        '/Home': (context) => SignUp(),
+      },
     );
   }
 }
