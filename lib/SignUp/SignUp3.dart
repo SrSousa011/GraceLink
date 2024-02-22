@@ -1,4 +1,4 @@
-import 'package:churchapp/SignUp/SignUpPage4.dart';
+import 'package:churchapp/SignUp/SignUp4.dart';
 import 'package:flutter/material.dart';
 
 class SignUpPage3 extends StatefulWidget {

@@ -1,4 +1,5 @@
 import 'package:churchapp/Home.dart';
+import 'package:churchapp/UserProfile.dart';
 import 'package:flutter/material.dart';
 
 class SignUpPage4 extends StatefulWidget {
@@ -51,7 +52,7 @@ class _SignUpPage4State extends State<SignUpPage4> {
                   // Senhas coincidem, navegar para a página Home
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => Home()),
+                    MaterialPageRoute(builder: (context) => UserProfile()),
                   );
                 } else {
                   // Senhas não coincidem, exibir mensagem de erro

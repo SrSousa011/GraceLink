@@ -1,4 +1,5 @@
 import 'package:churchapp/Home.dart';
+import 'package:churchapp/SignUp/SignUp3.dart';
 import 'package:flutter/material.dart';
 
 class SignUpPage2 extends StatefulWidget {
@@ -143,7 +144,7 @@ class _SignUpPageState2 extends State<SignUpPage2> {
                     // Navegar para a tela SignUp3 após o cadastro
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Home()),
+                      MaterialPageRoute(builder: (context) => SignUpPage3()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
