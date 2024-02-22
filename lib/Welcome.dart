@@ -10,32 +10,42 @@ class Welcome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/imagens/background_image.jpg'),
-            fit: BoxFit
-                .fill, // Alterado para BoxFit.fill para preencher toda a tela
+            fit: BoxFit.fill,
           ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Spacer(),
-            Text(
-              'Resplandecendo',
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            Spacer(), // Adiciona espaço para empurrar para baixo o logotipo e a escrita
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/icons/logo.png',
+                  height: 150,
+                  width: 150,
+                ),
+                SizedBox(
+                    height: 20), // Espaçamento entre o logotipo e os textos
+                Text(
+                  'Resplandecendo',
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'as',
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Nações - Athus',
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
-            Text(
-              'as',
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              'Naçoes - Athus',
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-            ),
-            Spacer(),
+            Spacer(), // Adiciona outro espaço para centralizar os botões de login/cadastro
             Container(
               color: Colors.white,
               padding: EdgeInsets.all(20),
