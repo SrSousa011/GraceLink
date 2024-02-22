@@ -26,22 +26,8 @@ class Welcome extends StatelessWidget {
               children: [
                 Image.asset(
                   'assets/icons/logo.png',
-                  height: 150,
-                  width: 150,
-                ),
-                SizedBox(
-                    height: 20), // Espaçamento entre o logotipo e os textos
-                Text(
-                  'Resplandecendo',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'as',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'Nações - Athus',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                  height: 400,
+                  width: 4000,
                 ),
               ],
             ),
