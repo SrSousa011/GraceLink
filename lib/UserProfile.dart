@@ -55,7 +55,7 @@ class UserProfile extends StatelessWidget {
                 style: TextStyle(fontSize: 20),
               ),
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 50),
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2,
