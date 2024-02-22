@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:churchapp/HomePage.dart';
+import 'package:churchapp/UserProfile.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -154,7 +154,7 @@ class _SignUpState extends State<SignUp> {
                     // Navigate para a tela de SignUp
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
+                      MaterialPageRoute(builder: (context) => UserProfile()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
