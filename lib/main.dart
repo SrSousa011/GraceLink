@@ -1,7 +1,9 @@
-import 'package:churchapp/Login.dart';
-import 'package:churchapp/SignUp.dart';
 import 'package:flutter/material.dart';
-import 'package:churchapp/Welcome.dart';
+import 'package:churchapp/Welcome.dart'; // Make sure to import Welcome widget
+import 'package:churchapp/Login.dart'; // Make sure to import Login widget
+import 'package:churchapp/SignUp.dart'; // Make sure to import SignUp widget
+import 'package:churchapp/Home.dart'; // Assuming Home widget is defined and imported correctly
+import 'package:churchapp/UserProfile.dart'; // Assuming UserProfile widget is defined and imported correctly
 
 void main() {
   runApp(MyApp());
@@ -22,7 +24,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/Login': (context) => Login(),
         '/SignUp': (context) => SignUp(),
-        '/Home': (context) => SignUp(),
+        '/Home': (context) => Home(),
+        '/UserProfile': (context) => UserProfile()
       },
     );
   }
