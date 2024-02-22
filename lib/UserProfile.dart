@@ -14,7 +14,7 @@ class UserProfile extends StatelessWidget {
             SizedBox(height: 40),
             CircleAvatar(
               radius: 100,
-              backgroundImage: AssetImage('assets/user_profile_image.jpg'),
+              backgroundImage: AssetImage('assets/imagens/profile_picture.jpg'),
             ),
             SizedBox(height: 10),
             Text(
