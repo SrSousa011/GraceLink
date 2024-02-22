@@ -18,7 +18,7 @@ class UserProfile extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Text(
-              'John Doe',
+              'Anaïs Chevalier',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
