@@ -1,6 +1,5 @@
-import 'package:churchapp/Home.dart';
-import 'package:churchapp/SignUp/SignUp3.dart';
 import 'package:flutter/material.dart';
+import 'package:churchapp/SignUp/SignUp3.dart';
 
 class SignUpPage2 extends StatefulWidget {
   @override
@@ -120,26 +119,33 @@ class _SignUpPageState2 extends State<SignUpPage2> {
                     ),
                   ],
                 ),
+
                 SizedBox(height: 20.0),
 
                 // Gender Dropdown
-                DropdownButtonFormField<String>(
-                  value: selectedGender,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedGender = newValue!;
-                    });
-                  },
-                  items: <String>['', 'Male', 'Female']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  decoration: InputDecoration(
-                    labelText: 'Gender',
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: selectedGender,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedGender = newValue!;
+                          });
+                        },
+                        items: <String>['', 'Male', 'Female']
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        decoration: InputDecoration(
+                          labelText: 'Gender',
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
 
                 SizedBox(height: 20.0),
