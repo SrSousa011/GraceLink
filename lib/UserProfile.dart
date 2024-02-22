@@ -55,14 +55,6 @@ class UserProfile extends StatelessWidget {
                 style: TextStyle(fontSize: 20),
               ),
             ),
-            SizedBox(height: 20),
-            Text(
-              'Photos',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
             SizedBox(height: 10),
             Expanded(
               child: GridView.count(
