@@ -1,6 +1,5 @@
-import 'package:churchapp/Home.dart';
-import 'package:churchapp/UserProfile.dart';
 import 'package:flutter/material.dart';
+import 'package:churchapp/UserProfile.dart';
 
 class SignUpPage4 extends StatefulWidget {
   @override
@@ -46,24 +45,38 @@ class _SignUpPage4State extends State<SignUpPage4> {
               ),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                if (password == confirmPassword) {
-                  // Senhas coincidem, navegar para a página Home
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => UserProfile()),
-                  );
-                } else {
-                  // Senhas não coincidem, exibir mensagem de erro
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Passwords do not match!'),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (password == confirmPassword) {
+                        // Senhas coincidem, navegar para a página Home
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => UserProfile()),
+                        );
+                      } else {
+                        // Senhas não coincidem, exibir mensagem de erro
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Passwords do not match!'),
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Color.fromARGB(255, 90, 175, 249),
+                      onPrimary: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
                     ),
-                  );
-                }
-              },
-              child: Text('Next'),
+                    child: Text('Next'),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
