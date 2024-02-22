@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:churchapp/HomePage.dart';
+import 'package:churchapp/UserProfile.dart';
 import 'package:churchapp/SignUp.dart'; // Importa a tela de SignUp
 
 class Login extends StatelessWidget {
@@ -36,7 +36,7 @@ class Login extends StatelessWidget {
                       // Navigate para a tela de SignUp
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => HomePage()),
+                        MaterialPageRoute(builder: (context) => UserProfile()),
                       );
                     },
                     style: ElevatedButton.styleFrom(
