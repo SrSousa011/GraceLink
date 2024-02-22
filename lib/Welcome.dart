@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:churchapp/Login.dart';
-import 'package:churchapp/SignUp.dart';
+import 'package:churchapp/SignUp/SignUp.dart';
 
 class Welcome extends StatelessWidget {
   const Welcome({Key? key, required this.title}) : super(key: key);

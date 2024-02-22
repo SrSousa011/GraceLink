@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:churchapp/UserProfile.dart';
-import 'package:churchapp/SignUp.dart'; // Importa a tela de SignUp
+import 'package:churchapp/SignUp/SignUp.dart'; // Importa a tela de SignUp
 
 class Login extends StatelessWidget {
   @override

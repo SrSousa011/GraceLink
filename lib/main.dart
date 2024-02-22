@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:churchapp/SplashScreen.dart';
 import 'package:churchapp/Login.dart';
-import 'package:churchapp/SignUp.dart';
+import 'package:churchapp/SignUp/SignUp.dart';
 import 'package:churchapp/Welcome.dart';
 import 'package:churchapp/Home.dart';
 import 'package:churchapp/UserProfile.dart';
