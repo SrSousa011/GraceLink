@@ -1,3 +1,4 @@
+import 'package:churchapp/SignUp/SignUp2.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/SplashScreen.dart';
 import 'package:churchapp/Login.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         // Adicione as rotas para outras telas
         '/Login': (context) => Login(),
         '/SignUp': (context) => SignUp(),
+        '/SignUp2': (context) => SignUpPage2(),
         '/Home': (context) => Home(),
         '/UserProfile': (context) => UserProfile(),
         '/Welcome': (context) => Welcome(title: 'GraceLink'),

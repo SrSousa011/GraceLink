@@ -1,3 +1,4 @@
+import 'package:churchapp/SignUp/SignUp2.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/UserProfile.dart';
 
@@ -39,7 +40,7 @@ class _SignUpState extends State<SignUp> {
                     // Navigate para a tela de SignUp
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => UserProfile()),
+                      MaterialPageRoute(builder: (context) => SignUpPage2()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
