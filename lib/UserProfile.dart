@@ -1,3 +1,5 @@
+// ignore_for_file: file_names, use_key_in_widget_constructors
+
 import 'package:flutter/material.dart';
 
 class UserProfile extends StatelessWidget {
@@ -5,19 +7,19 @@ class UserProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Profile'),
+        title: const Text('User Profile'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(height: 40),
-            CircleAvatar(
+            const SizedBox(height: 40),
+            const CircleAvatar(
               radius: 100,
               backgroundImage: AssetImage('assets/imagens/profile_picture.jpg'),
             ),
-            SizedBox(height: 10),
-            Text(
+            const SizedBox(height: 10),
+            const Text(
               'Anaïs Chevalier',
               style: TextStyle(
                 fontSize: 24,
@@ -25,8 +27,8 @@ class UserProfile extends StatelessWidget {
                 color: Colors.blue,
               ),
             ),
-            SizedBox(height: 10),
-            Row(
+            const SizedBox(height: 10),
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.location_on, color: Colors.blue),
@@ -40,22 +42,23 @@ class UserProfile extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 // Add your action here
               },
               style: ElevatedButton.styleFrom(
-                primary: Colors.blue,
-                onPrimary: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.blue,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
-              child: Text(
+              child: const Text(
                 'Follow',
                 style: TextStyle(fontSize: 20),
               ),
             ),
-            SizedBox(height: 50),
+            const SizedBox(height: 50),
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2,
@@ -63,12 +66,12 @@ class UserProfile extends StatelessWidget {
                   6,
                   (index) {
                     return Container(
-                      margin: EdgeInsets.all(5),
+                      margin: const EdgeInsets.all(5),
                       color: Colors.grey[300],
                       child: Center(
                         child: Text(
                           'Photo ${index + 1}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),

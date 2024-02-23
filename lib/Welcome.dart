@@ -43,7 +43,7 @@ class Welcome extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Login()),
+                        MaterialPageRoute(builder: (context) => const Login()),
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -65,8 +65,8 @@ class Welcome extends StatelessWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: const Color.fromARGB(255, 90, 175, 249),
-                      onPrimary: Colors.white,
+                      foregroundColor: Colors.white,
+                      backgroundColor: const Color.fromARGB(255, 90, 175, 249),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0),
                       ),

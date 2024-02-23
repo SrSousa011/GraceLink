@@ -79,12 +79,13 @@ class _SignUpPageState3 extends State<SignUpPage3> {
                     // Navigate to SignUp4 screen after signup
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SignUpPage4()),
+                      MaterialPageRoute(
+                          builder: (context) => const SignUpPage4()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: const Color.fromARGB(255, 90, 175, 249),
-                    onPrimary: Colors.white,
+                    foregroundColor: Colors.white,
+                    backgroundColor: const Color.fromARGB(255, 90, 175, 249),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),

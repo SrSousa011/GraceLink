@@ -1,4 +1,5 @@
-// ignore: file_names
+// ignore_for_file: file_names, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:churchapp/SignUp/SignUp3.dart';
 
@@ -6,7 +7,6 @@ class SignUpPage2 extends StatefulWidget {
   const SignUpPage2({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _SignUpPageState2 createState() => _SignUpPageState2();
 }
 
@@ -161,7 +161,8 @@ class _SignUpPageState2 extends State<SignUpPage2> {
                     // Navigate to SignUp3 screen after signup
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SignUpPage3()),
+                      MaterialPageRoute(
+                          builder: (context) => const SignUpPage3()),
                     );
                   },
                   style: ElevatedButton.styleFrom(

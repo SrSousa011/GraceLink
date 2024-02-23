@@ -44,7 +44,8 @@ class _SignUpState extends State<SignUp> {
                     // Navigate para a tela de SignUp
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SignUpPage2()),
+                      MaterialPageRoute(
+                          builder: (context) => const SignUpPage2()),
                     );
                   },
                   style: ElevatedButton.styleFrom(

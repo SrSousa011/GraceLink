@@ -1,3 +1,4 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:churchapp/UserProfile.dart';
 import 'package:churchapp/SignUp/SignUp.dart'; // Importa a tela de SignUp
