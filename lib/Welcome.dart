@@ -1,3 +1,4 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:churchapp/Login.dart';
 import 'package:churchapp/SignUp/SignUp.dart';
@@ -11,7 +12,7 @@ class Welcome extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/imagens/background_image.jpg'),
             fit: BoxFit.fill,
@@ -20,7 +21,7 @@ class Welcome extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Spacer(), // Adiciona espaço para empurrar para baixo o logotipo e a escrita
+            const Spacer(), // Adiciona espaço para empurrar para baixo o logotipo e a escrita
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -31,10 +32,10 @@ class Welcome extends StatelessWidget {
                 ),
               ],
             ),
-            Spacer(), // Adiciona outro espaço para centralizar os botões de login/cadastro
+            const Spacer(), // Adiciona outro espaço para centralizar os botões de login/cadastro
             Container(
               color: Colors.white,
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -46,31 +47,31 @@ class Welcome extends StatelessWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                      onPrimary: Color(0xFF1E88E5),
-                      side: BorderSide(color: Color(0xFF1E88E5)),
+                      foregroundColor: const Color(0xFF1E88E5),
+                      backgroundColor: Colors.white,
+                      side: const BorderSide(color: Color(0xFF1E88E5)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                     ),
-                    child: Text('Login'),
+                    child: const Text('Login'),
                   ),
-                  SizedBox(width: 20),
+                  const SizedBox(width: 20),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => SignUp()),
+                        MaterialPageRoute(builder: (context) => const SignUp()),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Color.fromARGB(255, 90, 175, 249),
+                      primary: const Color.fromARGB(255, 90, 175, 249),
                       onPrimary: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                     ),
-                    child: Text('Sign Up'),
+                    child: const Text('Sign Up'),
                   ),
                 ],
               ),

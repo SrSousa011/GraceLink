@@ -3,74 +3,82 @@ import 'package:churchapp/UserProfile.dart';
 import 'package:churchapp/SignUp/SignUp.dart'; // Importa a tela de SignUp
 
 class Login extends StatelessWidget {
+  const Login({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
       ),
-      body: Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                ),
-              ),
-              SizedBox(height: 20.0),
-              TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                ),
-              ),
-              SizedBox(height: 20.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      // Navigate para a tela de SignUp
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => UserProfile()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.white, // Cor de fundo branca
-                      onPrimary: Color(0xFF1E88E5), // Cor do texto azul
-                      side: BorderSide(color: Color(0xFF1E88E5)), // Borda azul
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                    child: Text('Login'),
+      body: SingleChildScrollView(
+        // Wrap with SingleChildScrollView
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Email',
                   ),
-                  SizedBox(width: 20), // Espaçamento entre os botões
-                  ElevatedButton(
-                    onPressed: () {
-                      // Navigate para a tela de SignUp
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SignUp()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Color.fromARGB(
-                          255, 90, 175, 249), // Cor de fundo azul
-                      onPrimary: Colors.white, // Cor do texto branco
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                    child: Text('Sign Up'),
+                ),
+                const SizedBox(height: 20.0),
+                const TextField(
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 20.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        // Navigate para a tela de SignUp
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => UserProfile()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: const Color(0xFF1E88E5),
+                        backgroundColor: Colors.white, // Cor do texto azul
+                        side: const BorderSide(
+                            color: Color(0xFF1E88E5)), // Borda azul
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                      ),
+                      child: const Text('Login'),
+                    ),
+                    const SizedBox(width: 20), // Espaçamento entre os botões
+                    ElevatedButton(
+                      onPressed: () {
+                        // Navigate para a tela de SignUp
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SignUp()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: const Color.fromARGB(
+                            255, 90, 175, 249), // Cor do texto branco
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                      ),
+                      child: const Text('Sign Up'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

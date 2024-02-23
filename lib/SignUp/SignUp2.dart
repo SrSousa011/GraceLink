@@ -1,8 +1,12 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:churchapp/SignUp/SignUp3.dart';
 
 class SignUpPage2 extends StatefulWidget {
+  const SignUpPage2({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _SignUpPageState2 createState() => _SignUpPageState2();
 }
 
@@ -16,17 +20,17 @@ class _SignUpPageState2 extends State<SignUpPage2> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('SignUp'),
+        title: const Text('SignUp'),
       ),
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                SizedBox(height: 200.0), // Adjusted SizedBox height
+                const SizedBox(height: 200.0), // Adjusted SizedBox height
 
                 // Date of Birth Section
                 Row(
@@ -48,13 +52,13 @@ class _SignUpPageState2 extends State<SignUpPage2> {
                             child: Text(value),
                           );
                         }).toList(),
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Day',
                         ),
                       ),
                     ),
 
-                    SizedBox(
+                    const SizedBox(
                       width: 20.0,
                     ),
 
@@ -86,13 +90,13 @@ class _SignUpPageState2 extends State<SignUpPage2> {
                             child: Text(value),
                           );
                         }).toList(),
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Month',
                         ),
                       ),
                     ),
 
-                    SizedBox(
+                    const SizedBox(
                       width: 20.0,
                     ),
 
@@ -112,7 +116,7 @@ class _SignUpPageState2 extends State<SignUpPage2> {
                             child: Text(value.toString()),
                           );
                         }).toList(),
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Year',
                         ),
                       ),
@@ -120,7 +124,7 @@ class _SignUpPageState2 extends State<SignUpPage2> {
                   ],
                 ),
 
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
 
                 // Gender Dropdown
                 Row(
@@ -140,7 +144,7 @@ class _SignUpPageState2 extends State<SignUpPage2> {
                             child: Text(value),
                           );
                         }).toList(),
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Gender',
                         ),
                       ),
@@ -148,7 +152,7 @@ class _SignUpPageState2 extends State<SignUpPage2> {
                   ],
                 ),
 
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
 
                 // Button "Next"
                 ElevatedButton(
@@ -161,13 +165,13 @@ class _SignUpPageState2 extends State<SignUpPage2> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Color.fromARGB(255, 90, 175, 249),
-                    onPrimary: Colors.white,
+                    foregroundColor: Colors.white,
+                    backgroundColor: const Color.fromARGB(255, 90, 175, 249),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                   ),
-                  child: Text('Next'),
+                  child: const Text('Next'),
                 ),
               ],
             ),

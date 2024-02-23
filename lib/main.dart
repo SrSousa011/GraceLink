@@ -10,32 +10,32 @@ import 'package:churchapp/Home.dart';
 import 'package:churchapp/UserProfile.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        colorScheme:
-            ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 90, 175, 249)),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color.fromARGB(255, 90, 175, 249)),
         useMaterial3: true,
       ),
       // Defina a tela de introdução como a tela inicial
-      home: SplashScreen(),
+      home: const SplashScreen(),
       routes: {
         // Adicione as rotas para outras telas
-        '/Login': (context) => Login(),
-        '/SignUp': (context) => SignUp(),
-        '/SignUp2': (context) => SignUpPage2(),
-        '/SignUp3': (context) => SignUpPage3(),
-        '/SignUp4': (context) => SignUpPage4(),
+        '/Login': (context) => const Login(),
+        '/SignUp': (context) => const SignUp(),
+        '/SignUp2': (context) => const SignUpPage2(),
+        '/SignUp3': (context) => const SignUpPage3(),
+        '/SignUp4': (context) => const SignUpPage4(),
         '/Home': (context) => Home(),
         '/UserProfile': (context) => UserProfile(),
-        '/Welcome': (context) => Welcome(title: 'GraceLink'),
+        '/Welcome': (context) => const Welcome(title: 'GraceLink'),
       },
     );
   }

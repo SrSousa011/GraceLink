@@ -1,9 +1,13 @@
+// ignore_for_file: file_names
+
 import 'package:churchapp/SignUp/SignUp2.dart';
 import 'package:flutter/material.dart';
-import 'package:churchapp/UserProfile.dart';
 
 class SignUp extends StatefulWidget {
+  const SignUp({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _SignUpState createState() => _SignUpState();
 }
 
@@ -12,29 +16,29 @@ class _SignUpState extends State<SignUp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('SignUp'),
+        title: const Text('SignUp'),
       ),
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                SizedBox(height: 200.0),
-                TextField(
+                const SizedBox(height: 200.0),
+                const TextField(
                   decoration: InputDecoration(
                     labelText: 'First Name',
                   ),
                 ),
-                SizedBox(height: 20.0),
-                TextField(
+                const SizedBox(height: 20.0),
+                const TextField(
                   decoration: InputDecoration(
                     labelText: 'Last Name',
                   ),
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 ElevatedButton(
                   onPressed: () {
                     // Navigate para a tela de SignUp
@@ -44,13 +48,13 @@ class _SignUpState extends State<SignUp> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Color.fromARGB(255, 90, 175, 249),
-                    onPrimary: Colors.white,
+                    foregroundColor: Colors.white,
+                    backgroundColor: const Color.fromARGB(255, 90, 175, 249),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                   ),
-                  child: Text('Next'),
+                  child: const Text('Next'),
                 ),
               ],
             ),

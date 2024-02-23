@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:churchapp/UserProfile.dart';
 
 class SignUpPage4 extends StatefulWidget {
+  const SignUpPage4({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _SignUpPage4State createState() => _SignUpPage4State();
 }
 
@@ -14,7 +17,7 @@ class _SignUpPage4State extends State<SignUpPage4> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('SignUp'),
+        title: const Text('SignUp'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -28,11 +31,11 @@ class _SignUpPage4State extends State<SignUpPage4> {
                   password = value;
                 });
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Password',
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             TextFormField(
               obscureText: true,
               onChanged: (value) {
@@ -40,11 +43,11 @@ class _SignUpPage4State extends State<SignUpPage4> {
                   confirmPassword = value;
                 });
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Confirm Password',
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
@@ -60,20 +63,20 @@ class _SignUpPage4State extends State<SignUpPage4> {
                       } else {
                         // Senhas não coincidem, exibir mensagem de erro
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text('Passwords do not match!'),
                           ),
                         );
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Color.fromARGB(255, 90, 175, 249),
+                      primary: const Color.fromARGB(255, 90, 175, 249),
                       onPrimary: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                     ),
-                    child: Text('Next'),
+                    child: const Text('Next'),
                   ),
                 ),
               ],
