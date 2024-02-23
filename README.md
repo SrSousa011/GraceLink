@@ -18,11 +18,11 @@ GraceLink is a mobile application designed to enhance the experience of church m
 
 ## Screenshots
 
-Include screenshots of the app's interface to give users a visual preview of what to expect when using ChurchApp.
+Include screenshots of the app's interface to give users a visual preview of what to expect when using GraceLink.
 
 ## Installation
 
-Provide instructions on how to install the ChurchApp on both Android and iOS devices. Include any prerequisites or dependencies required for installation.
+Provide instructions on how to install the GraceLink on both Android and iOS devices. Include any prerequisites or dependencies required for installation.
 
 ## Usage
 
@@ -30,25 +30,25 @@ Outline how users can navigate through the app and utilize its features effectiv
 
 ## Contributing
 
-Explain how other developers can contribute to the ChurchApp project. Include guidelines for submitting bug reports, feature requests, or code contributions.
+Explain how other developers can contribute to the GraceLink project. Include guidelines for submitting bug reports, feature requests, or code contributions.
 
 ## License
 
-ChurchApp is distributed under the [MIT License](https://opensource.org/licenses/MIT). See the [LICENSE](link-to-license-file) file for details.
+GraceLink is distributed under the [MIT License](https://opensource.org/licenses/MIT). See the [LICENSE](link-to-license-file) file for details.
 
 ## Credits
 
 - **Email:** <lucas.sousa_99@hotmail.com>
-- - **Social Media:** [Instagram](https://www.instagram.com/sousaluka99/)
+- **Social Media:** [Instagram](https://www.instagram.com/sousaluka99/)
 
 ## Contact
 
 - **Email:** <info@resplandecendonacoes.com>
-- **Issue Tracker:** [GitHub Issues](https://github.com/churchapp/project-name/issues)
-- **Community Forums:** [ChurchApp Community Forums](https://community.churchapp.com)
-- **Feedback Form:** [ChurchApp Feedback Form](https://feedback.churchapp.com)
+- **Issue Tracker:** [GitHub Issues](https://github.com/gracelink/project-name/issues)
+- **Community Forums:** [GraceLink Community Forums](https://community.gracelink.com)
+- **Feedback Form:** [GraceLink Feedback Form](https://feedback.gracelink.com)
 - **Support Hours:** Monday to Friday, 9:00 AM - 5:00 PM (EST)
 
 ## Disclaimer
 
-Include a disclaimer outlining any limitations or disclaimers associated with the use of the ChurchApp. This may include privacy policies, data usage agreements, or terms of service.
+Include a disclaimer outlining any limitations or disclaimers associated with the use of the GraceLink. This may include privacy policies, data usage agreements, or terms of service.
