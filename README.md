@@ -39,7 +39,7 @@ GraceLink is distributed under the [MIT License](https://opensource.org/licenses
 ## Credits
 
 - **Email:** <lucas.sousa_99@hotmail.com>
-- **Social Media:** [Instagram](https://www.instagram.com/sousaluka99/)
+- **Social Media:** [Instagram](https://www.instagram.com/sousaluka99/) | [GitHub](https://github.com/SrSousa011)
 
 ## Contact
 
