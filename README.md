@@ -1,6 +1,6 @@
-# ChurchApp
+# GraceLink
 
-ChurchApp is a mobile application designed to enhance the experience of church members by providing various features and functionalities tailored to their needs. This project aims to streamline communication, facilitate event management, and foster community engagement within the church.
+GraceLink is a mobile application designed to enhance the experience of church members by providing various features and functionalities tailored to their needs. This project aims to streamline communication, facilitate event management, and foster community engagement within the church.
 
 ## Features
 
