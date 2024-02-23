@@ -1,10 +1,9 @@
-// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:churchapp/UserProfile.dart';
 import 'package:churchapp/SignUp/SignUp.dart'; // Importa a tela de SignUp
 
 class Login extends StatelessWidget {
-  const Login({super.key});
+  const Login({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,9 +11,10 @@ class Login extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Login'),
       ),
-      body: SingleChildScrollView(
-        // Wrap with SingleChildScrollView
-        child: Center(
+      body: Center(
+        // Center widget added here
+        child: SingleChildScrollView(
+          // SingleChildScrollView wrapped around the content
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -38,7 +38,7 @@ class Login extends StatelessWidget {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        // Navigate para a tela de SignUp
+                        // Navigate para a tela de UserProfile
                         Navigator.push(
                           context,
                           MaterialPageRoute(
