@@ -1,6 +1,4 @@
-// ignore: file_names
 import 'package:flutter/material.dart';
-
 import 'MenuDrawer.dart';
 
 class Home extends StatelessWidget {
@@ -16,10 +14,9 @@ class Home extends StatelessWidget {
             Image.asset(
               'assets/icons/logo.png',
               fit: BoxFit.contain,
-              height: 32,
+              height: 70,
             ),
-            const SizedBox(width: 10),
-            const Text('Highlights'),
+            const SizedBox(width: 50),
           ],
         ),
       ),
