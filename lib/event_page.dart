@@ -2,7 +2,7 @@ import 'package:churchapp/MenuDrawer.dart';
 import 'package:flutter/material.dart';
 
 class EventPage extends StatefulWidget {
-  const EventPage({super.key});
+  const EventPage({Key? key}) : super(key: key);
 
   @override
   _EventPageState createState() => _EventPageState();
@@ -57,7 +57,7 @@ class _EventPageState extends State<EventPage> {
               title: Text(events[index].name),
               subtitle: Text(events[index].type),
               onTap: () {
-                // Implemente o que acontece quando um evento é selecionado
+                _showEventDetails(events[index]);
               },
             );
           },
@@ -65,9 +65,40 @@ class _EventPageState extends State<EventPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addEvent,
-        tooltip: 'Adicionar Evento',
+        tooltip: 'Novo Evento',
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  void _showEventDetails(Event event) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Detalhes do Evento: ${event.name}'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Tipo de Evento: ${event.type}'),
+                Text('Data do Evento: ${event.date}'),
+                if (event.endDate != null)
+                  Text('Data de Término: ${event.endDate}'),
+                Text('Local do Evento: ${event.location}'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Fechar'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -86,15 +117,16 @@ class _EventPageState extends State<EventPage> {
                   decoration:
                       const InputDecoration(labelText: 'Nome do Evento'),
                 ),
+                Text('Tipo de Evento'),
                 DropdownButtonFormField<String>(
                   value: _selectedEventType,
-                  hint: const Text('Escolha o Tipo do Evento'),
+                  hint: const Text('Selecione o Tipo de Evento'),
                   onChanged: (String? value) {
                     setState(() {
                       _selectedEventType = value!;
                     });
                   },
-                  items: <String>['Tipo 1', 'Tipo 2', 'Tipo 3']
+                  items: <String>['', 'Tipo 1', 'Tipo 2', 'Tipo 3']
                       .map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
@@ -121,12 +153,31 @@ class _EventPageState extends State<EventPage> {
                     }
                   },
                 ),
-                if (_selectedDate != null)
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _selectedEndDate != null,
+                      onChanged: (value) {
+                        setState(() {
+                          if (value!) {
+                            _selectedEndDate = DateTime.now();
+                            _eventEndDateController.text =
+                                _selectedEndDate.toString();
+                          } else {
+                            _selectedEndDate = null;
+                            _eventEndDateController.clear();
+                          }
+                        });
+                      },
+                    ),
+                    const Text('Data de Término (Opcional)'),
+                  ],
+                ),
+                if (_selectedEndDate != null)
                   TextFormField(
                     controller: _eventEndDateController,
                     decoration: const InputDecoration(
-                        labelText:
-                            'Data de Término do Evento (dd/mm/aaaa hh:mm)'),
+                        labelText: 'Data de Término (dd/mm/aaaa hh:mm)'),
                     onTap: () async {
                       final selectedEndDate = await showDatePicker(
                         context: context,
@@ -171,7 +222,7 @@ class _EventPageState extends State<EventPage> {
                     name: _eventNameController.text,
                     type: _selectedEventType,
                     date: _eventDateController.text,
-                    endDate: _eventEndDateController.text.isNotEmpty
+                    endDate: _selectedEndDate != null
                         ? _eventEndDateController.text
                         : null,
                     location: _eventLocationController.text,
