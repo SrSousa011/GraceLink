@@ -16,16 +16,28 @@ class EventPage extends StatefulWidget {
 class _EventPageState extends State<EventPage> {
   List<Event> events = [
     Event(
-      title: 'Evento 1',
-      description: 'Descrição do evento 1',
+      title: 'Culto de Domingo',
+      description:
+          'Participe do nosso culto dominical com louvor, adoração e uma mensagem inspiradora.',
+      date:
+          DateTime(2024, 3, 1, 10, 0), // Domingo, 1º de março de 2024, às 10h00
+      location: 'Igreja da Comunidade',
     ),
     Event(
-      title: 'Evento 2',
-      description: 'Descrição do evento 2',
+      title: 'Grupo de Estudo Bíblico',
+      description:
+          'Venha participar do nosso grupo de estudo bíblico semanal para aprender mais sobre a Palavra de Deus.',
+      date: DateTime(
+          2024, 3, 4, 19, 0), // Quarta-feira, 4 de março de 2024, às 19h00
+      location: 'Salão da Igreja',
     ),
     Event(
-      title: 'Evento 3',
-      description: 'Descrição do evento 3',
+      title: 'Concerto de Natal',
+      description:
+          'Celebre a época festiva com músicas de Natal apresentadas pelo coro da igreja.',
+      date: DateTime(2024, 12, 20, 18,
+          30), // Sexta-feira, 20 de dezembro de 2024, às 18h30
+      location: 'Igreja da Comunidade',
     ),
   ];
 
@@ -38,9 +50,16 @@ class _EventPageState extends State<EventPage> {
       body: ListView.builder(
         itemCount: events.length,
         itemBuilder: (context, index) {
-          return EventCard(
-            title: events[index].title,
-            description: events[index].description,
+          return GestureDetector(
+            onTap: () {
+              _navigateToEventDetailsScreen(context, events[index]);
+            },
+            child: EventCard(
+              title: events[index].title,
+              description: events[index].description,
+              date: events[index].date,
+              location: events[index].location,
+            ),
           );
         },
       ),
@@ -64,6 +83,13 @@ class _EventPageState extends State<EventPage> {
         events.add(result);
       });
     }
+  }
+
+  void _navigateToEventDetailsScreen(BuildContext context, Event event) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => EventDetailsScreen(event: event)),
+    );
   }
 }
 
@@ -91,18 +117,19 @@ class _AddEventScreenState extends State<AddEventScreen> {
           children: [
             TextField(
               controller: _titleController,
-              decoration: InputDecoration(labelText: 'Título do Evento'),
+              decoration: const InputDecoration(labelText: 'Título do Evento'),
             ),
             TextField(
               controller: _descriptionController,
-              decoration: InputDecoration(labelText: 'Descrição do Evento'),
+              decoration:
+                  const InputDecoration(labelText: 'Descrição do Evento'),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 _saveEvent(context);
               },
-              child: Text('Salvar'),
+              child: const Text('Salvar'),
             ),
           ],
         ),
@@ -114,6 +141,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
     final newEvent = Event(
       title: _titleController.text,
       description: _descriptionController.text,
+      date: DateTime.now(), // Change this to the selected date
+      location: 'Local do Evento', // Change this to the selected location
     );
     Navigator.pop(context, newEvent);
   }
@@ -122,21 +151,29 @@ class _AddEventScreenState extends State<AddEventScreen> {
 class Event {
   final String title;
   final String description;
+  final DateTime date;
+  final String location;
 
   Event({
     required this.title,
     required this.description,
+    required this.date,
+    required this.location,
   });
 }
 
 class EventCard extends StatelessWidget {
   final String title;
   final String description;
+  final DateTime date;
+  final String location;
 
   const EventCard({
     Key? key,
     required this.title,
     required this.description,
+    required this.date,
+    required this.location,
   }) : super(key: key);
 
   @override
@@ -160,9 +197,64 @@ class EventCard extends StatelessWidget {
               description,
               style: const TextStyle(fontSize: 16),
             ),
+            const SizedBox(height: 8),
+            Text(
+              'Data: ${_formatDate(date)}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Local: $location',
+              style: const TextStyle(fontSize: 16),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+}
+
+class EventDetailsScreen extends StatelessWidget {
+  final Event event;
+
+  const EventDetailsScreen({Key? key, required this.event}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(event.title),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Descrição: ${event.description}',
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Data: ${_formatDate(event.date)}',
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Local: ${event.location}',
+              style: const TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
   }
 }
