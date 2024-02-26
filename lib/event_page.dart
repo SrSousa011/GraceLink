@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: EventPage(),
   ));
 }
@@ -76,7 +77,7 @@ class _EventPageState extends State<EventPage> {
   void _navigateToAddEventScreen(BuildContext context) async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AddEventScreen()),
+      MaterialPageRoute(builder: (context) => const AddEventForm()),
     );
     if (result != null) {
       setState(() {
@@ -93,16 +94,36 @@ class _EventPageState extends State<EventPage> {
   }
 }
 
-class AddEventScreen extends StatefulWidget {
-  const AddEventScreen({Key? key}) : super(key: key);
+class AddEventForm extends StatefulWidget {
+  const AddEventForm({Key? key}) : super(key: key);
 
   @override
-  _AddEventScreenState createState() => _AddEventScreenState();
+  _AddEventFormState createState() => _AddEventFormState();
 }
 
-class _AddEventScreenState extends State<AddEventScreen> {
+class _AddEventFormState extends State<AddEventForm> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  DateTime? _selectedDate;
+  final _selectController = TextEditingController();
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  Future<void> _selectLocation(BuildContext context) async {
+    // Implementar a lógica para selecionar o local aqui
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,12 +138,39 @@ class _AddEventScreenState extends State<AddEventScreen> {
           children: [
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(labelText: 'Título do Evento'),
+              decoration: const InputDecoration(
+                labelText: 'Título do Evento',
+                icon: Icon(Icons.title),
+              ),
             ),
             TextField(
               controller: _descriptionController,
-              decoration:
-                  const InputDecoration(labelText: 'Descrição do Evento'),
+              decoration: const InputDecoration(
+                labelText: 'Descrição do Evento',
+                icon: Icon(Icons.description),
+              ),
+            ),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.calendar_today),
+                  onPressed: () {
+                    _selectDate(context);
+                  },
+                ),
+                Text(
+                  _selectedDate == null
+                      ? 'Selecione a data'
+                      : DateFormat('dd/MM/yyyy').format(_selectedDate!),
+                ),
+              ],
+            ),
+            TextField(
+              controller: _selectController,
+              decoration: const InputDecoration(
+                labelText: 'Selecione Local',
+                icon: Icon(Icons.location_on),
+              ),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -138,13 +186,36 @@ class _AddEventScreenState extends State<AddEventScreen> {
   }
 
   void _saveEvent(BuildContext context) {
-    final newEvent = Event(
-      title: _titleController.text,
-      description: _descriptionController.text,
-      date: DateTime.now(), // Change this to the selected date
-      location: 'Local do Evento', // Change this to the selected location
-    );
-    Navigator.pop(context, newEvent);
+    if (_titleController.text.isNotEmpty &&
+        _descriptionController.text.isNotEmpty &&
+        _selectedDate != null &&
+        _selectController.text.isNotEmpty) {
+      final newEvent = Event(
+        title: _titleController.text,
+        description: _descriptionController.text,
+        date: _selectedDate!,
+        location: _selectController.text,
+      );
+      Navigator.pop(context, newEvent);
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Erro ao salvar evento'),
+            content: const Text('Por favor, preencha todos os campos.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }
 
