@@ -21,35 +21,37 @@ class Home extends StatelessWidget {
         ),
       ),
       drawer: const MenuDrawer(),
-      body: const Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          EventCard(
-            title: 'Culto de Domingo',
-            description:
-                'Participe do culto de domingo para um momento de louvor, adoração e ensino da palavra de Deus.',
-          ),
-          EventCard(
-            title: 'Grupo de Estudo Bíblico',
-            description:
-                'Junte-se ao nosso grupo de estudo bíblico para uma análise profunda das Escrituras.',
-          ),
-          EventCard(
-            title: 'Festa de Boas-Vindas',
-            description:
-                'Conheça novos membros da comunidade em nossa festa de boas-vindas toda quarta-feira.',
-          ),
-          EventCard(
-            title: 'Ação Social',
-            description:
-                'Participe de nossa ação social neste sábado para ajudar os necessitados em nossa comunidade.',
-          ),
-          EventCard(
-            title: 'Noite de Louvor',
-            description:
-                'Desfrute de uma noite de louvor e adoração com músicas inspiradoras e mensagens edificantes.',
-          ),
-        ],
+      body: const SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            EventCard(
+              title: 'Culto de Domingo',
+              description:
+                  'Participe do culto de domingo para um momento de louvor, adoração e ensino da palavra de Deus.',
+            ),
+            EventCard(
+              title: 'Grupo de Estudo Bíblico',
+              description:
+                  'Junte-se ao nosso grupo de estudo bíblico para uma análise profunda das Escrituras.',
+            ),
+            EventCard(
+              title: 'Festa de Boas-Vindas',
+              description:
+                  'Conheça novos membros da comunidade em nossa festa de boas-vindas toda quarta-feira.',
+            ),
+            EventCard(
+              title: 'Ação Social',
+              description:
+                  'Participe de nossa ação social neste sábado para ajudar os necessitados em nossa comunidade.',
+            ),
+            EventCard(
+              title: 'Noite de Louvor',
+              description:
+                  'Desfrute de uma noite de louvor e adoração com músicas inspiradoras e mensagens edificantes.',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -60,10 +62,10 @@ class EventCard extends StatelessWidget {
   final String description;
 
   const EventCard({
-    super.key,
+    Key? key,
     required this.title,
     required this.description,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
