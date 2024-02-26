@@ -1,17 +1,17 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:churchapp/Welcome.dart';
 
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+class Splash_Screen extends StatefulWidget {
+  final Widget drawer; // Define drawer as a parameter
+
+  const Splash_Screen({Key? key, required this.drawer}) : super(key: key);
 
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  _Splash_ScreenState createState() => _Splash_ScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _Splash_ScreenState extends State<Splash_Screen> {
   @override
   void initState() {
     super.initState();
@@ -19,8 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          transitionDuration: const Duration(
-              milliseconds: 500), // Define a duração da transição
+          transitionDuration: const Duration(milliseconds: 500),
           pageBuilder: (_, __, ___) => const Welcome(title: 'GraceLink'),
           transitionsBuilder: (_, animation, __, child) {
             return FadeTransition(
@@ -36,6 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: widget.drawer, // Use the drawer parameter
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
