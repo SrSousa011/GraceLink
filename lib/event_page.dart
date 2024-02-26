@@ -1,5 +1,10 @@
-import 'package:churchapp/MenuDrawer.dart';
 import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: EventPage(),
+  ));
+}
 
 class EventPage extends StatefulWidget {
   const EventPage({Key? key}) : super(key: key);
@@ -11,36 +16,18 @@ class EventPage extends StatefulWidget {
 class _EventPageState extends State<EventPage> {
   List<Event> events = [
     Event(
-      name: 'Evento 1',
-      type: 'Tipo 1',
-      date: '10/03/2024 14:00',
-      location: 'Local 1',
+      title: 'Evento 1',
+      description: 'Descrição do evento 1',
     ),
     Event(
-      name: 'Evento 2',
-      type: 'Tipo 2',
-      date: '15/03/2024 16:00',
-      location: 'Local 2',
+      title: 'Evento 2',
+      description: 'Descrição do evento 2',
     ),
     Event(
-      name: 'Evento 3',
-      type: 'Tipo 3',
-      date: '20/03/2024 10:00',
-      location: 'Local 3',
+      title: 'Evento 3',
+      description: 'Descrição do evento 3',
     ),
   ];
-
-  String _selectedEventType =
-      ''; // Variável para armazenar o tipo de evento selecionado
-  final TextEditingController _eventNameController = TextEditingController();
-  final TextEditingController _eventDateController = TextEditingController();
-  final TextEditingController _eventEndDateController = TextEditingController();
-  final TextEditingController _eventLocationController =
-      TextEditingController();
-
-  DateTime? _selectedDate; // Variável para armazenar a data selecionada
-  DateTime?
-      _selectedEndDate; // Variável para armazenar a data de término selecionada
 
   @override
   Widget build(BuildContext context) {
@@ -48,227 +35,134 @@ class _EventPageState extends State<EventPage> {
       appBar: AppBar(
         title: const Text('Eventos'),
       ),
-      drawer: const MenuDrawer(),
-      body: SafeArea(
-        child: ListView.builder(
-          itemCount: events.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text(events[index].name),
-              subtitle: Text(events[index].type),
-              onTap: () {
-                _showEventDetails(events[index]);
-              },
-            );
-          },
-        ),
+      body: ListView.builder(
+        itemCount: events.length,
+        itemBuilder: (context, index) {
+          return EventCard(
+            title: events[index].title,
+            description: events[index].description,
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addEvent,
+        onPressed: () {
+          _navigateToAddEventScreen(context);
+        },
         tooltip: 'Novo Evento',
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  void _showEventDetails(Event event) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Detalhes do Evento: ${event.name}'),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Tipo de Evento: ${event.type}'),
-                Text('Data do Evento: ${event.date}'),
-                if (event.endDate != null)
-                  Text('Data de Término: ${event.endDate}'),
-                Text('Local do Evento: ${event.location}'),
-              ],
+  void _navigateToAddEventScreen(BuildContext context) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddEventScreen()),
+    );
+    if (result != null) {
+      setState(() {
+        events.add(result);
+      });
+    }
+  }
+}
+
+class AddEventScreen extends StatefulWidget {
+  const AddEventScreen({Key? key}) : super(key: key);
+
+  @override
+  _AddEventScreenState createState() => _AddEventScreenState();
+}
+
+class _AddEventScreenState extends State<AddEventScreen> {
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Novo Evento'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: _titleController,
+              decoration: InputDecoration(labelText: 'Título do Evento'),
             ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Fechar'),
+            TextField(
+              controller: _descriptionController,
+              decoration: InputDecoration(labelText: 'Descrição do Evento'),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
               onPressed: () {
-                Navigator.pop(context);
+                _saveEvent(context);
               },
+              child: Text('Salvar'),
             ),
           ],
-        );
-      },
+        ),
+      ),
     );
   }
 
-  void _addEvent() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Novo Evento'),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: _eventNameController,
-                  decoration:
-                      const InputDecoration(labelText: 'Nome do Evento'),
-                ),
-                Text('Tipo de Evento'),
-                DropdownButtonFormField<String>(
-                  value: _selectedEventType,
-                  hint: const Text('Selecione o Tipo de Evento'),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _selectedEventType = value!;
-                    });
-                  },
-                  items: <String>['', 'Tipo 1', 'Tipo 2', 'Tipo 3']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                TextFormField(
-                  controller: _eventDateController,
-                  decoration: const InputDecoration(
-                      labelText: 'Data do Evento (dd/mm/aaaa hh:mm)'),
-                  onTap: () async {
-                    final selectedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(2100),
-                    );
-                    if (selectedDate != null) {
-                      setState(() {
-                        _selectedDate = selectedDate;
-                        _eventDateController.text = selectedDate.toString();
-                      });
-                    }
-                  },
-                ),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: _selectedEndDate != null,
-                      onChanged: (value) {
-                        setState(() {
-                          if (value!) {
-                            _selectedEndDate = DateTime.now();
-                            _eventEndDateController.text =
-                                _selectedEndDate.toString();
-                          } else {
-                            _selectedEndDate = null;
-                            _eventEndDateController.clear();
-                          }
-                        });
-                      },
-                    ),
-                    const Text('Data de Término (Opcional)'),
-                  ],
-                ),
-                if (_selectedEndDate != null)
-                  TextFormField(
-                    controller: _eventEndDateController,
-                    decoration: const InputDecoration(
-                        labelText: 'Data de Término (dd/mm/aaaa hh:mm)'),
-                    onTap: () async {
-                      final selectedEndDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime(2100),
-                      );
-                      if (selectedEndDate != null) {
-                        setState(() {
-                          _selectedEndDate = selectedEndDate;
-                          _eventEndDateController.text =
-                              selectedEndDate.toString();
-                        });
-                      }
-                    },
-                  ),
-                TextField(
-                  controller: _eventLocationController,
-                  decoration:
-                      const InputDecoration(labelText: 'Local do Evento'),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancelar'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            TextButton(
-              child: const Text('Salvar'),
-              onPressed: () {
-                // Verifica se todos os campos estão preenchidos
-                if (_eventNameController.text.isNotEmpty &&
-                    _selectedEventType.isNotEmpty &&
-                    _eventDateController.text.isNotEmpty &&
-                    _eventLocationController.text.isNotEmpty) {
-                  // Criar o objeto Event com as informações coletadas
-                  Event newEvent = Event(
-                    name: _eventNameController.text,
-                    type: _selectedEventType,
-                    date: _eventDateController.text,
-                    endDate: _selectedEndDate != null
-                        ? _eventEndDateController.text
-                        : null,
-                    location: _eventLocationController.text,
-                  );
-
-                  // Adicionar o novo evento à lista de eventos
-                  setState(() {
-                    events.add(newEvent);
-                  });
-
-                  // Fechar o diálogo
-                  Navigator.pop(context);
-                } else {
-                  // Exibe um snackbar se algum campo estiver vazio
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Por favor, preencha todos os campos.')),
-                  );
-                }
-              },
-            ),
-          ],
-        );
-      },
+  void _saveEvent(BuildContext context) {
+    final newEvent = Event(
+      title: _titleController.text,
+      description: _descriptionController.text,
     );
+    Navigator.pop(context, newEvent);
   }
 }
 
 class Event {
-  final String name;
-  final String type;
-  final String date;
-  final String? endDate; // Pode ser nulo se não houver data de término
-  final String location;
+  final String title;
+  final String description;
 
   Event({
-    required this.name,
-    required this.type,
-    required this.date,
-    this.endDate,
-    required this.location,
+    required this.title,
+    required this.description,
   });
 }
 
-void main() {
-  runApp(const MaterialApp(
-    home: EventPage(),
-  ));
+class EventCard extends StatelessWidget {
+  final String title;
+  final String description;
+
+  const EventCard({
+    Key? key,
+    required this.title,
+    required this.description,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              description,
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
