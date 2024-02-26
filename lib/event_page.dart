@@ -1,3 +1,4 @@
+import 'package:churchapp/MenuDrawer.dart';
 import 'package:flutter/material.dart';
 
 class event_page extends StatefulWidget {
@@ -20,6 +21,7 @@ class _event_pageState extends State<event_page> {
       appBar: AppBar(
         title: const Text('Eventos'),
       ),
+      drawer: const MenuDrawer(),
       body: ListView.builder(
         itemCount: events.length,
         itemBuilder: (context, index) {

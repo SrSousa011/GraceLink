@@ -1,6 +1,8 @@
 // ignore: file_names
 import 'package:flutter/material.dart';
 
+import 'MenuDrawer.dart';
+
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -21,6 +23,7 @@ class Home extends StatelessWidget {
           ],
         ),
       ),
+      drawer: const MenuDrawer(),
       body: const Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
