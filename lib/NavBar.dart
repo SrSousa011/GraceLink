@@ -105,25 +105,30 @@ class NavBar extends StatelessWidget {
               },
             ),
             ListTile(
-              title: const Text('Notifications'),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Notifications'),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: const Text(
+                      '8',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               leading: const Icon(Icons.notifications_outlined),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/notifications');
               },
-              trailing: Container(
-                color: Colors.red,
-                width: 20,
-                height: 20,
-                child: const Center(
-                  child: Text(
-                    '8',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ),
             ),
             ListTile(
               title: const Text('Videos'),
