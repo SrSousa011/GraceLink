@@ -1,3 +1,4 @@
+import 'package:churchapp/UserProfile.dart';
 import 'package:flutter/material.dart';
 
 class MenuDrawer extends StatelessWidget {
@@ -6,21 +7,24 @@ class MenuDrawer extends StatelessWidget {
   Widget buildHeader(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 270, // Ajuste a altura conforme necessário
+      height: 270,
       child: DrawerHeader(
         decoration: const BoxDecoration(
-          color: Colors.blue,
+          color: Colors.blue, // Add background color here
         ),
         child: GestureDetector(
           onTap: () {
-            Navigator.pop(
-                context); // Fechar o drawer quando o cabeçalho for tocado
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => UserProfile()),
+            );
           },
           child: const Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
-                radius: 72, // Ajuste o raio do avatar conforme necessário
+                radius: 72,
                 backgroundImage:
                     AssetImage('assets/imagens/profile_picture.jpg'),
               ),
