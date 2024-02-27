@@ -92,14 +92,6 @@ class MenuDrawer extends StatelessWidget {
               // Handle tap on Notifications menu item
             },
           ),
-          // Favorites
-          ListTile(
-            title: const Text('Favorites'),
-            leading: const Icon(Icons.favorite_outline),
-            onTap: () {
-              // Handle tap on Favorites menu item
-            },
-          ),
         ],
       ),
     );
