@@ -110,11 +110,11 @@ class NavBar extends StatelessWidget {
                 children: [
                   const Text('Notifications'),
                   Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.red,
-                      borderRadius: BorderRadius.circular(10),
+                      shape: BoxShape.circle, // Define a forma como circular
                     ),
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(10),
                     child: const Text(
                       '8',
                       style: TextStyle(
