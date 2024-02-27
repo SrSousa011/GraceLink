@@ -10,7 +10,11 @@ class NavBar extends StatelessWidget {
       height: 270,
       child: DrawerHeader(
         decoration: const BoxDecoration(
-          color: Colors.blue, // Add background color here
+          color: Colors.blue,
+          image: DecorationImage(
+            image: AssetImage('assets/imagens/bacground-image-center.jpg'),
+            fit: BoxFit.cover,
+          ),
         ),
         child: GestureDetector(
           onTap: () {
@@ -99,6 +103,27 @@ class NavBar extends StatelessWidget {
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/devenir_membre');
               },
+            ),
+            ListTile(
+              title: const Text('Notifications'),
+              leading: const Icon(Icons.notifications_outlined),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/notifications');
+              },
+              trailing: Container(
+                color: Colors.red,
+                width: 20,
+                height: 20,
+                child: const Center(
+                  child: Text(
+                    '8',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ),
             ),
             ListTile(
               title: const Text('Videos'),
