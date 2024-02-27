@@ -3,16 +3,25 @@ import 'package:flutter/material.dart';
 class MenuDrawer extends StatelessWidget {
   const MenuDrawer({Key? key}) : super(key: key);
 
-  Widget buildHeader() {
-    return const DrawerHeader(
-      decoration: BoxDecoration(
-        color: Colors.blue,
-      ),
-      child: Text(
-        'Menu',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 24,
+  Widget buildHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16.0), // Adjust the padding as needed
+      child: DrawerHeader(
+        decoration: const BoxDecoration(
+          color: Colors.blue,
+        ),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.pop(
+                context); // Close the drawer when the header is tapped
+          },
+          child: const Text(
+            'Menu',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+            ),
+          ),
         ),
       ),
     );
@@ -35,7 +44,7 @@ class MenuDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          buildHeader(),
+          buildHeader(context),
           buildMenuItem('Home', Icons.home_outlined, '/Home', context),
           buildMenuItem(
               'User Profile', Icons.person_outlined, '/UserProfile', context),
