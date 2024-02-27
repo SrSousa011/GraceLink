@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:churchapp/MenuDrawer.dart'; // Importe o MenuDrawer
+import 'package:churchapp/NavBar.dart'; // Importe o MenuDrawer
 
 class UserProfile extends StatelessWidget {
   @override

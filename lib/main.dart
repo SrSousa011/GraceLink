@@ -9,7 +9,7 @@ import 'package:churchapp/SignUp/SignUp4.dart';
 import 'package:churchapp/Welcome.dart';
 import 'package:churchapp/Home.dart';
 import 'package:churchapp/UserProfile.dart';
-import 'package:churchapp/MenuDrawer.dart'; // Importe o MenuDrawer
+import 'package:churchapp/NavBar.dart'; // Importe o MenuDrawer
 
 void main() {
   runApp(const MyApp());
