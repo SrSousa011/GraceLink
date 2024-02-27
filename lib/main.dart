@@ -7,8 +7,8 @@ import 'package:churchapp/views/splash-screen.dart';
 import 'package:churchapp/views/user-profile.dart';
 import 'package:churchapp/views/event-Page.dart';
 import 'package:churchapp/views/SignUp/SignUp2.dart';
-import 'package:churchapp/views/SignUp/SignUp3.dart';
-import 'package:churchapp/views/SignUp/SignUp4.dart';
+import 'package:churchapp/views/SignUp/signUp3.dart';
+import 'package:churchapp/views/SignUp/signUp4.dart';
 import 'package:churchapp/views/welcome.dart';
 
 void main() {
