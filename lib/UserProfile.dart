@@ -20,7 +20,7 @@ class UserProfile extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Text(
-              'Anaïs Chevalier',
+              'Anaïs',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
