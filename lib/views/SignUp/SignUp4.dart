@@ -1,9 +1,5 @@
-// ignore: duplicate_ignore
-// ignore: file_names
-// ignore_for_file: file_names
-
+import 'package:churchapp/views/UserProfile.dart';
 import 'package:flutter/material.dart';
-import 'package:churchapp/UserProfile.dart';
 
 class SignUpPage4 extends StatefulWidget {
   const SignUpPage4({super.key});

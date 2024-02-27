@@ -1,6 +1,6 @@
 // ignore_for_file: file_names
 
-import 'package:churchapp/SignUp/SignUp2.dart';
+import 'package:churchapp/views/SignUp/SignUp2.dart';
 import 'package:flutter/material.dart';
 
 class SignUp extends StatefulWidget {

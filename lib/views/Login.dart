@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:churchapp/UserProfile.dart';
-import 'package:churchapp/SignUp/SignUp.dart'; // Importa a tela de SignUp
+import 'package:churchapp/views/SignUp/signUp.dart';
+import 'package:churchapp/views/UserProfile.dart';
+import 'package:flutter/material.dart'; // Importa a tela de SignUp
 
-class login extends StatelessWidget {
-  const login({Key? key}) : super(key: key); // Adding a key to the login widget
+class Login extends StatelessWidget {
+  const Login({Key? key}) : super(key: key); // Adding a key to the login widget
 
   @override
   Widget build(BuildContext context) {

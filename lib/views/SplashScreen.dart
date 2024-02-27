@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:churchapp/Welcome.dart';
+import 'package:churchapp/views/Welcome.dart';
 
-class Splash_Screen extends StatefulWidget {
+class SplashScreen extends StatefulWidget {
   final Widget drawer; // Define drawer as a parameter
 
-  const Splash_Screen({Key? key, required this.drawer}) : super(key: key);
+  const SplashScreen({Key? key, required this.drawer}) : super(key: key);
 
   @override
-  _Splash_ScreenState createState() => _Splash_ScreenState();
+  _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _Splash_ScreenState extends State<Splash_Screen> {
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();

@@ -1,4 +1,4 @@
-import 'package:churchapp/UserProfile.dart';
+import 'package:churchapp/views/UserProfile.dart';
 import 'package:flutter/material.dart';
 
 class NavBar extends StatelessWidget {

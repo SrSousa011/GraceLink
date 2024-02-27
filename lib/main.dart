@@ -1,15 +1,15 @@
-import 'package:churchapp/event_page.dart';
+import 'package:churchapp/navBar.dart';
+import 'package:churchapp/views/EventPage.dart';
+import 'package:churchapp/views/SignUp/signUp.dart';
+import 'package:churchapp/views/UserProfile.dart';
 import 'package:flutter/material.dart';
-import 'package:churchapp/Splash_Screen.dart';
-import 'package:churchapp/Login.dart';
-import 'package:churchapp/SignUp/SignUp.dart';
-import 'package:churchapp/SignUp/SignUp2.dart';
-import 'package:churchapp/SignUp/SignUp3.dart';
-import 'package:churchapp/SignUp/SignUp4.dart';
-import 'package:churchapp/Welcome.dart';
-import 'package:churchapp/Home.dart';
-import 'package:churchapp/UserProfile.dart';
-import 'package:churchapp/NavBar.dart'; // Importe o MenuDrawer
+import 'package:churchapp/views/SplashScreen.dart';
+import 'package:churchapp/views/Login.dart';
+import 'package:churchapp/views/SignUp/SignUp2.dart';
+import 'package:churchapp/views/SignUp/SignUp3.dart';
+import 'package:churchapp/views/SignUp/SignUp4.dart';
+import 'package:churchapp/views/Welcome.dart';
+import 'package:churchapp/views/Home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const Splash_Screen(
+      home: const SplashScreen(
         drawer: NavBar(), // Passe o MenuDrawer como parâmetro
       ),
       routes: {
