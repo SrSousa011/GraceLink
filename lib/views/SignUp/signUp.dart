@@ -1,13 +1,12 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, library_private_types_in_public_api
 
-import 'package:churchapp/views/SignUp/SignUp2.dart';
+import 'package:churchapp/views/SignUp/signUp2.dart';
 import 'package:flutter/material.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _SignUpState createState() => _SignUpState();
 }
 

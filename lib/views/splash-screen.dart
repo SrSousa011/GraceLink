@@ -1,6 +1,8 @@
+// ignore_for_file: file_names, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:churchapp/views/Welcome.dart';
+import 'package:churchapp/views/welcome.dart';
 
 class SplashScreen extends StatefulWidget {
   final Widget drawer; // Define drawer as a parameter

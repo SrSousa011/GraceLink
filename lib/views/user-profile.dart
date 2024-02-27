@@ -1,6 +1,6 @@
-// ignore: file_names
+// ignore_for_file: file_names, library_private_types_in_public_api
 
-import 'package:churchapp/views/NavBar.dart';
+import 'package:churchapp/views/nav-bar.dart';
 import 'package:flutter/material.dart';
 
 class UserProfile extends StatelessWidget {
@@ -94,7 +94,7 @@ class UserProfile extends StatelessWidget {
 }
 
 void main() {
-  runApp(const MaterialApp(
+  runApp(MaterialApp(
     home: UserProfile(), // Set the home parameter to UserProfile
   ));
 }

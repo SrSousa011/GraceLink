@@ -1,9 +1,14 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import 'package:churchapp/navBar.dart';
 >>>>>>> 41a00e2 ([ADD]  circular notification badge to notifications in NavBar)
+=======
+// ignore_for_file: file_names, library_private_types_in_public_api
+
+>>>>>>> c2f1437 ([ADD]  Refactoring)
 import 'package:churchapp/views/SignUp/signUp.dart';
-import 'package:churchapp/views/UserProfile.dart';
+import 'package:churchapp/views/User-Profile.dart';
 import 'package:flutter/material.dart'; // Importa a tela de SignUp
 
 class Login extends StatelessWidget {

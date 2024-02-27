@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import 'package:churchapp/navBar.dart';
 import 'package:churchapp/views/EventPage.dart';
 import 'package:churchapp/views/SignUp/signUp.dart';
@@ -12,6 +13,15 @@ import 'package:churchapp/views/EventPage.dart';
 import 'package:churchapp/views/Home.dart';
 >>>>>>> 41a00e2 ([ADD]  circular notification badge to notifications in NavBar)
 import 'package:churchapp/views/Login.dart';
+=======
+import 'package:churchapp/views/nav-bar.dart';
+import 'package:churchapp/views/splash-screen.dart';
+import 'package:churchapp/views/user-profile.dart';
+import 'package:flutter/material.dart';
+import 'package:churchapp/views/event-Page.dart';
+import 'package:churchapp/views/home.dart';
+import 'package:churchapp/views/login.dart';
+>>>>>>> c2f1437 ([ADD]  Refactoring)
 import 'package:churchapp/views/SignUp/SignUp2.dart';
 import 'package:churchapp/views/SignUp/SignUp3.dart';
 import 'package:churchapp/views/SignUp/SignUp4.dart';
@@ -20,10 +30,14 @@ import 'package:churchapp/views/Welcome.dart';
 import 'package:churchapp/views/Home.dart';
 =======
 import 'package:churchapp/views/SignUp/signUp.dart';
+<<<<<<< HEAD
 import 'package:churchapp/views/SplashScreen.dart';
 import 'package:churchapp/views/UserProfile.dart';
 import 'package:churchapp/views/Welcome.dart';
 >>>>>>> 41a00e2 ([ADD]  circular notification badge to notifications in NavBar)
+=======
+import 'package:churchapp/views/welcome.dart';
+>>>>>>> c2f1437 ([ADD]  Refactoring)
 
 void main() {
   runApp(const MyApp());
