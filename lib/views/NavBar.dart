@@ -21,7 +21,7 @@ class NavBar extends StatelessWidget {
             Navigator.pop(context);
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => UserProfile()),
+              MaterialPageRoute(builder: (context) => const UserProfile()),
             );
           },
           child: const Column(

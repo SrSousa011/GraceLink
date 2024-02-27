@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import 'package:churchapp/navBar.dart';
+>>>>>>> 41a00e2 ([ADD]  circular notification badge to notifications in NavBar)
 import 'package:churchapp/views/SignUp/signUp.dart';
 import 'package:churchapp/views/UserProfile.dart';
 import 'package:flutter/material.dart'; // Importa a tela de SignUp
@@ -46,7 +50,11 @@ class Login extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
+<<<<<<< HEAD
                                 builder: (context) => UserProfile()),
+=======
+                                builder: (context) => const UserProfile()),
+>>>>>>> 41a00e2 ([ADD]  circular notification badge to notifications in NavBar)
                           );
                         },
                         style: ElevatedButton.styleFrom(

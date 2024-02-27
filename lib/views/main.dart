@@ -1,29 +1,15 @@
-<<<<<<< HEAD
 import 'package:churchapp/navBar.dart';
 import 'package:churchapp/views/EventPage.dart';
 import 'package:churchapp/views/SignUp/signUp.dart';
 import 'package:churchapp/views/UserProfile.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/SplashScreen.dart';
-=======
-import 'package:flutter/material.dart';
-import 'package:churchapp/navBar.dart';
-import 'package:churchapp/views/EventPage.dart';
-import 'package:churchapp/views/Home.dart';
->>>>>>> 41a00e2 ([ADD]  circular notification badge to notifications in NavBar)
 import 'package:churchapp/views/Login.dart';
 import 'package:churchapp/views/SignUp/SignUp2.dart';
 import 'package:churchapp/views/SignUp/SignUp3.dart';
 import 'package:churchapp/views/SignUp/SignUp4.dart';
-<<<<<<< HEAD
 import 'package:churchapp/views/Welcome.dart';
 import 'package:churchapp/views/Home.dart';
-=======
-import 'package:churchapp/views/SignUp/signUp.dart';
-import 'package:churchapp/views/SplashScreen.dart';
-import 'package:churchapp/views/UserProfile.dart';
-import 'package:churchapp/views/Welcome.dart';
->>>>>>> 41a00e2 ([ADD]  circular notification badge to notifications in NavBar)
 
 void main() {
   runApp(const MyApp());
