@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-// ignore: file_names
-import 'package:churchapp/views/Login.dart';
-=======
-// ignore_for_file: file_names, library_private_types_in_public_api
-
->>>>>>> c2f1437 ([ADD]  Refactoring)
+// ignore_for_file: file_names, library_priv'login.dart'ackage:churchapp/views/SignUp/signUp.dart';
 import 'package:churchapp/views/SignUp/signUp.dart';
 import 'package:churchapp/views/login.dart';
 import 'package:flutter/material.dart';
