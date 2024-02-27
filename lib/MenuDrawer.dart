@@ -3,80 +3,51 @@ import 'package:flutter/material.dart';
 class MenuDrawer extends StatelessWidget {
   const MenuDrawer({Key? key}) : super(key: key);
 
+  Widget buildHeader() {
+    return const DrawerHeader(
+      decoration: BoxDecoration(
+        color: Colors.blue,
+      ),
+      child: Text(
+        'Menu',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 24,
+        ),
+      ),
+    );
+  }
+
+  Widget buildMenuItem(
+      String title, IconData icon, String route, BuildContext context) {
+    return ListTile(
+      title: Text(title),
+      leading: Icon(icon),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, route);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.blue,
-            ),
-            child: Text(
-              'Menu',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-              ),
-            ),
-          ),
-          ListTile(
-            title: const Text('Home'),
-            leading: const Icon(Icons.home),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/Home');
-            },
-          ),
-          ListTile(
-            title: const Text('User Profile'),
-            leading: const Icon(Icons.person),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/UserProfile');
-            },
-          ),
-          ListTile(
-            title: const Text('Events'),
-            leading: const Icon(Icons.event),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/EventPage');
-            },
-          ),
-          ListTile(
-            title: const Text('Donations'),
-            leading: const Icon(Icons.volunteer_activism),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/donations');
-            },
-          ),
-          ListTile(
-            title: const Text('Courses'),
-            leading: const Icon(Icons.school),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/courses');
-            },
-          ),
-          ListTile(
-            title: const Text('Devenir membre'),
-            leading: const Icon(Icons.group_add),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/devenir_membre');
-            },
-          ),
-          ListTile(
-            title: const Text('Videos'),
-            leading: const Icon(Icons.video_library),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/videos');
-            },
-          ),
-          ListTile(
-            title: const Text('About Us'),
-            leading: const Icon(Icons.info),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/about_us');
-            },
-          ),
+          buildHeader(),
+          buildMenuItem('Home', Icons.home_outlined, '/Home', context),
+          buildMenuItem(
+              'User Profile', Icons.person_outlined, '/UserProfile', context),
+          buildMenuItem('Events', Icons.event, '/EventPage', context),
+          buildMenuItem('Donations', Icons.volunteer_activism_outlined,
+              '/donations', context),
+          buildMenuItem('Courses', Icons.school_outlined, '/courses', context),
+          buildMenuItem('Devenir membre', Icons.group_add_outlined,
+              '/devenir_membre', context),
+          buildMenuItem(
+              'Videos', Icons.video_library_outlined, '/videos', context),
+          buildMenuItem('About Us', Icons.info_outlined, '/about_us', context),
         ],
       ),
     );
