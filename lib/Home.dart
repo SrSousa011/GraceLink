@@ -20,7 +20,7 @@ class Home extends StatelessWidget {
           ],
         ),
       ),
-      drawer: const MenuDrawer(),
+      drawer: const NavBar(),
       body: const SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

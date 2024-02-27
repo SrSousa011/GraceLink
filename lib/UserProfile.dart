@@ -8,7 +8,7 @@ class UserProfile extends StatelessWidget {
       appBar: AppBar(
         title: const Text('User Profile'),
       ),
-      drawer: const MenuDrawer(), // Adicione o MenuDrawer aqui
+      drawer: const NavBar(), // Adicione o MenuDrawer aqui
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

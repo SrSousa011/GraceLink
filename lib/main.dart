@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const Splash_Screen(
-        drawer: MenuDrawer(), // Passe o MenuDrawer como parâmetro
+        drawer: NavBar(), // Passe o MenuDrawer como parâmetro
       ),
       routes: {
         '/Login': (context) => const Login(),

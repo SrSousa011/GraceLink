@@ -1,8 +1,8 @@
 import 'package:churchapp/UserProfile.dart';
 import 'package:flutter/material.dart';
 
-class MenuDrawer extends StatelessWidget {
-  const MenuDrawer({Key? key}) : super(key: key);
+class NavBar extends StatelessWidget {
+  const NavBar({Key? key}) : super(key: key);
 
   Widget buildHeader(BuildContext context) {
     return SizedBox(
