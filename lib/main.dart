@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         '/SignUp3': (context) => const SignUpPage3(),
         '/SignUp4': (context) => const SignUpPage4(),
         '/Home': (context) => const Home(),
-        '/UserProfile': (context) => UserProfile(),
+        '/UserProfile': (context) => const UserProfile(),
         '/EventPage': (context) => const EventPage(),
         '/Welcome': (context) => const Welcome(title: 'GraceLink'),
       },
