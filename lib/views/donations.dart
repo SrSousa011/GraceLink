@@ -25,6 +25,7 @@ class DonationsPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Donations'),
       ),
+      drawer: const NavBar(),
       body: const DonationWidget(), // Incorporando o DonationWidget aqui
     );
   }
@@ -69,7 +70,7 @@ class DonationWidgetState extends State<DonationWidget> {
               hintText: 'Digite o valor da sua doação',
             ),
           ),
-          const SizedBox(height: 20.0),
+          const SizedBox(height: 40.0),
           const Text(
             'Doar como:',
             style: TextStyle(
@@ -106,7 +107,7 @@ class DonationWidgetState extends State<DonationWidget> {
               ),
             ],
           ),
-          const SizedBox(height: 20.0),
+          const SizedBox(height: 40.0),
           const Text(
             'Destino da doação:',
             style: TextStyle(
@@ -149,7 +150,7 @@ class DonationWidgetState extends State<DonationWidget> {
               ),
             ],
           ),
-          const SizedBox(height: 20.0),
+          const SizedBox(height: 70.0),
           if (donationType != null) Image.asset('assets/$donationType.png'),
           if (foodType != null) Image.asset('assets/$foodType.png'),
         ],
@@ -188,7 +189,6 @@ class ChooseTypePage extends StatelessWidget {
             ? const Text('Escolha o tipo de doação')
             : const Text('Selecione o tipo de alimento'),
       ),
-      drawer: const NavBar(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
