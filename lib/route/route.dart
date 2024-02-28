@@ -40,6 +40,8 @@ Route<dynamic> controller(RouteSettings settings) {
       return MaterialPageRoute(builder: (_) => const NavBar());
     case '/eventpage': // Event Page Screen Route
       return MaterialPageRoute(builder: (_) => const EventPage());
+    case '/home': // Home Screen Route
+      return MaterialPageRoute(builder: (_) => const Home());
     default:
       return MaterialPageRoute(
           builder: (_) =>

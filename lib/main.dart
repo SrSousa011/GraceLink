@@ -1,4 +1,5 @@
 import 'package:churchapp/views/SignUp/signUp.dart';
+import 'package:churchapp/views/donations.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/home.dart';
 import 'package:churchapp/views/login.dart';
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
         '/Home': (context) => const Home(),
         '/UserProfile': (context) => const UserProfile(),
         '/EventPage': (context) => const EventPage(),
+        '/Donations': (context) => const Donations(),
         '/Welcome': (context) => const Welcome(title: 'GraceLink'),
       },
     );
