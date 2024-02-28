@@ -1,5 +1,6 @@
 // ignore_for_file: file_names, library_private_types_in_public_api
 
+import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -50,6 +51,7 @@ class _EventPageState extends State<EventPage> {
       appBar: AppBar(
         title: const Text('Eventos'),
       ),
+      drawer: const NavBar(),
       body: ListView.builder(
         itemCount: events.length,
         itemBuilder: (context, index) {
