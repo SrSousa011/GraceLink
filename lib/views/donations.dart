@@ -26,6 +26,8 @@ class DonationsPage extends StatelessWidget {
         title: const Text('Donations'),
       ),
       drawer: const NavBar(),
+      resizeToAvoidBottomInset:
+          false, // Evita redimensionamento para evitar o overflow
       body: const DonationWidget(), // Incorporando o DonationWidget aqui
     );
   }
@@ -46,21 +48,22 @@ class DonationWidgetState extends State<DonationWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          const Text(
-            'Valor da doação:',
-            style: TextStyle(
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
-              color: Color.fromARGB(255, 153, 153, 153),
+    return SingleChildScrollView(
+      // Envolve o conteúdo em SingleChildScrollView
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            const Text(
+              'Valor da doação:',
+              style: TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 153, 153, 153),
+              ),
             ),
-          ),
-          Expanded(
-            child: TextField(
+            TextField(
               controller: donationController,
               keyboardType: TextInputType.number,
               inputFormatters: [
@@ -71,91 +74,91 @@ class DonationWidgetState extends State<DonationWidget> {
                 hintText: 'Digite o valor da sua doação',
               ),
             ),
-          ),
-          const SizedBox(height: 40.0),
-          const Text(
-            'Doar como:',
-            style: TextStyle(
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
-              color: Color.fromARGB(255, 153, 153, 153),
+            const SizedBox(height: 40.0),
+            const Text(
+              'Doar como:',
+              style: TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 153, 153, 153),
+              ),
             ),
-          ),
-          const SizedBox(height: 10.0),
-          Row(
-            children: [
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  value: selectedPayment,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedPayment = newValue!;
-                    });
-                  },
-                  items: <String>[
-                    'Paypal',
-                    'Cartão de Crédito',
-                    'Cartão de Débito'
-                  ].map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  decoration: const InputDecoration(
-                    labelText: ' ',
+            const SizedBox(height: 10.0),
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: selectedPayment,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedPayment = newValue!;
+                      });
+                    },
+                    items: <String>[
+                      'Paypal',
+                      'Cartão de Crédito',
+                      'Cartão de Débito'
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    decoration: const InputDecoration(
+                      labelText: ' ',
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 40.0),
-          const Text(
-            'Destino da doação:',
-            style: TextStyle(
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
-              color: Color.fromARGB(255, 153, 153, 153),
+              ],
             ),
-          ),
-          const SizedBox(height: 10.0),
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    _navigateToChooseTypePage(context, 'chooseDonationType');
-                  },
-                  icon: const Icon(Icons.payment),
-                  label: const Text('Escolha o tipo de doação'),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(400, 100),
-                    foregroundColor: const Color(0xFF1E88E5),
-                    backgroundColor: Colors.white,
+            const SizedBox(height: 40.0),
+            const Text(
+              'Destino da doação:',
+              style: TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 153, 153, 153),
+              ),
+            ),
+            const SizedBox(height: 10.0),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      _navigateToChooseTypePage(context, 'chooseDonationType');
+                    },
+                    icon: const Icon(Icons.payment),
+                    label: const Text('Escolha o tipo de doação'),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(400, 100),
+                      foregroundColor: const Color(0xFF1E88E5),
+                      backgroundColor: Colors.white,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 40.0),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    _navigateToChooseTypePage(context, 'chooseFoodType');
-                  },
-                  icon: const Icon(Icons.food_bank),
-                  label: const Text('Selecione o tipo de alimento'),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(400, 100),
-                    foregroundColor: const Color(0xFF1E88E5),
-                    backgroundColor: Colors.white,
+                const SizedBox(width: 40.0),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      _navigateToChooseTypePage(context, 'chooseFoodType');
+                    },
+                    icon: const Icon(Icons.food_bank),
+                    label: const Text('Selecione o tipo de alimento'),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(400, 100),
+                      foregroundColor: const Color(0xFF1E88E5),
+                      backgroundColor: Colors.white,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 70.0),
-          if (donationType != null) Image.asset('assets/$donationType.png'),
-          if (foodType != null) Image.asset('assets/$foodType.png'),
-        ],
+              ],
+            ),
+            const SizedBox(height: 70.0),
+            if (donationType != null) Image.asset('assets/$donationType.png'),
+            if (foodType != null) Image.asset('assets/$foodType.png'),
+          ],
+        ),
       ),
     );
   }
