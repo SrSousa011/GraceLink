@@ -51,11 +51,21 @@ class DonationWidgetState extends State<DonationWidget> {
             controller: donationController,
             keyboardType: TextInputType.number,
             decoration: const InputDecoration(
-              hintText: 'Digite o valor da sua doação (em euros)',
+              hintText: 'Digite o valor da sua doação',
             ),
           ),
           const SizedBox(height: 50.0),
-          const Text('Doar como:'),
+          const Text(
+            'Doar como:',
+            style: TextStyle(
+              fontSize: 24.0, // Ajuste o tamanho do texto conforme desejado
+              fontWeight:
+                  FontWeight.bold, // Ajuste o estilo do texto conforme desejado
+              color: Color.fromARGB(255, 153, 153,
+                  153), // Ajuste a cor do texto conforme desejado
+            ),
+          ),
+          const SizedBox(height: 20.0),
           Row(
             children: [
               Expanded(
