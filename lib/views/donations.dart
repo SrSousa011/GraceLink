@@ -1,5 +1,7 @@
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 void main() => runApp(const Donations());
 
@@ -46,29 +48,37 @@ class DonationWidgetState extends State<DonationWidget> {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          const Text(
+            'Valor da doação:',
+            style: TextStyle(
+              fontSize: 24.0,
+              fontWeight: FontWeight.bold,
+              color: Color.fromARGB(255, 153, 153, 153),
+            ),
+          ),
           TextField(
             controller: donationController,
             keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              CurrencyInputFormatter()
+            ],
             decoration: const InputDecoration(
               hintText: 'Digite o valor da sua doação',
             ),
           ),
-          const SizedBox(height: 70.0),
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Doar como:',
-              style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
-                color: Color.fromARGB(255, 153, 153, 153),
-              ),
+          const SizedBox(height: 20.0),
+          const Text(
+            'Doar como:',
+            style: TextStyle(
+              fontSize: 24.0,
+              fontWeight: FontWeight.bold,
+              color: Color.fromARGB(255, 153, 153, 153),
             ),
           ),
-          const SizedBox(height: 20.0),
-          // Paymment Dropdown
+          const SizedBox(height: 10.0),
           Row(
             children: [
               Expanded(
@@ -96,19 +106,16 @@ class DonationWidgetState extends State<DonationWidget> {
               ),
             ],
           ),
-          const SizedBox(height: 70.0),
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Destino da doação:',
-              style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
-                color: Color.fromARGB(255, 153, 153, 153),
-              ),
+          const SizedBox(height: 20.0),
+          const Text(
+            'Destino da doação:',
+            style: TextStyle(
+              fontSize: 24.0,
+              fontWeight: FontWeight.bold,
+              color: Color.fromARGB(255, 153, 153, 153),
             ),
           ),
-          const SizedBox(height: 20.0),
+          const SizedBox(height: 10.0),
           Row(
             children: [
               Expanded(
@@ -142,7 +149,7 @@ class DonationWidgetState extends State<DonationWidget> {
               ),
             ],
           ),
-          const SizedBox(height: 50.0),
+          const SizedBox(height: 20.0),
           if (donationType != null) Image.asset('assets/$donationType.png'),
           if (foodType != null) Image.asset('assets/$foodType.png'),
         ],
@@ -206,6 +213,25 @@ class ChooseTypePage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class CurrencyInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.selection.baseOffset == 0) {
+      return newValue;
+    }
+
+    double value = double.parse(newValue.text);
+    final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+    String newText = formatter.format(value / 100);
+
+    return newValue.copyWith(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newText.length),
     );
   }
 }
