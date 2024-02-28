@@ -2,13 +2,13 @@ import 'package:churchapp/views/SignUp/SignUp2.dart';
 import 'package:churchapp/views/SignUp/SignUp3.dart';
 import 'package:churchapp/views/SignUp/SignUp4.dart';
 import 'package:churchapp/views/SignUp/signUp.dart';
-import 'package:churchapp/views/UserProfile.dart'; // Update file name and path if necessary
+import 'package:churchapp/views/User-Profile.dart'; // Update file name and path if necessary
 import 'package:churchapp/views/Welcome.dart'; // Update file name and path if necessary
-import 'package:churchapp/views/event-Page.dart'; // Update file name and path if necessary
+import 'package:churchapp/views/event_page.dart'; // Update file name and path if necessary
 import 'package:churchapp/views/home.dart'; // Update file name and path if necessary
 import 'package:churchapp/views/login.dart'; // Update file name and path if necessary
-import 'package:churchapp/views/nav-bar.dart'; // Update file name and path if necessary
-import 'package:churchapp/views/splash-screen.dart'; // Update file name and path if necessary
+import 'package:churchapp/views/nav_bar.dart'; // Update file name and path if necessary
+import 'package:churchapp/views/splash_screen.dart'; // Update file name and path if necessary
 import 'package:flutter/material.dart';
 
 // Define the controller function

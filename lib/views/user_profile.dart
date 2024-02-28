@@ -1,6 +1,6 @@
 // ignore_for_file: file_names, library_private_types_in_public_api
 
-import 'package:churchapp/views/nav-bar.dart';
+import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
 
 class UserProfile extends StatelessWidget {
