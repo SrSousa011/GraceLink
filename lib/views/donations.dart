@@ -59,15 +59,17 @@ class DonationWidgetState extends State<DonationWidget> {
               color: Color.fromARGB(255, 153, 153, 153),
             ),
           ),
-          TextField(
-            controller: donationController,
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-              CurrencyInputFormatter()
-            ],
-            decoration: const InputDecoration(
-              hintText: 'Digite o valor da sua doação',
+          Expanded(
+            child: TextField(
+              controller: donationController,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                CurrencyInputFormatter()
+              ],
+              decoration: const InputDecoration(
+                hintText: 'Digite o valor da sua doação',
+              ),
             ),
           ),
           const SizedBox(height: 40.0),
@@ -226,7 +228,7 @@ class CurrencyInputFormatter extends TextInputFormatter {
     }
 
     double value = double.parse(newValue.text);
-    final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+    final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: '€');
     String newText = formatter.format(value / 100);
 
     return newValue.copyWith(
