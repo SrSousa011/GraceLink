@@ -68,8 +68,8 @@ class DonationWidgetState extends State<DonationWidget> {
                   },
                   items: <String>[
                     'Paypal',
-                    'Cartão de crédito',
-                    'cartão de débito'
+                    'Cartão de Crédito',
+                    'Cartão de Débito'
                   ].map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
