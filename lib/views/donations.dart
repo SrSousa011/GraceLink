@@ -1,3 +1,4 @@
+import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(const Donations());
@@ -14,7 +15,7 @@ class Donations extends StatelessWidget {
 }
 
 class DonationsPage extends StatelessWidget {
-  const DonationsPage({super.key});
+  const DonationsPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class DonationsPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Donations'),
       ),
-      body: const DonationWidget(),
+      body: DonationWidget(),
     );
   }
 }
@@ -35,7 +36,7 @@ class DonationWidget extends StatefulWidget {
 }
 
 class DonationWidgetState extends State<DonationWidget> {
-  double donationAmount = 0.0;
+  TextEditingController donationController = TextEditingController();
   String? donationType;
   String? foodType;
 
@@ -46,21 +47,12 @@ class DonationWidgetState extends State<DonationWidget> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text(
-            'Valor da Doação: € $donationAmount',
-            style: const TextStyle(fontSize: 20.0),
-          ),
-          const SizedBox(height: 20.0),
           TextField(
+            controller: donationController,
             keyboardType: TextInputType.number,
             decoration: const InputDecoration(
-              hintText: 'Digite o valor da sua doação',
+              hintText: 'Digite o valor da sua doação (em euros)',
             ),
-            onChanged: (value) {
-              setState(() {
-                donationAmount = double.tryParse(value) ?? 0.0;
-              });
-            },
           ),
           const SizedBox(height: 20.0),
           const Text('Doar como:'),
@@ -70,6 +62,10 @@ class DonationWidgetState extends State<DonationWidget> {
             },
             icon: const Icon(Icons.payment),
             label: const Text('Escolha o tipo de doação'),
+            style: ElevatedButton.styleFrom(
+              foregroundColor: const Color(0xFF1E88E5),
+              backgroundColor: Colors.white, // Define a cor azul para o botão
+            ),
           ),
           const SizedBox(height: 10.0),
           ElevatedButton.icon(
@@ -78,6 +74,10 @@ class DonationWidgetState extends State<DonationWidget> {
             },
             icon: const Icon(Icons.food_bank),
             label: const Text('Selecione o tipo de alimento'),
+            style: ElevatedButton.styleFrom(
+              foregroundColor: const Color(0xFF1E88E5),
+              backgroundColor: Colors.white, // Define a cor azul para o botão
+            ),
           ),
           const SizedBox(height: 20.0),
           if (donationType != null) Image.asset('assets/$donationType.png'),
@@ -108,7 +108,7 @@ class DonationWidgetState extends State<DonationWidget> {
 class ChooseTypePage extends StatelessWidget {
   final String type;
 
-  const ChooseTypePage({super.key, required this.type});
+  const ChooseTypePage({Key? key, required this.type}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -118,6 +118,7 @@ class ChooseTypePage extends StatelessWidget {
             ? const Text('Escolha o tipo de doação')
             : const Text('Selecione o tipo de alimento'),
       ),
+      drawer: const NavBar(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
