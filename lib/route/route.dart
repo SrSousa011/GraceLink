@@ -2,7 +2,7 @@ import 'package:churchapp/views/SignUp/SignUp2.dart';
 import 'package:churchapp/views/SignUp/SignUp3.dart';
 import 'package:churchapp/views/SignUp/SignUp4.dart';
 import 'package:churchapp/views/SignUp/signUp.dart';
-import 'package:churchapp/views/User-Profile.dart'; // Update file name and path if necessary
+import 'package:churchapp/views/User_Profile.dart'; // Update file name and path if necessary
 import 'package:churchapp/views/Welcome.dart'; // Update file name and path if necessary
 import 'package:churchapp/views/event_page.dart'; // Update file name and path if necessary
 import 'package:churchapp/views/home.dart'; // Update file name and path if necessary
