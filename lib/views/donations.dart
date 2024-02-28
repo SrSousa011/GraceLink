@@ -55,6 +55,18 @@ class DonationWidgetState extends State<DonationWidget> {
               hintText: 'Digite o valor da sua doação',
             ),
           ),
+          const SizedBox(height: 70.0),
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Doar como:',
+              style: TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 153, 153, 153),
+              ),
+            ),
+          ),
           const SizedBox(height: 20.0),
           // Paymment Dropdown
           Row(
@@ -84,15 +96,16 @@ class DonationWidgetState extends State<DonationWidget> {
               ),
             ],
           ),
-          const SizedBox(height: 50.0),
-          const Text(
-            'Doar como:',
-            style: TextStyle(
-              fontSize: 24.0, // Ajuste o tamanho do texto conforme desejado
-              fontWeight:
-                  FontWeight.bold, // Ajuste o estilo do texto conforme desejado
-              color: Color.fromARGB(255, 153, 153,
-                  153), // Ajuste a cor do texto conforme desejado
+          const SizedBox(height: 70.0),
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Destino da doação:',
+              style: TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 153, 153, 153),
+              ),
             ),
           ),
           const SizedBox(height: 20.0),
