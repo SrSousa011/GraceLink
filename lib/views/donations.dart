@@ -39,6 +39,7 @@ class DonationWidgetState extends State<DonationWidget> {
   TextEditingController donationController = TextEditingController();
   String? donationType;
   String? foodType;
+  String selectedPayment = 'Paypal'; // Default selected payment
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +55,35 @@ class DonationWidgetState extends State<DonationWidget> {
               hintText: 'Digite o valor da sua doação',
             ),
           ),
+          // Paymment Dropdown
+          Row(
+            children: [
+              Expanded(
+                child: DropdownButtonFormField<String>(
+                  value: selectedPayment,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedPayment = newValue!;
+                    });
+                  },
+                  items: <String>[
+                    'Paypal',
+                    'Cartão de crédito',
+                    'cartão de débito'
+                  ].map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  decoration: const InputDecoration(
+                    labelText: ' ',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20.0),
           const SizedBox(height: 50.0),
           const Text(
             'Doar como:',
