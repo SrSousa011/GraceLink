@@ -15,7 +15,11 @@ class Donations extends StatelessWidget {
         title: const Text('Donations'),
       ),
       drawer: const NavBar(),
-      body: const DonationWidget(), // Incorporando o DonationWidget aqui
+      body: SingleChildScrollView(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: const DonationWidget(),
+      ),
     );
   }
 }
