@@ -55,6 +55,7 @@ class DonationWidgetState extends State<DonationWidget> {
               hintText: 'Digite o valor da sua doação',
             ),
           ),
+          const SizedBox(height: 20.0),
           // Paymment Dropdown
           Row(
             children: [
@@ -83,7 +84,6 @@ class DonationWidgetState extends State<DonationWidget> {
               ),
             ],
           ),
-          const SizedBox(height: 20.0),
           const SizedBox(height: 50.0),
           const Text(
             'Doar como:',
