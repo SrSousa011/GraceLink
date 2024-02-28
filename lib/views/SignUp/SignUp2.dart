@@ -14,7 +14,7 @@ class _SignUpPageState2 extends State<SignUpPage2> {
   String selectedDay = '1'; // Default selected day
   String selectedMonth = 'January'; // Default selected month
   int selectedYear = 2000; // Default selected year
-  String selectedGender = ''; // Default selected gender
+  String selectedGender = 'Male'; // Default selected gender
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +137,7 @@ class _SignUpPageState2 extends State<SignUpPage2> {
                             selectedGender = newValue!;
                           });
                         },
-                        items: <String>['', 'Male', 'Female']
+                        items: <String>['Male', 'Female']
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
