@@ -23,7 +23,7 @@ class DonationsPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Donations'),
       ),
-      body: DonationWidget(),
+      body: const DonationWidget(),
     );
   }
 }
