@@ -54,32 +54,42 @@ class DonationWidgetState extends State<DonationWidget> {
               hintText: 'Digite o valor da sua doação (em euros)',
             ),
           ),
-          const SizedBox(height: 20.0),
+          const SizedBox(height: 50.0),
           const Text('Doar como:'),
-          ElevatedButton.icon(
-            onPressed: () {
-              _navigateToChooseTypePage(context, 'chooseDonationType');
-            },
-            icon: const Icon(Icons.payment),
-            label: const Text('Escolha o tipo de doação'),
-            style: ElevatedButton.styleFrom(
-              foregroundColor: const Color(0xFF1E88E5),
-              backgroundColor: Colors.white, // Define a cor azul para o botão
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    _navigateToChooseTypePage(context, 'chooseDonationType');
+                  },
+                  icon: const Icon(Icons.payment),
+                  label: const Text('Escolha o tipo de doação'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(400, 100),
+                    foregroundColor: const Color(0xFF1E88E5),
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 40.0),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    _navigateToChooseTypePage(context, 'chooseFoodType');
+                  },
+                  icon: const Icon(Icons.food_bank),
+                  label: const Text('Selecione o tipo de alimento'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(400, 100),
+                    foregroundColor: const Color(0xFF1E88E5),
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 10.0),
-          ElevatedButton.icon(
-            onPressed: () {
-              _navigateToChooseTypePage(context, 'chooseFoodType');
-            },
-            icon: const Icon(Icons.food_bank),
-            label: const Text('Selecione o tipo de alimento'),
-            style: ElevatedButton.styleFrom(
-              foregroundColor: const Color(0xFF1E88E5),
-              backgroundColor: Colors.white, // Define a cor azul para o botão
-            ),
-          ),
-          const SizedBox(height: 20.0),
+          const SizedBox(height: 50.0),
           if (donationType != null) Image.asset('assets/$donationType.png'),
           if (foodType != null) Image.asset('assets/$foodType.png'),
         ],
