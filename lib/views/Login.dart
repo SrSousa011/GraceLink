@@ -1,7 +1,7 @@
 // ignore_for_file: file_names, library_private_types_in_public_api
 
 import 'package:churchapp/views/SignUp/signUp.dart';
-import 'package:churchapp/views/User_Profile.dart';
+import 'package:churchapp/views/user_profile.dart';
 import 'package:flutter/material.dart'; // Importa a tela de SignUp
 
 class Login extends StatelessWidget {

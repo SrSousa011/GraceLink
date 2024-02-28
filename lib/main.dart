@@ -7,7 +7,7 @@ import 'package:churchapp/views/nav_bar.dart';
 import 'package:churchapp/views/splash_screen.dart';
 import 'package:churchapp/views/user_profile.dart';
 import 'package:churchapp/views/event_page.dart';
-import 'package:churchapp/views/SignUp/SignUp2.dart';
+import 'package:churchapp/views/SignUp/signUp2.dart';
 import 'package:churchapp/views/SignUp/signUp3.dart';
 import 'package:churchapp/views/SignUp/signUp4.dart';
 import 'package:churchapp/views/welcome.dart';
@@ -33,16 +33,16 @@ class MyApp extends StatelessWidget {
         drawer: NavBar(), // Passe o MenuDrawer como parâmetro
       ),
       routes: {
-        '/Login': (context) => const Login(),
-        '/SignUp': (context) => const SignUp(),
-        '/SignUp2': (context) => const SignUpPage2(),
-        '/SignUp3': (context) => const SignUpPage3(),
-        '/SignUp4': (context) => const SignUpPage4(),
-        '/Home': (context) => const Home(),
-        '/UserProfile': (context) => const UserProfile(),
-        '/EventPage': (context) => const EventPage(),
-        '/Donations': (context) => const Donations(),
-        '/Welcome': (context) => const Welcome(title: 'GraceLink'),
+        '/login': (context) => const Login(),
+        '/signUp': (context) => const SignUp(),
+        '/signUp2': (context) => const SignUpPage2(),
+        '/signUp3': (context) => const SignUpPage3(),
+        '/signUp4': (context) => const SignUpPage4(),
+        '/home': (context) => const Home(),
+        '/user_profile': (context) => const UserProfile(),
+        '/event_page': (context) => const EventPage(),
+        '/donations': (context) => const Donations(),
+        '/welcome': (context) => const Welcome(title: 'GraceLink'),
       },
     );
   }

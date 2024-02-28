@@ -1,6 +1,6 @@
 // ignore_for_file: file_names, library_private_types_in_public_api
 
-import 'package:churchapp/views/User_Profile.dart';
+import 'package:churchapp/views/user_profile.dart';
 import 'package:flutter/material.dart';
 
 class NavBar extends StatelessWidget {
@@ -68,28 +68,28 @@ class NavBar extends StatelessWidget {
               title: const Text('Home'),
               leading: const Icon(Icons.home_outlined),
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/Home');
+                Navigator.pushReplacementNamed(context, '/home');
               },
             ),
             ListTile(
               title: const Text('User Profile'),
               leading: const Icon(Icons.person_outlined),
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/UserProfile');
+                Navigator.pushReplacementNamed(context, '/user_profile');
               },
             ),
             ListTile(
               title: const Text('Events'),
               leading: const Icon(Icons.event),
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/EventPage');
+                Navigator.pushReplacementNamed(context, '/event_page');
               },
             ),
             ListTile(
               title: const Text('Donations'),
               leading: const Icon(Icons.volunteer_activism_outlined),
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/Donations');
+                Navigator.pushReplacementNamed(context, '/donations');
               },
             ),
             ListTile(
