@@ -3,70 +3,107 @@
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
 
-class Home extends StatelessWidget {
+void main() {
+  runApp(const MaterialApp(
+    home: Home(),
+  ));
+}
+
+class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
+
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  List<Event> events = [
+    Event(
+      title: 'Culto de Domingo',
+      description:
+          'Participe do nosso culto dominical com louvor, adoração e uma mensagem inspiradora.',
+      date:
+          DateTime(2024, 3, 1, 10, 0), // Domingo, 1º de março de 2024, às 10h00
+      location: 'Igreja da Comunidade',
+    ),
+    Event(
+      title: 'Grupo de Estudo Bíblico',
+      description:
+          'Venha participar do nosso grupo de estudo bíblico semanal para aprender mais sobre a Palavra de Deus.',
+      date: DateTime(
+          2024, 3, 4, 19, 0), // Quarta-feira, 4 de março de 2024, às 19h00
+      location: 'Salão da Igreja',
+    ),
+    Event(
+      title: 'Concerto de Natal',
+      description:
+          'Celebre a época festiva com músicas de Natal apresentadas pelo coro da igreja.',
+      date: DateTime(2024, 12, 20, 18,
+          30), // Sexta-feira, 20 de dezembro de 2024, às 18h30
+      location: 'Igreja da Comunidade',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/icons/logo.png',
-              fit: BoxFit.contain,
-              height: 70,
-            ),
-            const SizedBox(width: 50),
-          ],
-        ),
+        title: const Text('Home'),
       ),
       drawer: const NavBar(),
-      body: const SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            EventCard(
-              title: 'Culto de Domingo',
-              description:
-                  'Participe do culto de domingo para um momento de louvor, adoração e ensino da palavra de Deus.',
+      body: ListView.builder(
+        itemCount: events.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              _navigateToEventDetailsScreen(context, events[index]);
+            },
+            child: EventCard(
+              title: events[index].title,
+              description: events[index].description,
+              date: events[index].date,
+              location: events[index].location,
             ),
-            EventCard(
-              title: 'Grupo de Estudo Bíblico',
-              description:
-                  'Junte-se ao nosso grupo de estudo bíblico para uma análise profunda das Escrituras.',
-            ),
-            EventCard(
-              title: 'Festa de Boas-Vindas',
-              description:
-                  'Conheça novos membros da comunidade em nossa festa de boas-vindas toda quarta-feira.',
-            ),
-            EventCard(
-              title: 'Ação Social',
-              description:
-                  'Participe de nossa ação social neste sábado para ajudar os necessitados em nossa comunidade.',
-            ),
-            EventCard(
-              title: 'Noite de Louvor',
-              description:
-                  'Desfrute de uma noite de louvor e adoração com músicas inspiradoras e mensagens edificantes.',
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
+
+  void _navigateToEventDetailsScreen(BuildContext context, Event event) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => EventDetailsScreen(event: event)),
+    );
+  }
+}
+
+class Event {
+  final String title;
+  final String description;
+  final DateTime date;
+  final String location;
+
+  Event({
+    required this.title,
+    required this.description,
+    required this.date,
+    required this.location,
+  });
 }
 
 class EventCard extends StatelessWidget {
   final String title;
   final String description;
+  final DateTime date;
+  final String location;
 
   const EventCard({
     Key? key,
     required this.title,
     required this.description,
+    required this.date,
+    required this.location,
   }) : super(key: key);
 
   @override
@@ -90,9 +127,64 @@ class EventCard extends StatelessWidget {
               description,
               style: const TextStyle(fontSize: 16),
             ),
+            const SizedBox(height: 8),
+            Text(
+              'Data: ${_formatDate(date)}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Local: $location',
+              style: const TextStyle(fontSize: 16),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+}
+
+class EventDetailsScreen extends StatelessWidget {
+  final Event event;
+
+  const EventDetailsScreen({Key? key, required this.event}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(event.title),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Descrição: ${event.description}',
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Data: ${_formatDate(event.date)}',
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Local: ${event.location}',
+              style: const TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
   }
 }
