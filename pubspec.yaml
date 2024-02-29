@@ -67,7 +67,9 @@ flutter:
       - assets/imagens/profile_picture.jpg
       - assets/icons/logo.png
       - assets/imagens/bacground-image-center.jpg
-
+      - assets/imagens/dizimo.jpg
+      - assets/imagens/oferta.jpg      
+      
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
