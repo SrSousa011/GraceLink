@@ -133,6 +133,7 @@ class CourseDetailsPage extends StatelessWidget {
                       ? Colors.red
                       : Colors.blue,
                 ),
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
               ),
               child: Text(
                 course.registrationDeadline == 'Encerrado'
