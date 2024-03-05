@@ -1,4 +1,3 @@
-// ignore_for_file: file_names, library_priv'login.dart'ackage:churchapp/views/SignUp/signUp.dart';
 import 'package:churchapp/views/SignUp/signUp.dart';
 import 'package:churchapp/views/login.dart';
 import 'package:flutter/material.dart';
@@ -11,73 +10,84 @@ class Welcome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/imagens/background_image.jpg'),
-            fit: BoxFit.fill,
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Spacer(), // Adiciona espaço para empurrar para baixo o logotipo e a escrita
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/icons/logo.png',
-                  height: 400,
-                  width: 4000,
-                ),
-              ],
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 255, 153, 0),
+                  Color.fromARGB(255, 63, 166, 255)
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
-            const Spacer(), // Adiciona outro espaço para centralizar os botões de login/cadastro
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(20),
-              child: Row(
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Spacer(), // Adiciona espaço para empurrar para baixo o logotipo e a escrita
+              Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Login()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: const Color(0xFF1E88E5),
-                      backgroundColor: Colors.white,
-                      side: const BorderSide(color: Color(0xFF1E88E5)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                    child: const Text('Login'),
-                  ),
-                  const SizedBox(width: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const SignUp()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: const Color.fromARGB(255, 90, 175, 249),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                    child: const Text('Sign Up'),
+                  Image.asset(
+                    'assets/icons/logo.png',
+                    height: 400,
+                    width: 4000,
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
+              const Spacer(), // Adiciona outro espaço para centralizar os botões de login/cadastro
+              Container(
+                color: Colors.white,
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Login()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: const Color(0xFF1E88E5),
+                        backgroundColor: Colors.white,
+                        side: const BorderSide(color: Color(0xFF1E88E5)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                      ),
+                      child: const Text('Login'),
+                    ),
+                    const SizedBox(width: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SignUp()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: const Color(0xFF1E88E5),
+                        side: const BorderSide(color: Color(0xFF1E88E5)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                      ),
+                      child: const Text('Sign Up'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
