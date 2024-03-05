@@ -37,7 +37,7 @@ class _CoursesState extends State<Courses> {
             child: Container(
               padding: const EdgeInsets.all(16.0),
               margin:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10.0),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [Color(0xFFFFD59C), Color(0xFF62CFF7)],
@@ -116,11 +116,13 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
           children: [
             Text('Ministrado por: ${widget.course.instructor}'),
             const SizedBox(height: 16.0),
-            Image.asset(
-              widget.course.image,
-              width: 400.0,
-              height: 400.0,
-              fit: BoxFit.cover,
+            Center(
+              child: Image.asset(
+                widget.course.image,
+                width: 300.0,
+                height: 350.0,
+                fit: BoxFit.cover,
+              ),
             ),
             const SizedBox(height: 16.0),
             Text('Preço: ${widget.course.price} €'),
