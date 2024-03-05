@@ -48,6 +48,8 @@ class _CoursesState extends State<Courses> {
                 borderRadius: BorderRadius.circular(16.0),
               ),
               child: Row(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start, // Alinha o conteúdo ao topo
                 children: [
                   Container(
                     width: 150.0,
@@ -63,18 +65,40 @@ class _CoursesState extends State<Courses> {
                   const SizedBox(width: 16.0),
                   Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start, // Alinha o conteúdo ao topo
                       children: [
                         Text(
                           coursesList[index].title,
                           style: const TextStyle(
-                            fontSize: 18.0,
+                            fontSize: 20.0,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(coursesList[index].instructor),
-                        Text(coursesList[index].description),
-                        Text('${coursesList[index].price} €'),
+                        const SizedBox(height: 8.0), // Espaço entre os textos
+                        Text(
+                          coursesList[index].instructor,
+                          style: const TextStyle(
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                        const SizedBox(height: 8.0), // Espaço entre os textos
+                        Text(
+                          coursesList[index].description,
+                          style: const TextStyle(
+                            fontSize: 15.0,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                        const SizedBox(height: 8.0), // Espaço entre os textos
+                        Text(
+                          '${coursesList[index].price} €',
+                          style: const TextStyle(
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -115,7 +139,7 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Ministrado por: ${widget.course.instructor}'),
+            Text(' ${widget.course.instructor}'),
             const SizedBox(height: 16.0),
             Center(
               child: Image.asset(
@@ -126,9 +150,8 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
               ),
             ),
             const SizedBox(height: 16.0),
-            Text('Preço: ${widget.course.price} €'),
+            Text(' ${widget.course.price} €'),
             const SizedBox(height: 16.0),
-            const Text('Descrição:'),
             Text(widget.course.description),
             const SizedBox(height: 16.0),
             Text(
