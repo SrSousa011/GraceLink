@@ -23,8 +23,14 @@ class _CoursesState extends State<Courses> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      CourseDetailsPage(course: coursesList[index]),
+                  builder: (context) => CourseDetailsPage(
+                    course: coursesList[index],
+                    onMarkAsClosed: () {
+                      setState(() {
+                        coursesList[index].registrationDeadline = 'Encerrado';
+                      });
+                    },
+                  ),
                 ),
               );
             },
@@ -84,16 +90,26 @@ class _CoursesState extends State<Courses> {
   }
 }
 
-class CourseDetailsPage extends StatelessWidget {
+class CourseDetailsPage extends StatefulWidget {
   final Course course;
+  final Function() onMarkAsClosed;
 
-  const CourseDetailsPage({Key? key, required this.course}) : super(key: key);
+  const CourseDetailsPage({
+    Key? key,
+    required this.course,
+    required this.onMarkAsClosed,
+  }) : super(key: key);
 
+  @override
+  _CourseDetailsPageState createState() => _CourseDetailsPageState();
+}
+
+class _CourseDetailsPageState extends State<CourseDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(course.title),
+        title: Text(widget.course.title),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -101,21 +117,22 @@ class CourseDetailsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Ministrado por: ${course.instructor}'),
+            Text('Ministrado por: ${widget.course.instructor}'),
             const SizedBox(height: 16.0),
             Image.asset(
-              course.image,
+              widget.course.image,
               width: 400.0,
               height: 400.0,
               fit: BoxFit.cover,
             ),
             const SizedBox(height: 16.0),
-            Text('Preço: ${course.price} €'),
+            Text('Preço: ${widget.course.price} €'),
             const SizedBox(height: 16.0),
             const Text('Descrição:'),
-            Text(course.description),
+            Text(widget.course.description),
             const SizedBox(height: 16.0),
-            Text('Inscrições disponíveis até: ${course.registrationDeadline}'),
+            Text(
+                'Inscrições disponíveis até: ${widget.course.registrationDeadline}'),
             const SizedBox(height: 32.0),
             ElevatedButton(
               onPressed: () {
@@ -125,18 +142,18 @@ class CourseDetailsPage extends StatelessWidget {
                     duration: Duration(seconds: 3),
                   ),
                 );
-                // Aqui você pode adicionar a lógica para inscrição no curso
+                widget.onMarkAsClosed(); // Call the callback to mark as closed
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
-                  course.registrationDeadline == 'Encerrado'
+                  widget.course.registrationDeadline == 'Encerrado'
                       ? Colors.red
                       : Colors.blue,
                 ),
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
               ),
               child: Text(
-                course.registrationDeadline == 'Encerrado'
+                widget.course.registrationDeadline == 'Encerrado'
                     ? 'Esgotado'
                     : 'Inscrever-se',
               ),
