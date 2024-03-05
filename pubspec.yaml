@@ -68,8 +68,10 @@ flutter:
       - assets/icons/logo.png
       - assets/imagens/bacground-image-center.jpg
       - assets/imagens/dizimo.jpg
-      - assets/imagens/oferta.jpg      
-      
+      - assets/imagens/oferta.jpg
+      - assets/imagens/mulher-unica.jpg
+      - assets/imagens/homen-ao-maximo.jpg
+      - assets/imagens/casados-para-sempre.jpg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
