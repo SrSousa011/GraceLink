@@ -71,12 +71,9 @@ class _CoursesState extends State<Courses> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
-                            'Ministrado por: ${coursesList[index].instructor}'),
-                        Text('Descrição: ${coursesList[index].description}'),
-                        Text('Preço: ${coursesList[index].price} €'),
-                        Text(
-                            'Inscrições disponíveis até: ${coursesList[index].registrationDeadline}'),
+                        Text(coursesList[index].instructor),
+                        Text(coursesList[index].description),
+                        Text('${coursesList[index].price} €'),
                       ],
                     ),
                   ),
