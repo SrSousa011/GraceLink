@@ -25,16 +25,14 @@ class DonationPage extends StatefulWidget {
 }
 
 class _DonationPageState extends State<DonationPage> {
-  late String donationType;
-  late String selectedPayment;
+  String donationType = '';
+  String selectedPayment = 'Paypal';
   late TextEditingController donationController;
 
   @override
   void initState() {
     super.initState();
     donationController = TextEditingController();
-    donationType = '';
-    selectedPayment = 'Paypal';
   }
 
   @override
@@ -62,19 +60,19 @@ class _DonationPageState extends State<DonationPage> {
               selectedPayment: selectedPayment,
               onPaymentSelected: (payment) {
                 setState(() {
-                  selectedPayment = payment!;
+                  selectedPayment = payment ?? selectedPayment;
                 });
               },
               onTypeSelected: (type) {
                 setState(() {
-                  donationType = type!;
+                  donationType = type ?? donationType;
                 });
               },
             ),
             DonationType(
               onTypeSelected: (type) {
                 setState(() {
-                  donationType = type!;
+                  donationType = type;
                 });
               },
               donationType: '',
