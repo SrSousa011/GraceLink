@@ -40,16 +40,13 @@ class _SplashScreenState extends State<SplashScreen> {
       drawer: widget.drawer, // Use the drawer parameter
       body: Container(
         decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/imagens/background_image.jpg'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Center(
-          child: Image.asset(
-            'assets/icons/logo.png',
-            height: 400,
-            width: 400,
+          gradient: LinearGradient(
+            colors: [
+              Color.fromARGB(255, 255, 153, 0),
+              Color.fromARGB(255, 63, 166, 255)
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
       ),
