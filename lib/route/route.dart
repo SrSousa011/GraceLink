@@ -2,9 +2,11 @@ import 'package:churchapp/views/SignUp/signUp2.dart';
 import 'package:churchapp/views/SignUp/signUp3.dart';
 import 'package:churchapp/views/SignUp/signUp4.dart';
 import 'package:churchapp/views/SignUp/signUp.dart';
+import 'package:churchapp/views/courses.dart';
+import 'package:churchapp/views/donations.dart';
+import 'package:churchapp/views/events.dart';
 import 'package:churchapp/views/user_profile.dart'; // Update file name and path if necessary
 import 'package:churchapp/views/welcome.dart'; // Update file name and path if necessary
-import 'package:churchapp/views/event_page.dart'; // Update file name and path if necessary
 import 'package:churchapp/views/home.dart'; // Update file name and path if necessary
 import 'package:churchapp/views/login.dart'; // Update file name and path if necessary
 import 'package:churchapp/views/nav_bar.dart'; // Update file name and path if necessary
@@ -38,8 +40,12 @@ Route<dynamic> controller(RouteSettings settings) {
       return MaterialPageRoute(builder: (_) => const UserProfile());
     case '/navbar': // Navigation Drawer Screen Route
       return MaterialPageRoute(builder: (_) => const NavBar());
+    case '/donations': // Navigation Drawer Screen Route
+      return MaterialPageRoute(builder: (_) => const Donations());
+    case '/courses': // Navigation Drawer Screen Route
+      return MaterialPageRoute(builder: (_) => const Courses());
     case '/eventpage': // Event Page Screen Route
-      return MaterialPageRoute(builder: (_) => const EventPage());
+      return MaterialPageRoute(builder: (_) => const Events());
     default:
       return MaterialPageRoute(
           builder: (_) =>
