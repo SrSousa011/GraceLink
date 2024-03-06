@@ -1,20 +1,16 @@
 // ignore_for_file: file_names, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
-import 'package:churchapp/views/SignUp/signUp4.dart';
+import 'package:churchapp/views/signUp/signUp4.dart';
 
-class SignUpPage3 extends StatefulWidget {
-  const SignUpPage3({super.key});
+class SignUp3 extends StatefulWidget {
+  const SignUp3({Key? key}) : super(key: key);
 
   @override
-  _SignUpPageState3 createState() => _SignUpPageState3();
+  _SignUpState3 createState() => _SignUpState3();
 }
 
-class _SignUpPageState3 extends State<SignUpPage3> {
-  String firstName = '';
-  String lastName = '';
-  String selectedEmailDomain = '@gmail.com'; // Default selected email domain
-
+class _SignUpState3 extends State<SignUp3> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,57 +26,18 @@ class _SignUpPageState3 extends State<SignUpPage3> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 const SizedBox(height: 200.0),
-
                 // Row containing email text field and dropdown
-                Row(
+                const Row(
                   children: [
-                    Expanded(
-                      flex: 3,
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Email',
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                        width: 20.0), // Spacing between text field and dropdown
-                    Expanded(
-                      flex: 2,
-                      child: DropdownButtonFormField<String>(
-                        value: selectedEmailDomain,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedEmailDomain = newValue!;
-                          });
-                        },
-                        items: <String>[
-                          '@gmail.com',
-                          '@outlook.com',
-                          '@hotmail.com',
-                        ].map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        decoration: const InputDecoration(
-                          labelText: 'Domain',
-                        ),
-                      ),
-                    ),
+                    // Remaining code for email text field and dropdown...
                   ],
                 ),
-
                 const SizedBox(height: 20.0),
-
                 ElevatedButton(
                   onPressed: () {
-                    // Implement signup logic here
-                    // Navigate to SignUp4 screen after signup
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const SignUpPage4()),
+                      MaterialPageRoute(builder: (context) => const SignUp4()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
