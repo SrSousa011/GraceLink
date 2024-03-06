@@ -6,18 +6,18 @@ import 'package:intl/intl.dart';
 
 void main() {
   runApp(const MaterialApp(
-    home: EventPage(),
+    home: Events(),
   ));
 }
 
-class EventPage extends StatefulWidget {
-  const EventPage({Key? key}) : super(key: key);
+class Events extends StatefulWidget {
+  const Events({Key? key}) : super(key: key);
 
   @override
-  _EventPageState createState() => _EventPageState();
+  _EventsState createState() => _EventsState();
 }
 
-class _EventPageState extends State<EventPage> {
+class _EventsState extends State<Events> {
   List<Event> events = [
     Event(
       title: 'Culto de Domingo',

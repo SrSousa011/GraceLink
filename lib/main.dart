@@ -7,7 +7,7 @@ import 'package:churchapp/views/login.dart';
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:churchapp/views/splash_screen.dart';
 import 'package:churchapp/views/user_profile.dart';
-import 'package:churchapp/views/event_page.dart';
+import 'package:churchapp/views/events.dart';
 import 'package:churchapp/views/SignUp/signUp2.dart';
 import 'package:churchapp/views/SignUp/signUp3.dart';
 import 'package:churchapp/views/SignUp/signUp4.dart';
@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const Home(),
         '/courses': (context) => const Courses(),
         '/user_profile': (context) => const UserProfile(),
-        '/event_page': (context) => const EventPage(),
+        '/event_page': (context) => const Events(),
         '/donations': (context) => const Donations(),
         '/welcome': (context) => const Welcome(title: 'GraceLink'),
       },
