@@ -3,16 +3,19 @@
 import 'package:churchapp/views/user_profile.dart';
 import 'package:flutter/material.dart';
 
-class SignUpPage4 extends StatefulWidget {
-  const SignUpPage4({super.key});
+class SignUp4 extends StatefulWidget {
+  const SignUp4({Key? key}) : super(key: key);
 
   @override
-  _SignUpPage4State createState() => _SignUpPage4State();
+  _SignUp4State createState() => _SignUp4State();
 }
 
-class _SignUpPage4State extends State<SignUpPage4> {
-  String password = '';
-  String confirmPassword = '';
+class _SignUp4State extends State<SignUp4> {
+  get password => null;
+
+  Object? get confirmPassword => null;
+
+  // Remaining code for SignUpPage4...
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +32,7 @@ class _SignUpPage4State extends State<SignUpPage4> {
               obscureText: true,
               onChanged: (value) {
                 setState(() {
-                  password = value;
+                  // Update password state variable...
                 });
               },
               decoration: const InputDecoration(
@@ -41,7 +44,7 @@ class _SignUpPage4State extends State<SignUpPage4> {
               obscureText: true,
               onChanged: (value) {
                 setState(() {
-                  confirmPassword = value;
+                  // Update confirmPassword state variable...
                 });
               },
               decoration: const InputDecoration(
@@ -55,14 +58,14 @@ class _SignUpPage4State extends State<SignUpPage4> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (password == confirmPassword) {
-                        // Senhas coincidem, navegar para a página Home
+                        // Passwords match, navigate to the next page
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => UserProfile()),
+                              builder: (context) => const UserProfile()),
                         );
                       } else {
-                        // Senhas não coincidem, exibir mensagem de erro
+                        // Passwords don't match, display error message
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Passwords do not match!'),
