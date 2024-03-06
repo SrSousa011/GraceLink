@@ -4,7 +4,7 @@ import 'package:churchapp/views/SignUp/signUp2.dart';
 import 'package:flutter/material.dart';
 
 class SignUp extends StatefulWidget {
-  const SignUp({super.key});
+  const SignUp({Key? key}) : super(key: key);
 
   @override
   _SignUpState createState() => _SignUpState();
@@ -40,7 +40,6 @@ class _SignUpState extends State<SignUp> {
                 const SizedBox(height: 20.0),
                 ElevatedButton(
                   onPressed: () {
-                    // Navigate para a tela de SignUp
                     Navigator.push(
                       context,
                       MaterialPageRoute(
