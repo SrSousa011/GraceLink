@@ -23,7 +23,7 @@ class _CoursesState extends State<Courses> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CourseDetailsPage(
+                  builder: (context) => CourseDetails(
                     course: coursesDetailsList[index],
                     onMarkAsClosed: () {
                       setState(() {
@@ -112,21 +112,21 @@ class _CoursesState extends State<Courses> {
   }
 }
 
-class CourseDetailsPage extends StatefulWidget {
+class CourseDetails extends StatefulWidget {
   final Course course;
   final Function() onMarkAsClosed;
 
-  const CourseDetailsPage({
+  const CourseDetails({
     Key? key,
     required this.course,
     required this.onMarkAsClosed,
   }) : super(key: key);
 
   @override
-  _CourseDetailsPageState createState() => _CourseDetailsPageState();
+  _CourseDetailsState createState() => _CourseDetailsState();
 }
 
-class _CourseDetailsPageState extends State<CourseDetailsPage> {
+class _CourseDetailsState extends State<CourseDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
