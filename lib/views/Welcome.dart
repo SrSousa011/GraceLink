@@ -1,4 +1,4 @@
-import 'package:churchapp/views/SignUp/signUp.dart';
+import 'package:churchapp/views/signUp/signUp.dart';
 import 'package:churchapp/views/login.dart';
 import 'package:flutter/material.dart';
 
