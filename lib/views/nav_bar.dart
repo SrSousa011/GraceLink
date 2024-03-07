@@ -65,7 +65,7 @@ class NavBar extends StatelessWidget {
           children: <Widget>[
             buildHeader(context),
             ListTile(
-              title: const Text('Home'),
+              title: const Text('home'),
               leading: const Icon(Icons.home_outlined),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/home');
