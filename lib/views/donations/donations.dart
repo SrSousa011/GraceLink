@@ -1,11 +1,9 @@
+import 'package:churchapp/views/donations/donate_how.dart';
+import 'package:churchapp/views/donations/donation_type.dart';
+import 'package:churchapp/views/donations/donation_value.dart';
+import 'package:churchapp/views/donations/donnation_buttom.dart';
 import 'package:churchapp/views/nav_bar.dart';
-
-import 'donate_how.dart';
 import 'package:flutter/material.dart';
-import 'donation_value.dart';
-import 'donation_type.dart';
-
-void main() => runApp(const Donations());
 
 class Donations extends StatefulWidget {
   const Donations({Key? key}) : super(key: key);
@@ -65,6 +63,14 @@ class _DonationPageState extends State<Donations> {
                 });
               },
               donationType: '',
+            ),
+            const SizedBox(height: 20.0),
+            // Usando o DonateButton
+            DonateButton(
+              onPressed: () {
+                // Implemente sua lógica de doação aqui
+              },
+              text: 'Doar agora',
             ),
           ],
         ),
