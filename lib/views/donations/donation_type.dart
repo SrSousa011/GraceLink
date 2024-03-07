@@ -40,68 +40,78 @@ class _DonationTypeState extends State<DonationType> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton.icon(
-                onPressed: () async {
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DonationOptionsScreen(
-                        onTypeSelected: (type) {
-                          setState(() {
-                            selectedDonationType = type;
-                          });
-                          widget.onTypeSelected(type);
-                        },
+              SizedBox(
+                width: 150,
+                height: 150,
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DonationOptionsScreen(
+                          onTypeSelected: (type) {
+                            setState(() {
+                              selectedDonationType = type;
+                            });
+                            widget.onTypeSelected(type);
+                          },
+                        ),
                       ),
+                    );
+                    if (result != null) {
+                      setState(() {
+                        selectedDonationType = result;
+                      });
+                    }
+                  },
+                  icon: const Icon(Icons.attach_money),
+                  label: Text(selectedDonationType.isEmpty
+                      ? "Escolha o tipo de doaçzão"
+                      : selectedDonationType),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(22.0), // Borda quadrada
                     ),
-                  );
-                  if (result != null) {
-                    setState(() {
-                      selectedDonationType = result;
-                    });
-                  }
-                },
-                icon: const Icon(Icons.attach_money),
-                label: Text(selectedDonationType.isEmpty
-                    ? "Escolha o tipo de doação"
-                    : selectedDonationType),
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(22.0),
                   ),
                 ),
               ),
               const SizedBox(
                 width: 20,
               ),
-              ElevatedButton.icon(
-                onPressed: () async {
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => FoodOptionsScreen(
-                        onTypeSelected: (type) {
-                          setState(() {
-                            selectedFoodType = type;
-                          });
-                          widget.onTypeSelected(type);
-                        },
+              SizedBox(
+                width: 150,
+                height: 150,
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FoodOptionsScreen(
+                          onTypeSelected: (type) {
+                            setState(() {
+                              selectedFoodType = type;
+                            });
+                            widget.onTypeSelected(type);
+                          },
+                        ),
                       ),
+                    );
+                    if (result != null) {
+                      setState(() {
+                        selectedFoodType = result;
+                      });
+                    }
+                  },
+                  icon: const Icon(Icons.food_bank),
+                  label: Text(selectedFoodType.isEmpty
+                      ? "Selecione o tipo de alimento"
+                      : selectedFoodType),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(22.0), // Borda quadrada
                     ),
-                  );
-                  if (result != null) {
-                    setState(() {
-                      selectedFoodType = result;
-                    });
-                  }
-                },
-                icon: const Icon(Icons.food_bank),
-                label: Text(selectedFoodType.isEmpty
-                    ? "Selecione o tipo de alimento"
-                    : selectedFoodType),
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(22.0),
                   ),
                 ),
               ),
