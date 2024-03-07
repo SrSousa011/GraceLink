@@ -26,7 +26,15 @@ class _CoursesState extends State<Courses> {
                 const EdgeInsets.only(bottom: 16.0), // Espaçamento inferior
             child: GestureDetector(
               onTap: () {
-                // Navega para os detalhes do curso
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CoursesDetails(
+                      course: coursesList[index],
+                      onMarkAsClosed: () {},
+                    ),
+                  ),
+                );
               },
               child: Container(
                 padding: const EdgeInsets.all(16.0),
