@@ -23,24 +23,24 @@ class _EventsState extends State<Events> {
       title: 'Culto de Domingo',
       description:
           'Participe do nosso culto dominical com louvor, adoração e uma mensagem inspiradora.',
-      date:
-          DateTime(2024, 3, 1, 10, 0), // Domingo, 1º de março de 2024, às 10h00
+      date: DateTime(2024, 3, 1, 10, 0),
+      time: const TimeOfDay(hour: 10, minute: 0), // Adding a default time
       location: 'Igreja da Comunidade',
     ),
     Event(
       title: 'Grupo de Estudo Bíblico',
       description:
           'Venha participar do nosso grupo de estudo bíblico semanal para aprender mais sobre a Palavra de Deus.',
-      date: DateTime(
-          2024, 3, 4, 19, 0), // Quarta-feira, 4 de março de 2024, às 19h00
+      date: DateTime(2024, 3, 4, 19, 0),
+      time: const TimeOfDay(hour: 10, minute: 0), // Adding a default time
       location: 'Salão da Igreja',
     ),
     Event(
       title: 'Concerto de Natal',
       description:
           'Celebre a época festiva com músicas de Natal apresentadas pelo coro da igreja.',
-      date: DateTime(2024, 12, 20, 18,
-          30), // Sexta-feira, 20 de dezembro de 2024, às 18h30
+      date: DateTime(2024, 12, 20, 18, 30),
+      time: const TimeOfDay(hour: 10, minute: 0), // Adding a default time
       location: 'Igreja da Comunidade',
     ),
   ];
@@ -63,6 +63,7 @@ class _EventsState extends State<Events> {
               title: events[index].title,
               description: events[index].description,
               date: events[index].date,
+              time: events[index].time,
               location: events[index].location,
             ),
           );
@@ -109,6 +110,7 @@ class _AddEventFormState extends State<AddEventForm> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
   final _selectController = TextEditingController();
 
   Future<void> _selectDate(BuildContext context) async {
@@ -121,6 +123,18 @@ class _AddEventFormState extends State<AddEventForm> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
+      });
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null && picked != _selectedTime) {
+      setState(() {
+        _selectedTime = picked;
       });
     }
   }
@@ -169,6 +183,21 @@ class _AddEventFormState extends State<AddEventForm> {
                 ),
               ],
             ),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.access_time),
+                  onPressed: () {
+                    _selectTime(context);
+                  },
+                ),
+                Text(
+                  _selectedTime == null
+                      ? 'Selecione o horário'
+                      : _selectedTime!.format(context),
+                ),
+              ],
+            ),
             TextField(
               controller: _selectController,
               decoration: const InputDecoration(
@@ -181,6 +210,10 @@ class _AddEventFormState extends State<AddEventForm> {
               onPressed: () {
                 _saveEvent(context);
               },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.blue,
+              ),
               child: const Text('Salvar'),
             ),
           ],
@@ -193,11 +226,13 @@ class _AddEventFormState extends State<AddEventForm> {
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty &&
         _selectedDate != null &&
+        _selectedTime != null &&
         _selectController.text.isNotEmpty) {
       final newEvent = Event(
         title: _titleController.text,
         description: _descriptionController.text,
         date: _selectedDate!,
+        time: _selectedTime!,
         location: _selectController.text,
       );
       Navigator.pop(context, newEvent);
@@ -223,24 +258,58 @@ class _AddEventFormState extends State<AddEventForm> {
   }
 }
 
-class Event {
-  final String title;
-  final String description;
-  final DateTime date;
-  final String location;
+class EventDetailsScreen extends StatelessWidget {
+  final Event event;
 
-  Event({
-    required this.title,
-    required this.description,
-    required this.date,
-    required this.location,
-  });
+  const EventDetailsScreen({Key? key, required this.event}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(event.title),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Title: ${event.title}',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Description: ${event.description}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Date: ${DateFormat('dd/MM/yyyy').format(event.date)}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Time: ${event.time.format(context)}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Location: ${event.location}',
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class EventCard extends StatelessWidget {
   final String title;
   final String description;
   final DateTime date;
+  final TimeOfDay time;
   final String location;
 
   const EventCard({
@@ -248,6 +317,7 @@ class EventCard extends StatelessWidget {
     required this.title,
     required this.description,
     required this.date,
+    required this.time,
     required this.location,
   }) : super(key: key);
 
@@ -274,7 +344,12 @@ class EventCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Data: ${_formatDate(date)}',
+              'Data: ${DateFormat('dd/MM/yyyy').format(date)}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Horário: ${time.format(context)}',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
@@ -287,49 +362,20 @@ class EventCard extends StatelessWidget {
       ),
     );
   }
-
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
 }
 
-class EventDetailsScreen extends StatelessWidget {
-  final Event event;
+class Event {
+  final String title;
+  final String description;
+  final DateTime date;
+  final TimeOfDay time;
+  final String location;
 
-  const EventDetailsScreen({Key? key, required this.event}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(event.title),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Descrição: ${event.description}',
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Data: ${_formatDate(event.date)}',
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Local: ${event.location}',
-              style: const TextStyle(fontSize: 18),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
+  Event({
+    required this.title,
+    required this.description,
+    required this.date,
+    required this.time,
+    required this.location,
+  });
 }
