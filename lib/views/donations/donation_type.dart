@@ -14,6 +14,9 @@ class DonationType extends StatefulWidget {
 }
 
 class _DonationTypeState extends State<DonationType> {
+  late String selectedDonationType = '';
+  late String selectedFoodType = '';
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -21,10 +24,9 @@ class _DonationTypeState extends State<DonationType> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           const Padding(
-            padding:
-                EdgeInsets.only(left: 25.0), // Adiciona espaçamento à esquerda
+            padding: EdgeInsets.only(left: 25.0),
             child: Text(
-              'Tipo de Doação:', // Adicionando rótulo
+              'Tipo de Doação:',
               style: TextStyle(
                 fontSize: 24.0,
                 fontWeight: FontWeight.bold,
@@ -34,58 +36,72 @@ class _DonationTypeState extends State<DonationType> {
           ),
           const SizedBox(
             height: 30,
-          ), // Adiciona espaço entre o texto e os botões
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
-                width: 150,
-                height: 150,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DonationOptionsScreen(
-                          onTypeSelected: widget.onTypeSelected,
-                        ),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DonationOptionsScreen(
+                        onTypeSelected: (type) {
+                          setState(() {
+                            selectedDonationType = type;
+                          });
+                          widget.onTypeSelected(type);
+                        },
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.attach_money),
-                  label: const Text("Escolha o tipo de doação"),
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(22.0), // Borda arredondada
                     ),
+                  );
+                  if (result != null) {
+                    setState(() {
+                      selectedDonationType = result;
+                    });
+                  }
+                },
+                icon: const Icon(Icons.attach_money),
+                label: Text(selectedDonationType.isEmpty
+                    ? "Escolha o tipo de doação"
+                    : selectedDonationType),
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(22.0),
                   ),
                 ),
               ),
               const SizedBox(
                 width: 20,
               ),
-              SizedBox(
-                width: 150,
-                height: 150,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => FoodOptionsScreen(
-                          onTypeSelected: widget.onTypeSelected,
-                        ),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FoodOptionsScreen(
+                        onTypeSelected: (type) {
+                          setState(() {
+                            selectedFoodType = type;
+                          });
+                          widget.onTypeSelected(type);
+                        },
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.food_bank),
-                  label: const Text("Selecione o tipo de alimento"),
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(22.0), // Borda arredondada
                     ),
+                  );
+                  if (result != null) {
+                    setState(() {
+                      selectedFoodType = result;
+                    });
+                  }
+                },
+                icon: const Icon(Icons.food_bank),
+                label: Text(selectedFoodType.isEmpty
+                    ? "Selecione o tipo de alimento"
+                    : selectedFoodType),
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(22.0),
                   ),
                 ),
               ),
@@ -114,7 +130,7 @@ class DonationOptionsScreen extends StatelessWidget {
           InkWell(
             onTap: () {
               onTypeSelected("Dízimo");
-              Navigator.pop(context); // Close the current screen
+              Navigator.pop(context, "Dízimo");
             },
             child: const ListTile(
               title: Text("Dízimo"),
@@ -123,7 +139,7 @@ class DonationOptionsScreen extends StatelessWidget {
           InkWell(
             onTap: () {
               onTypeSelected("Oferta");
-              Navigator.pop(context); // Close the current screen
+              Navigator.pop(context, "Oferta");
             },
             child: const ListTile(
               title: Text("Oferta"),
@@ -152,7 +168,7 @@ class FoodOptionsScreen extends StatelessWidget {
           InkWell(
             onTap: () {
               onTypeSelected("Projeto doar e amar");
-              Navigator.pop(context); // Close the current screen
+              Navigator.pop(context, "Projeto doar e amar");
             },
             child: const ListTile(
               title: Text("Projeto doar e amar"),
@@ -161,7 +177,7 @@ class FoodOptionsScreen extends StatelessWidget {
           InkWell(
             onTap: () {
               onTypeSelected("Missão África");
-              Navigator.pop(context); // Close the current screen
+              Navigator.pop(context, "Missão África");
             },
             child: const ListTile(
               title: Text("Missão África"),
