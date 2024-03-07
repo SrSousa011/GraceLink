@@ -7,33 +7,19 @@ import 'donation_type.dart';
 
 void main() => runApp(const Donations());
 
-class Donations extends StatelessWidget {
+class Donations extends StatefulWidget {
   const Donations({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Donations',
-      home: DonationPage(),
-    );
-  }
-}
-
-class DonationPage extends StatefulWidget {
-  const DonationPage({Key? key}) : super(key: key);
 
   @override
   _DonationPageState createState() => _DonationPageState();
 }
 
-class _DonationPageState extends State<DonationPage> {
+class _DonationPageState extends State<Donations> {
   String donationType = '';
   String selectedPayment = 'Paypal';
   late TextEditingController donationController;
 
-  @override
-  void initState() {
-    super.initState();
+  _DonationPageState() {
     donationController = TextEditingController();
   }
 
@@ -80,9 +66,6 @@ class _DonationPageState extends State<DonationPage> {
               },
               donationType: '',
             ),
-            const SizedBox(height: 70.0),
-            if (donationType.isNotEmpty) // Display selected donation type image
-              Image.asset('assets/$donationType.png'),
           ],
         ),
       ),
