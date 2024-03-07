@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 
 class CoursesDetails extends StatefulWidget {
   final Course course;
-  final Function() onMarkAsClosed;
 
-  const CoursesDetails({
-    Key? key,
-    required this.course,
-    required this.onMarkAsClosed,
-  }) : super(key: key);
+  const CoursesDetails(
+      {Key? key, required this.course, required Null Function() onMarkAsClosed})
+      : super(key: key);
 
   @override
   _CoursesDetailsState createState() => _CoursesDetailsState();
@@ -17,6 +14,9 @@ class CoursesDetails extends StatefulWidget {
 class _CoursesDetailsState extends State<CoursesDetails> {
   @override
   Widget build(BuildContext context) {
+    bool isClosed = widget.course.registrationDeadline ==
+        'Encerrado'; // Check if course is closed
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.course.title),
@@ -27,7 +27,7 @@ class _CoursesDetailsState extends State<CoursesDetails> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(' ${widget.course.instructor}'),
+            Text('${widget.course.instructor}'),
             const SizedBox(height: 16.0),
             Center(
               child: Image.asset(
@@ -38,35 +38,39 @@ class _CoursesDetailsState extends State<CoursesDetails> {
               ),
             ),
             const SizedBox(height: 16.0),
-            Text(' ${widget.course.price} €'),
+            Text('${widget.course.price} €'),
             const SizedBox(height: 16.0),
             Text(widget.course.description),
             const SizedBox(height: 16.0),
             Text(
-                'Inscrições disponíveis até: ${widget.course.registrationDeadline}'),
+              isClosed
+                  ? 'Inscrições encerradas'
+                  : 'Inscrições disponíveis até: ${widget.course.registrationDeadline}',
+            ),
             const SizedBox(height: 32.0),
             ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Inscrição realizada com sucesso!'),
-                    duration: Duration(seconds: 3),
-                  ),
-                );
-                widget.onMarkAsClosed(); // Call the callback to mark as closed
-              },
+              onPressed: isClosed
+                  ? null
+                  : () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Inscrição realizada com sucesso!'),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                      setState(() {
+                        widget.course.registrationDeadline =
+                            'Encerrado'; // Mark course as closed
+                      });
+                    },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
-                  widget.course.registrationDeadline == 'Encerrado'
-                      ? Colors.red
-                      : Colors.blue,
+                  isClosed ? Colors.red : Colors.blue,
                 ),
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
               ),
               child: Text(
-                widget.course.registrationDeadline == 'Encerrado'
-                    ? 'Esgotado'
-                    : 'Inscrever-se',
+                isClosed ? 'Esgotado' : 'Inscrever-se',
               ),
             ),
           ],
