@@ -13,22 +13,25 @@ class DonateButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: onPressed,
+      onPressed: () {
+        onPressed();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Doação realizada com sucesso!'),
+          ),
+        );
+      },
       style: ElevatedButton.styleFrom(
-        backgroundColor:
-            const Color(0xFF18A0FB), // Define a cor de fundo como 18A0FB
-        minimumSize:
-            const Size.fromHeight(60), // Define a altura mínima do botão
-        padding:
-            const EdgeInsets.all(20), // Define o preenchimento interno do botão
+        backgroundColor: const Color(0xFF18A0FB),
+        minimumSize: const Size.fromHeight(60),
+        padding: const EdgeInsets.all(20),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15), // Define a borda arredondada
+          borderRadius: BorderRadius.circular(15),
         ),
       ),
       child: Text(
         text,
-        style: const TextStyle(
-            color: Colors.white), // Define a cor do texto como branco
+        style: const TextStyle(color: Colors.white),
       ),
     );
   }
