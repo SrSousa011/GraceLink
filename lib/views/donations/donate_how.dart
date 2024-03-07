@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class DonationHow extends StatefulWidget {
-  const DonationHow(
-      {Key? key,
-      required String selectedPayment,
-      required Null Function(dynamic payment) onPaymentSelected,
-      required Null Function(dynamic type) onTypeSelected})
-      : super(key: key);
+  const DonationHow({
+    Key? key,
+    required String selectedPayment,
+    required Null Function(dynamic payment) onPaymentSelected,
+    required Null Function(dynamic type) onTypeSelected,
+  }) : super(key: key);
 
   @override
   State<DonationHow> createState() => _DonationHowState();
@@ -41,7 +41,7 @@ class _DonationHowState extends State<DonationHow> {
             value: selectedPayment,
             onChanged: (String? newValue) {
               setState(() {
-                selectedPayment = newValue!; // Update selectedPayment
+                selectedPayment = newValue!;
               });
             },
             items: <String>['Paypal', 'Cartão de Crédito', 'Cartão de Débito']
@@ -52,7 +52,7 @@ class _DonationHowState extends State<DonationHow> {
               );
             }).toList(),
             decoration: const InputDecoration(
-              labelText: ' ',
+              labelText: 'Método de Pagamento', // Adicionando rótulo
             ),
           ),
           const SizedBox(height: 70.0),
