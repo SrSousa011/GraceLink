@@ -16,47 +16,80 @@ class DonationType extends StatefulWidget {
 class _DonationTypeState extends State<DonationType> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
+    return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          const Text(
-            'Tipo de Doação:', // Adicionando rótulo
-            style: TextStyle(
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
-              color: Color.fromARGB(255, 153, 153, 153),
+          const Padding(
+            padding:
+                EdgeInsets.only(left: 25.0), // Adiciona espaçamento à esquerda
+            child: Text(
+              'Tipo de Doação:', // Adicionando rótulo
+              style: TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 153, 153, 153),
+              ),
             ),
           ),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DonationOptionsScreen(
-                    onTypeSelected: widget.onTypeSelected,
+          const SizedBox(
+            height: 30,
+          ), // Adiciona espaço entre o texto e os botões
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 150,
+                height: 150,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DonationOptionsScreen(
+                          onTypeSelected: widget.onTypeSelected,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.attach_money),
+                  label: const Text("Escolha o tipo de doação"),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(22.0), // Borda arredondada
+                    ),
                   ),
                 ),
-              );
-            },
-            icon: const Icon(Icons.attach_money),
-            label: const Text("Escolha o tipo de doação"),
-          ),
-          const SizedBox(height: 20), // Espaçamento entre os botões
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FoodOptionsScreen(
-                    onTypeSelected: widget.onTypeSelected,
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+              SizedBox(
+                width: 150,
+                height: 150,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FoodOptionsScreen(
+                          onTypeSelected: widget.onTypeSelected,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.food_bank),
+                  label: const Text("Selecione o tipo de alimento"),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(22.0), // Borda arredondada
+                    ),
                   ),
                 ),
-              );
-            },
-            icon: const Icon(Icons.food_bank),
-            label: const Text("Selecione o tipo de alimento"),
+              ),
+            ],
           ),
         ],
       ),
