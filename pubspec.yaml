@@ -72,6 +72,14 @@ flutter:
       - assets/imagens/mulher-unica.jpg
       - assets/imagens/homen-ao-maximo.jpg
       - assets/imagens/casados-para-sempre.jpg
+
+      - assets/aboutUs/aboutUs.jpg
+      - assets/aboutUs/antonio.jpg
+      - assets/aboutUs/antonio.jpg
+      - assets/aboutUs/bible.jpg
+      - assets/aboutUs/conceptual-image-focus-candle-light-with-man-hand-holding-wooden-cross-bible-blurred-world-2048x1365.jpg
+      - assets/aboutUs/hands.jpg
+      - assets/aboutUs/joaldo.jpg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
