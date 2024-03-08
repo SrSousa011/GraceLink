@@ -34,7 +34,7 @@ class _DonationPageState extends State<Donations> {
         title: const Text('Donations'),
       ),
       drawer: const NavBar(),
-      body: SizedBox(
+      body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
