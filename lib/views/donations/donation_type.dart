@@ -66,7 +66,7 @@ class _DonationTypeState extends State<DonationType> {
                   },
                   icon: const Icon(Icons.attach_money),
                   label: Text(selectedDonationType.isEmpty
-                      ? "Escolha o tipo de doaçzão"
+                      ? "Escolha o tipo de doação"
                       : selectedDonationType),
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
