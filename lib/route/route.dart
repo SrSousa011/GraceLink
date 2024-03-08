@@ -1,8 +1,6 @@
-import 'package:churchapp/views/SignUp/signUp2.dart';
+import 'package:churchapp/views/Member/become_member.dart';
 import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/nav_bar.dart';
-import 'package:churchapp/views/signUp/signUp3.dart';
-import 'package:churchapp/views/signUp/signUp4.dart';
 import 'package:churchapp/views/signUp/signUp.dart';
 import 'package:churchapp/views/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
@@ -24,12 +22,6 @@ Route<dynamic> controller(RouteSettings settings) {
       return MaterialPageRoute(builder: (_) => const Login());
     case '/signup': // Sign Up Screen Route
       return MaterialPageRoute(builder: (_) => const SignUp());
-    case '/signup2': // Sign Up 2 Screen Route
-      return MaterialPageRoute(builder: (_) => const SignUpPage2());
-    case '/signup3': // Sign Up 3 Screen Route
-      return MaterialPageRoute(builder: (_) => const SignUp3());
-    case '/signup4': // Sign Up 4 Screen Route
-      return MaterialPageRoute(builder: (_) => const SignUp4());
     case '/welcome': // Welcome Screen Route
       return MaterialPageRoute(
           builder: (_) => const Welcome(
@@ -49,6 +41,8 @@ Route<dynamic> controller(RouteSettings settings) {
       return MaterialPageRoute(builder: (_) => const AboutUs());
     case '/about_us': // Event Page Screen Route
       return MaterialPageRoute(builder: (_) => const Events());
+    case '/become_member': // Event Page Screen Route
+      return MaterialPageRoute(builder: (_) => const BecomeMember());
     default:
       return MaterialPageRoute(
           builder: (_) =>

@@ -100,10 +100,10 @@ class NavBar extends StatelessWidget {
               },
             ),
             ListTile(
-              title: const Text('Devenir membre'),
+              title: const Text('Become member'),
               leading: const Icon(Icons.group_add_outlined),
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/devenir_membre');
+                Navigator.pushReplacementNamed(context, '/become_member');
               },
             ),
             ListTile(
