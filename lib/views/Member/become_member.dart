@@ -1,3 +1,4 @@
+import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
 
 class BecomeMember extends StatefulWidget {
@@ -22,6 +23,7 @@ class _BecomeMemberState extends State<BecomeMember> {
         title: const Text('Tornar-se Membro'),
         centerTitle: true,
       ),
+      drawer: const NavBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
