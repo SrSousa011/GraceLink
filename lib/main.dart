@@ -44,6 +44,7 @@ class MyApp extends StatelessWidget {
         '/user_profile': (context) => const UserProfile(),
         '/event_page': (context) => const Events(),
         '/donations': (context) => const Donations(),
+        '/about_us': (context) => const AboutUs(),
         '/welcome': (context) => const Welcome(title: 'GraceLink'),
       },
     );
