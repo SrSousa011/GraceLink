@@ -27,7 +27,7 @@ class _CoursesDetailsState extends State<CoursesDetails> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${widget.course.instructor}'),
+            Text(widget.course.instructor),
             const SizedBox(height: 16.0),
             Center(
               child: Image.asset(
