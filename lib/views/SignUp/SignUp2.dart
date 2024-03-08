@@ -1,18 +1,17 @@
 // ignore_for_file: file_names, library_private_types_in_public_api
 
-import 'package:churchapp/views/signUp/signUp3.dart';
 import 'package:flutter/material.dart';
+
+import 'SignUp3.dart';
 
 class SignUpPage2 extends StatefulWidget {
   const SignUpPage2({Key? key}) : super(key: key);
 
   @override
-  _SignUpState2 createState() => _SignUpState2();
+  _SignUpState createState() => _SignUpState();
 }
 
-class _SignUpState2 extends State<SignUpPage2> {
-  // Remaining code for SignUpPage2...
-
+class _SignUpState extends State<SignUpPage2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,18 +27,39 @@ class _SignUpState2 extends State<SignUpPage2> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 const SizedBox(height: 200.0),
-                // Date of Birth Section
                 const Row(
-                  children: [
-                    // Remaining code for date of birth dropdowns...
+                  // Use Row instead of Column
+                  children: <Widget>[
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          labelText: 'Day',
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 20.0), // Add spacing between widgets
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          labelText: 'Month',
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 20.0), // Add spacing between widgets
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          labelText: 'Year',
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 20.0),
-                // Gender Dropdown
-                const Row(
-                  children: [
-                    // Remaining code for gender dropdown...
-                  ],
+                const TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Slect Gender',
+                  ),
                 ),
                 const SizedBox(height: 20.0),
                 ElevatedButton(
