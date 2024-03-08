@@ -12,7 +12,7 @@ class _SignUpPage2State extends State<SignUpPage2> {
   int? selectedDay;
   int? selectedMonth;
   int? selectedYear;
-  String selectedGender = '';
+  String selectedGender = 'Male'; // Set an initial value
 
   @override
   Widget build(BuildContext context) {
