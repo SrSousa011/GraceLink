@@ -1,17 +1,19 @@
-// ignore_for_file: file_names, library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
-
 import 'SignUp3.dart';
 
 class SignUpPage2 extends StatefulWidget {
   const SignUpPage2({Key? key}) : super(key: key);
 
   @override
-  _SignUpState createState() => _SignUpState();
+  _SignUpPage2State createState() => _SignUpPage2State();
 }
 
-class _SignUpState extends State<SignUpPage2> {
+class _SignUpPage2State extends State<SignUpPage2> {
+  int? selectedDay;
+  int? selectedMonth;
+  int? selectedYear;
+  String selectedGender = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,39 +29,91 @@ class _SignUpState extends State<SignUpPage2> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 const SizedBox(height: 200.0),
-                const Row(
-                  // Use Row instead of Column
+                Row(
                   children: <Widget>[
                     Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
+                      child: DropdownButtonFormField<int>(
+                        decoration: const InputDecoration(
                           labelText: 'Day',
                         ),
+                        value: selectedDay,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedDay = value!;
+                          });
+                        },
+                        items: List.generate(31, (index) {
+                          return DropdownMenuItem<int>(
+                            value: index + 1,
+                            child: Text((index + 1).toString()),
+                          );
+                        }),
                       ),
                     ),
-                    SizedBox(width: 20.0), // Add spacing between widgets
+                    const SizedBox(width: 20.0), // Add spacing between widgets
                     Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
+                      child: DropdownButtonFormField<int>(
+                        decoration: const InputDecoration(
                           labelText: 'Month',
                         ),
+                        value: selectedMonth,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedMonth = value!;
+                          });
+                        },
+                        items: List.generate(12, (index) {
+                          return DropdownMenuItem<int>(
+                            value: index + 1,
+                            child: Text((index + 1).toString()),
+                          );
+                        }),
                       ),
                     ),
-                    SizedBox(width: 20.0), // Add spacing between widgets
+                    const SizedBox(width: 20.0), // Add spacing between widgets
                     Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
+                      child: DropdownButtonFormField<int>(
+                        decoration: const InputDecoration(
                           labelText: 'Year',
                         ),
+                        value: selectedYear,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedYear = value!;
+                          });
+                        },
+                        items: List.generate(80, (index) {
+                          return DropdownMenuItem<int>(
+                            value: DateTime.now().year - index,
+                            child:
+                                Text((DateTime.now().year - index).toString()),
+                          );
+                        }),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20.0),
-                const TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Slect Gender',
+                DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(
+                    labelText: 'Select Gender',
                   ),
+                  value: selectedGender,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedGender = value!;
+                    });
+                  },
+                  items: const [
+                    DropdownMenuItem<String>(
+                      value: 'Male',
+                      child: Text('Male'),
+                    ),
+                    DropdownMenuItem<String>(
+                      value: 'Female',
+                      child: Text('Female'),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 20.0),
                 ElevatedButton(
