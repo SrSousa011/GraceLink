@@ -34,45 +34,47 @@ class _DonationPageState extends State<Donations> {
         title: const Text('Donations'),
       ),
       drawer: const NavBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            DonationValue(
-              donationController: donationController,
-            ),
-            const SizedBox(height: 20.0),
-            DonationHow(
-              selectedPayment: selectedPayment,
-              onPaymentSelected: (payment) {
-                setState(() {
-                  selectedPayment = payment ?? selectedPayment;
-                });
-              },
-              onTypeSelected: (type) {
-                setState(() {
-                  donationType = type ?? donationType;
-                });
-              },
-            ),
-            DonationType(
-              onTypeSelected: (type) {
-                setState(() {
-                  donationType = type;
-                });
-              },
-              donationType: '',
-            ),
-            const SizedBox(height: 20.0),
-            // Usando o DonateButton
-            DonateButton(
-              onPressed: () {
-                // Implemente sua lógica de doação aqui
-              },
-              text: 'Doar agora',
-            ),
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              DonationValue(
+                donationController: donationController,
+              ),
+              const SizedBox(height: 20.0),
+              DonationHow(
+                selectedPayment: selectedPayment,
+                onPaymentSelected: (payment) {
+                  setState(() {
+                    selectedPayment = payment ?? selectedPayment;
+                  });
+                },
+                onTypeSelected: (type) {
+                  setState(() {
+                    donationType = type ?? donationType;
+                  });
+                },
+              ),
+              DonationType(
+                onTypeSelected: (type) {
+                  setState(() {
+                    donationType = type;
+                  });
+                },
+                donationType: '',
+              ),
+              const SizedBox(height: 20.0),
+              // Using the DonateButton
+              DonateButton(
+                onPressed: () {
+                  // Implement your donation logic here
+                },
+                text: 'Doar agora',
+              ),
+            ],
+          ),
         ),
       ),
     );
