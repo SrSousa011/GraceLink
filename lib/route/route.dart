@@ -1,4 +1,5 @@
 import 'package:churchapp/views/SignUp/signUp2.dart';
+import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:churchapp/views/signUp/signUp3.dart';
 import 'package:churchapp/views/signUp/signUp4.dart';
@@ -45,6 +46,8 @@ Route<dynamic> controller(RouteSettings settings) {
     case '/courses': // Navigation Drawer Screen Route
       return MaterialPageRoute(builder: (_) => const Courses());
     case '/eventpage': // Event Page Screen Route
+      return MaterialPageRoute(builder: (_) => const AboutUs());
+    case '/about_us': // Event Page Screen Route
       return MaterialPageRoute(builder: (_) => const Events());
     default:
       return MaterialPageRoute(

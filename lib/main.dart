@@ -1,3 +1,4 @@
+import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:churchapp/views/signUp/signUp.dart';
 import 'package:churchapp/views/courses/courses.dart';
