@@ -1,7 +1,8 @@
 // ignore_for_file: file_names, library_private_types_in_public_api
 
-import 'package:churchapp/views/SignUp/signUp2.dart';
 import 'package:flutter/material.dart';
+
+import 'SignUp2.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({Key? key}) : super(key: key);
