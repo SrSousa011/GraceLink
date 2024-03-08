@@ -29,7 +29,7 @@ class _DonationHowState extends State<DonationHow> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           const Text(
-            'Doar como:',
+            'Método de Pagamento:',
             style: TextStyle(
               fontSize: 24.0,
               fontWeight: FontWeight.bold,
@@ -51,11 +51,8 @@ class _DonationHowState extends State<DonationHow> {
                 child: Text(value),
               );
             }).toList(),
-            decoration: const InputDecoration(
-              labelText: 'Método de Pagamento', // Adicionando rótulo
-            ),
           ),
-          const SizedBox(height: 70.0),
+          const SizedBox(height: 20.0),
         ],
       ),
     );
