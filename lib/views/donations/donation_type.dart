@@ -24,7 +24,7 @@ class _DonationTypeState extends State<DonationType> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           const Padding(
-            padding: EdgeInsets.only(left: 25.0),
+            padding: EdgeInsets.all(20.0),
             child: Text(
               'Tipo de Doação:',
               style: TextStyle(
@@ -35,7 +35,7 @@ class _DonationTypeState extends State<DonationType> {
             ),
           ),
           const SizedBox(
-            height: 30,
+            height: 10,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -117,6 +117,7 @@ class _DonationTypeState extends State<DonationType> {
               ),
             ],
           ),
+          const SizedBox(height: 70.0), // Adicionando o SizedBox aqui
         ],
       ),
     );
