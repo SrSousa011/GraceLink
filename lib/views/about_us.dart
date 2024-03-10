@@ -141,7 +141,7 @@ class AboutUs extends StatelessWidget {
                                   flex: 2,
                                   child: Image.asset(
                                     'assets/aboutUs/joaldo.jpg',
-                                    height: 200, // Ajuste aqui
+                                    height: 170, // Ajuste aqui
                                     width: double.infinity,
                                   ),
                                 ),
