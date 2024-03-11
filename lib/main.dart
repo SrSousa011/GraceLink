@@ -4,7 +4,7 @@ import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:churchapp/views/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
-import 'package:churchapp/views/signUp/sign_up_personal_iInfo.dart';
+import 'package:churchapp/views/signUp/sign_up_personali_Info.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/login.dart';
 import 'package:churchapp/views/splash_screen.dart';

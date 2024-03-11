@@ -1,4 +1,4 @@
-import 'package:churchapp/views/signUp/sign_up_personal_iInfo.dart';
+import 'package:churchapp/views/signUp/sign_up_personali_Info.dart';
 import 'package:churchapp/views/user_profile.dart';
 import 'package:flutter/material.dart'; // Importa a tela de SignUp
 

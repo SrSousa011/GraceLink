@@ -1,5 +1,5 @@
 import 'package:churchapp/views/login.dart';
-import 'package:churchapp/views/signUp/sign_up_personal_iInfo.dart';
+import 'package:churchapp/views/signUp/sign_up_personali_Info.dart';
 import 'package:flutter/material.dart';
 
 class Welcome extends StatelessWidget {
