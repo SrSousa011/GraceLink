@@ -40,24 +40,9 @@ class _BecomeMemberState extends State<BecomeMember> {
       numberOfDigits: 10,
     ),
     DDDCountryItem(
-      countryCode: 'BR',
-      dddCode: '+55',
-      numberOfDigits: 11,
-    ),
-    DDDCountryItem(
-      countryCode: 'UK',
-      dddCode: '+44',
-      numberOfDigits: 11,
-    ),
-    DDDCountryItem(
       countryCode: 'FR',
       dddCode: '+33',
       numberOfDigits: 9,
-    ),
-    DDDCountryItem(
-      countryCode: 'DE',
-      dddCode: '+49',
-      numberOfDigits: 11,
     ),
     DDDCountryItem(
       countryCode: 'ES',
@@ -68,6 +53,26 @@ class _BecomeMemberState extends State<BecomeMember> {
       countryCode: 'IT',
       dddCode: '+39',
       numberOfDigits: 10,
+    ),
+    DDDCountryItem(
+      countryCode: 'UK',
+      dddCode: '+44',
+      numberOfDigits: 11,
+    ),
+    DDDCountryItem(
+      countryCode: 'DE',
+      dddCode: '+49',
+      numberOfDigits: 11,
+    ),
+    DDDCountryItem(
+      countryCode: 'BR',
+      dddCode: '+55',
+      numberOfDigits: 11,
+    ),
+    DDDCountryItem(
+      countryCode: 'PT',
+      dddCode: '+351',
+      numberOfDigits: 9,
     ),
     DDDCountryItem(
       countryCode: 'LU',
