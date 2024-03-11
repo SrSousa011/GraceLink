@@ -1,9 +1,9 @@
+import 'package:churchapp/views/donations/donnation_buttom.dart';
+import 'package:flutter/material.dart';
 import 'package:churchapp/views/donations/donate_how.dart';
 import 'package:churchapp/views/donations/donation_type.dart';
 import 'package:churchapp/views/donations/donation_value.dart';
-import 'package:churchapp/views/donations/donnation_buttom.dart';
 import 'package:churchapp/views/nav_bar.dart';
-import 'package:flutter/material.dart';
 
 class Donations extends StatefulWidget {
   const Donations({Key? key}) : super(key: key);
@@ -17,7 +17,9 @@ class _DonationPageState extends State<Donations> {
   String selectedPayment = 'QR Code';
   late TextEditingController donationController;
 
-  _DonationPageState() {
+  @override
+  void initState() {
+    super.initState();
     donationController = TextEditingController();
   }
 
@@ -60,38 +62,32 @@ class _DonationPageState extends State<Donations> {
                   donationType = type;
                 });
               },
-              donationType: '',
+              donationType: donationType,
             ),
             const SizedBox(height: 20.0),
-            SizedBox(
-              width: double.infinity, // Para ocupar toda a largura disponível
-              child: ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Confirmation'),
-                        content: const Text(
-                            'You have successfully made a donation!'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Close'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.blue,
-                ),
-                child: const Text('Donation'),
-              ),
+            DonateButton(
+              // Using the corrected DonationButton widget
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Confirmation'),
+                      content:
+                          const Text('You have successfully made a donation!'),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              text: 'Donate', // Specify the button text
             ),
           ],
         ),

@@ -14,24 +14,35 @@ class DonateButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        onPressed();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Doação realizada com sucesso!'),
-          ),
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Confirmation'),
+              content: const Text('You have successfully made a donation!'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Close'),
+                ),
+              ],
+            );
+          },
         );
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF18A0FB),
         minimumSize: const Size.fromHeight(60),
         padding: const EdgeInsets.all(20),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
+        backgroundColor: Colors.blue, // Changed background color to blue
       ),
       child: Text(
         text,
-        style: const TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white), // Set text color to white
       ),
     );
   }
