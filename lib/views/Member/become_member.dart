@@ -1,11 +1,9 @@
-import 'package:churchapp/views/nav_bar.dart';
-import 'package:country_icons/country_icons.dart';
 import 'package:flutter/material.dart';
 
 class DDDCountryItem {
   final String countryCode;
   final String dddCode;
-  final int numberOfDigits; // New field for the number of digits
+  final int numberOfDigits;
 
   DDDCountryItem({
     required this.countryCode,
@@ -14,6 +12,65 @@ class DDDCountryItem {
   });
 }
 
+// Reusable Widgets
+class CountryCodeDropdown extends StatelessWidget {
+  final String selectedDDD;
+  final List<DropdownMenuItem<String>> dropdownItems;
+  final ValueChanged<String?> onChanged;
+
+  const CountryCodeDropdown({
+    Key? key,
+    required this.selectedDDD,
+    required this.dropdownItems,
+    required this.onChanged,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      flex: 1,
+      child: DropdownButtonFormField<String>(
+        decoration: const InputDecoration(
+          labelText: 'Country Code',
+        ),
+        value: selectedDDD,
+        onChanged: onChanged,
+        items: dropdownItems,
+      ),
+    );
+  }
+}
+
+class PhoneTextField extends StatelessWidget {
+  final int maxLength;
+  final TextEditingController controller;
+
+  const PhoneTextField({
+    Key? key,
+    required this.maxLength,
+    required this.controller,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      flex: 3,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 23.0),
+        child: TextField(
+          maxLength: maxLength,
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: 'Phone',
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Main Widget
 class BecomeMember extends StatefulWidget {
   const BecomeMember({Key? key}) : super(key: key);
 
@@ -25,13 +82,12 @@ class _BecomeMemberState extends State<BecomeMember> {
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController churchController = TextEditingController();
-  TextEditingController maritalStatusController = TextEditingController();
   TextEditingController reasonController = TextEditingController();
   TextEditingController referenceController = TextEditingController();
 
   String selectedCivilState = 'Single';
   String selectedDDD = '+1';
-  int numberOfPhoneDigits = 10; // Default number of digits
+  int numberOfPhoneDigits = 10;
 
   List<DDDCountryItem> dddCountryList = [
     DDDCountryItem(
@@ -93,7 +149,6 @@ class _BecomeMemberState extends State<BecomeMember> {
           title: const Text('Tornar-se Membro'),
           centerTitle: true,
         ),
-        drawer: const NavBar(),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
           child: Column(
@@ -106,49 +161,22 @@ class _BecomeMemberState extends State<BecomeMember> {
               const SizedBox(height: 20.0),
               Row(
                 children: [
-                  Expanded(
-                    flex: 1,
-                    child: DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                        labelText: 'Country Code',
-                      ),
-                      value: selectedDDD,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedDDD = value!;
-                          // Update the number of phone digits based on the selected country
-                          numberOfPhoneDigits = dddCountryList
-                              .firstWhere((item) => item.dddCode == selectedDDD)
-                              .numberOfDigits;
-                        });
-                      },
-                      items: dddCountryList.map((item) {
-                        return DropdownMenuItem<String>(
-                          value: item.dddCode,
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 10),
-                              Text(item.dddCode),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                  CountryCodeDropdown(
+                    selectedDDD: selectedDDD,
+                    dropdownItems: buildDropdownItems(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedDDD = value!;
+                        numberOfPhoneDigits = dddCountryList
+                            .firstWhere((item) => item.dddCode == selectedDDD)
+                            .numberOfDigits;
+                      });
+                    },
                   ),
                   const SizedBox(width: 10.0),
-                  Expanded(
-                    flex: 3,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 23.0),
-                      child: TextField(
-                        maxLength: numberOfPhoneDigits,
-                        controller: phoneController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Phone',
-                        ),
-                      ),
-                    ),
+                  PhoneTextField(
+                    maxLength: numberOfPhoneDigits,
+                    controller: phoneController,
                   ),
                 ],
               ),
@@ -231,6 +259,20 @@ class _BecomeMemberState extends State<BecomeMember> {
         ),
       ),
     );
+  }
+
+  List<DropdownMenuItem<String>> buildDropdownItems() {
+    return dddCountryList.map((item) {
+      return DropdownMenuItem<String>(
+        value: item.dddCode,
+        child: Row(
+          children: [
+            const SizedBox(width: 10),
+            Text(item.dddCode),
+          ],
+        ),
+      );
+    }).toList();
   }
 }
 
