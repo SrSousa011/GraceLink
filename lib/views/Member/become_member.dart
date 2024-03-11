@@ -108,51 +108,46 @@ class _BecomeMemberState extends State<BecomeMember> {
                 children: [
                   Expanded(
                     flex: 1,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: DropdownButtonFormField<String>(
-                            decoration: const InputDecoration(
-                              labelText: 'Country Code',
-                            ),
-                            value: selectedDDD,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedDDD = value!;
-                                // Update the number of phone digits based on the selected country
-                                numberOfPhoneDigits = dddCountryList
-                                    .firstWhere(
-                                        (item) => item.dddCode == selectedDDD)
-                                    .numberOfDigits;
-                              });
-                            },
-                            items: dddCountryList.map((item) {
-                              return DropdownMenuItem<String>(
-                                value: item.dddCode,
-                                child: Row(
-                                  children: [
-                                    const SizedBox(width: 10),
-                                    Text(item.dddCode),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
+                    child: DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        labelText: 'Country Code',
+                      ),
+                      value: selectedDDD,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedDDD = value!;
+                          // Update the number of phone digits based on the selected country
+                          numberOfPhoneDigits = dddCountryList
+                              .firstWhere((item) => item.dddCode == selectedDDD)
+                              .numberOfDigits;
+                        });
+                      },
+                      items: dddCountryList.map((item) {
+                        return DropdownMenuItem<String>(
+                          value: item.dddCode,
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 10),
+                              Text(item.dddCode),
+                            ],
                           ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(width: 10.0),
+                  Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 23.0),
+                      child: TextField(
+                        maxLength: numberOfPhoneDigits,
+                        controller: phoneController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Phone',
                         ),
-                        const SizedBox(width: 10.0),
-                        Expanded(
-                          flex: 3,
-                          child: TextField(
-                            controller: phoneController,
-                            keyboardType: TextInputType.number,
-                            maxLength: numberOfPhoneDigits,
-                            decoration: const InputDecoration(
-                              labelText: 'Phone',
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ],
