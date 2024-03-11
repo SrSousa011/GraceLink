@@ -31,38 +31,33 @@ class _BecomeMemberState extends State<BecomeMember> {
           children: <Widget>[
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+              decoration: const InputDecoration(labelText: 'Adress'),
             ),
             const SizedBox(height: 20.0),
             TextField(
               controller: phoneController,
-              obscureText: true,
               decoration: const InputDecoration(labelText: 'Telefone'),
             ),
             const SizedBox(height: 20.0),
             TextField(
               controller: churchController,
-              obscureText: true,
               decoration:
                   const InputDecoration(labelText: 'Última igreja visitada?'),
             ),
             const SizedBox(height: 20.0),
             TextField(
               controller: maritalStatusController,
-              obscureText: true,
               decoration: const InputDecoration(labelText: 'Estado Civil?'),
             ),
             const SizedBox(height: 20.0),
             TextField(
               controller: reasonController,
-              obscureText: true,
               decoration: const InputDecoration(
                   labelText: 'Porque deseja se tornar um membro?'),
             ),
             const SizedBox(height: 20.0),
             TextField(
               controller: referenceController,
-              obscureText: true,
               decoration: const InputDecoration(
                   labelText: 'Referência de um membro atual'),
             ),
