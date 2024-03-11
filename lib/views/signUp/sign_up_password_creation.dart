@@ -40,7 +40,7 @@ class _SignUpPasswordCreationState extends State<SignUpPasswordCreation> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => UserProfile()),
+                              builder: (context) => const UserProfile()),
                         );
                       } else {
                         showDialog(
