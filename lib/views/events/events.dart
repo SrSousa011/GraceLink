@@ -1,5 +1,8 @@
 // ignore_for_file: file_names, library_private_types_in_public_api
 
+import 'package:churchapp/views/events/Floating_action_button_widget.dart';
+import 'package:churchapp/views/events/app_bar_widget.dart';
+import 'package:churchapp/views/events/event_list_view.dart';
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -48,33 +51,20 @@ class _EventsState extends State<Events> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Eventos'),
-      ),
+      appBar: const AppBarWidget(title: 'Eventos'),
       drawer: const NavBar(),
-      body: ListView.builder(
-        itemCount: events.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              _navigateToEventDetailsScreen(context, events[index]);
-            },
-            child: EventCard(
-              title: events[index].title,
-              description: events[index].description,
-              date: events[index].date,
-              time: events[index].time,
-              location: events[index].location,
-            ),
-          );
+      body: EventListView(
+        events: events,
+        onTap: (event) {
+          _navigateToEventDetailsScreen(context, event);
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButtonWidget(
         onPressed: () {
           _navigateToAddEventScreen(context);
         },
         tooltip: 'Novo Evento',
-        child: const Icon(Icons.add),
+        icon: Icons.add,
       ),
     );
   }
@@ -146,9 +136,7 @@ class _AddEventFormState extends State<AddEventForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Novo Evento'),
-      ),
+      appBar: const AppBarWidget(title: 'Novo Evento'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
