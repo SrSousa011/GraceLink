@@ -1,3 +1,4 @@
+import 'package:churchapp/views/home/home.dart';
 import 'package:churchapp/views/member/become_member.dart';
 import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/nav_bar.dart';
@@ -5,7 +6,6 @@ import 'package:churchapp/views/signUp/signUp.dart';
 import 'package:churchapp/views/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
 import 'package:flutter/material.dart';
-import 'package:churchapp/views/home.dart';
 import 'package:churchapp/views/login.dart';
 import 'package:churchapp/views/splash_screen.dart';
 import 'package:churchapp/views/user_profile.dart';
