@@ -1,7 +1,4 @@
-// ignore_for_file: file_names, library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
-
 import 'SignUp2.dart';
 
 class SignUp extends StatefulWidget {
@@ -12,6 +9,23 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  late TextEditingController _firstNameController;
+  late TextEditingController _lastNameController;
+
+  @override
+  void initState() {
+    super.initState();
+    _firstNameController = TextEditingController();
+    _lastNameController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,19 +41,17 @@ class _SignUpState extends State<SignUp> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 const SizedBox(height: 200.0),
-                const TextField(
-                  decoration: InputDecoration(
-                    labelText: 'First Name',
-                  ),
+                TextFieldWidget(
+                  labelText: 'First Name',
+                  controller: _firstNameController,
                 ),
                 const SizedBox(height: 20.0),
-                const TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Last Name',
-                  ),
+                TextFieldWidget(
+                  labelText: 'Last Name',
+                  controller: _lastNameController,
                 ),
                 const SizedBox(height: 20.0),
-                ElevatedButton(
+                ElevatedButtonWidget(
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -47,20 +59,60 @@ class _SignUpState extends State<SignUp> {
                           builder: (context) => const SignUpPage2()),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: const Color.fromARGB(255, 90, 175, 249),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
-                  child: const Text('Next'),
+                  text: 'Next',
                 ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class TextFieldWidget extends StatelessWidget {
+  const TextFieldWidget({
+    Key? key,
+    required this.labelText,
+    required this.controller,
+  }) : super(key: key);
+
+  final String labelText;
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+      ),
+    );
+  }
+}
+
+class ElevatedButtonWidget extends StatelessWidget {
+  const ElevatedButtonWidget({
+    Key? key,
+    required this.onPressed,
+    required this.text,
+  }) : super(key: key);
+
+  final VoidCallback onPressed;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 90, 175, 249),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+      ),
+      child: Text(text),
     );
   }
 }
