@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:churchapp/views/login.dart';
 import 'package:churchapp/views/splash_screen.dart';
 import 'package:churchapp/views/user_profile.dart';
-import 'package:churchapp/views/events.dart';
+import 'package:churchapp/views/events/events.dart';
 import 'package:churchapp/views/welcome.dart';
 
 void main() {
