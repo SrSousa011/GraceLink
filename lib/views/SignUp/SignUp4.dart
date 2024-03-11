@@ -27,50 +27,22 @@ class _SignUp4State extends State<SignUp4> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 const SizedBox(height: 200.0),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: passwordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Password',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                PasswordTextField(controller: passwordController),
                 const SizedBox(height: 20.0),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: confirmPasswordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Confirm Password',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                ConfirmPasswordTextField(controller: confirmPasswordController),
                 const SizedBox(height: 20.0),
-                ElevatedButton(
+                NextButton(
                   onPressed: () {
-                    // Check if both password fields are not empty
                     if (passwordController.text.isNotEmpty &&
                         confirmPasswordController.text.isNotEmpty) {
-                      // Check if passwords match
                       if (passwordController.text ==
                           confirmPasswordController.text) {
-                        // Navigate to the next step in the signup process
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => UserProfile()),
                         );
                       } else {
-                        // Display dialog for password mismatch
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
@@ -90,7 +62,6 @@ class _SignUp4State extends State<SignUp4> {
                         );
                       }
                     } else {
-                      // Display dialog for empty fields
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -110,20 +81,88 @@ class _SignUp4State extends State<SignUp4> {
                       );
                     }
                   },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: const Color.fromARGB(255, 90, 175, 249),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
-                  child: const Text('Next'),
                 ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class PasswordTextField extends StatelessWidget {
+  const PasswordTextField({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: controller,
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'Password',
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ConfirmPasswordTextField extends StatelessWidget {
+  const ConfirmPasswordTextField({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: controller,
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'Confirm Password',
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class NextButton extends StatelessWidget {
+  const NextButton({
+    Key? key,
+    required this.onPressed,
+  }) : super(key: key);
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 90, 175, 249),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+      ),
+      child: const Text('Next'),
     );
   }
 }
