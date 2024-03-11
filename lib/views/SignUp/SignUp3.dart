@@ -27,33 +27,11 @@ class _SignUpState3 extends State<SignUp3> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 const SizedBox(height: 200.0),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: emailController,
-                        decoration: const InputDecoration(
-                          labelText: 'Email',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                EmailTextField(controller: emailController),
                 const SizedBox(height: 20.0),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: confirmEmailController,
-                        decoration: const InputDecoration(
-                          labelText: 'Confirm Email',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                ConfirmEmailTextField(controller: confirmEmailController),
                 const SizedBox(height: 20.0),
-                ElevatedButton(
+                NextButton(
                   onPressed: () {
                     // Check if the email and confirm email fields are not empty
                     if (emailController.text.isNotEmpty &&
@@ -107,20 +85,86 @@ class _SignUpState3 extends State<SignUp3> {
                       );
                     }
                   },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: const Color.fromARGB(255, 90, 175, 249),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
-                  child: const Text('Next'),
                 ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class EmailTextField extends StatelessWidget {
+  const EmailTextField({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              labelText: 'Email',
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ConfirmEmailTextField extends StatelessWidget {
+  const ConfirmEmailTextField({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              labelText: 'Confirm Email',
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class NextButton extends StatelessWidget {
+  const NextButton({
+    Key? key,
+    required this.onPressed,
+  }) : super(key: key);
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 90, 175, 249),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+      ),
+      child: const Text('Next'),
     );
   }
 }
