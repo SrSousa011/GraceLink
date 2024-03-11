@@ -11,10 +11,13 @@ class BecomeMember extends StatefulWidget {
 class _BecomeMemberState extends State<BecomeMember> {
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
+  TextEditingController dddController = TextEditingController();
   TextEditingController churchController = TextEditingController();
   TextEditingController maritalStatusController = TextEditingController();
   TextEditingController reasonController = TextEditingController();
   TextEditingController referenceController = TextEditingController();
+
+  String selectedCivilState = 'Single';
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +37,26 @@ class _BecomeMemberState extends State<BecomeMember> {
               decoration: const InputDecoration(labelText: 'Adress'),
             ),
             const SizedBox(height: 20.0),
-            TextField(
-              controller: phoneController,
-              decoration: const InputDecoration(labelText: 'Telefone'),
+            Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: TextField(
+                    controller: dddController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: 'DDD'),
+                  ),
+                ),
+                const SizedBox(width: 10.0),
+                Expanded(
+                  flex: 3,
+                  child: TextField(
+                    controller: phoneController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: 'Telefone'),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20.0),
             TextField(
@@ -45,9 +65,30 @@ class _BecomeMemberState extends State<BecomeMember> {
                   const InputDecoration(labelText: 'Última igreja visitada?'),
             ),
             const SizedBox(height: 20.0),
-            TextField(
-              controller: maritalStatusController,
-              decoration: const InputDecoration(labelText: 'Estado Civil?'),
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(
+                labelText: 'Estado Civil?',
+              ),
+              value: selectedCivilState,
+              onChanged: (value) {
+                setState(() {
+                  selectedCivilState = value!;
+                });
+              },
+              items: const [
+                DropdownMenuItem<String>(
+                  value: 'Single',
+                  child: Text('Single'),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'Married',
+                  child: Text('Married'),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'Divorced',
+                  child: Text('Divorced'),
+                ),
+              ],
             ),
             const SizedBox(height: 20.0),
             TextField(
