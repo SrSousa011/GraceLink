@@ -1,4 +1,4 @@
-import 'package:churchapp/views/Member/become_member.dart';
+import 'package:churchapp/views/member/become_member.dart';
 import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:churchapp/views/signUp/signUp.dart';
