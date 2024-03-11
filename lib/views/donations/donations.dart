@@ -62,11 +62,36 @@ class _DonationPageState extends State<Donations> {
               },
               donationType: '',
             ),
-            DonateButton(
-              onPressed: () {
-                // Implemente sua lógica de doação aqui
-              },
-              text: 'Doar agora',
+            const SizedBox(height: 20.0),
+            SizedBox(
+              width: double.infinity, // Para ocupar toda a largura disponível
+              child: ElevatedButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Confirmation'),
+                        content: const Text(
+                            'You have successfully made a donation!'),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Close'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue,
+                ),
+                child: const Text('Donation'),
+              ),
             ),
           ],
         ),
