@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'SignUp2.dart';
+import 'sign_up_date_of_birth.dart';
 
-class SignUp extends StatefulWidget {
-  const SignUp({Key? key}) : super(key: key);
+class SignUpPersonalInfo extends StatefulWidget {
+  const SignUpPersonalInfo({Key? key}) : super(key: key);
 
   @override
-  _SignUpState createState() => _SignUpState();
+  _SignUpPersonalInfoState createState() => _SignUpPersonalInfoState();
 }
 
-class _SignUpState extends State<SignUp> {
+class _SignUpPersonalInfoState extends State<SignUpPersonalInfo> {
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
 
@@ -56,7 +56,7 @@ class _SignUpState extends State<SignUp> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const SignUpPage2()),
+                          builder: (context) => const SignUpDateOfBirth()),
                     );
                   },
                   text: 'Next',

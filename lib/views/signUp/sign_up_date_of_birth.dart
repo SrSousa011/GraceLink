@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'SignUp3.dart';
+import 'sign_up_email_confirmation.dart';
 
-class SignUpPage2 extends StatefulWidget {
-  const SignUpPage2({Key? key}) : super(key: key);
+class SignUpDateOfBirth extends StatefulWidget {
+  const SignUpDateOfBirth({Key? key}) : super(key: key);
 
   @override
-  _SignUpPage2State createState() => _SignUpPage2State();
+  _SignUpDateOfBirthState createState() => _SignUpDateOfBirthState();
 }
 
-class _SignUpPage2State extends State<SignUpPage2> {
+class _SignUpDateOfBirthState extends State<SignUpDateOfBirth> {
   int? selectedDay;
   int? selectedMonth;
   int? selectedYear;
@@ -63,7 +63,9 @@ class _SignUpPage2State extends State<SignUpPage2> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const SignUp3()),
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const SignUpEmailConfirmation()),
                     );
                   },
                   text: 'Next',

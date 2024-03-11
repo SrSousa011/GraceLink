@@ -2,9 +2,9 @@ import 'package:churchapp/views/home/home.dart';
 import 'package:churchapp/views/member/become_member.dart';
 import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/nav_bar.dart';
-import 'package:churchapp/views/signUp/signUp.dart';
 import 'package:churchapp/views/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
+import 'package:churchapp/views/signUp/sign_up_personal_iInfo.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/login.dart';
 import 'package:churchapp/views/splash_screen.dart';
@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         '/login': (context) => const Login(),
-        '/signUp': (context) => const SignUp(),
+        '/signUp': (context) => const SignUpPersonalInfo(),
         '/home': (context) => const Home(),
         '/courses': (context) => const Courses(),
         '/user_profile': (context) => const UserProfile(),

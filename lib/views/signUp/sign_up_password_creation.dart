@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/user_profile.dart';
 
-class SignUp4 extends StatefulWidget {
-  const SignUp4({Key? key}) : super(key: key);
+class SignUpPasswordCreation extends StatefulWidget {
+  const SignUpPasswordCreation({Key? key}) : super(key: key);
 
   @override
-  _SignUp4State createState() => _SignUp4State();
+  _SignUpPasswordCreationState createState() => _SignUpPasswordCreationState();
 }
 
-class _SignUp4State extends State<SignUp4> {
+class _SignUpPasswordCreationState extends State<SignUpPasswordCreation> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
 

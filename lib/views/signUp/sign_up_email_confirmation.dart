@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/signUp/signUp4.dart';
 
-class SignUp3 extends StatefulWidget {
-  const SignUp3({Key? key}) : super(key: key);
+class SignUpEmailConfirmation extends StatefulWidget {
+  const SignUpEmailConfirmation({Key? key}) : super(key: key);
 
   @override
   _SignUpState3 createState() => _SignUpState3();
 }
 
-class _SignUpState3 extends State<SignUp3> {
+class _SignUpState3 extends State<SignUpEmailConfirmation> {
   TextEditingController emailController = TextEditingController();
   TextEditingController confirmEmailController = TextEditingController();
 
