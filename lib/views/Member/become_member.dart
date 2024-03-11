@@ -1,3 +1,4 @@
+import 'package:churchapp/views/nav_bar.dart';
 import 'package:country_icons/country_icons.dart';
 import 'package:flutter/material.dart';
 
@@ -87,6 +88,7 @@ class _BecomeMemberState extends State<BecomeMember> {
           title: const Text('Tornar-se Membro'),
           centerTitle: true,
         ),
+        drawer: const NavBar(),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
           child: Column(
@@ -139,10 +141,10 @@ class _BecomeMemberState extends State<BecomeMember> {
                           child: TextField(
                             controller: phoneController,
                             keyboardType: TextInputType.number,
+                            maxLength: numberOfPhoneDigits,
                             decoration: const InputDecoration(
                               labelText: 'Phone',
                             ),
-                            maxLength: numberOfPhoneDigits,
                           ),
                         ),
                       ],
