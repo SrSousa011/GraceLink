@@ -18,7 +18,7 @@ class _DonationHowState extends State<DonationHow> {
   @override
   void initState() {
     super.initState();
-    selectedPayment = 'Paypal'; // Initialize selectedPayment
+    selectedPayment = 'QR Code'; // Initialize selectedPayment
   }
 
   @override
@@ -44,7 +44,7 @@ class _DonationHowState extends State<DonationHow> {
                 selectedPayment = newValue!;
               });
             },
-            items: <String>['Paypal', 'Cartão de Crédito', 'Cartão de Débito']
+            items: <String>['QR Code', 'Link']
                 .map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,

@@ -14,7 +14,7 @@ class Donations extends StatefulWidget {
 
 class _DonationPageState extends State<Donations> {
   String donationType = '';
-  String selectedPayment = 'Paypal';
+  String selectedPayment = 'QR Code';
   late TextEditingController donationController;
 
   _DonationPageState() {
