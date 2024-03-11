@@ -1,12 +1,11 @@
-// ignore_for_file: file_names, library_private_types_in_public_api
-
-import 'package:churchapp/views/user_profile.dart';
 import 'package:flutter/material.dart';
+import 'package:churchapp/views/user_profile.dart';
 
-class NavBar extends StatelessWidget {
-  const NavBar({Key? key}) : super(key: key);
+class DrawerHeaderWidget extends StatelessWidget {
+  const DrawerHeaderWidget({Key? key}) : super(key: key);
 
-  Widget buildHeader(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: 270,
@@ -45,9 +44,22 @@ class NavBar extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget buildMenuItem(
-      String title, IconData icon, String route, BuildContext context) {
+class DrawerMenuItem extends StatelessWidget {
+  const DrawerMenuItem({
+    Key? key,
+    required this.title,
+    required this.icon,
+    required this.route,
+  }) : super(key: key);
+
+  final String title;
+  final IconData icon;
+  final String route;
+
+  @override
+  Widget build(BuildContext context) {
     return ListTile(
       title: Text(title),
       leading: Icon(icon),
@@ -56,95 +68,62 @@ class NavBar extends StatelessWidget {
       },
     );
   }
+}
+
+class NavBar extends StatelessWidget {
+  const NavBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
+    return const Drawer(
       child: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            buildHeader(context),
-            ListTile(
-              title: const Text('Home'),
-              leading: const Icon(Icons.home_outlined),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/home');
-              },
+            DrawerHeaderWidget(),
+            DrawerMenuItem(
+              title: 'Home',
+              icon: Icons.home_outlined,
+              route: '/home',
             ),
-            ListTile(
-              title: const Text('User Profile'),
-              leading: const Icon(Icons.person_outlined),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/user_profile');
-              },
+            DrawerMenuItem(
+              title: 'User Profile',
+              icon: Icons.person_outlined,
+              route: '/user_profile',
             ),
-            ListTile(
-              title: const Text('Events'),
-              leading: const Icon(Icons.event),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/event_page');
-              },
+            DrawerMenuItem(
+              title: 'Events',
+              icon: Icons.event,
+              route: '/event_page',
             ),
-            ListTile(
-              title: const Text('Donations'),
-              leading: const Icon(Icons.volunteer_activism_outlined),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/donations');
-              },
+            DrawerMenuItem(
+              title: 'Donations',
+              icon: Icons.volunteer_activism_outlined,
+              route: '/donations',
             ),
-            ListTile(
-              title: const Text('Courses'),
-              leading: const Icon(Icons.school_outlined),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/courses');
-              },
+            DrawerMenuItem(
+              title: 'Courses',
+              icon: Icons.school_outlined,
+              route: '/courses',
             ),
-            ListTile(
-              title: const Text('Become member'),
-              leading: const Icon(Icons.group_add_outlined),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/become_member');
-              },
+            DrawerMenuItem(
+              title: 'Become member',
+              icon: Icons.group_add_outlined,
+              route: '/become_member',
             ),
-            ListTile(
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Notifications'),
-                  Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle, // Define a forma como circular
-                    ),
-                    padding: const EdgeInsets.all(10),
-                    child: const Text(
-                      '8',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              leading: const Icon(Icons.notifications_outlined),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/notifications');
-              },
+            DrawerMenuItem(
+              title: 'Notifications',
+              icon: Icons.notifications_outlined,
+              route: '/notifications',
             ),
-            ListTile(
-              title: const Text('Videos'),
-              leading: const Icon(Icons.video_library_outlined),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/videos');
-              },
+            DrawerMenuItem(
+              title: 'Videos',
+              icon: Icons.video_library_outlined,
+              route: '/videos',
             ),
-            ListTile(
-              title: const Text('About Us'),
-              leading: const Icon(Icons.info_outlined),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/about_us');
-              },
+            DrawerMenuItem(
+              title: 'About Us',
+              icon: Icons.info_outlined,
+              route: '/about_us',
             ),
           ],
         ),
