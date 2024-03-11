@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:churchapp/views/signUp/signUp4.dart';
+import 'package:churchapp/views/signUp/sign_up_password_creation.dart';
 
 class SignUpEmailConfirmation extends StatefulWidget {
   const SignUpEmailConfirmation({Key? key}) : super(key: key);
@@ -42,7 +42,8 @@ class _SignUpState3 extends State<SignUpEmailConfirmation> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const SignUp4()),
+                              builder: (context) =>
+                                  const SignUpPasswordCreation()),
                         );
                       } else {
                         // Display a dialog indicating email mismatch
