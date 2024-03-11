@@ -39,9 +39,8 @@ class Welcome extends StatelessWidget {
                   ),
                 ],
               ),
-              const Spacer(), // Adiciona outro espaço para centralizar os botões de login/cadastro
+              const Spacer(),
               Container(
-                color: Colors.white,
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -59,12 +58,21 @@ class Welcome extends StatelessWidget {
                         backgroundColor: Colors.white,
                         side: const BorderSide(color: Color(0xFF1E88E5)),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
+                          borderRadius: BorderRadius.circular(
+                              30.0), // Aumenta o tamanho do botão
                         ),
                       ),
-                      child: const Text('Login'),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                            vertical: 15), // Ajusta o tamanho vertical do texto
+                        child: Text(
+                          'Login',
+                          style: TextStyle(
+                              fontSize: 20), // Aumenta o tamanho do texto
+                        ),
+                      ),
                     ),
-                    const SizedBox(width: 20),
+                    const SizedBox(width: 40),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.push(
@@ -78,10 +86,19 @@ class Welcome extends StatelessWidget {
                         backgroundColor: const Color(0xFF1E88E5),
                         side: const BorderSide(color: Color(0xFF1E88E5)),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
+                          borderRadius: BorderRadius.circular(
+                              30.0), // Aumenta o tamanho do botão
                         ),
                       ),
-                      child: const Text('Sign Up'),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                            vertical: 15), // Ajusta o tamanho vertical do texto
+                        child: Text(
+                          'Sign Up',
+                          style: TextStyle(
+                              fontSize: 20), // Aumenta o tamanho do texto
+                        ),
+                      ),
                     ),
                   ],
                 ),
