@@ -5,6 +5,7 @@ import 'package:churchapp/views/nav_bar.dart';
 import 'package:churchapp/views/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
 import 'package:churchapp/views/signUp/sign_up_personali_Info.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/login.dart';
 import 'package:churchapp/views/splash_screen.dart';
@@ -12,12 +13,15 @@ import 'package:churchapp/views/user_profile.dart';
 import 'package:churchapp/views/events/events.dart';
 import 'package:churchapp/views/welcome.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Ensure that Flutter is initialized
+  await Firebase.initializeApp(); // Initialize Firebase
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
