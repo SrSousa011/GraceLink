@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "110994513710",
+    "project_id": "gracelink-fca2d",
+    "storage_bucket": "gracelink-fca2d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:110994513710:android:477e70ec30bc08d58ce4bf",
+        "android_client_info": {
+          "package_name": "com.gracelink.push_notifications"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9qnu93Qm1GriOwCrmABv4tbMM4qFI7Fs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
