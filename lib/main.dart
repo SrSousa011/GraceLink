@@ -4,6 +4,7 @@ import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:churchapp/views/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
+import 'package:churchapp/views/notifications/push_notification_handler.dart';
 import 'package:churchapp/views/signUp/sign_up_personali_Info.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,12 @@ void main() async {
   WidgetsFlutterBinding
       .ensureInitialized(); // Ensure that Flutter is initialized
   await Firebase.initializeApp(); // Initialize Firebase
-  runApp(const MyApp());
+  final pushNotificationHandler =
+      PushNotificationHandler(); // Create an instance of PushNotificationHandler
+  await pushNotificationHandler
+      .requestNotificationPermission(); // Request permission for push notifications
+  await pushNotificationHandler.initNotifications(); // Initialize notifications
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
