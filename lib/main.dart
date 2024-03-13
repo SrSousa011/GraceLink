@@ -4,9 +4,7 @@ import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:churchapp/views/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
-import 'package:churchapp/views/notifications/push_notification_handler.dart';
 import 'package:churchapp/views/signUp/sign_up_personali_Info.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/login.dart';
 import 'package:churchapp/views/splash_screen.dart';
@@ -14,16 +12,8 @@ import 'package:churchapp/views/user_profile.dart';
 import 'package:churchapp/views/events/events.dart';
 import 'package:churchapp/views/welcome.dart';
 
-void main() async {
-  WidgetsFlutterBinding
-      .ensureInitialized(); // Ensure that Flutter is initialized
-  await Firebase.initializeApp(); // Initialize Firebase
-  final pushNotificationHandler =
-      PushNotificationHandler(); // Create an instance of PushNotificationHandler
-  await pushNotificationHandler
-      .requestNotificationPermission(); // Request permission for push notifications
-  await pushNotificationHandler.initNotifications(); // Initialize notifications
-  runApp(MyApp());
+void main() {
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -40,7 +30,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const SplashScreen(
-        drawer: NavBar(), // Passe o MenuDrawer como parâmetro
+        drawer: NavBar(),
       ),
       routes: {
         '/login': (context) => const Login(),
