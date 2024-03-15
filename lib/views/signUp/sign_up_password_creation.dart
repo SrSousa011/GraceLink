@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:churchapp/views/user_profile.dart';
 
 class SignUpPasswordCreation extends StatefulWidget {
-  const SignUpPasswordCreation({Key? key}) : super(key: key);
+  const SignUpPasswordCreation({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SignUpPasswordCreationState createState() => _SignUpPasswordCreationState();
 }
 
@@ -93,9 +94,9 @@ class _SignUpPasswordCreationState extends State<SignUpPasswordCreation> {
 
 class PasswordTextField extends StatelessWidget {
   const PasswordTextField({
-    Key? key,
+    super.key,
     required this.controller,
-  }) : super(key: key);
+  });
 
   final TextEditingController controller;
 
@@ -119,9 +120,9 @@ class PasswordTextField extends StatelessWidget {
 
 class ConfirmPasswordTextField extends StatelessWidget {
   const ConfirmPasswordTextField({
-    Key? key,
+    super.key,
     required this.controller,
-  }) : super(key: key);
+  });
 
   final TextEditingController controller;
 
@@ -145,9 +146,9 @@ class ConfirmPasswordTextField extends StatelessWidget {
 
 class NextButton extends StatelessWidget {
   const NextButton({
-    Key? key,
+    super.key,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   final VoidCallback onPressed;
 

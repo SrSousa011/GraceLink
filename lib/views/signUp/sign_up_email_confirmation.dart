@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:churchapp/views/signUp/sign_up_password_creation.dart';
 
 class SignUpEmailConfirmation extends StatefulWidget {
-  const SignUpEmailConfirmation({Key? key}) : super(key: key);
+  const SignUpEmailConfirmation({super.key});
 
   @override
-  _SignUpState3 createState() => _SignUpState3();
+  // ignore: library_private_types_in_public_api
+  _SignUpEmailConfirmation createState() => _SignUpEmailConfirmation();
 }
 
-class _SignUpState3 extends State<SignUpEmailConfirmation> {
+class _SignUpEmailConfirmation extends State<SignUpEmailConfirmation> {
   TextEditingController emailController = TextEditingController();
   TextEditingController confirmEmailController = TextEditingController();
 
@@ -98,9 +99,9 @@ class _SignUpState3 extends State<SignUpEmailConfirmation> {
 
 class EmailTextField extends StatelessWidget {
   const EmailTextField({
-    Key? key,
+    super.key,
     required this.controller,
-  }) : super(key: key);
+  });
 
   final TextEditingController controller;
 
@@ -123,9 +124,9 @@ class EmailTextField extends StatelessWidget {
 
 class ConfirmEmailTextField extends StatelessWidget {
   const ConfirmEmailTextField({
-    Key? key,
+    super.key,
     required this.controller,
-  }) : super(key: key);
+  });
 
   final TextEditingController controller;
 
@@ -142,30 +143,6 @@ class ConfirmEmailTextField extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class NextButton extends StatelessWidget {
-  const NextButton({
-    Key? key,
-    required this.onPressed,
-  }) : super(key: key);
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: const Color.fromARGB(255, 90, 175, 249),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-      ),
-      child: const Text('Next'),
     );
   }
 }

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'sign_up_email_confirmation.dart';
 
 class SignUpDateOfBirth extends StatefulWidget {
-  const SignUpDateOfBirth({Key? key}) : super(key: key);
+  const SignUpDateOfBirth({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SignUpDateOfBirthState createState() => _SignUpDateOfBirthState();
 }
 
@@ -81,14 +82,14 @@ class _SignUpDateOfBirthState extends State<SignUpDateOfBirth> {
 
 class DateOfBirthDropdowns extends StatelessWidget {
   const DateOfBirthDropdowns({
-    Key? key,
+    super.key,
     this.selectedDay,
     this.selectedMonth,
     this.selectedYear,
     required this.onChangedDay,
     required this.onChangedMonth,
     required this.onChangedYear,
-  }) : super(key: key);
+  });
 
   final int? selectedDay;
   final int? selectedMonth;
@@ -155,10 +156,10 @@ class DateOfBirthDropdowns extends StatelessWidget {
 
 class GenderDropdown extends StatelessWidget {
   const GenderDropdown({
-    Key? key,
+    super.key,
     required this.selectedGender,
     required this.onChangedGender,
-  }) : super(key: key);
+  });
 
   final String selectedGender;
   final ValueChanged<String?> onChangedGender;
@@ -187,10 +188,10 @@ class GenderDropdown extends StatelessWidget {
 
 class ElevatedButtonWidget extends StatelessWidget {
   const ElevatedButtonWidget({
-    Key? key,
+    super.key,
     required this.onPressed,
     required this.text,
-  }) : super(key: key);
+  });
 
   final VoidCallback onPressed;
   final String text;

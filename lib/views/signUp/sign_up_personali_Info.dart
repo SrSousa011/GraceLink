@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'sign_up_date_of_birth.dart';
 
 class SignUpPersonalInfo extends StatefulWidget {
-  const SignUpPersonalInfo({Key? key}) : super(key: key);
+  const SignUpPersonalInfo({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SignUpPersonalInfoState createState() => _SignUpPersonalInfoState();
 }
 
@@ -72,10 +73,10 @@ class _SignUpPersonalInfoState extends State<SignUpPersonalInfo> {
 
 class TextFieldWidget extends StatelessWidget {
   const TextFieldWidget({
-    Key? key,
+    super.key,
     required this.labelText,
     required this.controller,
-  }) : super(key: key);
+  });
 
   final String labelText;
   final TextEditingController controller;
@@ -93,10 +94,10 @@ class TextFieldWidget extends StatelessWidget {
 
 class ElevatedButtonWidget extends StatelessWidget {
   const ElevatedButtonWidget({
-    Key? key,
+    super.key,
     required this.onPressed,
     required this.text,
-  }) : super(key: key);
+  });
 
   final VoidCallback onPressed;
   final String text;
