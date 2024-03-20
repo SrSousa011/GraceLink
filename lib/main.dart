@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
         drawer: NavBar(),
       ),
       routes: {
-        '/login': (context) => const Login(),
+        '/login': (context) => const SignInPage(),
         '/signUp': (context) => const SignUpPage(),
         '/home': (context) => const Home(),
         '/courses': (context) => const Courses(),
