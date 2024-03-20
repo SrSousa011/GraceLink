@@ -27,10 +27,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Comunidade Connect',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 90, 175, 249),
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.blue, // Adjust as needed
         ),
-        useMaterial3: true,
+        // useMaterial3: true, // Remove this line if not needed
       ),
       home: const SplashScreen(
         drawer: NavBar(),

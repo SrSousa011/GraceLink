@@ -55,88 +55,96 @@ class _SignUpPageState extends State<SignUpPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                const SizedBox(height: 20.0),
-                TextFieldWidget(
-                  labelText: 'First Name',
-                  controller: _firstNameController,
-                ),
-                const SizedBox(height: 20.0),
-                TextFieldWidget(
-                  labelText: 'Last Name',
-                  controller: _lastNameController,
-                ),
-                const SizedBox(height: 20.0),
-                DateOfBirthDropdowns(
-                  selectedDay: selectedDay,
-                  selectedMonth: selectedMonth,
-                  selectedYear: selectedYear,
-                  onChangedDay: (value) {
-                    setState(() {
-                      selectedDay = value;
-                    });
-                  },
-                  onChangedMonth: (value) {
-                    setState(() {
-                      selectedMonth = value;
-                    });
-                  },
-                  onChangedYear: (value) {
-                    setState(() {
-                      selectedYear = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 20.0),
-                GenderDropdown(
-                  selectedGender: selectedGender,
-                  onChangedGender: (value) {
-                    setState(() {
-                      selectedGender = value!;
-                    });
-                  },
-                ),
-                const SizedBox(height: 20.0),
-                TextFieldWidget(
-                  labelText: 'Email',
-                  controller: _emailController,
-                ),
-                const SizedBox(height: 20.0),
-                TextFieldWidget(
-                  labelText: 'Confirm Email',
-                  controller: _confirmEmailController,
-                ),
-                const SizedBox(height: 20.0),
-                TextFieldWidget(
-                  labelText: 'Password',
-                  controller: _passwordController,
-                ),
-                const SizedBox(height: 20.0),
-                TextFieldWidget(
-                  labelText: 'Confirm Password',
-                  controller: _confirmPasswordController,
-                ),
-                const SizedBox(height: 20.0),
-                ElevatedButton(
-                  onPressed: () {
-                    // Validate fields and navigate to next step
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: const Color.fromARGB(255, 90, 175, 249),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
-                  child: const Text('Next'),
-                ),
-              ],
+              children: buildInputs() + buildLoginButton(),
             ),
           ),
         ),
       ),
     );
   }
+
+  List<Widget> buildInputs() {
+    return <Widget>[
+      const SizedBox(height: 20.0),
+      TextFieldWidget(
+        labelText: 'First Name',
+        controller: _firstNameController,
+      ),
+      const SizedBox(height: 20.0),
+      TextFieldWidget(
+        labelText: 'Last Name',
+        controller: _lastNameController,
+      ),
+      const SizedBox(height: 20.0),
+      DateOfBirthDropdowns(
+        selectedDay: selectedDay,
+        selectedMonth: selectedMonth,
+        selectedYear: selectedYear,
+        onChangedDay: (value) {
+          setState(() {
+            selectedDay = value;
+          });
+        },
+        onChangedMonth: (value) {
+          setState(() {
+            selectedMonth = value;
+          });
+        },
+        onChangedYear: (value) {
+          setState(() {
+            selectedYear = value;
+          });
+        },
+      ),
+      const SizedBox(height: 20.0),
+      GenderDropdown(
+        selectedGender: selectedGender,
+        onChangedGender: (value) {
+          setState(() {
+            selectedGender = value!;
+          });
+        },
+      ),
+      const SizedBox(height: 20.0),
+      TextFieldWidget(
+        labelText: 'Email',
+        controller: _emailController,
+      ),
+      const SizedBox(height: 20.0),
+      TextFieldWidget(
+        labelText: 'Confirm Email',
+        controller: _confirmEmailController,
+      ),
+      const SizedBox(height: 20.0),
+      TextFieldWidget(
+        labelText: 'Password',
+        controller: _passwordController,
+      ),
+      const SizedBox(height: 20.0),
+      TextFieldWidget(
+        labelText: 'Confirm Password',
+        controller: _confirmPasswordController,
+      ),
+    ];
+  }
+}
+
+List<Widget> buildLoginButton() {
+  return [
+    const SizedBox(height: 20.0),
+    ElevatedButton(
+        onPressed: () {
+          // Validate fields and navigate to next step
+        },
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: const Color.fromARGB(255, 90, 175, 249),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+        ),
+        child: const Text('Next'))
+  ];
 }
 
 class DateOfBirthDropdowns extends StatelessWidget {
