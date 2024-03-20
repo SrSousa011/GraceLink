@@ -1,9 +1,9 @@
-import 'package:churchapp/views/signUp/sign_up_personali_Info.dart';
+import 'package:churchapp/views/signUp/signUp_page.dart';
 import 'package:churchapp/views/user_profile.dart';
 import 'package:flutter/material.dart'; // Importa a tela de SignUp
 
 class Login extends StatelessWidget {
-  const Login({Key? key}) : super(key: key); // Adding a key to the login widget
+  const Login({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +67,7 @@ class Login extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    const SignUpPersonalInfo()),
+                                builder: (context) => const SignUpPage()),
                           );
                         },
                         style: ElevatedButton.styleFrom(

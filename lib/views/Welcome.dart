@@ -1,9 +1,9 @@
 import 'package:churchapp/views/login.dart';
-import 'package:churchapp/views/signUp/sign_up_personali_Info.dart';
+import 'package:churchapp/views/signUp/signUp_page.dart';
 import 'package:flutter/material.dart';
 
 class Welcome extends StatelessWidget {
-  const Welcome({Key? key, required this.title}) : super(key: key);
+  const Welcome({super.key, required this.title});
 
   final String title;
 
@@ -70,7 +70,7 @@ class Welcome extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const SignUpPersonalInfo()),
+                              builder: (context) => const SignUpPage()),
                         );
                       },
                       style: ElevatedButton.styleFrom(

@@ -1,19 +1,46 @@
 import 'package:flutter/material.dart';
-import 'sign_up_email_confirmation.dart';
 
-class SignUpDateOfBirth extends StatefulWidget {
-  const SignUpDateOfBirth({super.key});
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _SignUpDateOfBirthState createState() => _SignUpDateOfBirthState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _SignUpDateOfBirthState extends State<SignUpDateOfBirth> {
+class _SignUpPageState extends State<SignUpPage> {
+  late TextEditingController _firstNameController;
+  late TextEditingController _lastNameController;
+  late TextEditingController _emailController;
+  late TextEditingController _confirmEmailController;
+  late TextEditingController _passwordController;
+  late TextEditingController _confirmPasswordController;
+
   int? selectedDay;
   int? selectedMonth;
   int? selectedYear;
-  String selectedGender = 'Male'; // Set an initial value
+  String selectedGender = 'Male';
+
+  @override
+  void initState() {
+    super.initState();
+    _firstNameController = TextEditingController();
+    _lastNameController = TextEditingController();
+    _emailController = TextEditingController();
+    _confirmEmailController = TextEditingController();
+    _passwordController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _confirmEmailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +56,17 @@ class _SignUpDateOfBirthState extends State<SignUpDateOfBirth> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                const SizedBox(height: 200.0),
+                const SizedBox(height: 20.0),
+                TextFieldWidget(
+                  labelText: 'First Name',
+                  controller: _firstNameController,
+                ),
+                const SizedBox(height: 20.0),
+                TextFieldWidget(
+                  labelText: 'Last Name',
+                  controller: _lastNameController,
+                ),
+                const SizedBox(height: 20.0),
                 DateOfBirthDropdowns(
                   selectedDay: selectedDay,
                   selectedMonth: selectedMonth,
@@ -60,16 +97,38 @@ class _SignUpDateOfBirthState extends State<SignUpDateOfBirth> {
                   },
                 ),
                 const SizedBox(height: 20.0),
-                ElevatedButtonWidget(
+                TextFieldWidget(
+                  labelText: 'Email',
+                  controller: _emailController,
+                ),
+                const SizedBox(height: 20.0),
+                TextFieldWidget(
+                  labelText: 'Confirm Email',
+                  controller: _confirmEmailController,
+                ),
+                const SizedBox(height: 20.0),
+                TextFieldWidget(
+                  labelText: 'Password',
+                  controller: _passwordController,
+                ),
+                const SizedBox(height: 20.0),
+                TextFieldWidget(
+                  labelText: 'Confirm Password',
+                  controller: _confirmPasswordController,
+                ),
+                const SizedBox(height: 20.0),
+                ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const SignUpEmailConfirmation()),
-                    );
+                    // Validate fields and navigate to next step
                   },
-                  text: 'Next',
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: const Color.fromARGB(255, 90, 175, 249),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
+                  child: const Text('Next'),
                 ),
               ],
             ),
@@ -186,28 +245,23 @@ class GenderDropdown extends StatelessWidget {
   }
 }
 
-class ElevatedButtonWidget extends StatelessWidget {
-  const ElevatedButtonWidget({
+class TextFieldWidget extends StatelessWidget {
+  const TextFieldWidget({
     super.key,
-    required this.onPressed,
-    required this.text,
+    required this.labelText,
+    required this.controller,
   });
 
-  final VoidCallback onPressed;
-  final String text;
+  final String labelText;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: const Color.fromARGB(255, 90, 175, 249),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
-        ),
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
       ),
-      child: Text(text),
     );
   }
 }

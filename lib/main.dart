@@ -1,11 +1,10 @@
-import 'package:churchapp/firebase_options.dart';
 import 'package:churchapp/views/home/home.dart';
 import 'package:churchapp/views/member/become_member.dart';
 import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:churchapp/views/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
-import 'package:churchapp/views/signUp/sign_up_personali_Info.dart';
+import 'package:churchapp/views/signUp/signUp_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/login.dart';
@@ -16,9 +15,7 @@ import 'package:churchapp/views/welcome.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -40,7 +37,7 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         '/login': (context) => const Login(),
-        '/signUp': (context) => const SignUpPersonalInfo(),
+        '/signUp': (context) => const SignUpPage(),
         '/home': (context) => const Home(),
         '/courses': (context) => const Courses(),
         '/user_profile': (context) => const UserProfile(),
