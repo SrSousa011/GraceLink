@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 class AuthenticationService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -7,20 +7,14 @@ class AuthenticationService {
   Future<void> signUpWithPersonalInfo({
     required String firstName,
     required String lastName,
-  }) async {
-    // Implement sign up with personal info
-    // You can set up user profile here or store temporary data
-  }
+  }) async {}
 
   Future<void> signUpWithDateOfBirthAndGender({
     required int? selectedDay,
     required int? selectedMonth,
     required int? selectedYear,
     required String selectedGender,
-  }) async {
-    // Implement sign up with date of birth and gender
-    // Store these details temporarily or set up user profile
-  }
+  }) async {}
 
   Future<void> signUpWithEmailAndConfirmation({
     required String email,
@@ -46,8 +40,10 @@ class AuthenticationService {
       );
     } catch (error) {
       // Handle any errors that occur during sign up
-      print('Error signing up: $error');
-      throw error;
+      if (kDebugMode) {
+        print('Error signing up: $error');
+      }
+      rethrow;
     }
   }
 }
