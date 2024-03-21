@@ -1,7 +1,6 @@
-import 'package:churchapp/views/signUp/signUp_page.dart';
 import 'package:churchapp/views/user_profile.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart'; // Importa a tela de SignUp
+import 'package:flutter/material.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
