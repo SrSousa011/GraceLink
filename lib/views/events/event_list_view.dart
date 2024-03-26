@@ -6,10 +6,10 @@ class EventListView extends StatelessWidget {
   final void Function(Event) onTap;
 
   const EventListView({
-    Key? key,
+    super.key,
     required this.events,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

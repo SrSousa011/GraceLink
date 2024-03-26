@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 class CoursesDetails extends StatefulWidget {
   final Course course;
-
   const CoursesDetails(
-      {Key? key, required this.course, required Null Function() onMarkAsClosed})
-      : super(key: key);
+      {super.key,
+      required this.course,
+      required Null Function() onMarkAsClosed});
 
   @override
-  _CoursesDetailsState createState() => _CoursesDetailsState();
+  State<CoursesDetails> createState() => _CoursesDetailsState();
 }
 
 class _CoursesDetailsState extends State<CoursesDetails> {

@@ -1,16 +1,13 @@
-// ignore_for_file: file_names, library_private_types_in_public_api
-
+import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:churchapp/views/welcome.dart';
 
 class SplashScreen extends StatefulWidget {
-  final Widget drawer; // Define drawer as a parameter
-
-  const SplashScreen({Key? key, required this.drawer}) : super(key: key);
+  const SplashScreen({super.key, required NavBar drawer});
 
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
@@ -37,7 +34,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: widget.drawer, // Use the drawer parameter
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(

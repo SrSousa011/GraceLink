@@ -70,13 +70,11 @@ class PhoneTextField extends StatelessWidget {
     );
   }
 }
-
-// Main Widget
 class BecomeMember extends StatefulWidget {
-  const BecomeMember({Key? key}) : super(key: key);
+  const BecomeMember({super.key});
 
   @override
-  _BecomeMemberState createState() => _BecomeMemberState();
+  State<BecomeMember> createState() => _BecomeMemberState();
 }
 
 class _BecomeMemberState extends State<BecomeMember> {

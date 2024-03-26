@@ -14,7 +14,7 @@ void main() {
 }
 
 class Events extends StatefulWidget {
-  const Events({Key? key}) : super(key: key);
+  const Events({super.key});
 
   @override
   _EventsState createState() => _EventsState();

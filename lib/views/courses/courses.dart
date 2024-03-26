@@ -3,10 +3,10 @@ import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
 
 class Courses extends StatefulWidget {
-  const Courses({Key? key}) : super(key: key);
+  const Courses({super.key});
 
   @override
-  _CoursesState createState() => _CoursesState();
+  State<Courses> createState() => _CoursesState();
 }
 
 class _CoursesState extends State<Courses> {

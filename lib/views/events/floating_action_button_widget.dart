@@ -6,11 +6,11 @@ class FloatingActionButtonWidget extends StatelessWidget {
   final IconData icon;
 
   const FloatingActionButtonWidget({
-    Key? key,
+    super.key,
     required this.onPressed,
     required this.tooltip,
     required this.icon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

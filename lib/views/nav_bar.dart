@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:churchapp/views/user_profile.dart';
 
 class DrawerHeaderWidget extends StatelessWidget {
-  const DrawerHeaderWidget({Key? key}) : super(key: key);
+  const DrawerHeaderWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +48,11 @@ class DrawerHeaderWidget extends StatelessWidget {
 
 class DrawerMenuItem extends StatelessWidget {
   const DrawerMenuItem({
-    Key? key,
+    super.key,
     required this.title,
     required this.icon,
     required this.route,
-  }) : super(key: key);
+  });
 
   final String title;
   final IconData icon;
@@ -71,7 +71,7 @@ class DrawerMenuItem extends StatelessWidget {
 }
 
 class NavBar extends StatelessWidget {
-  const NavBar({Key? key}) : super(key: key);
+  const NavBar({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 
 class AvatarSection extends StatelessWidget {
   const AvatarSection({
-    Key? key,
+    super.key,
     required this.name,
     required this.location,
-  }) : super(key: key);
+  });
 
   final String name;
   final String location;
@@ -51,7 +51,7 @@ class AvatarSection extends StatelessWidget {
 }
 
 class FollowButton extends StatelessWidget {
-  const FollowButton({Key? key, required this.onPressed}) : super(key: key);
+  const FollowButton({super.key, required this.onPressed});
 
   final VoidCallback onPressed;
 
@@ -104,7 +104,7 @@ class PhotoGrid extends StatelessWidget {
 }
 
 class UserProfile extends StatelessWidget {
-  const UserProfile({Key? key}) : super(key: key);
+  const UserProfile({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -6,10 +6,10 @@ import 'package:churchapp/views/donations/donation_value.dart';
 import 'package:churchapp/views/nav_bar.dart';
 
 class Donations extends StatefulWidget {
-  const Donations({Key? key}) : super(key: key);
+  const Donations({super.key});
 
   @override
-  _DonationPageState createState() => _DonationPageState();
+  State<Donations> createState() => _DonationPageState();
 }
 
 class _DonationPageState extends State<Donations> {

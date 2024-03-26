@@ -5,7 +5,7 @@ import 'package:churchapp/views/nav_bar.dart';
 import 'package:churchapp/views/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
 import 'package:churchapp/views/events/events.dart';
-import 'package:churchapp/views/signUp/signUp_page.dart';
+import 'package:churchapp/views/signUp/sign_up_page.dart';
 import 'package:churchapp/views/user_profile.dart'; // Update file name and path if necessary
 import 'package:churchapp/views/welcome.dart'; // Update file name and path if necessary
 import 'package:churchapp/views/login.dart'; // Update file name and path if necessary
