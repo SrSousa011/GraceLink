@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "787647442720",
+    "project_id": "gracelink-ecf97",
+    "storage_bucket": "gracelink-ecf97.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:787647442720:android:8f5a74e8a7a22ea9ec3145",
+        "android_client_info": {
+          "package_name": "com.church.gracelink"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjnYTknPTUF7SC0jA_pMAYQMDs8wCUTJ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
