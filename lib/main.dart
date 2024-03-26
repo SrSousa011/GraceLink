@@ -5,17 +5,20 @@ import 'package:churchapp/views/nav_bar.dart';
 import 'package:churchapp/views/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
 import 'package:churchapp/views/signUp/signUp_page.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/login.dart';
 import 'package:churchapp/views/splash_screen.dart';
 import 'package:churchapp/views/user_profile.dart';
 import 'package:churchapp/views/events/events.dart';
 import 'package:churchapp/views/welcome.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -36,7 +39,7 @@ class MyApp extends StatelessWidget {
         drawer: NavBar(),
       ),
       routes: {
-        '/login': (context) => const Login(),
+        '/login': (context) => const SignInPage(),
         '/signUp': (context) => const SignUpPage(),
         '/home': (context) => const Home(),
         '/courses': (context) => const Courses(),

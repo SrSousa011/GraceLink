@@ -1,14 +1,51 @@
-import 'package:churchapp/views/signUp/signUp_page.dart';
 import 'package:churchapp/views/user_profile.dart';
-import 'package:flutter/material.dart'; // Importa a tela de SignUp
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
-class Login extends StatelessWidget {
-  const Login({super.key});
+class SignInPage extends StatefulWidget {
+  const SignInPage({super.key});
+
+  @override
+  State<SignInPage> createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
+  late TextEditingController _emailController;
+  late TextEditingController _passwordController;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void validateAndSubmit() {
+    final form = _formKey.currentState;
+    if (form != null && form.validate()) {
+      if (kDebugMode) {
+        print(
+            'Form is valid. Email: $_emailController, Password: $_passwordController');
+      }
+      // Insira o código aqui para processar o login ou realizar outras ações após a validação do formulário.
+    } else {
+      if (kDebugMode) {
+        print(
+            'Form is invalid.  Email: $_emailController, Password: $_passwordController');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // GlobalKey
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
@@ -24,17 +61,29 @@ class Login extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const TextField(
-                    decoration: InputDecoration(
+                  TextFormField(
+                    controller:
+                        _emailController, // Atribua o TextEditingController ao controller
+                    decoration: const InputDecoration(
                       labelText: 'Email',
                     ),
+                    onSaved: (value) {
+                      _emailController.text =
+                          value!; // Salve o valor no TextEditingController
+                    },
                   ),
                   const SizedBox(height: 20.0),
-                  const TextField(
+                  TextFormField(
+                    controller:
+                        _passwordController, // Atribua o TextEditingController ao controller
                     obscureText: true,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Password',
                     ),
+                    onSaved: (value) {
+                      _passwordController.text =
+                          value!; // Salve o valor no TextEditingController
+                    },
                   ),
                   const SizedBox(height: 20.0),
                   Row(
@@ -67,7 +116,7 @@ class Login extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const SignUpPage()),
+                                builder: (context) => const SignInPage()),
                           );
                         },
                         style: ElevatedButton.styleFrom(

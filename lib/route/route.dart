@@ -19,7 +19,7 @@ Route<dynamic> controller(RouteSettings settings) {
       return MaterialPageRoute(
           builder: (_) => const SplashScreen(drawer: NavBar()));
     case '/login': // Login Screen Route
-      return MaterialPageRoute(builder: (_) => const Login());
+      return MaterialPageRoute(builder: (_) => const SignInPage());
     case '/signup': // Sign Up Screen Route
       return MaterialPageRoute(builder: (_) => const SignUpPage());
     case '/welcome': // Welcome Screen Route
