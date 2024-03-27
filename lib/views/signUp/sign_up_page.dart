@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({Key? key});
+  const SignUpPage({super.key});
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
@@ -16,6 +18,7 @@ class _SignUpPageState extends State<SignUpPage> {
   late TextEditingController _confirmPasswordController;
   late TextEditingController _phoneNumberController;
   late TextEditingController _dddController;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   int? selectedDay;
   int? selectedMonth;
@@ -52,30 +55,33 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SignUp'),
+        title: const Text('Sign Up'),
       ),
       body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildNameSection(),
-                const SizedBox(height: 20.0),
-                _buildDateOfBirthSection(),
-                const SizedBox(height: 20.0),
-                _buildGenderSection(),
-                const SizedBox(height: 20.0),
-                _buildEmailSection(),
-                const SizedBox(height: 20.0),
-                _buildPasswordSection(),
-                const SizedBox(height: 20.0),
-                _buildPhoneNumberSection(),
-                const SizedBox(height: 20.0),
-                _buildSignUpButton(),
-              ],
+        child: Form(
+          key: _formKey,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildNameSection(),
+                  const SizedBox(height: 20.0),
+                  _buildDateOfBirthSection(),
+                  const SizedBox(height: 20.0),
+                  _buildGenderSection(),
+                  const SizedBox(height: 20.0),
+                  _buildEmailSection(),
+                  const SizedBox(height: 20.0),
+                  _buildPasswordSection(),
+                  const SizedBox(height: 20.0),
+                  _buildPhoneNumberSection(),
+                  const SizedBox(height: 20.0),
+                  _buildSignUpButton(),
+                ],
+              ),
             ),
           ),
         ),
@@ -158,6 +164,7 @@ class _SignUpPageState extends State<SignUpPage> {
         TextFieldWidget(
           labelText: 'Email',
           controller: _emailController,
+          validator: _validateEmail,
         ),
         const SizedBox(height: 20.0),
         TextFieldWidget(
@@ -175,11 +182,14 @@ class _SignUpPageState extends State<SignUpPage> {
         TextFieldWidget(
           labelText: 'Password',
           controller: _passwordController,
+          validator: _validatePassword,
+          obscureText: true,
         ),
         const SizedBox(height: 20.0),
         TextFieldWidget(
           labelText: 'Confirm Password',
           controller: _confirmPasswordController,
+          obscureText: true,
         ),
       ],
     );
@@ -187,19 +197,59 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget _buildSignUpButton() {
     return ElevatedButton(
-      onPressed: () {
-        // Validate fields and navigate to next step
-      },
+      onPressed: validateAndSubmit,
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        foregroundColor: Colors.white,
         backgroundColor: const Color.fromARGB(255, 90, 175, 249),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
         ),
-        textStyle: const TextStyle(fontSize: 18),
       ),
       child: const Text('Sign Up'),
     );
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Email cannot be empty';
+    }
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+      return 'Invalid email';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password cannot be empty';
+    }
+    if (value.length < 6) {
+      return 'Password must be at least 6 characters long';
+    }
+    return null;
+  }
+
+  Future<void> validateAndSubmit() async {
+    final form = _formKey.currentState;
+    if (form != null && form.validate()) {
+      // Form is valid, process signup here.
+      String email = _emailController.text.trim();
+      String password = _passwordController.text;
+      try {
+        UserCredential user =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        if (kDebugMode) {
+          print('Signed up: ${user.user!.uid}');
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error: $e');
+        }
+      }
+    }
   }
 }
 
@@ -210,7 +260,7 @@ class DateOfBirthDropdowns extends StatelessWidget {
     this.selectedMonth,
     this.selectedYear,
     required this.onChangedDay,
-    required this.onChangedMonth,
+    required this.onChangedMonth, // This field name should match the one provided here
     required this.onChangedYear,
   });
 
@@ -218,7 +268,8 @@ class DateOfBirthDropdowns extends StatelessWidget {
   final int? selectedMonth;
   final int? selectedYear;
   final ValueChanged<int?> onChangedDay;
-  final ValueChanged<int?> onChangedMonth;
+  final ValueChanged<int?>
+      onChangedMonth; // Ensure this matches the field name provided
   final ValueChanged<int?> onChangedYear;
 
   @override
@@ -247,7 +298,8 @@ class DateOfBirthDropdowns extends StatelessWidget {
               labelText: 'Month',
             ),
             value: selectedMonth,
-            onChanged: onChangedMonth,
+            onChanged:
+                onChangedMonth, // Ensure this matches the field name provided
             items: List.generate(12, (index) {
               return DropdownMenuItem<int>(
                 value: index + 1,
@@ -314,18 +366,24 @@ class TextFieldWidget extends StatelessWidget {
     super.key,
     required this.labelText,
     required this.controller,
+    this.validator,
+    this.obscureText = false,
   });
 
   final String labelText;
   final TextEditingController controller;
+  final String? Function(String?)? validator;
+  final bool obscureText;
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
       ),
+      validator: validator,
+      obscureText: obscureText,
     );
   }
 }
