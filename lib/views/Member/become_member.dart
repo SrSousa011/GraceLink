@@ -20,11 +20,11 @@ class CountryCodeDropdown extends StatelessWidget {
   final ValueChanged<String?> onChanged;
 
   const CountryCodeDropdown({
-    Key? key,
+    super.key,
     required this.selectedDDD,
     required this.dropdownItems,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +47,10 @@ class PhoneTextField extends StatelessWidget {
   final TextEditingController controller;
 
   const PhoneTextField({
-    Key? key,
+    super.key,
     required this.maxLength,
     required this.controller,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

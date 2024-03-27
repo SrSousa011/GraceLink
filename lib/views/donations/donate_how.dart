@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 class DonationHow extends StatefulWidget {
   const DonationHow({
-    Key? key,
+    super.key,
     required String selectedPayment,
     required Null Function(dynamic payment) onPaymentSelected,
     required Null Function(dynamic type) onTypeSelected,
-  }) : super(key: key);
+  });
 
   @override
   State<DonationHow> createState() => _DonationHowState();

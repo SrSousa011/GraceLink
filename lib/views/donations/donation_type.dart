@@ -4,10 +4,10 @@ class DonationType extends StatefulWidget {
   final void Function(String) onTypeSelected;
 
   const DonationType({
-    Key? key,
+    super.key,
     required this.onTypeSelected,
     required String donationType,
-  }) : super(key: key);
+  });
 
   @override
   State<DonationType> createState() => _DonationTypeState();
@@ -127,8 +127,7 @@ class _DonationTypeState extends State<DonationType> {
 class DonationOptionsScreen extends StatelessWidget {
   final void Function(String) onTypeSelected;
 
-  const DonationOptionsScreen({Key? key, required this.onTypeSelected})
-      : super(key: key);
+  const DonationOptionsScreen({super.key, required this.onTypeSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -165,8 +164,7 @@ class DonationOptionsScreen extends StatelessWidget {
 class FoodOptionsScreen extends StatelessWidget {
   final void Function(String) onTypeSelected;
 
-  const FoodOptionsScreen({Key? key, required this.onTypeSelected})
-      : super(key: key);
+  const FoodOptionsScreen({super.key, required this.onTypeSelected});
 
   @override
   Widget build(BuildContext context) {

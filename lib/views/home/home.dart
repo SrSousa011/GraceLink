@@ -95,12 +95,12 @@ class EventCard extends StatelessWidget {
   final String location;
 
   const EventCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.description,
     required this.date,
     required this.location,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +149,7 @@ class EventCard extends StatelessWidget {
 class EventDetailsScreen extends StatelessWidget {
   final Event event;
 
-  const EventDetailsScreen({Key? key, required this.event}) : super(key: key);
+  const EventDetailsScreen({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {

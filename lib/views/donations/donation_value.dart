@@ -3,8 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class DonationValue extends StatefulWidget {
-  const DonationValue({Key? key, required this.donationController})
-      : super(key: key);
+  const DonationValue({super.key, required this.donationController});
 
   final TextEditingController donationController;
 
