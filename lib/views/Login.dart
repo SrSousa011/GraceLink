@@ -1,15 +1,18 @@
+import 'package:flutter/material.dart';
+import 'package:churchapp/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
-class SignInPage extends StatefulWidget {
-  const SignInPage({super.key});
+class Login extends StatefulWidget {
+  const Login({super.key, required this.auth, required this.onSignedIn});
+  final BaseAuth auth;
+  final VoidCallback onSignedIn;
 
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  State<Login> createState() => _LoginState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _LoginState extends State<Login> {
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -30,20 +33,20 @@ class _SignInPageState extends State<SignInPage> {
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Email não pode ser vazio';
+      return 'Email cannot be empty';
     }
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-      return 'Email inválido';
+      return 'Invalid email';
     }
     return null;
   }
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Senha não pode ser vazia';
+      return 'Password cannot be empty';
     }
     if (value.length < 6) {
-      return 'Senha deve conter pelo menos 6 caracteres';
+      return 'Password must be at least 6 characters';
     }
     return null;
   }
@@ -55,14 +58,16 @@ class _SignInPageState extends State<SignInPage> {
       String email = _emailController.text.trim();
       String password = _passwordController.text;
       try {
-        UserCredential user =
-            await FirebaseAuth.instance.signInWithEmailAndPassword(
+        UserCredential userCredential =
+            await widget.auth.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
         if (kDebugMode) {
-          print('Signed in: ${user.user!.uid}');
+          print('Signed in: ${userCredential.user!.uid}');
         }
+        // Trigger the onSignedIn callback to navigate to the home page
+        widget.onSignedIn();
       } catch (e) {
         if (kDebugMode) {
           print('Error: $e');
