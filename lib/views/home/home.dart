@@ -1,15 +1,19 @@
-import 'package:churchapp/views/nav_bar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-void main() {
-  runApp(const MaterialApp(
-    home: Home(),
-  ));
-}
+import 'package:churchapp/services/auth_service.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  const Home({
+    super.key,
+    required this.auth,
+    required this.userId,
+    required this.onSignedOut,
+  });
+
+  final BaseAuth auth;
+  final String userId;
+  final VoidCallback onSignedOut;
 
   @override
   State<Home> createState() => _HomeState();
@@ -40,13 +44,29 @@ class _HomeState extends State<Home> {
     ),
   ];
 
+  Future<void> _handleSignOut(BuildContext context) async {
+    try {
+      await widget.auth.signOut();
+      widget.onSignedOut();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error signing out: $e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => _handleSignOut(context),
+          ),
+        ],
       ),
-      drawer: const NavBar(),
       body: ListView.builder(
         itemCount: events.length,
         itemBuilder: (context, index) {
