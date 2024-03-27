@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -47,18 +48,26 @@ class _SignInPageState extends State<SignInPage> {
     return null;
   }
 
-  void validateAndSubmit() {
+  Future<void> validateAndSubmit() async {
     final form = _formKey.currentState;
     if (form != null && form.validate()) {
       // Form is valid, process login here.
       String email = _emailController.text.trim();
       String password = _passwordController.text;
-
-      if (kDebugMode) {
-        print('Form is valid. Email: $email, Password: $password');
+      try {
+        UserCredential user =
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        if (kDebugMode) {
+          print('Signed in: ${user.user!.uid}');
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error: $e');
+        }
       }
-    } else {
-      // Form is invalid, display error messages below fields.
     }
   }
 
