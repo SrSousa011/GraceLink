@@ -76,75 +76,53 @@ class _SignInPageState extends State<SignInPage> {
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                    ),
-                    validator: _validateEmail,
-                  ),
-                  const SizedBox(height: 20.0),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                    ),
-                    validator: _validatePassword,
-                  ),
-                  const SizedBox(height: 20.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          validateAndSubmit();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: const Color(0xFF1E88E5),
-                          backgroundColor: Colors.white,
-                          side: const BorderSide(
-                            color: Color(0xFF1E88E5),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                        ),
-                        child: const Text('Login'),
-                      ),
-                      const SizedBox(width: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SignInPage(),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: const Color.fromARGB(
-                            255,
-                            90,
-                            175,
-                            249,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                        ),
-                        child: const Text('Sign Up'),
-                      ),
-                    ],
-                  ),
-                ],
+                children: buildInputs() + buildLoginButton(),
               ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  List<Widget> buildInputs() {
+    return <Widget>[
+      TextFormField(
+        controller: _emailController,
+        decoration: const InputDecoration(
+          labelText: 'Email',
+        ),
+        validator: _validateEmail,
+      ),
+      const SizedBox(height: 20.0),
+      TextFormField(
+        controller: _passwordController,
+        obscureText: true,
+        decoration: const InputDecoration(
+          labelText: 'Password',
+        ),
+        validator: _validatePassword,
+      ),
+      const SizedBox(height: 20.0),
+    ];
+  }
+
+  List<Widget> buildLoginButton() {
+    return [
+      ElevatedButton(
+        onPressed: () {
+          validateAndSubmit(); // Calling validateAndSubmit method
+        },
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: const Color.fromARGB(255, 90, 175, 249),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+        ),
+        child: const Text('Login'),
+      ),
+      const SizedBox(height: 20.0),
+    ];
   }
 }
