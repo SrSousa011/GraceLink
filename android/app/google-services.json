@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "787647442720",
-    "project_id": "gracelink-ecf97",
-    "storage_bucket": "gracelink-ecf97.appspot.com"
+    "project_number": "94231497145",
+    "project_id": "gracelink-ee62c",
+    "storage_bucket": "gracelink-ee62c.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:787647442720:android:8f5a74e8a7a22ea9ec3145",
+        "mobilesdk_app_id": "1:94231497145:android:29a8c5049453cc5e9b8e68",
         "android_client_info": {
           "package_name": "com.example.grace"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCjnYTknPTUF7SC0jA_pMAYQMDs8wCUTJ0"
+          "current_key": "AIzaSyCfNTLZbPh1XQqRhnhm5TMAtWjGto8if0w"
         }
       ],
       "services": {
