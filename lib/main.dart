@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Comunidade Connect',
       home: SplashScreen(
-        root: Root(auth: AuthenticationService()), // Using the Root widget
+        root: Root(auth: AuthenticationService()),
         drawer: const NavBar(),
       ),
     );
