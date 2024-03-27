@@ -1,3 +1,4 @@
+import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/login.dart';
 import 'package:churchapp/views/signUp/sign_up_page.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +51,10 @@ class Welcome extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const SignInPage()),
+                              builder: (context) => Login(
+                                    auth: AuthenticationService(),
+                                    onSignedIn: () {},
+                                  )),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -70,7 +74,10 @@ class Welcome extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const SignUpPage()),
+                              builder: (context) => SignUpPage(
+                                    auth: AuthenticationService(),
+                                    onSignedIn: () {},
+                                  )),
                         );
                       },
                       style: ElevatedButton.styleFrom(
