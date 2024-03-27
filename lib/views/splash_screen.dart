@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:churchapp/views/welcome.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key, required NavBar drawer});
+  const SplashScreen({super.key, required NavBar drawer, required root});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
