@@ -29,12 +29,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Comunidade Connect',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: Colors.blue, // Adjust as needed
-        ),
-        // useMaterial3: true, // Remove this line if not needed
-      ),
+      // Removendo o tema para que o aplicativo use o tema padrão do Flutter
+      // theme: ThemeData(
+      //   colorScheme: ColorScheme.fromSwatch(
+      //     primarySwatch: Colors.blue, // Adjust as needed
+      //   ),
+      //   // useMaterial3: true, // Remove this line if not needed
+      // ),
       home: const SplashScreen(
         drawer: NavBar(),
       ),
