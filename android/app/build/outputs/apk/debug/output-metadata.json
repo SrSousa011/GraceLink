@@ -1,7 +1,7 @@
 {
   "version": 3,
   "artifactType": {
-    "type": "PROCESSED_RES",
+    "type": "APK",
     "kind": "Directory"
   },
   "applicationId": "com.example.grace",
@@ -13,7 +13,7 @@
       "attributes": [],
       "versionCode": 1,
       "versionName": "1.0.0",
-      "outputFile": "resources-debug.ap_"
+      "outputFile": "app-debug.apk"
     }
   ],
   "elementType": "File"
