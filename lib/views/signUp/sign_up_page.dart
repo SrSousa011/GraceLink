@@ -55,7 +55,7 @@ class _SignUpPageState extends State<SignUpPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: buildInputs() + buildLoginButton(),
+              children: buildInputs() + buildSignUpButton(),
             ),
           ),
         ),
@@ -129,7 +129,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 }
 
-List<Widget> buildLoginButton() {
+List<Widget> buildSignUpButton() {
   return [
     const SizedBox(height: 20.0),
     ElevatedButton(
@@ -143,7 +143,7 @@ List<Widget> buildLoginButton() {
             borderRadius: BorderRadius.circular(20.0),
           ),
         ),
-        child: const Text('Next'))
+        child: const Text('Sign Up'))
   ];
 }
 
