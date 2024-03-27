@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+  const SignUpPage({Key? key});
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
@@ -14,6 +14,8 @@ class _SignUpPageState extends State<SignUpPage> {
   late TextEditingController _confirmEmailController;
   late TextEditingController _passwordController;
   late TextEditingController _confirmPasswordController;
+  late TextEditingController _phoneNumberController;
+  late TextEditingController _dddController;
 
   int? selectedDay;
   int? selectedMonth;
@@ -29,6 +31,8 @@ class _SignUpPageState extends State<SignUpPage> {
     _confirmEmailController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
+    _phoneNumberController = TextEditingController();
+    _dddController = TextEditingController();
   }
 
   @override
@@ -39,6 +43,8 @@ class _SignUpPageState extends State<SignUpPage> {
     _confirmEmailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _phoneNumberController.dispose();
+    _dddController.dispose();
     super.dispose();
   }
 
@@ -55,7 +61,21 @@ class _SignUpPageState extends State<SignUpPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: buildInputs() + buildSignUpButton(),
+              children: [
+                _buildNameSection(),
+                const SizedBox(height: 20.0),
+                _buildDateOfBirthSection(),
+                const SizedBox(height: 20.0),
+                _buildGenderSection(),
+                const SizedBox(height: 20.0),
+                _buildEmailSection(),
+                const SizedBox(height: 20.0),
+                _buildPasswordSection(),
+                const SizedBox(height: 20.0),
+                _buildPhoneNumberSection(),
+                const SizedBox(height: 20.0),
+                _buildSignUpButton(),
+              ],
             ),
           ),
         ),
@@ -63,88 +83,124 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  List<Widget> buildInputs() {
-    return <Widget>[
-      const SizedBox(height: 20.0),
-      TextFieldWidget(
-        labelText: 'First Name',
-        controller: _firstNameController,
-      ),
-      const SizedBox(height: 20.0),
-      TextFieldWidget(
-        labelText: 'Last Name',
-        controller: _lastNameController,
-      ),
-      const SizedBox(height: 20.0),
-      DateOfBirthDropdowns(
-        selectedDay: selectedDay,
-        selectedMonth: selectedMonth,
-        selectedYear: selectedYear,
-        onChangedDay: (value) {
-          setState(() {
-            selectedDay = value;
-          });
-        },
-        onChangedMonth: (value) {
-          setState(() {
-            selectedMonth = value;
-          });
-        },
-        onChangedYear: (value) {
-          setState(() {
-            selectedYear = value;
-          });
-        },
-      ),
-      const SizedBox(height: 20.0),
-      GenderDropdown(
-        selectedGender: selectedGender,
-        onChangedGender: (value) {
-          setState(() {
-            selectedGender = value!;
-          });
-        },
-      ),
-      const SizedBox(height: 20.0),
-      TextFieldWidget(
-        labelText: 'Email',
-        controller: _emailController,
-      ),
-      const SizedBox(height: 20.0),
-      TextFieldWidget(
-        labelText: 'Confirm Email',
-        controller: _confirmEmailController,
-      ),
-      const SizedBox(height: 20.0),
-      TextFieldWidget(
-        labelText: 'Password',
-        controller: _passwordController,
-      ),
-      const SizedBox(height: 20.0),
-      TextFieldWidget(
-        labelText: 'Confirm Password',
-        controller: _confirmPasswordController,
-      ),
-    ];
-  }
-}
-
-List<Widget> buildSignUpButton() {
-  return [
-    const SizedBox(height: 20.0),
-    ElevatedButton(
-        onPressed: () {
-          // Validate fields and navigate to next step
-        },
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
-          backgroundColor: const Color.fromARGB(255, 90, 175, 249),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
+  Widget _buildNameSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFieldWidget(
+          labelText: 'First Name',
+          controller: _firstNameController,
         ),
-        child: const Text('Sign Up'))
-  ];
+        const SizedBox(height: 20.0),
+        TextFieldWidget(
+          labelText: 'Last Name',
+          controller: _lastNameController,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPhoneNumberSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFieldWidget(
+          labelText: 'DDD',
+          controller: _dddController,
+        ),
+        const SizedBox(height: 20.0),
+        TextFieldWidget(
+          labelText: 'Cellphone Number',
+          controller: _phoneNumberController,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateOfBirthSection() {
+    return DateOfBirthDropdowns(
+      selectedDay: selectedDay,
+      selectedMonth: selectedMonth,
+      selectedYear: selectedYear,
+      onChangedDay: (value) {
+        setState(() {
+          selectedDay = value;
+        });
+      },
+      onChangedMonth: (value) {
+        setState(() {
+          selectedMonth = value;
+        });
+      },
+      onChangedYear: (value) {
+        setState(() {
+          selectedYear = value;
+        });
+      },
+    );
+  }
+
+  Widget _buildGenderSection() {
+    return GenderDropdown(
+      selectedGender: selectedGender,
+      onChangedGender: (value) {
+        setState(() {
+          selectedGender = value!;
+        });
+      },
+    );
+  }
+
+  Widget _buildEmailSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFieldWidget(
+          labelText: 'Email',
+          controller: _emailController,
+        ),
+        const SizedBox(height: 20.0),
+        TextFieldWidget(
+          labelText: 'Confirm Email',
+          controller: _confirmEmailController,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPasswordSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFieldWidget(
+          labelText: 'Password',
+          controller: _passwordController,
+        ),
+        const SizedBox(height: 20.0),
+        TextFieldWidget(
+          labelText: 'Confirm Password',
+          controller: _confirmPasswordController,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSignUpButton() {
+    return ElevatedButton(
+      onPressed: () {
+        // Validate fields and navigate to next step
+      },
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        backgroundColor: const Color.fromARGB(255, 90, 175, 249),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        textStyle: const TextStyle(fontSize: 18),
+      ),
+      child: const Text('Sign Up'),
+    );
+  }
 }
 
 class DateOfBirthDropdowns extends StatelessWidget {
