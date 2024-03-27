@@ -1,9 +1,12 @@
+import 'package:churchapp/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+  const SignUpPage({super.key, required this.auth, required this.onSignedIn});
+  final BaseAuth auth;
+  final VoidCallback onSignedIn;
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
@@ -232,22 +235,25 @@ class _SignUpPageState extends State<SignUpPage> {
   Future<void> validateAndSubmit() async {
     final form = _formKey.currentState;
     if (form != null && form.validate()) {
-      // Form is valid, process signup here.
+      // Form is valid, process sign up here.
       String email = _emailController.text.trim();
       String password = _passwordController.text;
       try {
-        UserCredential user =
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        UserCredential userCredential =
+            await widget.auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
+        widget.onSignedIn();
         if (kDebugMode) {
-          print('Signed up: ${user.user!.uid}');
+          print('User created: ${userCredential.user!.uid}');
         }
+        // Proceed with navigation or any other action upon successful sign-up
       } catch (e) {
         if (kDebugMode) {
           print('Error: $e');
         }
+        // Handle sign-up errors, such as displaying an error message
       }
     }
   }
