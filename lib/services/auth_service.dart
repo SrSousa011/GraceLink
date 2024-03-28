@@ -92,7 +92,7 @@ class AuthenticationService implements BaseAuth {
         email: email,
         password: password,
       );
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       rethrow;
     } catch (e) {
       rethrow;
@@ -109,7 +109,7 @@ class AuthenticationService implements BaseAuth {
         email: email,
         password: password,
       );
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       rethrow;
     } catch (e) {
       rethrow;
