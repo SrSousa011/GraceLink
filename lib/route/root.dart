@@ -4,7 +4,7 @@ import 'package:churchapp/views/home/home.dart';
 import 'package:churchapp/views/login.dart';
 
 class Root extends StatefulWidget {
-  const Root({Key? key, required this.auth});
+  const Root({super.key, required this.auth});
   final BaseAuth auth;
 
   @override
