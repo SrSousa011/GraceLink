@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key, required this.auth, required this.onSignedIn});
@@ -67,7 +67,7 @@ class _LoginState extends State<Login> {
           print('Signed in: ${userCredential.user!.uid}');
         }
         // Trigger the onSignedIn callback to navigate to the home page
-        widget.onSignedIn();
+        widget.onSignedIn(); // This callback should update the _authStatus
       } catch (e) {
         if (kDebugMode) {
           print('Error: $e');
