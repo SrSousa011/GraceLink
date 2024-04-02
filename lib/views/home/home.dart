@@ -68,6 +68,7 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
+      drawer: const NavBar(),
       body: ListView.builder(
         itemCount: events.length,
         itemBuilder: (context, index) {
@@ -178,7 +179,6 @@ class EventDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(event.title),
       ),
-      drawer: const NavBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
