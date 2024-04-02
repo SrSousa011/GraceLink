@@ -45,28 +45,11 @@ class _HomeState extends State<Home> {
     ),
   ];
 
-  Future<void> _handleSignOut(BuildContext context) async {
-    try {
-      await widget.auth.signOut();
-      widget.onSignedOut();
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error signing out: $e');
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => _handleSignOut(context),
-          ),
-        ],
       ),
       drawer: const NavBar(),
       body: ListView.builder(
