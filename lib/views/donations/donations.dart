@@ -1,3 +1,4 @@
+import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/donations/donnation_buttom.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/donations/donate_how.dart';
@@ -35,7 +36,9 @@ class _DonationPageState extends State<Donations> {
       appBar: AppBar(
         title: const Text('Donations'),
       ),
-      drawer: const NavBar(),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

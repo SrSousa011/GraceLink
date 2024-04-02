@@ -1,3 +1,4 @@
+import 'package:churchapp/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:churchapp/views/nav_bar.dart';
@@ -44,7 +45,9 @@ class _EventsPageState extends State<EventsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const AppBarWidget(title: 'Eventos'),
-      drawer: const NavBar(),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+      ),
       body: EventListView(
         events: events,
         onTap: (event) {

@@ -1,3 +1,5 @@
+import 'package:churchapp/services/auth_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/user_profile.dart';
 
@@ -71,63 +73,83 @@ class DrawerMenuItem extends StatelessWidget {
 }
 
 class NavBar extends StatelessWidget {
-  const NavBar({super.key});
+  final BaseAuth auth;
+
+  const NavBar({super.key, required this.auth});
 
   @override
   Widget build(BuildContext context) {
-    return const Drawer(
-      child: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            DrawerHeaderWidget(),
-            DrawerMenuItem(
-              title: 'Home',
-              icon: Icons.home_outlined,
-              route: '/home',
-            ),
-            DrawerMenuItem(
-              title: 'User Profile',
-              icon: Icons.person_outlined,
-              route: '/user_profile',
-            ),
-            DrawerMenuItem(
-              title: 'Events',
-              icon: Icons.event,
-              route: '/event_page',
-            ),
-            DrawerMenuItem(
-              title: 'Donations',
-              icon: Icons.volunteer_activism_outlined,
-              route: '/donations',
-            ),
-            DrawerMenuItem(
-              title: 'Courses',
-              icon: Icons.school_outlined,
-              route: '/courses',
-            ),
-            DrawerMenuItem(
-              title: 'Become member',
-              icon: Icons.group_add_outlined,
-              route: '/become_member',
-            ),
-            DrawerMenuItem(
-              title: 'Notifications',
-              icon: Icons.notifications_outlined,
-              route: '/notifications',
-            ),
-            DrawerMenuItem(
-              title: 'Videos',
-              icon: Icons.video_library_outlined,
-              route: '/videos',
-            ),
-            DrawerMenuItem(
-              title: 'About Us',
-              icon: Icons.info_outlined,
-              route: '/about_us',
-            ),
-          ],
-        ),
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          const DrawerHeaderWidget(),
+          const DrawerMenuItem(
+            title: 'Home',
+            icon: Icons.home_outlined,
+            route: '/home',
+          ),
+          const DrawerMenuItem(
+            title: 'User Profile',
+            icon: Icons.person_outlined,
+            route: '/user_profile',
+          ),
+          const DrawerMenuItem(
+            title: 'Events',
+            icon: Icons.event,
+            route: '/event_page',
+          ),
+          const DrawerMenuItem(
+            title: 'Donations',
+            icon: Icons.volunteer_activism_outlined,
+            route: '/donations',
+          ),
+          const DrawerMenuItem(
+            title: 'Courses',
+            icon: Icons.school_outlined,
+            route: '/courses',
+          ),
+          const DrawerMenuItem(
+            title: 'Become member',
+            icon: Icons.group_add_outlined,
+            route: '/become_member',
+          ),
+          const DrawerMenuItem(
+            title: 'Notifications',
+            icon: Icons.notifications_outlined,
+            route: '/notifications',
+          ),
+          const DrawerMenuItem(
+            title: 'Videos',
+            icon: Icons.video_library_outlined,
+            route: '/videos',
+          ),
+          const DrawerMenuItem(
+            title: 'About Us',
+            icon: Icons.info_outlined,
+            route: '/about_us',
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout), // Icon for Logout
+            title: const Text('Logout'),
+            onTap: () {
+              _handleSignOut(context); // Correctly call _handleSignOut method
+            },
+          ),
+        ],
       ),
     );
+  }
+
+  Future<void> _handleSignOut(BuildContext context) async {
+    try {
+      await auth.signOut(); // Call signOut method
+      // Navigate to the login screen or perform any other action after signing out
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error signing out: $e');
+      }
+      // Handle sign-out error
+    }
   }
 }

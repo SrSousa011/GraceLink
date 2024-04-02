@@ -1,3 +1,4 @@
+import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -10,7 +11,9 @@ class AboutUs extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Sobre Nós'),
       ),
-      drawer: const NavBar(),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

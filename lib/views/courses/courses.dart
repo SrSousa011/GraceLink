@@ -1,3 +1,4 @@
+import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/courses/courses_details.dart';
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,9 @@ class _CoursesState extends State<Courses> {
         title: const Text('Cursos'),
         centerTitle: true,
       ),
-      drawer: const NavBar(),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+      ),
       body: ListView.builder(
         itemCount: coursesList.length,
         itemBuilder: (context, index) {

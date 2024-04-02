@@ -51,7 +51,9 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: const Text('Home'),
       ),
-      drawer: const NavBar(),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+      ),
       body: ListView.builder(
         itemCount: events.length,
         itemBuilder: (context, index) {

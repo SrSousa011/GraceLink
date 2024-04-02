@@ -24,7 +24,9 @@ class MyApp extends StatelessWidget {
       title: 'Comunidade Connect',
       home: SplashScreen(
         root: Root(auth: AuthenticationService()),
-        drawer: const NavBar(),
+        drawer: NavBar(
+          auth: AuthenticationService(),
+        ),
       ),
       onGenerateRoute: AppRoutes.generateRoute,
     );

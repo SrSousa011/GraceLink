@@ -1,3 +1,4 @@
+import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -112,7 +113,9 @@ class UserProfile extends StatelessWidget {
       appBar: AppBar(
         title: const Text('User Profile'),
       ),
-      drawer: const NavBar(),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
