@@ -109,10 +109,16 @@ class AuthenticationService implements BaseAuth {
         email: email,
         password: password,
       );
-    } on FirebaseAuthException {
-      rethrow;
+    } on FirebaseAuthException catch (e) {
+      if (kDebugMode) {
+        print('FirebaseAuthException during sign in: ${e.message}');
+      }
+      throw e;
     } catch (e) {
-      rethrow;
+      if (kDebugMode) {
+        print('Error during sign in: $e');
+      }
+      throw e;
     }
   }
 
