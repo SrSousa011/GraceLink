@@ -1,26 +1,18 @@
-// ignore_for_file: file_names, library_private_types_in_public_api
-
-import 'package:churchapp/views/events/Floating_action_button_widget.dart';
-import 'package:churchapp/views/events/app_bar_widget.dart';
-import 'package:churchapp/views/events/event_list_view.dart';
-import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:churchapp/views/nav_bar.dart';
+import 'package:churchapp/views/events/event_list_view.dart';
+import 'package:churchapp/views/events/floating_action_button_widget.dart';
+import 'package:churchapp/views/events/app_bar_widget.dart';
 
-void main() {
-  runApp(const MaterialApp(
-    home: Events(),
-  ));
-}
-
-class Events extends StatefulWidget {
-  const Events({super.key});
+class EventsPage extends StatefulWidget {
+  const EventsPage({super.key});
 
   @override
-  _EventsState createState() => _EventsState();
+  State<EventsPage> createState() => _EventsPageState();
 }
 
-class _EventsState extends State<Events> {
+class _EventsPageState extends State<EventsPage> {
   List<Event> events = [
     Event(
       title: 'Culto de Domingo',
