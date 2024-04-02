@@ -1,4 +1,5 @@
 import 'package:churchapp/route/root.dart';
+import 'package:churchapp/route/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
         root: Root(auth: AuthenticationService()),
         drawer: const NavBar(),
       ),
+      onGenerateRoute: AppRoutes.generateRoute,
     );
   }
 }
