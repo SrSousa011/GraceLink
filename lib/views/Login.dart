@@ -1,4 +1,5 @@
 import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/home/home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -66,12 +67,21 @@ class _LoginState extends State<Login> {
         if (kDebugMode) {
           print('Signed in: ${userCredential.user!.uid}');
         }
-        // Trigger the onSignedIn callback to navigate to the home page
-        widget.onSignedIn(); // This callback should update the _authStatus
+        // Navigate to the home screen
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => Home(
+            auth: widget.auth,
+            userId: userCredential.user!.uid,
+            onSignedOut: () {
+              // Implement sign out if needed
+            },
+          ),
+        ));
       } catch (e) {
         if (kDebugMode) {
           print('Error: $e');
         }
+        // Handle errors here
       }
     }
   }
@@ -90,53 +100,42 @@ class _LoginState extends State<Login> {
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: buildInputs() + buildLoginButton(),
+                children: [
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                    ),
+                    validator: _validateEmail,
+                  ),
+                  const SizedBox(height: 20.0),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Password',
+                    ),
+                    validator: _validatePassword,
+                  ),
+                  const SizedBox(height: 20.0),
+                  ElevatedButton(
+                    onPressed: validateAndSubmit,
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: const Color.fromARGB(255, 90, 175, 249),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
+                    child: const Text('Login'),
+                  ),
+                  const SizedBox(height: 20.0),
+                ],
               ),
             ),
           ),
         ),
       ),
     );
-  }
-
-  List<Widget> buildInputs() {
-    return <Widget>[
-      TextFormField(
-        controller: _emailController,
-        decoration: const InputDecoration(
-          labelText: 'Email',
-        ),
-        validator: _validateEmail,
-      ),
-      const SizedBox(height: 20.0),
-      TextFormField(
-        controller: _passwordController,
-        obscureText: true,
-        decoration: const InputDecoration(
-          labelText: 'Password',
-        ),
-        validator: _validatePassword,
-      ),
-      const SizedBox(height: 20.0),
-    ];
-  }
-
-  List<Widget> buildLoginButton() {
-    return [
-      ElevatedButton(
-        onPressed: () {
-          validateAndSubmit(); // Calling validateAndSubmit method
-        },
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
-          backgroundColor: const Color.fromARGB(255, 90, 175, 249),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-        ),
-        child: const Text('Login'),
-      ),
-      const SizedBox(height: 20.0),
-    ];
   }
 }
