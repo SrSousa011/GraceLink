@@ -1,3 +1,4 @@
+import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -177,6 +178,7 @@ class EventDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(event.title),
       ),
+      drawer: const NavBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
