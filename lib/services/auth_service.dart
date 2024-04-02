@@ -12,6 +12,8 @@ abstract class BaseAuth {
 
   Future<void> signOut();
 
+  Future<void> signInWithUserID(String userID);
+
   Future<bool> isLoggedIn();
 
   // New methods for signing up
@@ -145,6 +147,26 @@ class AuthenticationService implements BaseAuth {
         print('Error signing out: $e');
       }
       rethrow;
+    }
+  }
+
+  @override
+  Future<void> signInWithUserID(String userID) async {
+    try {
+      // Use Firebase Auth to sign in with the provided user ID
+      // Generate a custom token and sign in with it
+      String customToken =
+          (await _auth.signInWithCustomToken(userID)) as String;
+
+      // Sign in with the custom token
+      UserCredential userCredential =
+          await _auth.signInWithCustomToken(customToken);
+
+      // Handle successful sign-in
+    } catch (e) {
+      // Handle sign-in errors
+      print('Error signing in with user ID: $e');
+      throw e;
     }
   }
 
