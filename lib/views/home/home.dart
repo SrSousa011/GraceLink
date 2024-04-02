@@ -1,5 +1,4 @@
 import 'package:churchapp/views/nav_bar.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:churchapp/services/auth_service.dart';
