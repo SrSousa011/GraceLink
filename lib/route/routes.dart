@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 class AppRoutes {
   static Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case '/':
+      case '/home':
         return MaterialPageRoute(
           builder: (_) => Home(
             auth: AuthenticationService(),
