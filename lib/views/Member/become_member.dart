@@ -152,6 +152,7 @@ class _BecomeMemberState extends State<BecomeMember> {
         ),
         drawer: NavBar(
           auth: AuthenticationService(),
+          authService: AuthenticationService(),
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
