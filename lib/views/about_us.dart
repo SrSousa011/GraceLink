@@ -13,6 +13,7 @@ class AboutUs extends StatelessWidget {
       ),
       drawer: NavBar(
         auth: AuthenticationService(),
+        authService: AuthenticationService(),
       ),
       body: SingleChildScrollView(
         child: Column(

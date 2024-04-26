@@ -38,6 +38,7 @@ class _DonationPageState extends State<Donations> {
       ),
       drawer: NavBar(
         auth: AuthenticationService(),
+        authService: AuthenticationService(),
       ),
       body: SingleChildScrollView(
         child: Column(

@@ -115,6 +115,7 @@ class UserProfile extends StatelessWidget {
       ),
       drawer: NavBar(
         auth: AuthenticationService(),
+        authService: AuthenticationService(),
       ),
       body: Center(
         child: Column(

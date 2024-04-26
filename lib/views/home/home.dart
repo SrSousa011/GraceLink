@@ -52,6 +52,7 @@ class _HomeState extends State<Home> {
       ),
       drawer: NavBar(
         auth: AuthenticationService(),
+        authService: AuthenticationService(),
       ),
       body: ListView.builder(
         itemCount: events.length,

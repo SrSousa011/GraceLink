@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
         root: Root(auth: AuthenticationService()),
         drawer: NavBar(
           auth: AuthenticationService(),
+          authService: AuthenticationService(),
         ),
       ),
       onGenerateRoute: AppRoutes.generateRoute,

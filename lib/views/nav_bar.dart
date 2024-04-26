@@ -3,79 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/user_profile.dart';
 
-class DrawerHeaderWidget extends StatelessWidget {
-  const DrawerHeaderWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 270,
-      child: DrawerHeader(
-        decoration: const BoxDecoration(
-          color: Colors.blue,
-          image: DecorationImage(
-            image: AssetImage('assets/imagens/bacground-image-center.jpg'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const UserProfile()),
-            );
-          },
-          child: const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircleAvatar(
-                radius: 72,
-                backgroundImage:
-                    AssetImage('assets/imagens/profile_picture.jpg'),
-              ),
-              SizedBox(height: 12),
-              Text(
-                'Anaïs',
-                style: TextStyle(fontSize: 20, color: Colors.white),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class DrawerMenuItem extends StatelessWidget {
-  const DrawerMenuItem({
-    super.key,
-    required this.title,
-    required this.icon,
-    required this.route,
-  });
-
-  final String title;
-  final IconData icon;
-  final String route;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(title),
-      leading: Icon(icon),
-      onTap: () {
-        Navigator.pushReplacementNamed(context, route);
-      },
-    );
-  }
-}
-
 class NavBar extends StatelessWidget {
   final BaseAuth auth;
+  final AuthenticationService authService;
 
-  const NavBar({super.key, required this.auth});
+  const NavBar({super.key, required this.auth, required this.authService});
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +15,6 @@ class NavBar extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          const DrawerHeaderWidget(),
           const DrawerMenuItem(
             title: 'Home',
             icon: Icons.home_outlined,
@@ -130,26 +61,38 @@ class NavBar extends StatelessWidget {
             route: '/about_us',
           ),
           ListTile(
-            leading: const Icon(Icons.logout), // Icon for Logout
+            leading: const Icon(Icons.logout),
             title: const Text('Logout'),
-            onTap: () {
-              _handleSignOut(context); // Correctly call _handleSignOut method
+            onTap: () async {
+              await authService.signOut();
             },
           ),
         ],
       ),
     );
   }
+}
 
-  Future<void> _handleSignOut(BuildContext context) async {
-    try {
-      await auth.signOut(); // Call signOut method
-      // Navigate to the login screen or perform any other action after signing out
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error signing out: $e');
-      }
-      // Handle sign-out error
-    }
+class DrawerMenuItem extends StatelessWidget {
+  const DrawerMenuItem({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.route,
+  });
+
+  final String title;
+  final IconData icon;
+  final String route;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(title),
+      leading: Icon(icon),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, route);
+      },
+    );
   }
 }

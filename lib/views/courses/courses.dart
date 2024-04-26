@@ -20,6 +20,7 @@ class _CoursesState extends State<Courses> {
       ),
       drawer: NavBar(
         auth: AuthenticationService(),
+        authService: AuthenticationService(),
       ),
       body: ListView.builder(
         itemCount: coursesList.length,

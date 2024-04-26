@@ -47,6 +47,7 @@ class _EventsPageState extends State<EventsPage> {
       appBar: const AppBarWidget(title: 'Eventos'),
       drawer: NavBar(
         auth: AuthenticationService(),
+        authService: AuthenticationService(),
       ),
       body: EventListView(
         events: events,
