@@ -1,4 +1,5 @@
 import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -244,11 +245,21 @@ class _SignUpPageState extends State<SignUpPage> {
           email: email,
           password: password,
         );
-        widget.onSignedIn();
+        widget
+            .onSignedIn(); // Chamando o método onSignedIn para indicar que o usuário está logado
         if (kDebugMode) {
           print('User created: ${userCredential.user!.uid}');
         }
-        // Proceed with navigation or any other action upon successful sign-up
+        // Navegar para a página Home
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => Home(
+            auth: widget.auth,
+            userId: userCredential.user!.uid,
+            onSignedOut: () {
+              // Implemente o logout se necessário
+            },
+          ),
+        ));
       } catch (e) {
         if (kDebugMode) {
           print('Error: $e');
