@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 abstract class BaseAuth {
   Future<UserCredential> createUserWithEmailAndPassword(
@@ -139,14 +140,31 @@ class AuthenticationService implements BaseAuth {
 
   @override
   Future<void> signOut() async {
-    // Implement signOut method
     try {
+      // Sign out the user
       await _auth.signOut();
     } catch (e) {
       if (kDebugMode) {
         print('Error signing out: $e');
       }
       rethrow;
+    }
+  }
+
+  Future<String?> _deleteUserToken() async {
+    try {
+      // Delete the user's token
+      await FirebaseAuth.instance.currentUser?.delete();
+
+      return 'Token deletado com sucesso';
+    } on FirebaseAuthException catch (e) {
+      // Se ocorrer uma exceção relacionada à autenticação, imprima o erro e retorne null
+      print('Erro de autenticação ao excluir o token: $e');
+      return null;
+    } catch (e) {
+      // Se ocorrer qualquer outra exceção, imprima o erro e retorne null
+      print('Erro ao excluir o token: $e');
+      return null;
     }
   }
 
