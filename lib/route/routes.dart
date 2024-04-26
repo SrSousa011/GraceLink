@@ -1,4 +1,5 @@
 import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/Welcome.dart';
 import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
@@ -11,6 +12,12 @@ import 'package:flutter/material.dart';
 class AppRoutes {
   static Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case '/welcome': // Adicionando a rota 'welcome'
+        return MaterialPageRoute(
+          builder: (_) => const Welcome(
+            title: '',
+          ),
+        );
       case '/home':
         return MaterialPageRoute(
           builder: (_) => Home(
