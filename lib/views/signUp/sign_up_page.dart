@@ -24,6 +24,8 @@ class _SignUpPageState extends State<SignUpPage> {
   late TextEditingController _dddController;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  final bool _isLoading = false;
+
   int? selectedDay;
   int? selectedMonth;
   int? selectedYear;
@@ -201,7 +203,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget _buildSignUpButton() {
     return ElevatedButton(
-      onPressed: validateAndSubmit,
+      onPressed: _isLoading ? null : _validateAndSubmit,
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
         backgroundColor: const Color.fromARGB(255, 90, 175, 249),
@@ -233,7 +235,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return null;
   }
 
-  Future<void> validateAndSubmit() async {
+  Future<void> _validateAndSubmit() async {
     final form = _formKey.currentState;
     if (form != null && form.validate()) {
       // Form is valid, process sign up here.
@@ -250,16 +252,17 @@ class _SignUpPageState extends State<SignUpPage> {
         if (kDebugMode) {
           print('User created: ${userCredential.user!.uid}');
         }
-        // Navegar para a página Home
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => Home(
-            auth: widget.auth,
-            userId: userCredential.user!.uid,
-            onSignedOut: () {
-              // Implemente o logout se necessário
-            },
-          ),
-        ));
+        if (mounted) {
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => Home(
+              auth: widget.auth,
+              userId: userCredential.user!.uid,
+              onSignedOut: () {
+                // Implemente o logout se necessário
+              },
+            ),
+          ));
+        }
       } catch (e) {
         if (kDebugMode) {
           print('Error: $e');
