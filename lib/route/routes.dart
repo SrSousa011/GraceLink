@@ -14,8 +14,9 @@ class AppRoutes {
     switch (settings.name) {
       case '/welcome': // Adicionando a rota 'welcome'
         return MaterialPageRoute(
-          builder: (_) => const Welcome(
+          builder: (_) => Welcome(
             title: '',
+            onSignedIn: () {},
           ),
         );
       case '/home':
