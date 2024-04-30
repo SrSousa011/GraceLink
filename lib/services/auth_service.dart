@@ -3,17 +3,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 abstract class BaseAuth {
-  Future<UserCredential> createUserWithEmailAndPassword(
-      {required String email, required String password});
+  Future<UserCredential> createUserWithEmailAndPassword({
+    required String email,
+    required String password,
+  });
 
-  Future<UserCredential> signInWithEmailAndPassword(
-      {required String email, required String password});
+  Future<UserCredential> signInWithEmailAndPassword({
+    required String email,
+    required String password,
+  });
 
   Future<String?> getCurrentUserId();
 
-  Future<void> signOut();
-
-  Future<void> signInWithUserID(String userID);
+  Future<void> signOut({VoidCallback? onSignedOut});
 
   Future<bool> isLoggedIn();
 
@@ -30,7 +32,7 @@ abstract class BaseAuth {
     required String selectedGender,
   });
 
-  Future<void> signUpWithEmailAndConfirmation({
+  Future<bool> signUpWithEmailAndConfirmation({
     required String email,
     required String emailConfirmation,
   });
@@ -43,7 +45,9 @@ class AuthenticationService implements BaseAuth {
   Future<void> signUpWithPersonalInfo({
     required String firstName,
     required String lastName,
-  }) async {}
+  }) async {
+    // Implement sign-up with personal info
+  }
 
   @override
   Future<void> signUpWithDateOfBirthAndGender({
@@ -51,37 +55,32 @@ class AuthenticationService implements BaseAuth {
     required int? selectedMonth,
     required int? selectedYear,
     required String selectedGender,
-  }) async {}
+  }) async {
+    // Implement sign-up with date of birth and gender
+  }
 
   @override
-  Future<void> signUpWithEmailAndConfirmation({
+  Future<bool> signUpWithEmailAndConfirmation({
     required String email,
     required String emailConfirmation,
   }) async {
-    // Implement sign up with email and confirmation
     // Validate email and email confirmation
     if (email != emailConfirmation) {
-      throw Exception('Emails do not match');
+      return false;
     }
-    // Store email temporarily or proceed with Firebase authentication
-  }
-
-  Future<void> signUpWithPassword({
-    required String email,
-    required String password,
-  }) async {
-    // Implement sign up with email and password
     try {
+      // Implement sign-up with email and password
       await _auth.createUserWithEmailAndPassword(
         email: email,
-        password: password,
+        password: email, // Use email as password for demonstration purpose
       );
+      return true;
     } catch (error) {
-      // Handle any errors that occur during sign up
+      // Handle any errors that occur during sign-up
       if (kDebugMode) {
         print('Error signing up: $error');
       }
-      rethrow;
+      return false;
     }
   }
 
@@ -103,29 +102,6 @@ class AuthenticationService implements BaseAuth {
   }
 
   @override
-  Future<UserCredential> signInWithEmailAndPassword({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      return await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-    } on FirebaseAuthException catch (e) {
-      if (kDebugMode) {
-        print('FirebaseAuthException during sign in: ${e.message}');
-      }
-      throw e;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error during sign in: $e');
-      }
-      throw e;
-    }
-  }
-
-  @override
   Future<String?> getCurrentUserId() async {
     try {
       User? user = _auth.currentUser;
@@ -139,51 +115,32 @@ class AuthenticationService implements BaseAuth {
   }
 
   @override
-  Future<void> signOut() async {
-    try {
-      // Sign out the user
-      await _auth.signOut();
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error signing out: $e');
-      }
-      rethrow;
-    }
-  }
-
-  Future<String?> _deleteUserToken() async {
-    try {
-      // Delete the user's token
-      await FirebaseAuth.instance.currentUser?.delete();
-
-      return 'Token deletado com sucesso';
-    } on FirebaseAuthException catch (e) {
-      // Se ocorrer uma exceção relacionada à autenticação, imprima o erro e retorne null
-      print('Erro de autenticação ao excluir o token: $e');
-      return null;
-    } catch (e) {
-      // Se ocorrer qualquer outra exceção, imprima o erro e retorne null
-      print('Erro ao excluir o token: $e');
-      return null;
-    }
+  Future<void> signOut({VoidCallback? onSignedOut}) async {
+    await FirebaseAuth.instance.signOut();
+    onSignedOut?.call();
   }
 
   @override
-  Future<void> signInWithUserID(String userID) async {
+  Future<UserCredential> signInWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
     try {
-      // Use Firebase Auth to sign in with the provided user ID
-      // Generate a custom token and sign in with it
-      String customToken =
-          (await _auth.signInWithCustomToken(userID)) as String;
-
-      // Sign in with the custom token
-      UserCredential userCredential =
-          await _auth.signInWithCustomToken(customToken);
-
-      // Handle successful sign-in
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      await FirebaseAuth.instance.currentUser?.getIdToken(true);
+      return userCredential;
+    } on FirebaseAuthException catch (e) {
+      if (kDebugMode) {
+        print('FirebaseAuthException during sign in: ${e.message}');
+      }
+      throw e;
     } catch (e) {
-      // Handle sign-in errors
-      print('Error signing in with user ID: $e');
+      if (kDebugMode) {
+        print('Error during sign in: $e');
+      }
       throw e;
     }
   }
