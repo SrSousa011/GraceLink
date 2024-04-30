@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/welcome.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/user_profile.dart';
@@ -6,8 +9,42 @@ import 'package:churchapp/views/user_profile.dart';
 class NavBar extends StatelessWidget {
   final BaseAuth auth;
   final AuthenticationService authService;
+  final VoidCallback? notLoggedIn; // Callback can be null
 
-  const NavBar({super.key, required this.auth, required this.authService});
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  NavBar(
+      {super.key,
+      required this.auth,
+      required this.authService,
+      this.notLoggedIn});
+
+  Future<void> signUserOut(BuildContext context) async {
+    try {
+      await authService.signOut(onSignedOut: () {
+        Navigator.pop(context); // Close the drawer after signing out
+        // Call the callback function after logout is completed
+        notLoggedIn?.call();
+        // Navigate to the login screen and remove all previous routes
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return Welcome(
+                title: '',
+                onSignedIn: () {},
+              );
+            },
+          ),
+          (route) => false, // Remove all routes except the newly pushed route
+        );
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error signing out: $e');
+      }
+      // Handle error gracefully
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +52,7 @@ class NavBar extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
+          const DrawerHeaderWidget(),
           const DrawerMenuItem(
             title: 'Home',
             icon: Icons.home_outlined,
@@ -64,7 +102,21 @@ class NavBar extends StatelessWidget {
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
             onTap: () async {
-              await authService.signOut();
+              await _auth.signOut();
+              Navigator.pop(context); // Close the drawer after logout
+              // Navigate to the login screen and remove all previous routes
+              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (BuildContext context) {
+                    return Welcome(
+                      title: '',
+                      onSignedIn: () {},
+                    );
+                  },
+                ),
+                (route) =>
+                    false, // Remove all routes except the newly pushed route
+              );
             },
           ),
         ],
@@ -91,8 +143,54 @@ class DrawerMenuItem extends StatelessWidget {
       title: Text(title),
       leading: Icon(icon),
       onTap: () {
+        Navigator.pop(context); // Close the drawer before navigating
         Navigator.pushReplacementNamed(context, route);
       },
+    );
+  }
+}
+
+class DrawerHeaderWidget extends StatelessWidget {
+  const DrawerHeaderWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 270,
+      child: DrawerHeader(
+        decoration: const BoxDecoration(
+          color: Colors.blue,
+          image: DecorationImage(
+            image: AssetImage('assets/imagens/bacground-image-center.jpg'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.pop(context); // Close the drawer before navigating
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UserProfile()),
+            );
+          },
+          child: const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 72,
+                backgroundImage:
+                    AssetImage('assets/imagens/profile_picture.jpg'),
+              ),
+              SizedBox(height: 12),
+              Text(
+                'Anaïs',
+                style: TextStyle(fontSize: 20, color: Colors.white),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
