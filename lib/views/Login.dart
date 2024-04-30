@@ -1,141 +1,196 @@
+import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/home/home.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
-  const Login({super.key, required this.auth, required this.onSignedIn});
   final BaseAuth auth;
-  final VoidCallback onSignedIn;
+  final VoidCallback? onLoggedIn; // Callback can be null
+
+  const Login({Key? key, required this.auth, this.onLoggedIn})
+      : super(key: key);
 
   @override
   State<Login> createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
-  late TextEditingController _emailController;
-  late TextEditingController _passwordController;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   @override
-  void initState() {
-    super.initState();
-    _emailController = TextEditingController();
-    _passwordController = TextEditingController();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color(0xFFB98B54)),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        title: const Text('Login'),
+      ),
+      body: Stack(
+        children: [
+          _buildLoginForm(),
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.5),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
+  Widget _buildLoginForm() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Form(
+        key: _formKey,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 20),
+                _buildEmailSection(),
+                const SizedBox(height: 20),
+                _buildPasswordSection(),
+                const SizedBox(height: 20.0),
+                _buildSignUpButton(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmailSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
+          controller: _emailController,
+          keyboardType: TextInputType.emailAddress,
+          decoration: const InputDecoration(
+            labelText: 'Email',
+          ),
+          validator: _validateEmail,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPasswordSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
+          controller: _passwordController,
+          decoration: InputDecoration(
+            labelText: 'Password',
+            suffixIcon: IconButton(
+              icon: Icon(
+                _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+              ),
+              onPressed: () {
+                setState(() {
+                  _isPasswordVisible = !_isPasswordVisible;
+                });
+              },
+            ),
+          ),
+          obscureText: !_isPasswordVisible,
+          validator: _validatePassword,
+          onFieldSubmitted: (_) {
+            _validateAndSubmit();
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSignUpButton() {
+    return ElevatedButton(
+      onPressed: _isLoading ? null : _validateAndSubmit,
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 90, 175, 249),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+      ),
+      child: const Text('Login'),
+    );
   }
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Email cannot be empty';
+      return 'Please enter your email';
     }
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-      return 'Invalid email';
+    if (!value.contains('@')) {
+      return 'Please enter a valid email';
     }
     return null;
   }
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Password cannot be empty';
+      return 'Please enter your password';
     }
     if (value.length < 6) {
-      return 'Password must be at least 6 characters';
+      return 'Password must be at least 6 characters long';
     }
     return null;
   }
 
-  Future<void> validateAndSubmit() async {
-    final form = _formKey.currentState;
-    if (form != null && form.validate()) {
-      // Form is valid, process login here.
-      String email = _emailController.text.trim();
-      String password = _passwordController.text;
+  Future<void> _validateAndSubmit() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
       try {
-        UserCredential userCredential =
-            await widget.auth.signInWithEmailAndPassword(
-          email: email,
-          password: password,
+        await widget.auth.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
         );
-        if (kDebugMode) {
-          print('Signed in: ${userCredential.user!.uid}');
-        }
-        // Navigate to the home screen
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => Home(
-            auth: widget.auth,
-            userId: userCredential.user!.uid,
-            onSignedOut: () {
-              // Implement sign out if needed
-            },
-          ),
-        ));
-      } catch (e) {
-        if (kDebugMode) {
-          print('Error: $e');
-        }
-        // Handle errors here
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                    ),
-                    validator: _validateEmail,
-                  ),
-                  const SizedBox(height: 20.0),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                    ),
-                    validator: _validatePassword,
-                  ),
-                  const SizedBox(height: 20.0),
-                  ElevatedButton(
-                    onPressed: validateAndSubmit,
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: const Color.fromARGB(255, 90, 175, 249),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                    child: const Text('Login'),
-                  ),
-                  const SizedBox(height: 20.0),
-                ],
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Home(
+                auth: widget.auth,
+                userId:
+                    'userID', // Substitua 'userID' pelo ID de usuário correto
+                onSignedOut: () {}, // Pode definir isso conforme necessário
               ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Login failed. Please try again.'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
   }
 }
