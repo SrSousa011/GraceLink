@@ -1,12 +1,17 @@
+import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/login.dart';
 import 'package:churchapp/views/signUp/sign_up_page.dart';
-import 'package:flutter/material.dart';
 
 class Welcome extends StatelessWidget {
-  const Welcome({super.key, required this.title});
+  const Welcome({
+    super.key,
+    required this.title,
+    required this.onSignedIn,
+  });
 
   final String title;
+  final VoidCallback onSignedIn;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +34,7 @@ class Welcome extends StatelessWidget {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const Spacer(), // Adiciona espaço para empurrar para baixo o logotipo e a escrita
+              const Spacer(),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -51,17 +56,19 @@ class Welcome extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => Login(
-                                    auth: AuthenticationService(),
-                                    onSignedIn: () {},
-                                  )),
+                            builder: (context) => Login(
+                              auth: AuthenticationService(),
+                              onLoggedIn: () {},
+                            ),
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: const Color(0xFF1E88E5),
-                        backgroundColor: Colors.white, // Cor do texto azul
+                        backgroundColor: Colors.white,
                         side: const BorderSide(
-                            color: Color(0xFF1E88E5)), // Borda azul
+                          color: Color(0xFF1E88E5),
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
@@ -74,16 +81,17 @@ class Welcome extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => SignUpPage(
-                                    auth: AuthenticationService(),
-                                    onSignedIn: () {},
-                                  )),
+                            builder: (context) => SignUpPage(
+                              auth: AuthenticationService(),
+                              onSignedIn: () {},
+                            ),
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
-                        backgroundColor: const Color.fromARGB(
-                            255, 90, 175, 249), // Cor do texto branco
+                        backgroundColor:
+                            const Color.fromARGB(255, 90, 175, 249),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),

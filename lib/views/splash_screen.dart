@@ -1,3 +1,4 @@
+import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -19,7 +20,10 @@ class _SplashScreenState extends State<SplashScreen> {
         context,
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 500),
-          pageBuilder: (_, __, ___) => const Welcome(title: 'GraceLink'),
+          pageBuilder: (_, __, ___) => Welcome(
+            title: 'GraceLink',
+            onSignedIn: () {},
+          ),
           transitionsBuilder: (_, animation, __, child) {
             return FadeTransition(
               opacity: animation,
