@@ -1,10 +1,11 @@
+import 'package:churchapp/views/login.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/home/home.dart';
-import 'package:churchapp/views/login.dart';
 
 class Root extends StatefulWidget {
-  const Root({super.key, required this.auth});
+  const Root({Key? key, required this.auth}) : super(key: key);
+
   final BaseAuth auth;
 
   @override
@@ -49,23 +50,19 @@ class _RootState extends State<Root> {
       case AuthStatus.notLoggedIn:
         return Login(
           auth: widget.auth,
-          onSignedIn: () {
-            _updateAuthStatus(AuthStatus.loggedIn, _currentUserId);
-          },
+          onLoggedIn: _handleLoggedIn,
         );
       case AuthStatus.loggedIn:
-        return Home(
-          auth: widget.auth,
-          userId: _currentUserId,
-          onSignedOut: () {
-            _updateAuthStatus(AuthStatus.notLoggedIn, '');
-            // Navigate to the login screen
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => Login(
+        // Navega para a tela Home após o login
+        return Navigator(
+          onGenerateRoute: (settings) {
+            return MaterialPageRoute(
+              builder: (context) => Home(
                 auth: widget.auth,
-                onSignedIn: () {}, // No need to handle onSignedIn here
+                userId: _currentUserId,
+                onSignedOut: _handleSignedOut,
               ),
-            ));
+            );
           },
         );
     }
@@ -77,5 +74,17 @@ class _RootState extends State<Root> {
         child: CircularProgressIndicator(),
       ),
     );
+  }
+
+  void _handleLoggedIn() {
+    setState(() {
+      _authStatus = AuthStatus.loggedIn;
+    });
+  }
+
+  void _handleSignedOut() {
+    setState(() {
+      _authStatus = AuthStatus.notLoggedIn;
+    });
   }
 }
