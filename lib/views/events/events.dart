@@ -138,71 +138,98 @@ class _AddEventFormState extends State<AddEventForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Título do Evento',
-                icon: Icon(Icons.title),
-              ),
-            ),
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Descrição do Evento',
-                icon: Icon(Icons.description),
-              ),
-            ),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.calendar_today),
-                  onPressed: () {
-                    _selectDate(context);
-                  },
-                ),
-                Text(
-                  _selectedDate == null
-                      ? 'Selecione a data'
-                      : DateFormat('dd/MM/yyyy').format(_selectedDate!),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.access_time),
-                  onPressed: () {
-                    _selectTime(context);
-                  },
-                ),
-                Text(
-                  _selectedTime == null
-                      ? 'Selecione o horário'
-                      : _selectedTime!.format(context),
-                ),
-              ],
-            ),
-            TextField(
-              controller: _selectController,
-              decoration: const InputDecoration(
-                labelText: 'Selecione Local',
-                icon: Icon(Icons.location_on),
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                _saveEvent(context);
-              },
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.blue,
-              ),
-              child: const Text('Salvar'),
-            ),
+            constTitleDescriptionField(),
+            constSizedBox(20.0),
+            buildDateSelectionRow(),
+            constSizedBox(20.0),
+            buildTimeSelectionRow(),
+            constSizedBox(20.0),
+            buildSelectLocationTextField(),
+            constSizedBox(20.0),
+            buildSignUpButton(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget constTitleDescriptionField() {
+    return Column(
+      children: [
+        TextField(
+          controller: _titleController,
+          decoration: const InputDecoration(
+            labelText: 'Título do Evento',
+            icon: Icon(Icons.title),
+          ),
+        ),
+        TextField(
+          controller: _descriptionController,
+          decoration: const InputDecoration(
+            labelText: 'Descrição do Evento',
+            icon: Icon(Icons.description),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildDateSelectionRow() {
+    return Row(
+      children: [
+        IconButton(
+          icon: const Icon(Icons.calendar_today),
+          onPressed: () {
+            _selectDate(context);
+          },
+        ),
+        Text(
+          _selectedDate == null
+              ? 'Selecione a data'
+              : DateFormat('dd/MM/yyyy').format(_selectedDate!),
+        ),
+      ],
+    );
+  }
+
+  Widget buildTimeSelectionRow() {
+    return Row(
+      children: [
+        IconButton(
+          icon: const Icon(Icons.access_time),
+          onPressed: () {
+            _selectTime(context);
+          },
+        ),
+        Text(
+          _selectedTime == null
+              ? 'Selecione o horário'
+              : _selectedTime!.format(context),
+        ),
+      ],
+    );
+  }
+
+  Widget buildSelectLocationTextField() {
+    return TextField(
+      controller: _selectController,
+      decoration: const InputDecoration(
+        labelText: 'Selecione Local',
+        icon: Icon(Icons.location_on),
+      ),
+    );
+  }
+
+  Widget buildSignUpButton() {
+    return ElevatedButton(
+      onPressed: () {
+        _saveEvent(context);
+      },
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.blue,
+      ),
+      child: const Text('Salvar'),
     );
   }
 
@@ -262,22 +289,22 @@ class EventDetailsScreen extends StatelessWidget {
               'Title: ${event.title}',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            constSizedBox(8),
             Text(
               'Description: ${event.description}',
               style: const TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 8),
+            constSizedBox(8),
             Text(
               'Date: ${DateFormat('dd/MM/yyyy').format(event.date)}',
               style: const TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 8),
+            constSizedBox(8),
             Text(
               'Time: ${event.time.format(context)}',
               style: const TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 8),
+            constSizedBox(8),
             Text(
               'Location: ${event.location}',
               style: const TextStyle(fontSize: 16),
@@ -321,22 +348,22 @@ class EventCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+            constSizedBox(8),
             Text(
               description,
               style: const TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 8),
+            constSizedBox(8),
             Text(
               'Data: ${DateFormat('dd/MM/yyyy').format(date)}',
               style: const TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 8),
+            constSizedBox(8),
             Text(
               'Horário: ${time.format(context)}',
               style: const TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 8),
+            constSizedBox(8),
             Text(
               'Local: $location',
               style: const TextStyle(fontSize: 16),
@@ -362,4 +389,8 @@ class Event {
     required this.time,
     required this.location,
   });
+}
+
+SizedBox constSizedBox(double height) {
+  return SizedBox(height: height);
 }
