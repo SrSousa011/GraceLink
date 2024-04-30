@@ -6,8 +6,7 @@ class Login extends StatefulWidget {
   final BaseAuth auth;
   final VoidCallback? onLoggedIn; // Callback can be null
 
-  const Login({Key? key, required this.auth, this.onLoggedIn})
-      : super(key: key);
+  const Login({super.key, required this.auth, this.onLoggedIn});
 
   @override
   State<Login> createState() => _LoginState();
