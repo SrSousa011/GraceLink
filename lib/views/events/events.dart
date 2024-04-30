@@ -89,7 +89,7 @@ class AddEventForm extends StatefulWidget {
   const AddEventForm({super.key});
 
   @override
-  _AddEventFormState createState() => _AddEventFormState();
+  State<StatefulWidget> createState() => _AddEventFormState();
 }
 
 class _AddEventFormState extends State<AddEventForm> {
