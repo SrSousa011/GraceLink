@@ -1,7 +1,8 @@
-import 'package:churchapp/views/nav_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/nav_bar.dart';
 
 class Home extends StatefulWidget {
   const Home({
@@ -14,6 +15,10 @@ class Home extends StatefulWidget {
   final BaseAuth auth;
   final String userId;
   final VoidCallback onSignedOut;
+
+  void sigUerOut() {
+    FirebaseAuth.instance.signOut();
+  }
 
   @override
   State<Home> createState() => _HomeState();
@@ -136,9 +141,8 @@ class EventCard extends StatelessWidget {
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
-            // You can add time here if needed
             Text(
-              'Horário: ${DateFormat('HH:mm').format(date)}', // Format time as needed
+              'Horário: ${DateFormat('HH:mm').format(date)}',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
@@ -179,9 +183,8 @@ class EventDetailsScreen extends StatelessWidget {
               style: const TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 8),
-            // You can add time here if needed
             Text(
-              'Horário: ${DateFormat('HH:mm').format(event.date)}', // Format time as needed
+              'Horário: ${DateFormat('HH:mm').format(event.date)}',
               style: const TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 16),
