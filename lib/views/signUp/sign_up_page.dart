@@ -4,6 +4,78 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+// Model for the DDD Country Item
+class DDDCountryItem {
+  final String countryCode;
+  final String dddCode;
+  final int numberOfDigits;
+
+  DDDCountryItem({
+    required this.countryCode,
+    required this.dddCode,
+    required this.numberOfDigits,
+  });
+}
+
+// Dropdown Widget for Country Code
+class CountryCodeDropdown extends StatelessWidget {
+  final String selectedDDD;
+  final List<DropdownMenuItem<String>> dropdownItems;
+  final ValueChanged<String?> onChanged;
+
+  const CountryCodeDropdown({
+    super.key,
+    required this.selectedDDD,
+    required this.dropdownItems,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      flex: 1,
+      child: DropdownButtonFormField<String>(
+        decoration: const InputDecoration(
+          labelText: 'Country Code',
+        ),
+        value: selectedDDD,
+        onChanged: onChanged,
+        items: dropdownItems,
+      ),
+    );
+  }
+}
+
+// Phone Text Field Widget
+class PhoneTextField extends StatelessWidget {
+  final int maxLength;
+  final TextEditingController controller;
+
+  const PhoneTextField({
+    super.key,
+    required this.maxLength,
+    required this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      flex: 3,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 23.0),
+        child: TextField(
+          maxLength: maxLength,
+          controller: controller,
+          keyboardType: TextInputType.phone,
+          decoration: const InputDecoration(
+            labelText: 'Phone Number',
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key, required this.auth, required this.onSignedIn});
   final BaseAuth auth;
@@ -21,7 +93,6 @@ class _SignUpPageState extends State<SignUpPage> {
   late TextEditingController _passwordController;
   late TextEditingController _confirmPasswordController;
   late TextEditingController _phoneNumberController;
-  late TextEditingController _dddController;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final bool _isLoading = false;
@@ -30,6 +101,58 @@ class _SignUpPageState extends State<SignUpPage> {
   int? selectedMonth;
   int? selectedYear;
   String selectedGender = 'Male';
+
+  String selectedCivilState = 'Single';
+  String selectedDDD = '+1';
+  int numberOfPhoneDigits = 10;
+
+  List<DDDCountryItem> dddCountryList = [
+    DDDCountryItem(
+      countryCode: 'US',
+      dddCode: '+1',
+      numberOfDigits: 10,
+    ),
+    DDDCountryItem(
+      countryCode: 'FR',
+      dddCode: '+33',
+      numberOfDigits: 9,
+    ),
+    DDDCountryItem(
+      countryCode: 'ES',
+      dddCode: '+34',
+      numberOfDigits: 9,
+    ),
+    DDDCountryItem(
+      countryCode: 'IT',
+      dddCode: '+39',
+      numberOfDigits: 10,
+    ),
+    DDDCountryItem(
+      countryCode: 'UK',
+      dddCode: '+44',
+      numberOfDigits: 11,
+    ),
+    DDDCountryItem(
+      countryCode: 'DE',
+      dddCode: '+49',
+      numberOfDigits: 11,
+    ),
+    DDDCountryItem(
+      countryCode: 'BR',
+      dddCode: '+55',
+      numberOfDigits: 11,
+    ),
+    DDDCountryItem(
+      countryCode: 'PT',
+      dddCode: '+351',
+      numberOfDigits: 9,
+    ),
+    DDDCountryItem(
+      countryCode: 'LU',
+      dddCode: '+352',
+      numberOfDigits: 9,
+    ),
+  ];
 
   @override
   void initState() {
@@ -41,7 +164,6 @@ class _SignUpPageState extends State<SignUpPage> {
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
     _phoneNumberController = TextEditingController();
-    _dddController = TextEditingController();
   }
 
   @override
@@ -53,7 +175,6 @@ class _SignUpPageState extends State<SignUpPage> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _phoneNumberController.dispose();
-    _dddController.dispose();
     super.dispose();
   }
 
@@ -76,8 +197,6 @@ class _SignUpPageState extends State<SignUpPage> {
                   _buildNameSection(),
                   const SizedBox(height: 20.0),
                   _buildDateOfBirthSection(),
-                  const SizedBox(height: 20.0),
-                  _buildGenderSection(),
                   const SizedBox(height: 20.0),
                   _buildEmailSection(),
                   const SizedBox(height: 20.0),
@@ -113,17 +232,54 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Widget _buildPhoneNumberSection() {
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: CountryCodeDropdown(
+            selectedDDD: selectedDDD,
+            dropdownItems: dddCountryList
+                .map((item) => DropdownMenuItem<String>(
+                      value: item.dddCode,
+                      child: Text(item.dddCode),
+                    ))
+                .toList(),
+            onChanged: (String? value) {
+              setState(() {
+                selectedDDD = value!;
+                numberOfPhoneDigits = dddCountryList
+                    .firstWhere((element) => element.dddCode == selectedDDD)
+                    .numberOfDigits;
+              });
+            },
+          ),
+        ),
+        const SizedBox(width: 20.0),
+        Expanded(
+          flex: 2,
+          child: PhoneTextField(
+            maxLength: numberOfPhoneDigits,
+            controller: _phoneNumberController,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCountryCodeSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextFieldWidget(
-          labelText: 'DDD',
-          controller: _dddController,
-        ),
-        const SizedBox(height: 20.0),
-        TextFieldWidget(
-          labelText: 'Cellphone Number',
-          controller: _phoneNumberController,
+        TextFormField(
+          controller: TextEditingController(text: selectedDDD),
+          readOnly: true,
+          onTap: () {
+            // Implement logic to navigate to a page where users can select a country code
+          },
+          keyboardType: TextInputType.text,
+          decoration: const InputDecoration(
+            labelText: 'Country Code',
+          ),
         ),
       ],
     );
@@ -147,17 +303,6 @@ class _SignUpPageState extends State<SignUpPage> {
       onChangedYear: (value) {
         setState(() {
           selectedYear = value;
-        });
-      },
-    );
-  }
-
-  Widget _buildGenderSection() {
-    return GenderDropdown(
-      selectedGender: selectedGender,
-      onChangedGender: (value) {
-        setState(() {
-          selectedGender = value!;
         });
       },
     );
