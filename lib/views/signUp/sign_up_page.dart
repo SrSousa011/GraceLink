@@ -50,11 +50,13 @@ class CountryCodeDropdown extends StatelessWidget {
 class PhoneTextField extends StatelessWidget {
   final int maxLength;
   final TextEditingController controller;
+  final String? Function(String value) validator;
 
   const PhoneTextField({
     super.key,
     required this.maxLength,
     required this.controller,
+    required this.validator,
   });
 
   @override
@@ -225,11 +227,13 @@ class _SignUpPageState extends State<SignUpPage> {
         TextFieldWidget(
           labelText: 'First Name',
           controller: _firstNameController,
+          validator: _validateName,
         ),
         const SizedBox(height: 20.0),
         TextFieldWidget(
           labelText: 'Last Name',
           controller: _lastNameController,
+          validator: _validateLastName,
         ),
       ],
     );
@@ -264,25 +268,7 @@ class _SignUpPageState extends State<SignUpPage> {
           child: PhoneTextField(
             maxLength: numberOfPhoneDigits,
             controller: _phoneNumberController,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCountryCodeSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextFormField(
-          controller: TextEditingController(text: selectedDDD),
-          readOnly: true,
-          onTap: () {
-            // Implement logic to navigate to a page where users can select a country code
-          },
-          keyboardType: TextInputType.text,
-          decoration: const InputDecoration(
-            labelText: 'Country Code',
+            validator: _validatePhoneNumber,
           ),
         ),
       ],
@@ -325,6 +311,7 @@ class _SignUpPageState extends State<SignUpPage> {
         TextFieldWidget(
           labelText: 'Confirm Email',
           controller: _confirmEmailController,
+          validator: _validateEmailConf,
         ),
       ],
     );
@@ -352,7 +339,7 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
           ),
           obscureText: !_isPasswordConfVisible,
-          validator: _validatePasswordConf,
+          validator: _validatePassword,
         ),
       ],
     );
@@ -378,10 +365,7 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
           ),
           obscureText: !_isPasswordVisible,
-          validator: _validatePassword,
-          onFieldSubmitted: (_) {
-            _validateAndSubmit();
-          },
+          validator: _validatePasswordConf,
         ),
       ],
     );
@@ -421,9 +405,38 @@ class _SignUpPageState extends State<SignUpPage> {
     return null;
   }
 
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Name cannot be empty';
+    }
+    return null;
+  }
+
+  String? _validateLastName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Last Name cannot be empty';
+    }
+    return null;
+  }
+
+  String? _validatePhoneNumber(String value) {
+    if (value.isEmpty) {
+      return 'Phone number cannot be empty';
+    }
+    return null;
+  }
+
+  String? _validateEmailConf(String? value) {
+    final String email = _emailController.text.trim();
+    if (value != email) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+
   String? _validatePasswordConf(String? value) {
-    final password = _passwordController.text.trim();
-    if (value != password) {
+    final String passwordControllerValue = _passwordController.text.trim();
+    if (value != passwordControllerValue) {
       return 'Passwords do not match';
     }
     return null;
