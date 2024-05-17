@@ -96,6 +96,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final bool _isLoading = false;
+  bool _isPasswordVisible = false;
+  bool _isPasswordConfVisible = false;
 
   int? selectedDay;
   int? selectedMonth;
@@ -201,6 +203,8 @@ class _SignUpPageState extends State<SignUpPage> {
                   _buildEmailSection(),
                   const SizedBox(height: 20.0),
                   _buildPasswordSection(),
+                  const SizedBox(height: 20.0),
+                  _buildPasswordSectionConfirmation(),
                   const SizedBox(height: 20.0),
                   _buildPhoneNumberSection(),
                   const SizedBox(height: 20.0),
@@ -330,17 +334,54 @@ class _SignUpPageState extends State<SignUpPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextFieldWidget(
-          labelText: 'Password',
+        TextFormField(
           controller: _passwordController,
-          validator: _validatePassword,
-          obscureText: true,
+          decoration: InputDecoration(
+            labelText: 'Password',
+            suffixIcon: IconButton(
+              icon: Icon(
+                _isPasswordConfVisible
+                    ? Icons.visibility
+                    : Icons.visibility_off,
+              ),
+              onPressed: () {
+                setState(() {
+                  _isPasswordConfVisible = !_isPasswordConfVisible;
+                });
+              },
+            ),
+          ),
+          obscureText: !_isPasswordConfVisible,
+          validator: _validatePasswordConf,
         ),
-        const SizedBox(height: 20.0),
-        TextFieldWidget(
-          labelText: 'Confirm Password',
+      ],
+    );
+  }
+
+  Widget _buildPasswordSectionConfirmation() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
           controller: _confirmPasswordController,
-          obscureText: true,
+          decoration: InputDecoration(
+            labelText: 'Confirm Password ',
+            suffixIcon: IconButton(
+              icon: Icon(
+                _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+              ),
+              onPressed: () {
+                setState(() {
+                  _isPasswordVisible = !_isPasswordVisible;
+                });
+              },
+            ),
+          ),
+          obscureText: !_isPasswordVisible,
+          validator: _validatePassword,
+          onFieldSubmitted: (_) {
+            _validateAndSubmit();
+          },
         ),
       ],
     );
@@ -376,6 +417,14 @@ class _SignUpPageState extends State<SignUpPage> {
     }
     if (value.length < 6) {
       return 'Password must be at least 6 characters long';
+    }
+    return null;
+  }
+
+  String? _validatePasswordConf(String? value) {
+    final password = _passwordController.text.trim();
+    if (value != password) {
+      return 'Passwords do not match';
     }
     return null;
   }
