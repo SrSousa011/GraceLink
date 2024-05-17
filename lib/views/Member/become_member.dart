@@ -80,7 +80,7 @@ class BecomeMember extends StatefulWidget {
   const BecomeMember({super.key});
 
   @override
-  _BecomeMemberState createState() => _BecomeMemberState();
+  State<BecomeMember> createState() => _BecomeMemberState();
 }
 
 class _BecomeMemberState extends State<BecomeMember> {
@@ -92,7 +92,7 @@ class _BecomeMemberState extends State<BecomeMember> {
   late TextEditingController _referenceController;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   String selectedCivilState = 'Single';
   String selectedDDD = '+1';
