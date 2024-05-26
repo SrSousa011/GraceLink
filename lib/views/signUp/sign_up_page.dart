@@ -24,7 +24,7 @@ class CountryCodeDropdown extends StatelessWidget {
   final ValueChanged<String?> onChanged;
 
   const CountryCodeDropdown({
-    Key? key,
+    super.key,
     required this.selectedDDD,
     required this.dropdownItems,
     required this.onChanged,
@@ -53,7 +53,7 @@ class PhoneTextField extends StatelessWidget {
   final String? Function(String value) validator;
 
   const PhoneTextField({
-    Key? key,
+    super.key,
     required this.maxLength,
     required this.controller,
     required this.validator,
@@ -79,7 +79,7 @@ class PhoneTextField extends StatelessWidget {
 }
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({Key? key, required this.auth, required this.onSignedIn});
+  const SignUpPage({super.key, required this.auth, required this.onSignedIn});
   final BaseAuth auth;
   final VoidCallback onSignedIn;
 
