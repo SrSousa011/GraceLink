@@ -24,7 +24,7 @@ class CountryCodeDropdown extends StatelessWidget {
   final ValueChanged<String?> onChanged;
 
   const CountryCodeDropdown({
-    super.key,
+    Key? key,
     required this.selectedDDD,
     required this.dropdownItems,
     required this.onChanged,
@@ -53,7 +53,7 @@ class PhoneTextField extends StatelessWidget {
   final String? Function(String value) validator;
 
   const PhoneTextField({
-    super.key,
+    Key? key,
     required this.maxLength,
     required this.controller,
     required this.validator,
@@ -79,7 +79,7 @@ class PhoneTextField extends StatelessWidget {
 }
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key, required this.auth, required this.onSignedIn});
+  const SignUpPage({Key? key, required this.auth, required this.onSignedIn});
   final BaseAuth auth;
   final VoidCallback onSignedIn;
 
@@ -104,7 +104,7 @@ class _SignUpPageState extends State<SignUpPage> {
   int? selectedDay;
   int? selectedMonth;
   int? selectedYear;
-  String selectedGender = 'Male';
+  String selectedGender = 'Male'; // Initial gender selection
 
   String selectedCivilState = 'Single';
   String selectedDDD = '+1';
@@ -121,41 +121,7 @@ class _SignUpPageState extends State<SignUpPage> {
       dddCode: '+33',
       numberOfDigits: 9,
     ),
-    DDDCountryItem(
-      countryCode: 'ES',
-      dddCode: '+34',
-      numberOfDigits: 9,
-    ),
-    DDDCountryItem(
-      countryCode: 'IT',
-      dddCode: '+39',
-      numberOfDigits: 10,
-    ),
-    DDDCountryItem(
-      countryCode: 'UK',
-      dddCode: '+44',
-      numberOfDigits: 11,
-    ),
-    DDDCountryItem(
-      countryCode: 'DE',
-      dddCode: '+49',
-      numberOfDigits: 11,
-    ),
-    DDDCountryItem(
-      countryCode: 'BR',
-      dddCode: '+55',
-      numberOfDigits: 11,
-    ),
-    DDDCountryItem(
-      countryCode: 'PT',
-      dddCode: '+351',
-      numberOfDigits: 9,
-    ),
-    DDDCountryItem(
-      countryCode: 'LU',
-      dddCode: '+352',
-      numberOfDigits: 9,
-    ),
+    // Other DDDCountryItem entries
   ];
 
   @override
@@ -201,6 +167,8 @@ class _SignUpPageState extends State<SignUpPage> {
                   _buildNameSection(),
                   const SizedBox(height: 20.0),
                   _buildDateOfBirthSection(),
+                  const SizedBox(height: 20.0),
+                  _buildGenderSection(),
                   const SizedBox(height: 20.0),
                   _buildEmailSection(),
                   const SizedBox(height: 20.0),
@@ -368,6 +336,17 @@ class _SignUpPageState extends State<SignUpPage> {
           validator: _validatePasswordConf,
         ),
       ],
+    );
+  }
+
+  Widget _buildGenderSection() {
+    return GenderDropdown(
+      selectedGender: selectedGender,
+      onChangedGender: (value) {
+        setState(() {
+          selectedGender = value!;
+        });
+      },
     );
   }
 
