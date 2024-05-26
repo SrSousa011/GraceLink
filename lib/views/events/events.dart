@@ -1,11 +1,7 @@
-import 'package:churchapp/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:churchapp/views/nav_bar.dart';
-import 'package:churchapp/views/events/event_list_view.dart';
-import 'package:churchapp/views/events/floating_action_button_widget.dart';
-import 'package:churchapp/views/events/app_bar_widget.dart';
 
+// Main EventsPage Widget
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
 
@@ -44,23 +40,29 @@ class _EventsPageState extends State<EventsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppBarWidget(title: 'Eventos'),
-      drawer: NavBar(
-        auth: AuthenticationService(),
-        authService: AuthenticationService(),
+      appBar: AppBar(
+        title: const Text('Eventos'),
       ),
-      body: EventListView(
-        events: events,
-        onTap: (event) {
-          _navigateToEventDetailsScreen(context, event);
+      body: ListView.builder(
+        itemCount: events.length,
+        itemBuilder: (context, index) {
+          final event = events[index];
+          return ListTile(
+            title: Text(event.title),
+            subtitle: Text(
+                '${DateFormat('dd/MM/yyyy').format(event.date)} - ${event.time.format(context)}'),
+            onTap: () {
+              _navigateToEventDetailsScreen(context, event);
+            },
+          );
         },
       ),
-      floatingActionButton: FloatingActionButtonWidget(
+      floatingActionButton: FloatingActionButton(
         onPressed: () {
           _navigateToAddEventScreen(context);
         },
         tooltip: 'Novo Evento',
-        icon: Icons.add,
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -85,6 +87,7 @@ class _EventsPageState extends State<EventsPage> {
   }
 }
 
+// Form for adding a new event
 class AddEventForm extends StatefulWidget {
   const AddEventForm({super.key});
 
@@ -97,6 +100,7 @@ class _AddEventFormState extends State<AddEventForm> {
   final _descriptionController = TextEditingController();
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
+  bool _useLocation = false; // New state variable
   final _selectController = TextEditingController();
 
   Future<void> _selectDate(BuildContext context) async {
@@ -125,14 +129,12 @@ class _AddEventFormState extends State<AddEventForm> {
     }
   }
 
-  Future<void> _selectLocation(BuildContext context) async {
-    // Implementar a lógica para selecionar o local aqui
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppBarWidget(title: 'Novo Evento'),
+      appBar: AppBar(
+        title: const Text('Novo Evento'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -211,12 +213,31 @@ class _AddEventFormState extends State<AddEventForm> {
   }
 
   Widget buildSelectLocationTextField() {
-    return TextField(
-      controller: _selectController,
-      decoration: const InputDecoration(
-        labelText: 'Selecione Local',
-        icon: Icon(Icons.location_on),
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Checkbox(
+              value: _useLocation,
+              onChanged: (value) {
+                setState(() {
+                  _useLocation = value!;
+                });
+              },
+            ),
+            const Text('Usar local'),
+          ],
+        ),
+        if (_useLocation)
+          TextField(
+            controller: _selectController,
+            decoration: const InputDecoration(
+              labelText: 'Selecione Local',
+              icon: Icon(Icons.location_on),
+            ),
+          ),
+      ],
     );
   }
 
@@ -237,14 +258,14 @@ class _AddEventFormState extends State<AddEventForm> {
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty &&
         _selectedDate != null &&
-        _selectedTime != null &&
-        _selectController.text.isNotEmpty) {
+        _selectedTime != null) {
       final newEvent = Event(
         title: _titleController.text,
         description: _descriptionController.text,
         date: _selectedDate!,
         time: _selectedTime!,
         location: _selectController.text,
+        useLocation: _useLocation,
       );
       Navigator.pop(context, newEvent);
     } else {
@@ -375,12 +396,14 @@ class EventCard extends StatelessWidget {
   }
 }
 
+// Event class definition
 class Event {
   final String title;
   final String description;
   final DateTime date;
   final TimeOfDay time;
   final String location;
+  final bool useLocation; // New boolean field
 
   Event({
     required this.title,
@@ -388,6 +411,7 @@ class Event {
     required this.date,
     required this.time,
     required this.location,
+    this.useLocation = false, // Default value is false
   });
 }
 
