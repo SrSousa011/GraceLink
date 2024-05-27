@@ -52,14 +52,16 @@ class _EventsPageState extends State<EventsPage> {
       body: ListView.builder(
         itemCount: events.length,
         itemBuilder: (context, index) {
-          final event = events[index];
-          return ListTile(
-            title: Text(event.title),
-            subtitle: Text(
-                '${DateFormat('dd/MM/yyyy').format(event.date)} - ${event.time.format(context)}'),
+          return GestureDetector(
             onTap: () {
-              _navigateToEventDetailsScreen(context, event);
+              _navigateToEventDetailsScreen(context, events[index]);
             },
+            child: EventCard(
+                title: events[index].title,
+                description: events[index].description,
+                date: events[index].date,
+                location: events[index].location,
+                time: const TimeOfDay(hour: 10, minute: 0)),
           );
         },
       ),
