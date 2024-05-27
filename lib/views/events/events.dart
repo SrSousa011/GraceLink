@@ -1,3 +1,5 @@
+import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -42,6 +44,10 @@ class _EventsPageState extends State<EventsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Eventos'),
+      ),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+        authService: AuthenticationService(),
       ),
       body: ListView.builder(
         itemCount: events.length,
