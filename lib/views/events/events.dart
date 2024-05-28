@@ -1,5 +1,6 @@
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar.dart';
+import 'package:churchapp/views/signUp/sign_up_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -108,7 +109,9 @@ class _AddEventFormState extends State<AddEventForm> {
   final _descriptionController = TextEditingController();
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
-  bool _useLocation = false; // New state variable
+  bool _useLocation = false;
+  String selectedGender = 'Male';
+
   final _selectController = TextEditingController();
 
   Future<void> _selectDate(BuildContext context) async {
@@ -154,7 +157,8 @@ class _AddEventFormState extends State<AddEventForm> {
             constSizedBox(20.0),
             buildTimeSelectionRow(),
             constSizedBox(20.0),
-            buildSelectLocationTextField(),
+            buildSelectLocation(),
+            _buildSelecGender(),
             constSizedBox(20.0),
             buildSignUpButton(),
           ],
@@ -220,7 +224,18 @@ class _AddEventFormState extends State<AddEventForm> {
     );
   }
 
-  Widget buildSelectLocationTextField() {
+  Widget _buildSelecGender() {
+    return GenderDropdown(
+      selectedGender: selectedGender,
+      onChangedGender: (value) {
+        setState(() {
+          selectedGender = value!;
+        });
+      },
+    );
+  }
+
+  Widget buildSelectLocation() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
