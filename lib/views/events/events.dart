@@ -20,6 +20,10 @@ class _EventsState extends State<Events> {
       appBar: AppBar(
         title: const Text('Eventos'),
       ),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+        authService: AuthenticationService(),
+      ),
       body: StreamBuilder<List<Event>>(
         stream: readEvents(),
         builder: (context, snapshot) {
@@ -329,10 +333,6 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Atualizar Evento'),
-      ),
-      drawer: NavBar(
-        auth: AuthenticationService(),
-        authService: AuthenticationService(),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
