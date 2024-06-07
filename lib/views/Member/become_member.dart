@@ -1,83 +1,9 @@
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar.dart';
-import 'package:churchapp/views/signUp/sign_up_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-// Model for the DDD Country Item
-class DDDCountryItem {
-  final String countryCode;
-  final String dddCode;
-  final int numberOfDigits;
-
-  DDDCountryItem({
-    required this.countryCode,
-    required this.dddCode,
-    required this.numberOfDigits,
-  });
-}
-
-// Dropdown Widget for Country Code
-class CountryCodeDropdown extends StatelessWidget {
-  final String selectedDDD;
-  final List<DropdownMenuItem<String>> dropdownItems;
-  final ValueChanged<String?> onChanged;
-
-  const CountryCodeDropdown({
-    super.key,
-    required this.selectedDDD,
-    required this.dropdownItems,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      flex: 1,
-      child: DropdownButtonFormField<String>(
-        decoration: const InputDecoration(
-          labelText: 'Country Code',
-        ),
-        value: selectedDDD,
-        onChanged: onChanged,
-        items: dropdownItems,
-      ),
-    );
-  }
-}
-
-// Phone Text Field Widget
-class PhoneTextField extends StatelessWidget {
-  final int maxLength;
-  final TextEditingController controller;
-
-  const PhoneTextField({
-    super.key,
-    required this.maxLength,
-    required this.controller,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      flex: 3,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 23.0),
-        child: TextField(
-          maxLength: maxLength,
-          controller: controller,
-          keyboardType: TextInputType.phone,
-          decoration: const InputDecoration(
-            labelText: 'Phone Number',
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// BecomeMember Widget
 class BecomeMember extends StatefulWidget {
   const BecomeMember({super.key});
 
@@ -86,91 +12,55 @@ class BecomeMember extends StatefulWidget {
 }
 
 class _BecomeMemberState extends State<BecomeMember> {
-  late TextEditingController _emailController;
   late TextEditingController _phoneNumberController;
   late TextEditingController _addressController;
   late TextEditingController _lastVisitedChurchController;
   late TextEditingController _reasonForMembershipController;
   late TextEditingController _referenceController;
+  late TextEditingController _fullNameController;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final bool _isLoading = false;
+  bool _isLoading = false;
 
-  String selectedCivilState = 'Single';
   String selectedDDD = '+1';
   int numberOfPhoneDigits = 10;
   int? selectedDay;
   int? selectedMonth;
   int? selectedYear;
   String selectedGender = 'Male';
+  String selectedCivilStatus = 'Single';
 
-  List<DDDCountryItem> dddCountryList = [
-    DDDCountryItem(
-      countryCode: 'US',
-      dddCode: '+1',
-      numberOfDigits: 10,
-    ),
-    DDDCountryItem(
-      countryCode: 'FR',
-      dddCode: '+33',
-      numberOfDigits: 9,
-    ),
-    DDDCountryItem(
-      countryCode: 'ES',
-      dddCode: '+34',
-      numberOfDigits: 9,
-    ),
-    DDDCountryItem(
-      countryCode: 'IT',
-      dddCode: '+39',
-      numberOfDigits: 10,
-    ),
-    DDDCountryItem(
-      countryCode: 'UK',
-      dddCode: '+44',
-      numberOfDigits: 11,
-    ),
-    DDDCountryItem(
-      countryCode: 'DE',
-      dddCode: '+49',
-      numberOfDigits: 11,
-    ),
-    DDDCountryItem(
-      countryCode: 'BR',
-      dddCode: '+55',
-      numberOfDigits: 11,
-    ),
-    DDDCountryItem(
-      countryCode: 'PT',
-      dddCode: '+351',
-      numberOfDigits: 9,
-    ),
-    DDDCountryItem(
-      countryCode: 'LU',
-      dddCode: '+352',
-      numberOfDigits: 9,
-    ),
+  final List<DDDCountryItem> dddCountryList = [
+    DDDCountryItem(countryCode: 'US', dddCode: '+1', numberOfDigits: 10),
+    DDDCountryItem(countryCode: 'FR', dddCode: '+33', numberOfDigits: 9),
+    DDDCountryItem(countryCode: 'ES', dddCode: '+34', numberOfDigits: 9),
+    DDDCountryItem(countryCode: 'IT', dddCode: '+39', numberOfDigits: 10),
+    DDDCountryItem(countryCode: 'UK', dddCode: '+44', numberOfDigits: 11),
+    DDDCountryItem(countryCode: 'DE', dddCode: '+49', numberOfDigits: 11),
+    DDDCountryItem(countryCode: 'BR', dddCode: '+55', numberOfDigits: 11),
+    DDDCountryItem(countryCode: 'PT', dddCode: '+351', numberOfDigits: 9),
+    DDDCountryItem(countryCode: 'LU', dddCode: '+352', numberOfDigits: 9),
   ];
 
   @override
   void initState() {
     super.initState();
-    _emailController = TextEditingController();
     _phoneNumberController = TextEditingController();
     _addressController = TextEditingController();
     _lastVisitedChurchController = TextEditingController();
     _reasonForMembershipController = TextEditingController();
     _referenceController = TextEditingController();
+    _fullNameController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _emailController.dispose();
     _phoneNumberController.dispose();
     _addressController.dispose();
     _lastVisitedChurchController.dispose();
     _reasonForMembershipController.dispose();
     _referenceController.dispose();
+    _fullNameController.dispose();
     super.dispose();
   }
 
@@ -185,36 +75,31 @@ class _BecomeMemberState extends State<BecomeMember> {
         authService: AuthenticationService(),
       ),
       body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildDateOfBirthSection(),
-                  const SizedBox(height: 20.0),
-                  _buildGenderSection(),
-                  const SizedBox(height: 20.0),
-                  _buildEmailSection(),
-                  const SizedBox(height: 20.0),
-                  _buildPhoneNumberSection(),
-                  const SizedBox(height: 20.0),
-                  _buildCountryCodeSection(),
-                  const SizedBox(height: 20.0),
-                  _buildLastVisitedChurchSection(),
-                  const SizedBox(height: 20.0),
-                  _buildCivilStatusSection(),
-                  const SizedBox(height: 20.0),
-                  _buildReasonForMembershipSection(),
-                  const SizedBox(height: 20.0),
-                  _buildReferenceSection(),
-                  const SizedBox(height: 20.0),
-                  _buildSignUpButton(),
-                ],
-              ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildDateOfBirthSection(),
+                const SizedBox(height: 20.0),
+                _buildFullNameSection(),
+                const SizedBox(height: 20.0),
+                _buildPhoneNumberSection(),
+                const SizedBox(height: 20.0),
+                _buildLastVisitedChurchSection(),
+                const SizedBox(height: 20.0),
+                _buildCivilStatusSection(),
+                const SizedBox(height: 20.0),
+                _buildAdressSection(),
+                const SizedBox(height: 20.0),
+                _buildReasonForMembershipSection(),
+                const SizedBox(height: 20.0),
+                _buildReferenceSection(),
+                const SizedBox(height: 20.0),
+                _buildSignUpButton(),
+              ],
             ),
           ),
         ),
@@ -227,52 +112,51 @@ class _BecomeMemberState extends State<BecomeMember> {
       children: [
         Expanded(
           flex: 1,
-          child: CountryCodeDropdown(
-            selectedDDD: selectedDDD,
-            dropdownItems: dddCountryList
-                .map((item) => DropdownMenuItem<String>(
-                      value: item.dddCode,
-                      child: Text(item.dddCode),
-                    ))
-                .toList(),
-            onChanged: (String? value) {
-              setState(() {
-                selectedDDD = value!;
-                numberOfPhoneDigits = dddCountryList
-                    .firstWhere((element) => element.dddCode == selectedDDD)
-                    .numberOfDigits;
-              });
-            },
-          ),
+          child: _buildCountryCodeDropdown(),
         ),
         const SizedBox(width: 20.0),
         Expanded(
-          flex: 2,
-          child: PhoneTextField(
-            maxLength: numberOfPhoneDigits,
-            controller: _phoneNumberController,
-          ),
+          flex: 3,
+          child: _buildPhoneTextField(),
         ),
       ],
     );
   }
 
-  Widget _buildCountryCodeSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextFormField(
-          controller: TextEditingController(text: selectedDDD),
-          readOnly: true,
-          onTap: () {
-            // Implement logic to navigate to a page where users can select a country code
-          },
-          keyboardType: TextInputType.text,
-          decoration: const InputDecoration(
-            labelText: 'Country Code',
-          ),
+  Widget _buildCountryCodeDropdown() {
+    return DropdownButtonFormField<String>(
+      value: selectedDDD,
+      onChanged: (String? value) {
+        setState(() {
+          selectedDDD = value!;
+          numberOfPhoneDigits = dddCountryList
+              .firstWhere((item) => item.dddCode == selectedDDD)
+              .numberOfDigits;
+        });
+      },
+      items: dddCountryList
+          .map((item) => DropdownMenuItem<String>(
+                value: item.dddCode,
+                child: Text(item.dddCode),
+              ))
+          .toList(),
+      decoration: const InputDecoration(
+        labelText: 'Country Code',
+      ),
+    );
+  }
+
+  Widget _buildPhoneTextField() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 23.0),
+      child: TextField(
+        maxLength: numberOfPhoneDigits,
+        controller: _phoneNumberController,
+        keyboardType: TextInputType.phone,
+        decoration: const InputDecoration(
+          labelText: 'Phone Number',
         ),
-      ],
+      ),
     );
   }
 
@@ -310,43 +194,42 @@ class _BecomeMemberState extends State<BecomeMember> {
     );
   }
 
-  Widget _buildEmailSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextFormField(
-          controller: _emailController,
-          keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(
-            labelText: 'Email',
-          ),
-          validator: _validateEmail,
-        ),
-      ],
+  Widget _buildFullNameSection() {
+    return TextFormField(
+      controller: _fullNameController,
+      keyboardType: TextInputType.text,
+      decoration: const InputDecoration(
+        labelText: 'Full Name',
+      ),
+    );
+  }
+
+  Widget _buildAdressSection() {
+    return TextFormField(
+      controller: _addressController,
+      keyboardType: TextInputType.text,
+      decoration: const InputDecoration(
+        labelText: 'Adress',
+      ),
     );
   }
 
   Widget _buildLastVisitedChurchSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextFormField(
-          controller: _lastVisitedChurchController,
-          keyboardType: TextInputType.text,
-          decoration: const InputDecoration(
-            labelText: 'Last Visited Church',
-          ),
-        ),
-      ],
+    return TextFormField(
+      controller: _lastVisitedChurchController,
+      keyboardType: TextInputType.text,
+      decoration: const InputDecoration(
+        labelText: 'Last Visited Church',
+      ),
     );
   }
 
   Widget _buildCivilStatusSection() {
     return DropdownButtonFormField<String>(
-      value: selectedCivilState,
+      value: selectedCivilStatus,
       onChanged: (String? value) {
         setState(() {
-          selectedCivilState = value!;
+          selectedCivilStatus = value!;
         });
       },
       items: const [
@@ -370,32 +253,22 @@ class _BecomeMemberState extends State<BecomeMember> {
   }
 
   Widget _buildReasonForMembershipSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextFormField(
-          controller: _reasonForMembershipController,
-          keyboardType: TextInputType.text,
-          decoration: const InputDecoration(
-            labelText: 'Reason for Membership',
-          ),
-        ),
-      ],
+    return TextFormField(
+      controller: _reasonForMembershipController,
+      keyboardType: TextInputType.text,
+      decoration: const InputDecoration(
+        labelText: 'Reason for Membership',
+      ),
     );
   }
 
   Widget _buildReferenceSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextFormField(
-          controller: _referenceController,
-          keyboardType: TextInputType.text,
-          decoration: const InputDecoration(
-            labelText: 'Reference from Current Member',
-          ),
-        ),
-      ],
+    return TextFormField(
+      controller: _referenceController,
+      keyboardType: TextInputType.text,
+      decoration: const InputDecoration(
+        labelText: 'Reference from Current Member',
+      ),
     );
   }
 
@@ -403,13 +276,12 @@ class _BecomeMemberState extends State<BecomeMember> {
     return ElevatedButton(
       onPressed: _isLoading ? null : _validateAndSubmit,
       style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
         backgroundColor: const Color.fromARGB(255, 90, 175, 249),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
         ),
       ),
-      child: const Text('Submit Application'),
+      child: const Text('Submit'),
     );
   }
 
@@ -423,67 +295,157 @@ class _BecomeMemberState extends State<BecomeMember> {
     return null;
   }
 
-  Future<void> _validateAndSubmit() async {
+  void _validateAndSubmit() async {
     final form = _formKey.currentState;
     if (form != null && form.validate()) {
-      // Form is valid, process sign up here.
-      String phoneNumber = _phoneNumberController.text.trim();
-      String address = _addressController.text.trim();
-      String countryCode = selectedDDD; // Use selectedDDD for country code
-      String lastVisitedChurch = _lastVisitedChurchController.text.trim();
-      String civilStatus = selectedCivilState;
-      String reasonForMembership = _reasonForMembershipController.text.trim();
-      String reference = _referenceController.text.trim();
+      form.save();
+      setState(() {
+        _isLoading = true;
+      });
 
+      final phoneNumber = _phoneNumberController.text.trim();
+      final address = _addressController.text.trim();
+      final lastVisitedChurch = _lastVisitedChurchController.text.trim();
+      final reasonForMembership = _reasonForMembershipController.text.trim();
+      final reference = _referenceController.text.trim();
+      final fullName = _fullNameController.text.trim();
+
+      final member = Member(
+        id: '', // This will be set by Firestore
+        phoneNumber: phoneNumber,
+        address: address,
+        lastVisitedChurch: lastVisitedChurch,
+        reasonForMembership: reasonForMembership,
+        reference: reference,
+        fullName: fullName,
+      );
+
+      final firestoreService = FirestoreService();
       try {
-        // Find the DDD item for the selected country code
-        dddCountryList.firstWhere(
-          (item) => item.dddCode == selectedDDD,
-          orElse: () => DDDCountryItem(
-            countryCode: '',
-            dddCode: selectedDDD,
-            numberOfDigits: 10, // Default to 10 digits if not found
-          ),
+        await firestoreService.addMember(member);
+
+        // Clear the form and show success message
+        form.reset();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Application submitted successfully')),
         );
-
-        // Example: Implement the logic to send this data to the server or process it
-        // Here, we're just printing it for demonstration purposes
-        if (kDebugMode) {
-          print('Phone Number: $phoneNumber');
-          print('Address: $address');
-          print('Country Code: $countryCode');
-          print('Last Visited Church: $lastVisitedChurch');
-          print('Civil Status: $civilStatus');
-          print('Reason for Membership: $reasonForMembership');
-          print('Reference: $reference');
-        }
-
-        if (mounted) {
-          // Replace this with your navigation logic
-          Navigator.of(context).pop();
-        }
       } catch (e) {
         if (kDebugMode) {
-          print('Error: $e');
+          print('Error submitting application: $e');
         }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to submit application')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
+    }
+  }
+}
+
+class Member {
+  final String id;
+  final String fullName;
+  final String address;
+  final String phoneNumber;
+  final String lastVisitedChurch;
+  final String reasonForMembership;
+  final String reference;
+
+  Member({
+    required this.id,
+    required this.phoneNumber,
+    required this.address,
+    required this.lastVisitedChurch,
+    required this.reasonForMembership,
+    required this.reference,
+    required this.fullName,
+  });
+}
+
+class DDDCountryItem {
+  final String countryCode;
+  final String dddCode;
+  final int numberOfDigits;
+
+  DDDCountryItem({
+    required this.countryCode,
+    required this.dddCode,
+    required this.numberOfDigits,
+  });
+}
+
+class DateOfBirthDropdowns extends StatelessWidget {
+  final int? selectedDay;
+  final int? selectedMonth;
+  final int? selectedYear;
+  final ValueChanged<int?> onChangedDay;
+  final ValueChanged<int?> onChangedMonth;
+  final ValueChanged<int?> onChangedYear;
+
+  const DateOfBirthDropdowns({
+    super.key,
+    required this.selectedDay,
+    required this.selectedMonth,
+    required this.selectedYear,
+    required this.onChangedDay,
+    required this.onChangedMonth,
+    required this.onChangedYear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Implement your date of birth dropdowns here
+    return Container();
+  }
+}
+
+class GenderDropdown extends StatelessWidget {
+  final String selectedGender;
+  final ValueChanged<String?> onChangedGender;
+
+  const GenderDropdown({
+    super.key,
+    required this.selectedGender,
+    required this.onChangedGender,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+
+class FirestoreService {
+  final CollectionReference _memberCollection =
+      FirebaseFirestore.instance.collection('becomeMember');
+
+  Future<void> addMember(Member member) async {
+    try {
+      await _memberCollection.add({
+        'fullName': member.fullName,
+        'address': member.address,
+        'phoneNumber': member.phoneNumber,
+        'lastVisitedChurch': member.lastVisitedChurch,
+        'reasonForMembership': member.reasonForMembership,
+        'reference': member.reference,
+      });
+    } catch (e) {
+      throw Exception('Failed to add member: $e');
     }
   }
 }
 
 void main() {
   runApp(
-    MultiProvider(
-      providers: const [
-        // Add your provider for CountryCodeService here if needed
-      ],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: const BecomeMember(),
+    MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
       ),
+      home: const BecomeMember(),
     ),
   );
 }
