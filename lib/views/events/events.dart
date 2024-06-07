@@ -619,7 +619,14 @@ class _AddEventFormState extends State<AddEventForm> {
             const SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: () => _saveEvent(context),
-              child: const Text('Salvar Evento'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: const Color.fromARGB(255, 90, 175, 249),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
+              child: const Text('Salvar'),
             ),
           ],
         ),
