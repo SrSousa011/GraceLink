@@ -1,4 +1,6 @@
+import 'package:churchapp/notifications.dart';
 import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/videos.dart';
 import 'package:churchapp/views/welcome.dart';
 import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/courses/courses.dart';
@@ -29,6 +31,10 @@ class AppRoutes {
         );
       case '/user_profile':
         return MaterialPageRoute(builder: (_) => const UserProfile());
+      case '/notifications':
+        return MaterialPageRoute(builder: (_) => const Notifications());
+      case '/videos':
+        return MaterialPageRoute(builder: (_) => const Videos());
       case '/event_page':
         return MaterialPageRoute(
             builder: (_) =>
