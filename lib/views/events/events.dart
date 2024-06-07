@@ -1,68 +1,46 @@
-import 'package:churchapp/services/auth_service.dart';
-import 'package:churchapp/views/nav_bar.dart';
-import 'package:churchapp/views/signUp/sign_up_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // Main EventsPage Widget
-class EventsPage extends StatefulWidget {
-  const EventsPage({super.key});
+class Events extends StatefulWidget {
+  const Events({super.key});
 
   @override
-  State<EventsPage> createState() => _EventsPageState();
+  State<Events> createState() => _EventsState();
 }
 
-class _EventsPageState extends State<EventsPage> {
-  List<Event> events = [
-    Event(
-      title: 'Culto de Domingo',
-      description:
-          'Participe do nosso culto dominical com louvor, adoração e uma mensagem inspiradora.',
-      date: DateTime(2024, 3, 1, 10, 0),
-      time: const TimeOfDay(hour: 10, minute: 0), // Adding a default time
-      location: 'Igreja da Comunidade',
-    ),
-    Event(
-      title: 'Grupo de Estudo Bíblico',
-      description:
-          'Venha participar do nosso grupo de estudo bíblico semanal para aprender mais sobre a Palavra de Deus.',
-      date: DateTime(2024, 3, 4, 19, 0),
-      time: const TimeOfDay(hour: 10, minute: 0), // Adding a default time
-      location: 'Salão da Igreja',
-    ),
-    Event(
-      title: 'Concerto de Natal',
-      description:
-          'Celebre a época festiva com músicas de Natal apresentadas pelo coro da igreja.',
-      date: DateTime(2024, 12, 20, 18, 30),
-      time: const TimeOfDay(hour: 10, minute: 0), // Adding a default time
-      location: 'Igreja da Comunidade',
-    ),
-  ];
-
+class _EventsState extends State<Events> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Eventos'),
       ),
-      drawer: NavBar(
-        auth: AuthenticationService(),
-        authService: AuthenticationService(),
-      ),
-      body: ListView.builder(
-        itemCount: events.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              _navigateToEventDetailsScreen(context, events[index]);
+      body: StreamBuilder<List<Event>>(
+        stream: readEvents(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return const Center(child: Text('Erro ao carregar eventos'));
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Nenhum evento encontrado'));
+          }
+          final events = snapshot.data!;
+          return ListView.builder(
+            itemCount: events.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  _navigateToEventDetailsScreen(context, events[index]);
+                },
+                child: EventListItem(event: events[index]),
+              );
             },
-            child: EventCard(
-                title: events[index].title,
-                description: events[index].description,
-                date: events[index].date,
-                location: events[index].location,
-                time: const TimeOfDay(hour: 10, minute: 0)),
           );
         },
       ),
@@ -81,43 +59,190 @@ class _EventsPageState extends State<EventsPage> {
       context,
       MaterialPageRoute(builder: (context) => const AddEventForm()),
     );
-    if (result != null) {
-      setState(() {
-        events.add(result);
-      });
+    if (result != null && result) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Evento adicionado com sucesso')),
+      );
     }
   }
 
-  void _navigateToEventDetailsScreen(BuildContext context, Event event) {
-    Navigator.push(
+  void _navigateToEventDetailsScreen(BuildContext context, Event event) async {
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => EventDetailsScreen(event: event)),
+    );
+    if (result != null && result) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Evento atualizado')),
+      );
+    }
+  }
+}
+
+class EventListItem extends StatelessWidget {
+  final Event event;
+
+  const EventListItem({super.key, required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.all(8.0),
+      child: ListTile(
+        title: Text(event.title),
+        subtitle: Text(DateFormat('dd/MM/yyyy').format(event.date)),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => EventDetailsScreen(event: event)),
+          );
+        },
+      ),
     );
   }
 }
 
-// Form for adding a new event
-class AddEventForm extends StatefulWidget {
-  const AddEventForm({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _AddEventFormState();
+Stream<List<Event>> readEvents() {
+  CollectionReference events = FirebaseFirestore.instance.collection('events');
+  return events.snapshots().map((snapshot) => snapshot.docs
+      .map((doc) =>
+          Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
+      .toList());
 }
 
-class _AddEventFormState extends State<AddEventForm> {
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
+class EventDetailsScreen extends StatelessWidget {
+  final Event event;
+
+  const EventDetailsScreen({super.key, required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(event.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              _navigateToUpdateEventScreen(context, event);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () {
+              _deleteEvent(context, event);
+            },
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Título: ${event.title}',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            _buildDetailsText('Descrição: ${event.description}'),
+            _buildDetailsText(
+              'Data: ${DateFormat('dd/MM/yyyy').format(event.date)}',
+            ),
+            _buildDetailsText('Hora: ${event.time.format(context)}'),
+            _buildDetailsText('Localização: ${event.location}'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailsText(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 16),
+      ),
+    );
+  }
+
+  void _navigateToUpdateEventScreen(BuildContext context, Event event) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => UpdateEventForm(event: event)),
+    );
+    if (result != null && result) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Evento atualizado')),
+      );
+    }
+  }
+
+  void _deleteEvent(BuildContext context, Event event) async {
+    try {
+      await deleteEvent(event.id);
+      Navigator.pop(context, true); // Return true to indicate success
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Erro ao excluir evento'),
+            content: const Text('Ocorreu um erro ao tentar excluir o evento.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+}
+
+class UpdateEventForm extends StatefulWidget {
+  final Event event;
+
+  const UpdateEventForm({super.key, required this.event});
+
+  @override
+  State<StatefulWidget> createState() => _UpdateEventFormState();
+}
+
+class _UpdateEventFormState extends State<UpdateEventForm> {
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
-  bool _useLocation = false;
-  String selectedGender = 'Male';
+  String _location = '';
 
-  final _selectController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.event.title);
+    _descriptionController =
+        TextEditingController(text: widget.event.description);
+    _selectedDate = widget.event.date;
+    _selectedTime = widget.event.time;
+    _location = widget.event.location;
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(2101),
     );
@@ -131,7 +256,7 @@ class _AddEventFormState extends State<AddEventForm> {
   Future<void> _selectTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: _selectedTime ?? TimeOfDay.now(),
     );
     if (picked != null && picked != _selectedTime) {
       setState(() {
@@ -140,157 +265,232 @@ class _AddEventFormState extends State<AddEventForm> {
     }
   }
 
+  Future<void> _updateEvent(BuildContext context) async {
+    if (_titleController.text.isNotEmpty &&
+        _descriptionController.text.isNotEmpty &&
+        _selectedDate != null &&
+        _selectedTime != null) {
+      final updatedEvent = Event(
+        id: widget.event.id,
+        title: _titleController.text,
+        description: _descriptionController.text,
+        date: _selectedDate!,
+        time: _selectedTime!,
+        location: _location,
+      );
+      try {
+        await updateEvent(updatedEvent, widget.event.id);
+        Navigator.pop(context, true); // Return true to indicate success
+      } catch (e) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Erro ao atualizar evento'),
+              content:
+                  const Text('Ocorreu um erro ao tentar atualizar o evento.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Erro ao atualizar evento'),
+            content: const Text('Por favor, preencha todos os campos.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Novo Evento'),
+        title: const Text('Atualizar Evento'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            constTitleDescriptionField(),
-            constSizedBox(20.0),
-            buildDateSelectionRow(),
-            constSizedBox(20.0),
-            buildTimeSelectionRow(),
-            constSizedBox(20.0),
-            buildSelectLocation(),
-            _buildSelecGender(),
-            constSizedBox(20.0),
-            buildSignUpButton(),
+            TextField(
+              controller: _titleController,
+              decoration: const InputDecoration(
+                labelText: 'Título do Evento',
+                icon: Icon(Icons.title),
+              ),
+            ),
+            const SizedBox(height: 20.0),
+            TextField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Descrição do Evento',
+                icon: Icon(Icons.description),
+              ),
+            ),
+            const SizedBox(height: 20.0),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.calendar_today),
+                  onPressed: () => _selectDate(context),
+                ),
+                if (_selectedDate != null)
+                  Text(
+                    DateFormat('dd/MM/yyyy').format(_selectedDate!),
+                    style: const TextStyle(fontSize: 18.0),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 20.0),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.access_time),
+                  onPressed: () => _selectTime(context),
+                ),
+                if (_selectedTime != null)
+                  Text(
+                    _selectedTime!.format(context),
+                    style: const TextStyle(fontSize: 18.0),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 20.0),
+            TextField(
+              onChanged: (value) => _location = value,
+              decoration: const InputDecoration(
+                labelText: 'Localização',
+                icon: Icon(Icons.location_on),
+              ),
+            ),
+            const SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: () => _updateEvent(context),
+              child: const Text('Atualizar Evento'),
+            ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget constTitleDescriptionField() {
-    return Column(
-      children: [
-        TextField(
-          controller: _titleController,
-          decoration: const InputDecoration(
-            labelText: 'Título do Evento',
-            icon: Icon(Icons.title),
-          ),
-        ),
-        TextField(
-          controller: _descriptionController,
-          decoration: const InputDecoration(
-            labelText: 'Descrição do Evento',
-            icon: Icon(Icons.description),
-          ),
-        ),
-      ],
-    );
+// AddEventForm Widget
+class AddEventForm extends StatefulWidget {
+  const AddEventForm({super.key});
+
+  @override
+  State<AddEventForm> createState() => _AddEventFormState();
+}
+
+class _AddEventFormState extends State<AddEventForm> {
+  late TextEditingController _idController;
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
+  String _location = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _idController = TextEditingController();
+    _titleController = TextEditingController();
+    _descriptionController = TextEditingController();
+    _selectedDate = DateTime.now();
+    _selectedTime = TimeOfDay.now();
   }
 
-  Widget buildDateSelectionRow() {
-    return Row(
-      children: [
-        IconButton(
-          icon: const Icon(Icons.calendar_today),
-          onPressed: () {
-            _selectDate(context);
-          },
-        ),
-        Text(
-          _selectedDate == null
-              ? 'Selecione a data'
-              : DateFormat('dd/MM/yyyy').format(_selectedDate!),
-        ),
-      ],
-    );
+  @override
+  void dispose() {
+    _idController.dispose();
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 
-  Widget buildTimeSelectionRow() {
-    return Row(
-      children: [
-        IconButton(
-          icon: const Icon(Icons.access_time),
-          onPressed: () {
-            _selectTime(context);
-          },
-        ),
-        Text(
-          _selectedTime == null
-              ? 'Selecione o horário'
-              : _selectedTime!.format(context),
-        ),
-      ],
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
     );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
   }
 
-  Widget _buildSelecGender() {
-    return GenderDropdown(
-      selectedGender: selectedGender,
-      onChangedGender: (value) {
-        setState(() {
-          selectedGender = value!;
-        });
-      },
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime ?? TimeOfDay.now(),
     );
+    if (picked != null && picked != _selectedTime) {
+      setState(() {
+        _selectedTime = picked;
+      });
+    }
   }
 
-  Widget buildSelectLocation() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Checkbox(
-              value: _useLocation,
-              onChanged: (value) {
-                setState(() {
-                  _useLocation = value!;
-                });
-              },
-            ),
-            const Text('Usar local'),
-          ],
-        ),
-        if (_useLocation)
-          TextField(
-            controller: _selectController,
-            decoration: const InputDecoration(
-              labelText: 'Selecione Local',
-              icon: Icon(Icons.location_on),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget buildSignUpButton() {
-    return ElevatedButton(
-      onPressed: () {
-        _saveEvent(context);
-      },
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.blue,
-      ),
-      child: const Text('Salvar'),
-    );
-  }
-
-  void _saveEvent(BuildContext context) {
+  Future<void> _saveEvent(BuildContext context) async {
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty &&
         _selectedDate != null &&
         _selectedTime != null) {
       final newEvent = Event(
+        id: _idController.text,
         title: _titleController.text,
         description: _descriptionController.text,
         date: _selectedDate!,
         time: _selectedTime!,
-        location: _selectController.text,
-        useLocation: _useLocation,
+        location: _location,
       );
-      Navigator.pop(context, newEvent);
+      try {
+        await addEvent(newEvent);
+        Navigator.pop(context, true); // Return true to indicate success
+      } catch (e) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Erro ao salvar evento'),
+              content: const Text('Ocorreu um erro ao tentar salvar o evento.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
     } else {
       showDialog(
         context: context,
@@ -311,106 +511,73 @@ class _AddEventFormState extends State<AddEventForm> {
       );
     }
   }
-}
-
-class EventDetailsScreen extends StatelessWidget {
-  final Event event;
-
-  const EventDetailsScreen({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(event.title),
+        title: const Text('Novo Evento'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Title: ${event.title}',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            constSizedBox(8),
-            Text(
-              'Description: ${event.description}',
-              style: const TextStyle(fontSize: 16),
-            ),
-            constSizedBox(8),
-            Text(
-              'Date: ${DateFormat('dd/MM/yyyy').format(event.date)}',
-              style: const TextStyle(fontSize: 16),
-            ),
-            constSizedBox(8),
-            Text(
-              'Time: ${event.time.format(context)}',
-              style: const TextStyle(fontSize: 16),
-            ),
-            constSizedBox(8),
-            Text(
-              'Location: ${event.location}',
-              style: const TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class EventCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final DateTime date;
-  final TimeOfDay time;
-  final String location;
-
-  const EventCard({
-    super.key,
-    required this.title,
-    required this.description,
-    required this.date,
-    required this.time,
-    required this.location,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+            TextField(
+              controller: _titleController,
+              decoration: const InputDecoration(
+                labelText: 'Título do Evento',
+                icon: Icon(Icons.title),
               ),
             ),
-            constSizedBox(8),
-            Text(
-              description,
-              style: const TextStyle(fontSize: 16),
+            const SizedBox(height: 20.0),
+            TextField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Descrição do Evento',
+                icon: Icon(Icons.description),
+              ),
             ),
-            constSizedBox(8),
-            Text(
-              'Data: ${DateFormat('dd/MM/yyyy').format(date)}',
-              style: const TextStyle(fontSize: 16),
+            const SizedBox(height: 20.0),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.calendar_today),
+                  onPressed: () => _selectDate(context),
+                ),
+                if (_selectedDate != null)
+                  Text(
+                    DateFormat('dd/MM/yyyy').format(_selectedDate!),
+                    style: const TextStyle(fontSize: 18.0),
+                  ),
+              ],
             ),
-            constSizedBox(8),
-            Text(
-              'Horário: ${time.format(context)}',
-              style: const TextStyle(fontSize: 16),
+            const SizedBox(height: 20.0),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.access_time),
+                  onPressed: () => _selectTime(context),
+                ),
+                if (_selectedTime != null)
+                  Text(
+                    _selectedTime!.format(context),
+                    style: const TextStyle(fontSize: 18.0),
+                  ),
+              ],
             ),
-            constSizedBox(8),
-            Text(
-              'Local: $location',
-              style: const TextStyle(fontSize: 16),
+            const SizedBox(height: 20.0),
+            TextField(
+              onChanged: (value) => _location = value,
+              decoration: const InputDecoration(
+                labelText: 'Localização',
+                icon: Icon(Icons.location_on),
+              ),
+            ),
+            const SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: () => _saveEvent(context),
+              child: const Text('Salvar Evento'),
             ),
           ],
         ),
@@ -419,25 +586,102 @@ class EventCard extends StatelessWidget {
   }
 }
 
-// Event class definition
 class Event {
+  final String id; // Unique ID of the event
   final String title;
   final String description;
   final DateTime date;
   final TimeOfDay time;
   final String location;
-  final bool useLocation; // New boolean field
 
   Event({
+    required this.id,
     required this.title,
     required this.description,
     required this.date,
     required this.time,
     required this.location,
-    this.useLocation = false, // Default value is false
   });
+
+  factory Event.fromFirestore(String id, Map<String, dynamic> data) {
+    return Event(
+      id: id,
+      title: data['title'] ?? '',
+      description: data['description'] ?? '',
+      date: (data['date'] as Timestamp).toDate(),
+      time: TimeOfDay(
+        hour: int.parse(data['time'].split(':')[0]),
+        minute: int.parse(data['time'].split(':')[1]),
+      ),
+      location: data['location'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'description': description,
+      'date': date,
+      'time': '${time.hour}:${time.minute}',
+      'location': location,
+    };
+  }
 }
 
-SizedBox constSizedBox(double height) {
-  return SizedBox(height: height);
+Future<void> addEvent(Event event) async {
+  try {
+    CollectionReference events =
+        FirebaseFirestore.instance.collection('events');
+    await events.add({
+      'title': event.title,
+      'description': event.description,
+      'date': Timestamp.fromDate(event.date), // Convert DateTime to Timestamp
+      'time': '${event.time.hour}:${event.time.minute}',
+      'location': event.location,
+    });
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error adding event: $e');
+    }
+    rethrow; // Propagate error to the caller if necessary
+  }
+}
+
+Future<void> updateEvent(Event event, String eventId) async {
+  try {
+    CollectionReference events =
+        FirebaseFirestore.instance.collection('events');
+    await events.doc(eventId).update({
+      'title': event.title,
+      'description': event.description,
+      'date': Timestamp.fromDate(event.date), // Convert DateTime to Timestamp
+      'time': '${event.time.hour}:${event.time.minute}',
+      'location': event.location,
+    });
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error updating event: $e');
+    }
+    rethrow; // Propagate error to the caller if necessary
+  }
+}
+
+Future<void> deleteEvent(String eventId) async {
+  try {
+    CollectionReference events =
+        FirebaseFirestore.instance.collection('events');
+    await events.doc(eventId).delete();
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error deleting event: $e');
+    }
+    rethrow; // Propagate error to the caller if necessary
+  }
+}
+
+void main() {
+  runApp(const MaterialApp(
+    title: 'Flutter Firestore Events',
+    home: Events(),
+  ));
 }

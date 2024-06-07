@@ -18,13 +18,7 @@ class EventListView extends StatelessWidget {
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () => onTap(events[index]),
-          child: EventCard(
-            title: events[index].title,
-            description: events[index].description,
-            date: events[index].date,
-            time: events[index].time,
-            location: events[index].location,
-          ),
+          child: EventListItem(event: events[index]),
         );
       },
     );

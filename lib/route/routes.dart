@@ -32,7 +32,7 @@ class AppRoutes {
       case '/event_page':
         return MaterialPageRoute(
             builder: (_) =>
-                const EventsPage()); // Use EventsPage widget for events route
+                const Events()); // Use EventsPage widget for events route
       case '/donations':
         return MaterialPageRoute(builder: (_) => const Donations());
       case '/courses':
