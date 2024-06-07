@@ -1,3 +1,5 @@
+import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/nav_bar.dart';
 import 'package:churchapp/views/signUp/sign_up_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -177,6 +179,10 @@ class _BecomeMemberState extends State<BecomeMember> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Become a Member'),
+      ),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+        authService: AuthenticationService(),
       ),
       body: SingleChildScrollView(
         child: Form(
