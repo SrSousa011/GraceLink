@@ -2,6 +2,7 @@ import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/donations/donnation_buttom.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/donations/donation_type.dart';
+import 'package:churchapp/views/donations/donation_value.dart';
 import 'package:churchapp/views/nav_bar.dart';
 
 class Donations extends StatefulWidget {
@@ -41,6 +42,9 @@ class _DonationPageState extends State<Donations> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            DonationValue(
+              donationController: donationController,
+            ),
             DonationType(
               onTypeSelected: (type) {
                 setState(() {
@@ -51,6 +55,7 @@ class _DonationPageState extends State<Donations> {
             ),
             const SizedBox(height: 20.0),
             DonateButton(
+              // Using the corrected DonationButton widget
               onPressed: () {
                 showDialog(
                   context: context,
