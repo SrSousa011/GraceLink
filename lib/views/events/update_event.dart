@@ -184,7 +184,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
             const SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: () => _updateEvent(context),
-              child: const Text('Atualizar Evento'),
+              child: const Text('Atualizar'),
             ),
           ],
         ),
