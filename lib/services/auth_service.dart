@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 abstract class BaseAuth {
   Future<UserCredential> createUserWithEmailAndPassword({
@@ -136,12 +135,12 @@ class AuthenticationService implements BaseAuth {
       if (kDebugMode) {
         print('FirebaseAuthException during sign in: ${e.message}');
       }
-      throw e;
+      rethrow;
     } catch (e) {
       if (kDebugMode) {
         print('Error during sign in: $e');
       }
-      throw e;
+      rethrow;
     }
   }
 
