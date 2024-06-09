@@ -14,9 +14,9 @@ class UpdateEventForm extends StatefulWidget {
 class _UpdateEventFormState extends State<UpdateEventForm> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
+  late TextEditingController _locationController;
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
-  String _location = '';
 
   @override
   void initState() {
@@ -24,15 +24,16 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
     _titleController = TextEditingController(text: widget.event.title);
     _descriptionController =
         TextEditingController(text: widget.event.description);
+    _locationController = TextEditingController(text: widget.event.location);
     _selectedDate = widget.event.date;
     _selectedTime = widget.event.time;
-    _location = widget.event.location;
   }
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
+    _locationController.dispose();
     super.dispose();
   }
 
@@ -73,7 +74,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
         description: _descriptionController.text,
         date: _selectedDate!,
         time: _selectedTime!,
-        location: _location,
+        location: _locationController.text,
       );
       try {
         await updateEvent(updatedEvent, widget.event.id);
@@ -130,65 +131,94 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Título do Evento',
-                icon: Icon(Icons.title),
-              ),
-            ),
+            _buildTitleEvent(),
             const SizedBox(height: 20.0),
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Descrição do Evento',
-                icon: Icon(Icons.description),
-              ),
-            ),
+            _buildDescriptionEvent(),
             const SizedBox(height: 20.0),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.calendar_today),
-                  onPressed: () => _selectDate(context),
-                ),
-                if (_selectedDate != null)
-                  Text(
-                    DateFormat('dd/MM/yyyy').format(_selectedDate!),
-                    style: const TextStyle(fontSize: 18.0),
-                  ),
-              ],
-            ),
+            _buildSlectDate(),
             const SizedBox(height: 20.0),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.access_time),
-                  onPressed: () => _selectTime(context),
-                ),
-                if (_selectedTime != null)
-                  Text(
-                    _selectedTime!.format(context),
-                    style: const TextStyle(fontSize: 18.0),
-                  ),
-              ],
-            ),
+            _builSelecTime(),
             const SizedBox(height: 20.0),
-            TextField(
-              onChanged: (value) => _location = value,
-              decoration: const InputDecoration(
-                labelText: 'Localização',
-                icon: Icon(Icons.location_on),
-              ),
-            ),
+            _builSelecLocation(),
             const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () => _updateEvent(context),
-              child: const Text('Atualizar'),
-            ),
+            _buildUpdateButton(),
+            const SizedBox(height: 20.0),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTitleEvent() {
+    return TextField(
+      controller: _titleController,
+      decoration: const InputDecoration(
+        labelText: 'Título do Evento',
+        icon: Icon(Icons.title),
+      ),
+    );
+  }
+
+  Widget _buildDescriptionEvent() {
+    return TextField(
+      controller: _descriptionController,
+      decoration: const InputDecoration(
+        labelText: 'Descrição do Evento',
+        icon: Icon(Icons.description),
+      ),
+    );
+  }
+
+  Widget _buildSlectDate() {
+    return Row(
+      children: [
+        IconButton(
+          icon: const Icon(Icons.calendar_today),
+          onPressed: () => _selectDate(context),
+        ),
+        if (_selectedDate != null)
+          Text(
+            DateFormat('dd/MM/yyyy').format(_selectedDate!),
+            style: const TextStyle(fontSize: 18.0),
+          ),
+      ],
+    );
+  }
+
+  Widget _builSelecTime() {
+    return Row(
+      children: [
+        IconButton(
+          icon: const Icon(Icons.access_time),
+          onPressed: () => _selectTime(context),
+        ),
+        if (_selectedTime != null)
+          Text(
+            _selectedTime!.format(context),
+            style: const TextStyle(fontSize: 18.0),
+          ),
+      ],
+    );
+  }
+
+  Widget _builSelecLocation() {
+    return TextField(
+      controller: _locationController,
+      decoration: const InputDecoration(
+        labelText: 'Localização',
+        icon: Icon(Icons.location_on),
+      ),
+    );
+  }
+
+  Widget _buildUpdateButton() {
+    return ElevatedButton(
+      onPressed: () => _updateEvent(context),
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: const Color(0xFF5AAFf9),
+      ),
+      child: const Text('Atualizar'),
     );
   }
 }
