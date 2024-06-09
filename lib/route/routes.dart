@@ -1,6 +1,6 @@
-import 'package:churchapp/notifications.dart';
+import 'package:churchapp/views/notifications.dart';
 import 'package:churchapp/services/auth_service.dart';
-import 'package:churchapp/videos.dart';
+import 'package:churchapp/views/videos.dart';
 import 'package:churchapp/views/welcome.dart';
 import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/courses/courses.dart';
