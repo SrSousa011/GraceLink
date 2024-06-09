@@ -63,6 +63,10 @@ class DonationDetailsScreen extends StatelessWidget {
                   ),
                 );
               },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: const Color(0xFF5AAFf9),
+              ),
               child: const Text('Upload Photo'),
             ),
           ],

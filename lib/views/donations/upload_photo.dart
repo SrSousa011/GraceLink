@@ -16,6 +16,10 @@ class UploadPhotoScreen extends StatelessWidget {
             // For now, just navigate back to the previous screen
             Navigator.pop(context);
           },
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: const Color(0xFF5AAFf9),
+          ),
           child: const Text('Upload Photo'),
         ),
       ),
