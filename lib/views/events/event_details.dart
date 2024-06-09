@@ -1,4 +1,5 @@
 import 'package:churchapp/views/events/events.dart';
+import 'package:churchapp/views/events/update_event.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
