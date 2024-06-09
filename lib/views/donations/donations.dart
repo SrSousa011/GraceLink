@@ -107,11 +107,7 @@ class _DonationsState extends State<Donations> {
                   foregroundColor: Colors.white,
                   backgroundColor: const Color(0xFF5AAFf9),
                 ),
-                child: const Text(
-                  'Next',
-                  style:
-                      TextStyle(fontSize: 20), // Increase font size if needed
-                ),
+                child: const Text('Next'),
               ),
             ],
           ),
