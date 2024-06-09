@@ -149,13 +149,20 @@ class _BecomeMemberState extends State<BecomeMember> {
   Widget _buildPhoneTextField() {
     return Padding(
       padding: const EdgeInsets.only(top: 23.0),
-      child: TextField(
+      child: TextFormField(
         maxLength: numberOfPhoneDigits,
         controller: _phoneNumberController,
         keyboardType: TextInputType.phone,
         decoration: const InputDecoration(
           labelText: 'Phone Number',
         ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Phone number cannot be empty';
+          }
+          // Additional validation logic can be added here
+          return null;
+        },
       ),
     );
   }
@@ -183,17 +190,6 @@ class _BecomeMemberState extends State<BecomeMember> {
     );
   }
 
-  Widget _buildGenderSection() {
-    return GenderDropdown(
-      selectedGender: selectedGender,
-      onChangedGender: (value) {
-        setState(() {
-          selectedGender = value!;
-        });
-      },
-    );
-  }
-
   Widget _buildFullNameSection() {
     return TextFormField(
       controller: _fullNameController,
@@ -201,6 +197,13 @@ class _BecomeMemberState extends State<BecomeMember> {
       decoration: const InputDecoration(
         labelText: 'Full Name',
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Full name cannot be empty';
+        }
+        // Additional validation logic can be added here
+        return null;
+      },
     );
   }
 
@@ -209,8 +212,15 @@ class _BecomeMemberState extends State<BecomeMember> {
       controller: _addressController,
       keyboardType: TextInputType.text,
       decoration: const InputDecoration(
-        labelText: 'Adress',
+        labelText: 'Address',
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Address cannot be empty';
+        }
+        // Additional validation logic can be added here
+        return null;
+      },
     );
   }
 
@@ -259,6 +269,13 @@ class _BecomeMemberState extends State<BecomeMember> {
       decoration: const InputDecoration(
         labelText: 'Reason for Membership',
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Reason for membership cannot be empty';
+        }
+        // Additional validation logic can be added here
+        return null;
+      },
     );
   }
 
@@ -283,16 +300,6 @@ class _BecomeMemberState extends State<BecomeMember> {
       ),
       child: const Text('Submit'),
     );
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Email cannot be empty';
-    }
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-      return 'Invalid email address';
-    }
-    return null;
   }
 
   void _validateAndSubmit() async {
