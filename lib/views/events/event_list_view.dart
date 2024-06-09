@@ -1,3 +1,4 @@
+import 'package:churchapp/views/events/event_list_item.dart';
 import 'package:churchapp/views/events/events.dart';
 import 'package:flutter/material.dart';
 
