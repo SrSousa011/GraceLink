@@ -66,9 +66,11 @@ class _StoragePageState extends State<StoragePage> {
       if (kDebugMode) {
         print('Error loading image: $e');
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error loading image')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error loading image')),
+        );
+      }
       setState(() {
         _uploading = false;
       });
@@ -77,7 +79,7 @@ class _StoragePageState extends State<StoragePage> {
 
   Future<void> _uploadImage() async {
     XFile? file = await _picker.pickImage(source: ImageSource.gallery);
-    if (file != null) {
+    if (file != null && context.mounted) {
       try {
         File uploadFile = File(file.path);
         String ref = 'images/img-${DateTime.now().millisecondsSinceEpoch}.jpg';
@@ -95,13 +97,17 @@ class _StoragePageState extends State<StoragePage> {
 
         await uploadTask.whenComplete(() => _loadImage());
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('File Uploaded Successfully')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('File Uploaded Successfully')),
+          );
+        }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Upload Error')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Upload Error')),
+          );
+        }
       }
     }
   }
@@ -110,9 +116,11 @@ class _StoragePageState extends State<StoragePage> {
     try {
       if (_uploadedImageRef != null) {
         await _uploadedImageRef!.delete();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('File Removed Successfully')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('File Removed Successfully')),
+          );
+        }
         setState(() {
           _uploadedImageRef = null;
           _uploadedImageUrl = null;
@@ -122,9 +130,11 @@ class _StoragePageState extends State<StoragePage> {
       if (kDebugMode) {
         print('Error removing image: $e');
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error removing image')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error removing image')),
+        );
+      }
     }
   }
 

@@ -333,6 +333,7 @@ class _BecomeMemberState extends State<BecomeMember> {
 
         // Clear the form and show success message
         form.reset();
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Application submitted successfully')),
         );
@@ -340,9 +341,11 @@ class _BecomeMemberState extends State<BecomeMember> {
         if (kDebugMode) {
           print('Error submitting application: $e');
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to submit application')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to submit application')),
+          );
+        }
       } finally {
         setState(() {
           _isLoading = false;

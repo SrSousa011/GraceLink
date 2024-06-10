@@ -76,7 +76,8 @@ class _AddEventFormState extends State<AddEventForm> {
       );
       try {
         await addEvent(newEvent);
-        Navigator.pop(context, true); // Return true to indicate success
+        if (!context.mounted) return;
+        Navigator.pop(context, true);
       } catch (e) {
         showDialog(
           context: context,

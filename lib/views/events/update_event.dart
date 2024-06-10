@@ -78,6 +78,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
       );
       try {
         await updateEvent(updatedEvent, widget.event.id);
+        if (!context.mounted) return;
         Navigator.pop(context, true); // Return true to indicate success
       } catch (e) {
         showDialog(

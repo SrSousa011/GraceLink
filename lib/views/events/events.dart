@@ -15,6 +15,8 @@ class Events extends StatefulWidget {
 }
 
 class _EventsState extends State<Events> {
+  final GlobalKey<_EventsState> myWidgetKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,27 +64,29 @@ class _EventsState extends State<Events> {
   }
 
   void _navigateToAddEventScreen(BuildContext context) async {
+    // Navigate to AddEventForm and wait for a result
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const AddEventForm()),
     );
-    if (result != null && result) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Evento adicionado com sucesso')),
-      );
+
+    if (result != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Evento adicionado com sucesso')),
+        );
+      }
     }
   }
 
-  void _navigateToEventDetailsScreen(BuildContext context, Event event) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => EventDetailsScreen(event: event)),
+void _navigateToEventDetailsScreen(BuildContext context, Event event) async {
+  final result = await Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => EventDetailsScreen(event: event)),
+  );
+  if (result != null && context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Evento atualizado')),
     );
-    if (result != null && result) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Evento atualizado')),
-      );
-    }
   }
 }
 

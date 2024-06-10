@@ -60,21 +60,27 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      // Show a success SnackBar
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Donation successfully completed'),
-        ),
-      );
+      // Check if the widget is still mounted before showing the SnackBar
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Donation successfully completed'),
+          ),
+        );
+      }
 
       // Optionally, navigate to another screen or reset the form
+      if (!mounted) return; // Checks `this.mounted`, not `context.mounted`.
       Navigator.of(context).pop();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to complete donation: $e'),
-        ),
-      );
+      // Check if the widget is still mounted before showing the SnackBar
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to complete donation: $e'),
+          ),
+        );
+      }
     }
   }
 

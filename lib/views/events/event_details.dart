@@ -64,7 +64,7 @@ class EventDetailsScreen extends StatelessWidget {
       context,
       MaterialPageRoute(builder: (context) => UpdateEventForm(event: event)),
     );
-    if (result != null && result) {
+    if (result != null && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Evento atualizado')),
       );
@@ -74,6 +74,7 @@ class EventDetailsScreen extends StatelessWidget {
   void _deleteEvent(BuildContext context, Event event) async {
     try {
       await deleteEvent(event.id);
+      if (!context.mounted) return;
       Navigator.pop(context, true); // Return true to indicate success
     } catch (e) {
       showDialog(

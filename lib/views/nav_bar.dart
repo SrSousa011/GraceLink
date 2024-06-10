@@ -103,6 +103,7 @@ class NavBar extends StatelessWidget {
             title: const Text('Logout'),
             onTap: () async {
               await _auth.signOut();
+              if (!context.mounted) return;
               Navigator.pop(context); // Close the drawer after logout
               // Navigate to the login screen and remove all previous routes
               Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
