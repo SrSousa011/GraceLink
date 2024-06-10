@@ -1,82 +1,14 @@
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/home/home.dart';
+import 'package:churchapp/views/signUp/date_birth.dart';
+import 'package:churchapp/views/signUp/gender.dart';
+import 'package:churchapp/views/signUp/phone.dart';
+import 'package:churchapp/views/signUp/telephoneNumber.dart';
+import 'package:churchapp/views/signUp/text_field.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
-
-// Model for the DDD Country Item
-class DDDCountryItem {
-  final String countryCode;
-  final String dddCode;
-  final int numberOfDigits;
-
-  DDDCountryItem({
-    required this.countryCode,
-    required this.dddCode,
-    required this.numberOfDigits,
-  });
-}
-
-// Dropdown Widget for Country Code
-class CountryCodeDropdown extends StatelessWidget {
-  final String selectedDDD;
-  final List<DropdownMenuItem<String>> dropdownItems;
-  final ValueChanged<String?> onChanged;
-
-  const CountryCodeDropdown({
-    super.key,
-    required this.selectedDDD,
-    required this.dropdownItems,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      flex: 1,
-      child: DropdownButtonFormField<String>(
-        decoration: const InputDecoration(
-          labelText: 'Country Code',
-        ),
-        value: selectedDDD,
-        onChanged: onChanged,
-        items: dropdownItems,
-      ),
-    );
-  }
-}
-
-// Phone Text Field Widget
-class PhoneTextField extends StatelessWidget {
-  final int maxLength;
-  final TextEditingController controller;
-  final String? Function(String value) validator;
-
-  const PhoneTextField({
-    super.key,
-    required this.maxLength,
-    required this.controller,
-    required this.validator,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      flex: 3,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 23.0),
-        child: TextField(
-          maxLength: maxLength,
-          controller: controller,
-          keyboardType: TextInputType.phone,
-          decoration: const InputDecoration(
-            labelText: 'Phone Number',
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key, required this.auth, required this.onSignedIn});
@@ -97,32 +29,17 @@ class _SignUpPageState extends State<SignUpPage> {
   late TextEditingController _phoneNumberController;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final bool _isLoading = false;
+  bool _isLoading = false;
   bool _isPasswordVisible = false;
   bool _isPasswordConfVisible = false;
 
   int? selectedDay;
   int? selectedMonth;
   int? selectedYear;
-  String selectedGender = 'Male'; // Initial gender selection
-
+  String selectedGender = 'Male';
   String selectedCivilState = 'Single';
   String selectedDDD = '+1';
   int numberOfPhoneDigits = 10;
-
-  List<DDDCountryItem> dddCountryList = [
-    DDDCountryItem(
-      countryCode: 'US',
-      dddCode: '+1',
-      numberOfDigits: 10,
-    ),
-    DDDCountryItem(
-      countryCode: 'FR',
-      dddCode: '+33',
-      numberOfDigits: 9,
-    ),
-    // Other DDDCountryItem entries
-  ];
 
   @override
   void initState() {
@@ -428,23 +345,51 @@ class _SignUpPageState extends State<SignUpPage> {
       String email = _emailController.text.trim();
       String password = _passwordController.text;
       try {
+        setState(() {
+          _isLoading = true;
+        });
+
+        // Create user in Firebase Authentication
         UserCredential userCredential =
             await widget.auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
+
+        // Save user data to Firestore
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set({
+          'fullName':
+              _firstNameController.text + _lastNameController.text.trim(),
+          'email': email,
+          'phoneNumber': selectedDDD + _phoneNumberController.text.trim(),
+          'dateOfBirth': DateTime(
+            selectedYear!,
+            selectedMonth!,
+            selectedDay!,
+          ),
+        });
+
+        setState(() {
+          _isLoading = false;
+        });
+
         widget
-            .onSignedIn(); // Chamando o método onSignedIn para indicar que o usuário está logado
+            .onSignedIn(); // Calling the onSignedIn method to indicate that the user is signed in
+
         if (kDebugMode) {
           print('User created: ${userCredential.user!.uid}');
         }
+
         if (mounted) {
           Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) => Home(
               auth: widget.auth,
               userId: userCredential.user!.uid,
               onSignedOut: () {
-                // Implemente o logout se necessário
+                // Implement logout if needed
               },
             ),
           ));
@@ -453,143 +398,25 @@ class _SignUpPageState extends State<SignUpPage> {
         if (kDebugMode) {
           print('Error: $e');
         }
-        // Handle sign-up errors, such as displaying an error message
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Sign Up Error'),
+              content: Text('Failed to sign up: $e'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
       }
     }
-  }
-}
-
-class DateOfBirthDropdowns extends StatelessWidget {
-  const DateOfBirthDropdowns({
-    super.key,
-    this.selectedDay,
-    this.selectedMonth,
-    this.selectedYear,
-    required this.onChangedDay,
-    required this.onChangedMonth, // This field name should match the one provided here
-    required this.onChangedYear,
-  });
-
-  final int? selectedDay;
-  final int? selectedMonth;
-  final int? selectedYear;
-  final ValueChanged<int?> onChangedDay;
-  final ValueChanged<int?>
-      onChangedMonth; // Ensure this matches the field name provided
-  final ValueChanged<int?> onChangedYear;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: DropdownButtonFormField<int>(
-            decoration: const InputDecoration(
-              labelText: 'Day',
-            ),
-            value: selectedDay,
-            onChanged: onChangedDay,
-            items: List.generate(31, (index) {
-              return DropdownMenuItem<int>(
-                value: index + 1,
-                child: Text((index + 1).toString()),
-              );
-            }),
-          ),
-        ),
-        const SizedBox(width: 20.0),
-        Expanded(
-          child: DropdownButtonFormField<int>(
-            decoration: const InputDecoration(
-              labelText: 'Month',
-            ),
-            value: selectedMonth,
-            onChanged:
-                onChangedMonth, // Ensure this matches the field name provided
-            items: List.generate(12, (index) {
-              return DropdownMenuItem<int>(
-                value: index + 1,
-                child: Text((index + 1).toString()),
-              );
-            }),
-          ),
-        ),
-        const SizedBox(width: 20.0),
-        Expanded(
-          child: DropdownButtonFormField<int>(
-            decoration: const InputDecoration(
-              labelText: 'Year',
-            ),
-            value: selectedYear,
-            onChanged: onChangedYear,
-            items: List.generate(80, (index) {
-              return DropdownMenuItem<int>(
-                value: DateTime.now().year - index,
-                child: Text((DateTime.now().year - index).toString()),
-              );
-            }),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class GenderDropdown extends StatelessWidget {
-  const GenderDropdown({
-    super.key,
-    required this.selectedGender,
-    required this.onChangedGender,
-  });
-
-  final String selectedGender;
-  final ValueChanged<String?> onChangedGender;
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      decoration: const InputDecoration(
-        labelText: 'Select Gender',
-      ),
-      value: selectedGender,
-      onChanged: onChangedGender,
-      items: const [
-        DropdownMenuItem<String>(
-          value: 'Male',
-          child: Text('Male'),
-        ),
-        DropdownMenuItem<String>(
-          value: 'Female',
-          child: Text('Female'),
-        ),
-      ],
-    );
-  }
-}
-
-class TextFieldWidget extends StatelessWidget {
-  const TextFieldWidget({
-    super.key,
-    required this.labelText,
-    required this.controller,
-    this.validator,
-    this.obscureText = false,
-  });
-
-  final String labelText;
-  final TextEditingController controller;
-  final String? Function(String?)? validator;
-  final bool obscureText;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: labelText,
-      ),
-      validator: validator,
-      obscureText: obscureText,
-    );
   }
 }
