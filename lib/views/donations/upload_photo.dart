@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -13,11 +14,13 @@ class StoragePage extends StatefulWidget {
 }
 
 class _StoragePageState extends State<StoragePage> {
-  final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
+  final FirebaseStorage storage = FirebaseStorage.instance;
   final ImagePicker _picker = ImagePicker();
   Reference? _uploadedImageRef;
   String? _uploadedImageUrl;
   bool _uploading = false;
+  String? uploadStatus;
+  String? uploadedFileURL;
 
   @override
   void initState() {
@@ -25,9 +28,29 @@ class _StoragePageState extends State<StoragePage> {
     _loadImage();
   }
 
+  Future<bool> _clearUploadedImageState() async {
+    Completer<bool> completer = Completer<bool>();
+
+    try {
+      if (_uploadedImageRef != null) {
+        await _uploadedImageRef!.delete();
+      }
+      setState(() {
+        uploadStatus = null;
+        uploadedFileURL = null;
+        _uploadedImageRef = null;
+      });
+      completer.complete(true);
+    } catch (e) {
+      completer.complete(false);
+    }
+
+    return completer.future;
+  }
+
   Future<void> _loadImage() async {
     try {
-      ListResult result = await firebaseStorage.ref('images').listAll();
+      ListResult result = await storage.ref('images').listAll();
       if (result.items.isNotEmpty) {
         // Load only the first image if exists
         _uploadedImageRef = result.items[0];
@@ -58,7 +81,7 @@ class _StoragePageState extends State<StoragePage> {
       try {
         File uploadFile = File(file.path);
         String ref = 'images/img-${DateTime.now().millisecondsSinceEpoch}.jpg';
-        UploadTask uploadTask = firebaseStorage.ref(ref).putFile(uploadFile);
+        UploadTask uploadTask = storage.ref(ref).putFile(uploadFile);
 
         uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
           setState(() {
@@ -105,22 +128,6 @@ class _StoragePageState extends State<StoragePage> {
     }
   }
 
-  Future<String?> uploadImage(File imageFile) async {
-    try {
-      String ref = 'images/img-${DateTime.now().millisecondsSinceEpoch}.jpg';
-      UploadTask uploadTask = firebaseStorage.ref(ref).putFile(imageFile);
-
-      await uploadTask.whenComplete(() => _loadImage());
-
-      return await firebaseStorage.ref(ref).getDownloadURL();
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error uploading image: $e');
-      }
-      return null;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,22 +162,54 @@ class _StoragePageState extends State<StoragePage> {
           children: <Widget>[
             if (_uploadedImageUrl != null)
               Card(
-                margin: const EdgeInsets.all(8.0),
-                child: ListTile(
-                  title: Image.network(_uploadedImageUrl!),
-                  trailing: Wrap(
-                    spacing: 12, // space between each button
-                    children: <Widget>[
-                      ElevatedButton(
-                        onPressed: _confirmAndNavigateBack,
-                        child: const Text('Confirm'),
+                margin: const EdgeInsets.all(16.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                elevation: 5,
+                child: Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(10.0)),
+                      child: Image.network(
+                        _uploadedImageUrl!,
+                        width: double.infinity,
+                        height: 300,
+                        fit: BoxFit.cover,
                       ),
-                      ElevatedButton(
-                        onPressed: _removeImage,
-                        child: const Text('Remove Image'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          ElevatedButton(
+                            onPressed: _confirmAndNavigateBack,
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.green,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            child: const Text('Confirm'),
+                          ),
+                          ElevatedButton(
+                            onPressed: _removeImage,
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.red,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            child: const Text('Remove'),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             if (_uploading)
@@ -188,5 +227,6 @@ class _StoragePageState extends State<StoragePage> {
     // Here you can perform any confirmation logic
     // For this example, let's just navigate back
     Navigator.of(context).pop(_uploadedImageUrl);
+    await _clearUploadedImageState(); // Adicionado para limpar o estado após confirmar
   }
 }
