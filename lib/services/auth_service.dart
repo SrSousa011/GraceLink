@@ -13,6 +13,7 @@ abstract class BaseAuth {
   });
 
   Future<String?> getCurrentUserId();
+  Future<String?> getCurrentUserName();
 
   Future<void> signOut({VoidCallback? onSignedOut});
 
@@ -148,5 +149,22 @@ class AuthenticationService implements BaseAuth {
   Future<bool> isLoggedIn() async {
     User? user = _auth.currentUser;
     return user != null;
+  }
+
+  @override
+  Future<String?> getCurrentUserName() async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        return user.displayName;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting current user name: $e');
+      }
+      return null;
+    }
   }
 }
