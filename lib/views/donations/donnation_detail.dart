@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:churchapp/views/donations/upload_photo.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,13 +12,13 @@ class DonationDetailsScreen extends StatefulWidget {
   final String donationValue;
 
   const DonationDetailsScreen({
-    Key? key,
+    super.key,
     required this.fullName,
     required this.isbn,
     required this.bankName,
     required this.donationType,
     required this.donationValue,
-  }) : super(key: key);
+  });
 
   @override
   State<DonationDetailsScreen> createState() => _DonationDetailsScreenState();
@@ -28,20 +27,6 @@ class DonationDetailsScreen extends StatefulWidget {
 class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
   String? uploadStatus;
   String? uploadedFileURL;
-
-  Future<bool> _clearUploadedImageState() {
-    Completer<bool> completer = Completer<bool>();
-
-    setState(() {
-      uploadStatus = null;
-      uploadedFileURL = null;
-    });
-
-    // Return true after the state has been cleared
-    completer.complete(true);
-
-    return completer.future;
-  }
 
   void _navigateAndUploadPhoto() async {
     final result = await Navigator.push(
@@ -82,15 +67,7 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
         ),
       );
 
-      // Clear the uploaded image state after donation confirmation
-      setState(() {
-        uploadStatus = null;
-        uploadedFileURL = null;
-      });
-
       // Optionally, navigate to another screen or reset the form
-
-      // Example of navigating back to the previous screen
       Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -108,7 +85,7 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
         title: const Text('Donation Details'),
       ),
       body: WillPopScope(
-        onWillPop: _clearUploadedImageState,
+        onWillPop: () async => true, // Remove _clearUploadedImageState call
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
