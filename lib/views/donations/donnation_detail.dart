@@ -1,6 +1,9 @@
+import 'dart:async';
+
+import 'package:churchapp/views/donations/upload_photo.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'upload_photo.dart';
 
 class DonationDetailsScreen extends StatefulWidget {
   final String fullName;
@@ -26,6 +29,20 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
   String? uploadStatus;
   String? uploadedFileURL;
 
+  Future<bool> _clearUploadedImageState() {
+    Completer<bool> completer = Completer<bool>();
+
+    setState(() {
+      uploadStatus = null;
+      uploadedFileURL = null;
+    });
+
+    // Return true after the state has been cleared
+    completer.complete(true);
+
+    return completer.future;
+  }
+
   void _navigateAndUploadPhoto() async {
     final result = await Navigator.push(
       context,
@@ -48,7 +65,9 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
     if (uploadedFileURL == null) return;
 
     try {
+      // Add donation details to Firestore
       await FirebaseFirestore.instance.collection('donations').add({
+        'userId': FirebaseAuth.instance.currentUser!.uid,
         'fullName': widget.fullName,
         'donationType': widget.donationType,
         'donationValue': widget.donationValue,
@@ -56,21 +75,22 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
+      // Show a success SnackBar
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Donation successfully completed'),
         ),
       );
 
-      // Limpar o estado da imagem carregada ao navegar para trás
+      // Clear the uploaded image state after donation confirmation
       setState(() {
         uploadStatus = null;
         uploadedFileURL = null;
       });
 
-      // Opcionalmente, navegar para outra tela ou redefinir o formulário
+      // Optionally, navigate to another screen or reset the form
 
-      // Exemplo de navegação para a tela anterior
+      // Example of navigating back to the previous screen
       Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -83,20 +103,13 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        // Limpar o estado da imagem carregada ao navegar para trás
-        setState(() {
-          uploadStatus = null;
-          uploadedFileURL = null;
-        });
-        return true;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Donation Details'),
-        ),
-        body: SingleChildScrollView(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Donation Details'),
+      ),
+      body: WillPopScope(
+        onWillPop: _clearUploadedImageState,
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,7 +139,7 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
                 style: const TextStyle(fontSize: 18.0),
               ),
               const Text(
-                  'Copy the ISB number and pay outside of the application.'),
+                  'Copy the ISBN number and pay outside of the application.'),
               const SizedBox(height: 30.0),
               if (uploadStatus == null) ...[
                 ElevatedButton(
