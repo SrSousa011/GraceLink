@@ -60,6 +60,16 @@ class _StoragePageState extends State<StoragePage> {
         String ref = 'images/img-${DateTime.now().millisecondsSinceEpoch}.jpg';
         UploadTask uploadTask = firebaseStorage.ref(ref).putFile(uploadFile);
 
+        uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+          setState(() {
+            _uploading = true;
+          });
+        }, onError: (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Upload Error')),
+          );
+        });
+
         await uploadTask.whenComplete(() => _loadImage());
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -86,17 +96,29 @@ class _StoragePageState extends State<StoragePage> {
         });
       }
     } catch (e) {
-      print('Error removing image: $e');
+      if (kDebugMode) {
+        print('Error removing image: $e');
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error removing image')),
       );
     }
   }
 
-  Future<void> _confirmAndNavigateBack() async {
-    // Here you can perform any confirmation logic
-    // For this example, let's just navigate back
-    Navigator.of(context).pop();
+  Future<String?> uploadImage(File imageFile) async {
+    try {
+      String ref = 'images/img-${DateTime.now().millisecondsSinceEpoch}.jpg';
+      UploadTask uploadTask = firebaseStorage.ref(ref).putFile(imageFile);
+
+      await uploadTask.whenComplete(() => _loadImage());
+
+      return await firebaseStorage.ref(ref).getDownloadURL();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error uploading image: $e');
+      }
+      return null;
+    }
   }
 
   @override
@@ -160,5 +182,11 @@ class _StoragePageState extends State<StoragePage> {
         ),
       ),
     );
+  }
+
+  Future<void> _confirmAndNavigateBack() async {
+    // Here you can perform any confirmation logic
+    // For this example, let's just navigate back
+    Navigator.of(context).pop(_uploadedImageUrl);
   }
 }
