@@ -1,6 +1,7 @@
-import 'package:churchapp/views/login/login.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/login/login.dart';
 import 'package:churchapp/views/home/home.dart';
 
 class Root extends StatefulWidget {
@@ -21,6 +22,15 @@ enum AuthStatus {
 class _RootState extends State<Root> {
   AuthStatus _authStatus = AuthStatus.notDetermined;
   late String _currentUserId;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -29,10 +39,24 @@ class _RootState extends State<Root> {
   }
 
   void _checkLoginStatus() async {
-    bool isLoggedIn = await widget.auth.isLoggedIn();
-    setState(() {
-      _authStatus = isLoggedIn ? AuthStatus.loggedIn : AuthStatus.notLoggedIn;
-    });
+    try {
+      bool isLoggedIn = await widget.auth.isLoggedIn();
+      if (mounted) {
+        setState(() {
+          _authStatus =
+              isLoggedIn ? AuthStatus.loggedIn : AuthStatus.notLoggedIn;
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error checking login status: $e');
+      }
+      if (mounted) {
+        setState(() {
+          _authStatus = AuthStatus.notLoggedIn;
+        });
+      }
+    }
   }
 
   @override
@@ -46,18 +70,7 @@ class _RootState extends State<Root> {
           onLoggedIn: _handleLoggedIn,
         );
       case AuthStatus.loggedIn:
-        // Navega para a tela Home após o login
-        return Navigator(
-          onGenerateRoute: (settings) {
-            return MaterialPageRoute(
-              builder: (context) => Home(
-                auth: widget.auth,
-                userId: _currentUserId,
-                onSignedOut: _handleSignedOut,
-              ),
-            );
-          },
-        );
+        return _buildHomeScreen();
     }
   }
 
@@ -69,15 +82,34 @@ class _RootState extends State<Root> {
     );
   }
 
-  void _handleLoggedIn() {
-    setState(() {
-      _authStatus = AuthStatus.loggedIn;
+  Widget _buildHomeScreen() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => Home(
+            auth: widget.auth,
+            userId: _currentUserId,
+            onSignedOut: _handleSignedOut,
+          ),
+        ),
+      );
     });
+    return _buildLoadingScreen();
+  }
+
+  void _handleLoggedIn() {
+    if (mounted) {
+      setState(() {
+        _authStatus = AuthStatus.loggedIn;
+      });
+    }
   }
 
   void _handleSignedOut() {
-    setState(() {
-      _authStatus = AuthStatus.notLoggedIn;
-    });
+    if (mounted) {
+      setState(() {
+        _authStatus = AuthStatus.notLoggedIn;
+      });
+    }
   }
 }
