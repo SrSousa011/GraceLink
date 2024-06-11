@@ -11,6 +11,7 @@ class AvatarSection extends StatelessWidget {
 
   final String name;
   final String location;
+  final bool canReturn = false;
 
   @override
   Widget build(BuildContext context) {
@@ -109,31 +110,39 @@ class UserProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('User Profile'),
-      ),
-      drawer: NavBar(
-        auth: AuthenticationService(),
-        authService: AuthenticationService(),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const AvatarSection(
-              name: 'Anaïs',
-              location: 'New York, USA',
-            ),
-            const SizedBox(height: 20),
-            FollowButton(
-              onPressed: () {
-                // Add your action here
-              },
-            ),
-            const SizedBox(height: 50),
-            const PhotoGrid(),
-          ],
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) {
+          return;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('User Profile'),
+        ),
+        drawer: NavBar(
+          auth: AuthenticationService(),
+          authService: AuthenticationService(),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const AvatarSection(
+                name: 'Anaïs',
+                location: 'New York, USA',
+              ),
+              const SizedBox(height: 20),
+              FollowButton(
+                onPressed: () {
+                  // Add your action here
+                },
+              ),
+              const SizedBox(height: 50),
+              const PhotoGrid(),
+            ],
+          ),
         ),
       ),
     );
