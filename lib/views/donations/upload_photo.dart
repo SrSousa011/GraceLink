@@ -1,148 +1,45 @@
-import 'dart:async';
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
+import 'package:churchapp/views/donations/donations.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StoragePage extends StatefulWidget {
-  const StoragePage({Key? key}) : super(key: key);
+  const StoragePage({super.key});
 
   @override
   State<StoragePage> createState() => _StoragePageState();
 }
 
 class _StoragePageState extends State<StoragePage> {
-  final FirebaseStorage storage = FirebaseStorage.instance;
   final ImagePicker _picker = ImagePicker();
-  Reference? _uploadedImageRef;
   String? _uploadedImageUrl;
-  bool _uploading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadImage();
-  }
-
-  Future<bool> _clearUploadedImageState() async {
-    Completer<bool> completer = Completer<bool>();
-
-    try {
-      if (_uploadedImageRef != null) {
-        await _uploadedImageRef!.delete();
-      }
-      setState(() {
-        _uploadedImageUrl = null;
-        _uploadedImageRef = null;
-      });
-      completer.complete(true);
-    } catch (e) {
-      completer.complete(false);
-    }
-
-    return completer.future;
-  }
-
-  Future<void> _loadImage() async {
-    try {
-      ListResult result = await storage.ref('images').listAll();
-      if (result.items.isNotEmpty) {
-        // Load only the first image if exists
-        _uploadedImageRef = result.items[0];
-        _uploadedImageUrl = await _uploadedImageRef!.getDownloadURL();
-      } else {
-        _uploadedImageRef = null;
-        _uploadedImageUrl = null;
-      }
-      setState(() {
-        _uploading = false;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error loading image: $e');
-      }
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error loading image')),
-        );
-      }
-      setState(() {
-        _uploading = false;
-      });
-    }
-  }
+  final bool _uploading = false;
 
   Future<void> _uploadImage() async {
     XFile? file = await _picker.pickImage(source: ImageSource.gallery);
     if (file != null && context.mounted) {
       try {
-        File uploadFile = File(file.path);
-        String ref = 'images/img-${DateTime.now().millisecondsSinceEpoch}.jpg';
-        UploadTask uploadTask = storage.ref(ref).putFile(uploadFile);
-
-        uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
-          setState(() {
-            _uploading = true;
-          });
-        }, onError: (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Upload Error')),
-          );
-        });
-
-        // Wait for the upload to complete
-        await uploadTask.whenComplete(() async {
-          // Get the download URL
-          _uploadedImageUrl = await storage.ref(ref).getDownloadURL();
-
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('File Uploaded Successfully')),
-            );
-          }
-        });
-
+        // Example of how to use the picked image (not uploading it)
         setState(() {
-          _uploading = false;
+          _uploadedImageUrl = file.path; // Use the local file path
         });
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Upload Error')),
+            const SnackBar(content: Text('Error uploading image')),
           );
         }
       }
     }
   }
 
-  Future<void> _removeImage() async {
-    try {
-      if (_uploadedImageRef != null) {
-        await _uploadedImageRef!.delete();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('File Removed Successfully')),
-          );
-        }
-        setState(() {
-          _uploadedImageRef = null;
-          _uploadedImageUrl = null;
-        });
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error removing image: $e');
-      }
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error removing image')),
-        );
-      }
-    }
+  void _removeImage() {
+    setState(() {
+      _uploadedImageUrl = null;
+    });
   }
 
   Future<void> _confirmAndNavigateBack() async {
@@ -164,8 +61,13 @@ class _StoragePageState extends State<StoragePage> {
           );
         }
 
-        Navigator.of(context).pop(_uploadedImageUrl);
-        await _clearUploadedImageState();
+        if (mounted) {
+          // Navigate to DonationsPage and replace the current page
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const Donations()),
+          );
+        }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -188,7 +90,7 @@ class _StoragePageState extends State<StoragePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Firebase Storage'),
+        title: const Text('Donation Page'),
         elevation: 0,
         actions: [
           if (_uploading)
@@ -228,8 +130,8 @@ class _StoragePageState extends State<StoragePage> {
                     ClipRRect(
                       borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(10.0)),
-                      child: Image.network(
-                        _uploadedImageUrl!,
+                      child: Image.file(
+                        File(_uploadedImageUrl!),
                         width: double.infinity,
                         height: 300,
                         fit: BoxFit.cover,
