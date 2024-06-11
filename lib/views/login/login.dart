@@ -20,6 +20,13 @@ class _LoginState extends State<Login> {
   bool _isPasswordVisible = false;
 
   @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -162,14 +169,16 @@ class _LoginState extends State<Login> {
           password: _passwordController.text,
         );
         if (mounted) {
+          if (widget.onLoggedIn != null) {
+            widget.onLoggedIn!();
+          }
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => Home(
                 auth: widget.auth,
-                userId:
-                    'userID', // Substitua 'userID' pelo ID de usuário correto
-                onSignedOut: () {}, // Pode definir isso conforme necessário
+                userId: 'userID', // Replace with the actual user ID
+                onSignedOut: () {}, // Define this as needed
               ),
             ),
           );
