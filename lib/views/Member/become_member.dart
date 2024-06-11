@@ -66,40 +66,48 @@ class _BecomeMemberState extends State<BecomeMember> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Become a Member'),
-      ),
-      drawer: NavBar(
-        auth: AuthenticationService(),
-        authService: AuthenticationService(),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildDateOfBirthSection(),
-                const SizedBox(height: 20.0),
-                _buildFullNameSection(),
-                const SizedBox(height: 20.0),
-                _buildPhoneNumberSection(),
-                const SizedBox(height: 20.0),
-                _buildLastVisitedChurchSection(),
-                const SizedBox(height: 20.0),
-                _buildCivilStatusSection(),
-                const SizedBox(height: 20.0),
-                _buildAdressSection(),
-                const SizedBox(height: 20.0),
-                _buildReasonForMembershipSection(),
-                const SizedBox(height: 20.0),
-                _buildReferenceSection(),
-                const SizedBox(height: 20.0),
-                _buildSignUpButton(),
-              ],
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) {
+          return;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Become a Member'),
+        ),
+        drawer: NavBar(
+          auth: AuthenticationService(),
+          authService: AuthenticationService(),
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildDateOfBirthSection(),
+                  const SizedBox(height: 20.0),
+                  _buildFullNameSection(),
+                  const SizedBox(height: 20.0),
+                  _buildPhoneNumberSection(),
+                  const SizedBox(height: 20.0),
+                  _buildLastVisitedChurchSection(),
+                  const SizedBox(height: 20.0),
+                  _buildCivilStatusSection(),
+                  const SizedBox(height: 20.0),
+                  _buildAdressSection(),
+                  const SizedBox(height: 20.0),
+                  _buildReasonForMembershipSection(),
+                  const SizedBox(height: 20.0),
+                  _buildReferenceSection(),
+                  const SizedBox(height: 20.0),
+                  _buildSignUpButton(),
+                ],
+              ),
             ),
           ),
         ),
@@ -394,6 +402,7 @@ class DateOfBirthDropdowns extends StatelessWidget {
   final ValueChanged<int?> onChangedDay;
   final ValueChanged<int?> onChangedMonth;
   final ValueChanged<int?> onChangedYear;
+  final bool canReturn = false;
 
   const DateOfBirthDropdowns({
     super.key,

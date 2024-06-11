@@ -15,6 +15,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
   late TextEditingController _locationController;
+  final bool canReturn = false;
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
 
@@ -123,28 +124,36 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Atualizar Evento'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTitleEvent(),
-            const SizedBox(height: 20.0),
-            _buildDescriptionEvent(),
-            const SizedBox(height: 20.0),
-            _buildSlectDate(),
-            const SizedBox(height: 20.0),
-            _builSelecTime(),
-            const SizedBox(height: 20.0),
-            _builSelecLocation(),
-            const SizedBox(height: 20.0),
-            _buildUpdateButton(),
-            const SizedBox(height: 20.0),
-          ],
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) {
+          return;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Atualizar Evento'),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTitleEvent(),
+              const SizedBox(height: 20.0),
+              _buildDescriptionEvent(),
+              const SizedBox(height: 20.0),
+              _buildSlectDate(),
+              const SizedBox(height: 20.0),
+              _builSelecTime(),
+              const SizedBox(height: 20.0),
+              _builSelecLocation(),
+              const SizedBox(height: 20.0),
+              _buildUpdateButton(),
+              const SizedBox(height: 20.0),
+            ],
+          ),
         ),
       ),
     );
