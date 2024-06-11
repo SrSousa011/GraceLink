@@ -1,13 +1,15 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StoragePage extends StatefulWidget {
-  const StoragePage({super.key});
+  const StoragePage({Key? key}) : super(key: key);
 
   @override
   State<StoragePage> createState() => _StoragePageState();
@@ -19,8 +21,6 @@ class _StoragePageState extends State<StoragePage> {
   Reference? _uploadedImageRef;
   String? _uploadedImageUrl;
   bool _uploading = false;
-  String? uploadStatus;
-  String? uploadedFileURL;
 
   @override
   void initState() {
@@ -36,8 +36,7 @@ class _StoragePageState extends State<StoragePage> {
         await _uploadedImageRef!.delete();
       }
       setState(() {
-        uploadStatus = null;
-        uploadedFileURL = null;
+        _uploadedImageUrl = null;
         _uploadedImageRef = null;
       });
       completer.complete(true);
@@ -95,13 +94,21 @@ class _StoragePageState extends State<StoragePage> {
           );
         });
 
-        await uploadTask.whenComplete(() => _loadImage());
+        // Wait for the upload to complete
+        await uploadTask.whenComplete(() async {
+          // Get the download URL
+          _uploadedImageUrl = await storage.ref(ref).getDownloadURL();
 
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('File Uploaded Successfully')),
-          );
-        }
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('File Uploaded Successfully')),
+            );
+          }
+        });
+
+        setState(() {
+          _uploading = false;
+        });
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -135,6 +142,45 @@ class _StoragePageState extends State<StoragePage> {
           const SnackBar(content: Text('Error removing image')),
         );
       }
+    }
+  }
+
+  Future<void> _confirmAndNavigateBack() async {
+    if (_uploadedImageUrl != null) {
+      try {
+        // Save donation details to Firestore
+        await FirebaseFirestore.instance.collection('donations').add({
+          'userId': FirebaseAuth.instance.currentUser!.uid,
+          'fullName': 'Sergio Ribas Camargo',
+          'donationType': 'Type',
+          'donationValue': 'Value',
+          'photoURL': _uploadedImageUrl,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Donation successfully completed')),
+          );
+        }
+
+        Navigator.of(context).pop(_uploadedImageUrl);
+        await _clearUploadedImageState();
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to complete donation: $e'),
+            ),
+          );
+        }
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please upload an image before confirming.'),
+        ),
+      );
     }
   }
 
@@ -231,12 +277,5 @@ class _StoragePageState extends State<StoragePage> {
         ),
       ),
     );
-  }
-
-  Future<void> _confirmAndNavigateBack() async {
-    // Here you can perform any confirmation logic
-    // For this example, let's just navigate back
-    Navigator.of(context).pop(_uploadedImageUrl);
-    await _clearUploadedImageState(); // Adicionado para limpar o estado após confirmar
   }
 }
