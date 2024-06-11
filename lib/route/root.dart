@@ -4,7 +4,7 @@ import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/home/home.dart';
 
 class Root extends StatefulWidget {
-  const Root({Key? key, required this.auth}) : super(key: key);
+  const Root({super.key, required this.auth});
 
   final BaseAuth auth;
 
@@ -32,13 +32,6 @@ class _RootState extends State<Root> {
     bool isLoggedIn = await widget.auth.isLoggedIn();
     setState(() {
       _authStatus = isLoggedIn ? AuthStatus.loggedIn : AuthStatus.notLoggedIn;
-    });
-  }
-
-  void _updateAuthStatus(AuthStatus status, String userId) {
-    setState(() {
-      _authStatus = status;
-      _currentUserId = userId;
     });
   }
 
