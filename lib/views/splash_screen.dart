@@ -1,7 +1,7 @@
 import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:churchapp/views/welcome.dart';
+import 'package:churchapp/theme/welcome.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key, required NavBar drawer, required root});

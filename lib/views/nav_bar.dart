@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:churchapp/services/auth_service.dart';
-import 'package:churchapp/views/welcome.dart';
+import 'package:churchapp/theme/welcome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
