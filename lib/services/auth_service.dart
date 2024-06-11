@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class BaseAuth {
   Future<UserCredential> createUserWithEmailAndPassword({
@@ -40,6 +41,7 @@ abstract class BaseAuth {
 
 class AuthenticationService implements BaseAuth {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Future<void> signUpWithPersonalInfo({
@@ -115,6 +117,24 @@ class AuthenticationService implements BaseAuth {
   }
 
   @override
+  Future<String?> getCurrentUserName() async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        DocumentSnapshot snapshot =
+            await _firestore.collection('users').doc(user.uid).get();
+        return snapshot.get('fullName');
+      }
+      return null;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting current user name: $e');
+      }
+      rethrow;
+    }
+  }
+
+  @override
   Future<void> signOut({VoidCallback? onSignedOut}) async {
     await FirebaseAuth.instance.signOut();
     onSignedOut?.call();
@@ -149,22 +169,5 @@ class AuthenticationService implements BaseAuth {
   Future<bool> isLoggedIn() async {
     User? user = _auth.currentUser;
     return user != null;
-  }
-
-  @override
-  Future<String?> getCurrentUserName() async {
-    try {
-      User? user = _auth.currentUser;
-      if (user != null) {
-        return user.displayName;
-      } else {
-        return null;
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error getting current user name: $e');
-      }
-      return null;
-    }
   }
 }
