@@ -158,15 +158,18 @@ class _DonationsState extends State<Donations> {
                   donationType: donationType,
                 ),
                 const SizedBox(height: 20.0),
-                ElevatedButton(
-                  onPressed: () {
-                    navigateToDonationDetailsScreen(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: const Color(0xFF5AAFf9),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      navigateToDonationDetailsScreen(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: const Color(0xFF5AAFf9),
+                    ),
+                    child: const Text('Next'),
                   ),
-                  child: const Text('Next'),
                 ),
               ],
             ),
