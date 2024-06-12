@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 class AboutUs extends StatelessWidget {
   const AboutUs({super.key});
-  final bool canReturn = false;
 
   @override
   Widget build(BuildContext context) {

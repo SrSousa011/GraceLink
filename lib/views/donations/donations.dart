@@ -126,42 +126,50 @@ class _DonationsState extends State<Donations> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Donations'),
-      ),
-      drawer: NavBar(
-        auth: AuthenticationService(),
-        authService: AuthenticationService(),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const SizedBox(height: 20.0),
-              DonationValue(
-                controller: donationController,
-                donationController: donationController,
-                onValueChanged: (value) {},
-              ),
-              DonationType(
-                onTypeSelected: onTypeSelected,
-                donationType: donationType,
-              ),
-              const SizedBox(height: 20.0),
-              ElevatedButton(
-                onPressed: () {
-                  navigateToDonationDetailsScreen(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: const Color(0xFF5AAFf9),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) {
+          return;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Donations'),
+        ),
+        drawer: NavBar(
+          auth: AuthenticationService(),
+          authService: AuthenticationService(),
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const SizedBox(height: 20.0),
+                DonationValue(
+                  controller: donationController,
+                  donationController: donationController,
+                  onValueChanged: (value) {},
                 ),
-                child: const Text('Next'),
-              ),
-            ],
+                DonationType(
+                  onTypeSelected: onTypeSelected,
+                  donationType: donationType,
+                ),
+                const SizedBox(height: 20.0),
+                ElevatedButton(
+                  onPressed: () {
+                    navigateToDonationDetailsScreen(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(0xFF5AAFf9),
+                  ),
+                  child: const Text('Next'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
