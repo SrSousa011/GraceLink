@@ -301,10 +301,8 @@ class _BecomeMemberState extends State<BecomeMember> {
     return ElevatedButton(
       onPressed: _isLoading ? null : _validateAndSubmit,
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color.fromARGB(255, 90, 175, 249),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
-        ),
+        foregroundColor: Colors.white,
+        backgroundColor: const Color(0xFF5AAFf9),
       ),
       child: const Text('Submit'),
     );
