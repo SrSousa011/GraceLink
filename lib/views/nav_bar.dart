@@ -1,50 +1,24 @@
-import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/theme/welcome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:churchapp/views/user_profile.dart';
 
 class NavBar extends StatelessWidget {
   final BaseAuth auth;
   final AuthenticationService authService;
   final VoidCallback? notLoggedIn; // Callback can be null
+  final String? fullName; // Added fullName parameter
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  NavBar(
-      {super.key,
-      required this.auth,
-      required this.authService,
-      this.notLoggedIn});
-
-  Future<void> signUserOut(BuildContext context) async {
-    try {
-      await authService.signOut(onSignedOut: () {
-        Navigator.pop(context); // Close the drawer after signing out
-        // Call the callback function after logout is completed
-        notLoggedIn?.call();
-        // Navigate to the login screen and remove all previous routes
-        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (BuildContext context) {
-              return Welcome(
-                title: '',
-                onSignedIn: () {},
-              );
-            },
-          ),
-          (route) => false, // Remove all routes except the newly pushed route
-        );
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error signing out: $e');
-      }
-      // Handle error gracefully
-    }
-  }
+  NavBar({
+    super.key,
+    required this.auth,
+    required this.authService,
+    this.notLoggedIn,
+    this.fullName, // Initialize fullName in the constructor
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +26,9 @@ class NavBar extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          const DrawerHeaderWidget(),
+          DrawerHeaderWidget(
+            fullName: fullName,
+          ),
           const DrawerMenuItem(
             title: 'Home',
             icon: Icons.home_outlined,
@@ -152,7 +128,12 @@ class DrawerMenuItem extends StatelessWidget {
 }
 
 class DrawerHeaderWidget extends StatelessWidget {
-  const DrawerHeaderWidget({super.key});
+  final String? fullName;
+
+  const DrawerHeaderWidget({
+    super.key,
+    required this.fullName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -175,18 +156,18 @@ class DrawerHeaderWidget extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const UserProfile()),
             );
           },
-          child: const Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 72,
                 backgroundImage:
                     AssetImage('assets/imagens/profile_picture.jpg'),
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Text(
-                'Anaïs',
-                style: TextStyle(fontSize: 20, color: Colors.white),
+                fullName ?? 'Loading...',
+                style: const TextStyle(fontSize: 20, color: Colors.white),
               ),
             ],
           ),
