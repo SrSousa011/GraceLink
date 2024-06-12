@@ -60,7 +60,11 @@ class _VideosState extends State<Videos> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _launchURL,
-                child: const Text('Abrir no YouTube'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: const Color(0xFF5AAFf9),
+                ),
+                child: const Text('Past Video'),
               ),
             ],
           ),
