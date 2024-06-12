@@ -5,13 +5,12 @@ import 'package:flutter/material.dart';
 class AvatarSection extends StatelessWidget {
   const AvatarSection({
     super.key,
-    required this.name,
+    required this.fullName,
     required this.location,
   });
 
-  final String name;
+  final String? fullName;
   final String location;
-  final bool canReturn = false;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +24,7 @@ class AvatarSection extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Text(
-          name,
+          fullName ?? 'Loading...',
           style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -52,30 +51,28 @@ class AvatarSection extends StatelessWidget {
   }
 }
 
-class FollowButton extends StatelessWidget {
-  const FollowButton({super.key, required this.onPressed});
-
-  final VoidCallback onPressed;
+class PhotoGrid extends StatefulWidget {
+  const PhotoGrid({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.blue,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      ),
-      child: const Text(
-        'Follow',
-        style: TextStyle(fontSize: 20),
-      ),
-    );
-  }
+  State<PhotoGrid> createState() => _PhotoGridState();
 }
 
-class PhotoGrid extends StatelessWidget {
-  const PhotoGrid({super.key});
+class _PhotoGridState extends State<PhotoGrid> {
+  String? fullName;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    fullName = await AuthenticationService().getCurrentUserName();
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,8 +102,28 @@ class PhotoGrid extends StatelessWidget {
   }
 }
 
-class UserProfile extends StatelessWidget {
+class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
+
+  @override
+  State<UserProfile> createState() => _UserProfileState();
+}
+
+class _UserProfileState extends State<UserProfile> {
+  String? fullName;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    fullName = await AuthenticationService().getCurrentUserName();
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,15 +146,9 @@ class UserProfile extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const AvatarSection(
-                name: 'Anaïs',
+              AvatarSection(
+                fullName: fullName,
                 location: 'New York, USA',
-              ),
-              const SizedBox(height: 20),
-              FollowButton(
-                onPressed: () {
-                  // Add your action here
-                },
               ),
               const SizedBox(height: 50),
               const PhotoGrid(),
