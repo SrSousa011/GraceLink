@@ -284,7 +284,7 @@ class AuthenticationService implements BaseAuth {
       // Aqui você poderia também implementar um sistema de confirmação para o email atual
 
       // Atualizar o email no perfil do usuário
-      await user?.updateEmail(newEmail);
+      await user?.verifyBeforeUpdateEmail(newEmail);
 
       // Atualizar o nome de usuário no Firestore, supondo que você tenha armazenado o nome de usuário lá
       await _firestore.collection('users').doc(user?.uid).update({
@@ -301,7 +301,7 @@ class AuthenticationService implements BaseAuth {
       if (kDebugMode) {
         print("Email can't be changed: ${error.toString()}");
       }
-      throw error;
+      rethrow;
     }
   }
 
