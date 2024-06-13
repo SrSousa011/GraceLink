@@ -7,8 +7,8 @@ import 'package:churchapp/views/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
 import 'package:churchapp/views/home/home.dart';
 import 'package:churchapp/views/member/become_member.dart';
-import 'package:churchapp/views/events/events.dart'; // Import the EventsPage widget
-import 'package:churchapp/views/user_profile.dart';
+import 'package:churchapp/views/events/events.dart';
+import 'package:churchapp/views/user_Profile/user_profile.dart';
 import 'package:flutter/material.dart';
 
 class AppRoutes {

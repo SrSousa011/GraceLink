@@ -29,9 +29,17 @@ abstract class BaseAuth {
 
   Future<void> changePassword(String password);
 
+  Future<void> changeEmailWithConfirmation(
+      String currentEmail, String newEmail);
+
+  Future<void> changePasswordWithConfirmation(
+      String currentPassword, String newPassword);
+
   Future<void> signOut({VoidCallback? onSignedOut});
 
   Future<bool> isLoggedIn();
+
+  Future<String?> getCurrentUserEmail();
 
   // New methods for signing up
   Future<void> signUpWithPersonalInfo({
@@ -261,6 +269,79 @@ class AuthenticationService implements BaseAuth {
       await user?.delete();
     } catch (e) {
       throw Exception('Failed to delete account: $e');
+    }
+  }
+
+  @override
+  Future<void> changeEmailWithConfirmation(
+      String currentEmail, String newEmail) async {
+    User? user = _firebaseAuth.currentUser;
+
+    try {
+      // Confirmar que o usuário quer alterar o email
+      await user?.verifyBeforeUpdateEmail(newEmail);
+
+      // Aqui você poderia também implementar um sistema de confirmação para o email atual
+
+      // Atualizar o email no perfil do usuário
+      await user?.updateEmail(newEmail);
+
+      // Atualizar o nome de usuário no Firestore, supondo que você tenha armazenado o nome de usuário lá
+      await _firestore.collection('users').doc(user?.uid).update({
+        'email': newEmail,
+      });
+
+      // Enviar um email de verificação para o novo email
+      await user?.sendEmailVerification();
+
+      if (kDebugMode) {
+        print("Successfully changed email");
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print("Email can't be changed: ${error.toString()}");
+      }
+      throw error;
+    }
+  }
+
+  @override
+  Future<void> changePasswordWithConfirmation(
+      String currentPassword, String newPassword) async {
+    User? user = _firebaseAuth.currentUser;
+
+    try {
+      // Reautenticar o usuário antes de mudar a senha
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: user?.email ?? '',
+        password: currentPassword,
+      );
+      await user?.reauthenticateWithCredential(credential);
+
+      // Atualizar a senha do usuário
+      await user?.updatePassword(newPassword);
+
+      if (kDebugMode) {
+        print("Successfully changed password");
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print("Password can't be changed: ${error.toString()}");
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String?> getCurrentUserEmail() async {
+    try {
+      User? user = _firebaseAuth.currentUser;
+      return user?.email;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting current user email: $e');
+      }
+      rethrow;
     }
   }
 }
