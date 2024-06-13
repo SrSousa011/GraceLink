@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AvatarSection extends StatefulWidget {
   const AvatarSection({
@@ -16,6 +18,23 @@ class AvatarSection extends StatefulWidget {
 
 class _AvatarSectionState extends State<AvatarSection> {
   bool isAvatarTapped = false;
+  final ImagePicker _picker = ImagePicker();
+  String? _uploadedImageUrl;
+
+  Future<void> _uploadImage() async {
+    XFile? file = await _picker.pickImage(source: ImageSource.gallery);
+    if (file != null && mounted) {
+      setState(() {
+        _uploadedImageUrl = file.path; // Use the local file path
+      });
+    }
+  }
+
+  void _removeImage() {
+    setState(() {
+      _uploadedImageUrl = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +48,33 @@ class _AvatarSectionState extends State<AvatarSection> {
               isAvatarTapped = !isAvatarTapped;
             });
           },
-          child: CircleAvatar(
-            radius: isAvatarTapped ? 150 : 100, // Larger radius when tapped
-            backgroundImage:
-                const AssetImage('assets/imagens/profile_picture.jpg'),
+          child: Stack(
+            children: [
+              CircleAvatar(
+                radius: isAvatarTapped ? 150 : 100, // Larger radius when tapped
+                backgroundImage: _uploadedImageUrl != null
+                    ? FileImage(File(_uploadedImageUrl!))
+                    : const AssetImage('assets/imagens/avatar.png')
+                        as ImageProvider,
+              ),
+              Positioned(
+                bottom: -10,
+                left: 150,
+                child: IconButton(
+                  onPressed: _uploadImage,
+                  icon: const Icon(Icons.add_a_photo),
+                  color: Colors.blue,
+                ),
+              ),
+            ],
           ),
         ),
+        const SizedBox(height: 10),
+        if (_uploadedImageUrl != null)
+          ElevatedButton(
+            onPressed: _removeImage,
+            child: const Text('Remove Image'),
+          ),
         const SizedBox(height: 10),
         Text(
           widget.fullName ?? 'Loading...',
