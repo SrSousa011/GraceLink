@@ -27,24 +27,6 @@ class _UserProfileState extends State<UserProfile> {
     }
   }
 
-  void _sendPasswordResetEmail(BuildContext context) async {
-    String? email = await AuthenticationService().getCurrentUserEmail();
-    if (email != null) {
-      try {
-        await AuthenticationService().sendPasswordResetEmail(email);
-        if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password reset email sent')),
-        );
-      } catch (e) {
-        if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to send password reset email: $e')),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,14 +51,17 @@ class _UserProfileState extends State<UserProfile> {
         authService: AuthenticationService(),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AvatarSection(
-              fullName: fullName,
-              location: 'New York, USA',
-            ),
-          ],
+        child: Container(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              AvatarSection(
+                fullName: fullName,
+                location: 'New York, USA',
+              ),
+            ],
+          ),
         ),
       ),
     );
