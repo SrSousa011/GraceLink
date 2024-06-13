@@ -1,8 +1,8 @@
+import 'package:churchapp/views/user_Profile/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/theme/welcome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:churchapp/views/user_Profile/user_profile.dart';
 
 class NavBar extends StatelessWidget {
   final BaseAuth auth;
