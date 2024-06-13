@@ -71,6 +71,10 @@ class ChangeEmailScreen extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => _changeEmail(context),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: const Color(0xFF5AAFf9),
+              ),
               child: const Text('Change Email'),
             ),
           ],
