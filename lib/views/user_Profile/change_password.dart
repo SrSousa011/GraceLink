@@ -27,6 +27,7 @@ class ChangePasswordScreen extends StatelessWidget {
     try {
       await AuthenticationService()
           .changePasswordWithConfirmation(currentPassword, newPassword);
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Password changed successfully')),
       );
