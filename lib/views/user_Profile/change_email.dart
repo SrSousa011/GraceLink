@@ -6,6 +6,8 @@ class ChangeEmailScreen extends StatelessWidget {
   final TextEditingController _newEmailController = TextEditingController();
   final TextEditingController _confirmEmailController = TextEditingController();
 
+  ChangeEmailScreen({super.key});
+
   void _changeEmail(BuildContext context) async {
     String currentEmail = _currentEmailController.text.trim();
     String newEmail = _newEmailController.text.trim();
@@ -22,6 +24,7 @@ class ChangeEmailScreen extends StatelessWidget {
     try {
       await AuthenticationService()
           .changeEmailWithConfirmation(currentEmail, newEmail);
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Email changed successfully')),
       );
