@@ -47,10 +47,12 @@ class SettingsScreen extends StatelessWidget {
               if (email != null) {
                 try {
                   await AuthenticationService().sendPasswordResetEmail(email);
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Password reset email sent')),
                   );
                 } catch (e) {
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                         content:
