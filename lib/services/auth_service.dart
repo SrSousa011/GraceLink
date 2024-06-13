@@ -14,7 +14,20 @@ abstract class BaseAuth {
   });
 
   Future<String?> getCurrentUserId();
+
   Future<String?> getCurrentUserName();
+
+  Future<void> sendEmailVerification();
+
+  Future<bool> isEmailVerified();
+
+  Future<void> deleteUser();
+
+  Future<void> sendPasswordResetMail(String email);
+
+  Future<void> changeEmail(String email);
+
+  Future<void> changePassword(String password);
 
   Future<void> signOut({VoidCallback? onSignedOut});
 
@@ -40,7 +53,7 @@ abstract class BaseAuth {
 }
 
 class AuthenticationService implements BaseAuth {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
@@ -72,7 +85,7 @@ class AuthenticationService implements BaseAuth {
     }
     try {
       // Implement sign-up with email and password
-      await _auth.createUserWithEmailAndPassword(
+      await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: email, // Use email as password for demonstration purpose
       );
@@ -92,7 +105,7 @@ class AuthenticationService implements BaseAuth {
     required String password,
   }) async {
     try {
-      return await _auth.createUserWithEmailAndPassword(
+      return await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -106,7 +119,7 @@ class AuthenticationService implements BaseAuth {
   @override
   Future<String?> getCurrentUserId() async {
     try {
-      User? user = _auth.currentUser;
+      User? user = _firebaseAuth.currentUser;
       return user?.uid;
     } catch (e) {
       if (kDebugMode) {
@@ -119,7 +132,7 @@ class AuthenticationService implements BaseAuth {
   @override
   Future<String?> getCurrentUserName() async {
     try {
-      User? user = _auth.currentUser;
+      User? user = _firebaseAuth.currentUser;
       if (user != null) {
         DocumentSnapshot snapshot =
             await _firestore.collection('users').doc(user.uid).get();
@@ -136,7 +149,7 @@ class AuthenticationService implements BaseAuth {
 
   @override
   Future<void> signOut({VoidCallback? onSignedOut}) async {
-    await FirebaseAuth.instance.signOut();
+    await _firebaseAuth.signOut();
     onSignedOut?.call();
   }
 
@@ -146,11 +159,12 @@ class AuthenticationService implements BaseAuth {
     required String password,
   }) async {
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      UserCredential userCredential =
+          await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      await FirebaseAuth.instance.currentUser?.getIdToken(true);
+      await _firebaseAuth.currentUser?.getIdToken(true);
       return userCredential;
     } on FirebaseAuthException catch (e) {
       if (kDebugMode) {
@@ -167,7 +181,86 @@ class AuthenticationService implements BaseAuth {
 
   @override
   Future<bool> isLoggedIn() async {
-    User? user = _auth.currentUser;
+    User? user = _firebaseAuth.currentUser;
     return user != null;
+  }
+
+  @override
+  Future<void> sendEmailVerification() async {
+    User? user = _firebaseAuth.currentUser;
+    await user?.sendEmailVerification();
+  }
+
+  @override
+  Future<bool> isEmailVerified() async {
+    User? user = _firebaseAuth.currentUser;
+    return user?.emailVerified ?? false;
+  }
+
+  @override
+  Future<void> changeEmail(String email) async {
+    User? user = _firebaseAuth.currentUser;
+    try {
+      await user?.verifyBeforeUpdateEmail(email);
+      if (kDebugMode) {
+        print("Successfully changed email");
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print("Email can't be changed: ${error.toString()}");
+      }
+    }
+  }
+
+  @override
+  Future<void> changePassword(String password) async {
+    User? user = _firebaseAuth.currentUser;
+    try {
+      await user?.updatePassword(password);
+      if (kDebugMode) {
+        print("Successfully changed password");
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print("Password can't be changed: ${error.toString()}");
+      }
+    }
+  }
+
+  @override
+  Future<void> deleteUser() async {
+    User? user = _firebaseAuth.currentUser;
+    try {
+      await user?.delete();
+      if (kDebugMode) {
+        print("Successfully deleted user");
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print("User can't be deleted: ${error.toString()}");
+      }
+    }
+  }
+
+  @override
+  Future<void> sendPasswordResetMail(String email) async {
+    await _firebaseAuth.sendPasswordResetEmail(email: email);
+  }
+
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      throw Exception('Failed to send password reset email: $e');
+    }
+  }
+
+  Future<void> deleteAccount() async {
+    try {
+      final user = _firebaseAuth.currentUser;
+      await user?.delete();
+    } catch (e) {
+      throw Exception('Failed to delete account: $e');
+    }
   }
 }
