@@ -33,11 +33,18 @@ class _AvatarSectionState extends State<AvatarSection> {
   }
 
   Future<void> fetchData() async {
-    fullName = await AuthenticationService().getCurrentUserName();
-    if (mounted) {
-      setState(() {
-        isLoading = false;
-      });
+    try {
+      fullName = await AuthenticationService().getCurrentUserName();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching full name: $e');
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -77,13 +84,11 @@ class _AvatarSectionState extends State<AvatarSection> {
       String resp =
           await StoreData().saveData(file: imageFile.readAsBytesSync());
       if (resp == 'Success') {
-        // Imagem salva com sucesso
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Imagem salva com sucesso')),
         );
       } else {
-        // Lidar com erro
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Falha ao salvar imagem: $resp')),
@@ -120,8 +125,7 @@ class _AvatarSectionState extends State<AvatarSection> {
             child: Stack(
               children: [
                 CircleAvatar(
-                  radius:
-                      isAvatarTapped ? 150 : 100, // Maior raio quando tocado
+                  radius: isAvatarTapped ? 150 : 100,
                   backgroundImage: _uploadedImageUrl != null
                       ? Image.network(_uploadedImageUrl!).image
                       : const AssetImage('assets/imagens/avatar.png'),
@@ -148,36 +152,36 @@ class _AvatarSectionState extends State<AvatarSection> {
             onPressed: _saveImage,
             child: const Text('Salvar Imagem'),
           ),
-          const SizedBox(height: 10),
-          isLoading
-              ? const CircularProgressIndicator() // Mostra indicador de carregamento
-              : Column(
-                  children: [
-                    Text(
-                      fullName ?? 'Carregando...',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.location_on, color: Colors.blue),
-                        const SizedBox(width: 5),
-                        Text(
-                          widget.location,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.blue,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+          const SizedBox(height: 20),
+          if (isLoading) ...[
+            const CircularProgressIndicator(),
+            const SizedBox(height: 10),
+            const Text('Carregando...'),
+          ] else ...[
+            Text(
+              fullName ?? 'Nome não disponível',
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.location_on, color: Colors.blue),
+                const SizedBox(width: 5),
+                Text(
+                  widget.location,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.blue,
+                  ),
                 ),
+              ],
+            ),
+          ],
         ],
       ),
     );
