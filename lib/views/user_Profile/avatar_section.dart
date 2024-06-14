@@ -1,15 +1,15 @@
 import 'dart:io';
+import 'package:churchapp/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AvatarSection extends StatefulWidget {
   const AvatarSection({
     super.key,
-    required this.fullName,
     required this.location,
+    String? fullName,
   });
 
-  final String? fullName;
   final String location;
 
   @override
@@ -20,12 +20,26 @@ class _AvatarSectionState extends State<AvatarSection> {
   bool isAvatarTapped = false;
   final ImagePicker _picker = ImagePicker();
   String? _uploadedImageUrl;
+  String? fullName;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    fullName = await AuthenticationService().getCurrentUserName();
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   Future<void> _uploadImage() async {
     XFile? file = await _picker.pickImage(source: ImageSource.gallery);
     if (file != null && mounted) {
       setState(() {
-        _uploadedImageUrl = file.path; // Use the local file path
+        _uploadedImageUrl = file.path;
       });
     }
   }
@@ -77,7 +91,7 @@ class _AvatarSectionState extends State<AvatarSection> {
           ),
         const SizedBox(height: 10),
         Text(
-          widget.fullName ?? 'Loading...',
+          fullName ?? 'Loading...',
           style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,

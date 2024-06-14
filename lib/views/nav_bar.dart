@@ -4,21 +4,40 @@ import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/theme/welcome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class NavBar extends StatelessWidget {
+class NavBar extends StatefulWidget {
   final BaseAuth auth;
   final AuthenticationService authService;
-  final VoidCallback? notLoggedIn; // Callback can be null
-  final String? fullName; // Added fullName parameter
+  final VoidCallback? notLoggedIn;
+  final String? fullName;
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  NavBar({
+  const NavBar({
     super.key,
     required this.auth,
     required this.authService,
     this.notLoggedIn,
-    this.fullName, // Initialize fullName in the constructor
+    this.fullName,
   });
+
+  @override
+  State<NavBar> createState() => _NavBarState();
+}
+
+class _NavBarState extends State<NavBar> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String? fullName;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    fullName = await AuthenticationService().getCurrentUserName();
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,8 +180,7 @@ class DrawerHeaderWidget extends StatelessWidget {
             children: [
               const CircleAvatar(
                 radius: 72,
-                backgroundImage:
-                    AssetImage('assets/imagens/profile_picture.jpg'),
+                backgroundImage: AssetImage('assets/imagens/avatar.png'),
               ),
               const SizedBox(height: 12),
               Text(
