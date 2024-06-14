@@ -23,18 +23,42 @@ class _AvatarSectionState extends State<AvatarSection> {
   final ImagePicker _picker = ImagePicker();
   String? _uploadedImageUrl;
   String? fullName;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchData();
+    fetchData(); // Carrega o nome de usuário
     loadProfileImage(); // Carrega a imagem ao iniciar a página
   }
 
-  void fetchData() async {
+  Future<void> fetchData() async {
     fullName = await AuthenticationService().getCurrentUserName();
     if (mounted) {
-      setState(() {});
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> loadProfileImage() async {
+    try {
+      String imageUrl = await StoreData().getProfileImage();
+      if (mounted) {
+        setState(() {
+          _uploadedImageUrl = imageUrl;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error loading profile image: $e');
+      }
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -53,21 +77,22 @@ class _AvatarSectionState extends State<AvatarSection> {
       String resp =
           await StoreData().saveData(file: imageFile.readAsBytesSync());
       if (resp == 'Success') {
-        // Image saved successfully
+        // Imagem salva com sucesso
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Image saved successfully')),
+          const SnackBar(content: Text('Imagem salva com sucesso')),
         );
       } else {
-        // Handle error
+        // Lidar com erro
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save image: $resp')),
+          SnackBar(content: Text('Falha ao salvar imagem: $resp')),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please upload an image first')),
+        const SnackBar(
+            content: Text('Por favor, carregue uma imagem primeiro')),
       );
     }
   }
@@ -76,21 +101,6 @@ class _AvatarSectionState extends State<AvatarSection> {
     setState(() {
       _uploadedImageUrl = null;
     });
-  }
-
-  Future<void> loadProfileImage() async {
-    try {
-      String imageUrl = await StoreData().getProfileImage();
-      if (mounted) {
-        setState(() {
-          _uploadedImageUrl = imageUrl;
-        });
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error loading profile image: $e');
-      }
-    }
   }
 
   @override
@@ -111,7 +121,7 @@ class _AvatarSectionState extends State<AvatarSection> {
               children: [
                 CircleAvatar(
                   radius:
-                      isAvatarTapped ? 150 : 100, // Larger radius when tapped
+                      isAvatarTapped ? 150 : 100, // Maior raio quando tocado
                   backgroundImage: _uploadedImageUrl != null
                       ? Image.network(_uploadedImageUrl!).image
                       : const AssetImage('assets/imagens/avatar.png'),
@@ -132,36 +142,42 @@ class _AvatarSectionState extends State<AvatarSection> {
           if (_uploadedImageUrl != null)
             ElevatedButton(
               onPressed: _removeImage,
-              child: const Text('Remove Image'),
+              child: const Text('Remover Imagem'),
             ),
           ElevatedButton(
             onPressed: _saveImage,
-            child: const Text('Save Image'),
+            child: const Text('Salvar Imagem'),
           ),
           const SizedBox(height: 10),
-          Text(
-            fullName ?? 'Loading...',
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.location_on, color: Colors.blue),
-              const SizedBox(width: 5),
-              Text(
-                widget.location,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.blue,
+          isLoading
+              ? const CircularProgressIndicator() // Mostra indicador de carregamento
+              : Column(
+                  children: [
+                    Text(
+                      fullName ?? 'Carregando...',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.location_on, color: Colors.blue),
+                        const SizedBox(width: 5),
+                        Text(
+                          widget.location,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ],
       ),
     );
