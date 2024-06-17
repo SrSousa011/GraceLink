@@ -1,10 +1,12 @@
+import 'package:churchapp/services/auth_method.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/home/home.dart';
 
 class Login extends StatefulWidget {
   final BaseAuth auth;
-  final VoidCallback? onLoggedIn; // Callback can be null
+  final VoidCallback? onLoggedIn;
 
   const Login({super.key, required this.auth, this.onLoggedIn});
 
@@ -24,6 +26,38 @@ class _LoginState extends State<Login> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void loginUser() async {
+    String res = await AuthMethods().loginUser(
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+    if (res.startsWith('Error')) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(res),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    } else {
+      // Navigate to Home screen or perform any other actions after successful login
+      if (widget.onLoggedIn != null) {
+        widget.onLoggedIn!();
+      }
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Home(
+            auth: widget.auth,
+            userId: FirebaseAuth.instance.currentUser!.uid,
+            onSignedOut: () {},
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -126,7 +160,6 @@ class _LoginState extends State<Login> {
 
   Widget _buildSignUpButton() {
     return ElevatedButton(
-      onPressed: _isLoading ? null : _validateAndSubmit,
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
         backgroundColor: const Color.fromARGB(255, 90, 175, 249),
@@ -134,8 +167,40 @@ class _LoginState extends State<Login> {
           borderRadius: BorderRadius.circular(20.0),
         ),
       ),
-      child: const Text('Login'),
+      onPressed: _isLoading ? null : _validateAndSubmit,
+      child:
+          _isLoading ? const CircularProgressIndicator() : const Text('Login'),
     );
+  }
+
+  Future<void> _validateAndSubmit() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        await widget.auth.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
+        loginUser(); // Call loginUser method after successful sign-in
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Login failed. Please try again.'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
   }
 
   String? _validateEmail(String? value) {
@@ -156,49 +221,5 @@ class _LoginState extends State<Login> {
       return 'Password must be at least 6 characters long';
     }
     return null;
-  }
-
-  Future<void> _validateAndSubmit() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-      try {
-        await widget.auth.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
-        if (mounted) {
-          if (widget.onLoggedIn != null) {
-            widget.onLoggedIn!();
-          }
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Home(
-                auth: widget.auth,
-                userId: 'userID', // Replace with the actual user ID
-                onSignedOut: () {}, // Define this as needed
-              ),
-            ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Login failed. Please try again.'),
-              duration: Duration(seconds: 3),
-            ),
-          );
-        }
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      }
-    }
   }
 }
