@@ -1,4 +1,4 @@
-import 'package:churchapp/views/nav_bar.dart';
+import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:churchapp/theme/welcome.dart';

@@ -99,8 +99,7 @@ class _NavBarState extends State<NavBar> {
             onTap: () async {
               await _auth.signOut();
               if (!context.mounted) return;
-              Navigator.pop(context); // Close the drawer after logout
-              // Navigate to the login screen and remove all previous routes
+              Navigator.pop(context);
               Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
                 MaterialPageRoute(
                   builder: (BuildContext context) {

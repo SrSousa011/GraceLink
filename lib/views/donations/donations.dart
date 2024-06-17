@@ -2,7 +2,7 @@ import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/donations/donation_type.dart';
 import 'package:churchapp/views/donations/donation_value.dart';
 import 'package:churchapp/views/donations/donnation_detail.dart';
-import 'package:churchapp/views/nav_bar.dart';
+import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 

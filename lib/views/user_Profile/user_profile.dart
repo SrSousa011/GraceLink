@@ -2,7 +2,7 @@ import 'package:churchapp/views/user_Profile/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/user_Profile/avatar_section.dart';
 import 'package:churchapp/services/auth_service.dart';
-import 'package:churchapp/views/nav_bar.dart';
+import 'package:churchapp/views/nav_bar/nav_bar.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
