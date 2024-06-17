@@ -23,7 +23,6 @@ class NavBar extends StatefulWidget {
 }
 
 class _NavBarState extends State<NavBar> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   String? fullName;
 
   @override
@@ -97,9 +96,8 @@ class _NavBarState extends State<NavBar> {
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
             onTap: () async {
-              await _auth.signOut();
+              await FirebaseAuth.instance.signOut();
               if (!context.mounted) return;
-              Navigator.pop(context);
               Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
                 MaterialPageRoute(
                   builder: (BuildContext context) {
@@ -109,8 +107,7 @@ class _NavBarState extends State<NavBar> {
                     );
                   },
                 ),
-                (route) =>
-                    false, // Remove all routes except the newly pushed route
+                (route) => false,
               );
             },
           ),
