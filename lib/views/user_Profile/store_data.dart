@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class StoreData {
   final FirebaseStorage _storage = FirebaseStorage.instance;
@@ -14,32 +15,35 @@ class StoreData {
       String downloadURL = await snapshot.ref.getDownloadURL();
       return downloadURL;
     } catch (err) {
-      print('Error uploading image to storage: $err');
+      if (kDebugMode) {
+        print('Error uploading image to storage: $err');
+      }
       throw err.toString();
     }
   }
 
-  Future<String> saveData({required Uint8List file}) async {
+  Future<void> saveProfileImage(String downloadURL) async {
     try {
-      String imageUrl = await uploadImageToStorage('ProfileImage', file);
-      await _firestore.collection("userProfile").add({
-        'imageLink': imageUrl,
+      await _firestore.collection("userProfile").doc("profile").set({
+        'imageLink': downloadURL,
       });
-      return 'Success';
     } catch (err) {
-      print('Error saving data to Firestore: $err');
+      if (kDebugMode) {
+        print('Error saving profile image: $err');
+      }
       throw err.toString();
     }
   }
 
   Future<String> getProfileImage() async {
     try {
-      // Replace with the correct path to your ProfileImage in Firebase Storage
       String downloadURL =
-          await _storage.ref().child('ProfileImage').getDownloadURL();
+          await _storage.ref().child('profile_images').getDownloadURL();
       return downloadURL;
     } catch (err) {
-      print('Error getting profile image from storage: $err');
+      if (kDebugMode) {
+        print('Error getting profile image: $err');
+      }
       throw err.toString();
     }
   }
