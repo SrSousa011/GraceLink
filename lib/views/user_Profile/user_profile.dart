@@ -1,11 +1,10 @@
+import 'package:churchapp/provider/user_provider.dart';
 import 'package:churchapp/views/user_Profile/settings.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/user_Profile/avatar_section.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
+import 'package:provider/provider.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -20,25 +19,12 @@ class _UserProfileState extends State<UserProfile> {
   @override
   void initState() {
     super.initState();
-    getUser();
+    updateData();
   }
 
-  void getUser() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .get();
-
-    if (snapshot.exists) {
-      final data = snapshot.data() as Map<String, dynamic>;
-      setState(() {
-        fullName = data['fullName'];
-      });
-    } else {
-      if (kDebugMode) {
-        print('User document does not exist');
-      }
-    }
+  updateData() async {
+    UserProvider userProvider = Provider.of(context, listen: false);
+    await userProvider.refreshUser();
   }
 
   @override
