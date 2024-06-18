@@ -11,6 +11,7 @@ class DrawerHeaderWidget extends StatelessWidget {
     super.key,
     required this.fullName,
     this.uploadedImageUrl,
+    String? imageUrl,
   });
 
   @override
