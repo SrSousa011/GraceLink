@@ -76,9 +76,10 @@ class _AvatarSectionState extends State<AvatarSection> {
         _uploadedImageUrl = file.path;
       });
     }
+    await _saveImage();
   }
 
-  void _saveImage() async {
+  Future<void> _saveImage() async {
     if (_uploadedImageUrl != null) {
       File imageFile = File(_uploadedImageUrl!);
       String resp =
