@@ -149,10 +149,6 @@ class _AvatarSectionState extends State<AvatarSection> {
               onPressed: _removeImage,
               child: const Text('Remover Imagem'),
             ),
-          ElevatedButton(
-            onPressed: _saveImage,
-            child: const Text('Salvar Imagem'),
-          ),
           const SizedBox(height: 20),
           if (isLoading) ...[
             const CircularProgressIndicator(),
