@@ -15,6 +15,7 @@ class UserProfile extends StatefulWidget {
 
 class _UserProfileState extends State<UserProfile> {
   String fullName = '';
+  String address = '';
 
   @override
   void initState() {
@@ -58,7 +59,6 @@ class _UserProfileState extends State<UserProfile> {
             children: [
               AvatarSection(
                 fullName: fullName,
-                location: 'New York, USA',
               ),
             ],
           ),

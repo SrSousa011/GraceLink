@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:churchapp/provider/user_provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:churchapp/services/auth_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,11 +10,8 @@ import 'package:provider/provider.dart';
 class AvatarSection extends StatefulWidget {
   const AvatarSection({
     super.key,
-    required this.location,
-    String? fullName,
+    required String fullName,
   });
-
-  final String location;
 
   @override
   State<AvatarSection> createState() => _AvatarSectionState();
@@ -31,25 +27,14 @@ class _AvatarSectionState extends State<AvatarSection> {
   @override
   void initState() {
     super.initState();
-    loadProfileImage(); // Carrega a imagem ao iniciar a página
+    loadProfileImage();
     getUser();
   }
 
   void getUser() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .get();
-
-    if (snapshot.exists) {
-      final data = snapshot.data() as Map<String, dynamic>;
-      setState(() {
-        fullName = data['fullName'];
-      });
-    } else {
-      if (kDebugMode) {
-        print('User document does not exist');
-      }
+    fullName = (await AuthenticationService().getCurrentUserName())!;
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -173,21 +158,6 @@ class _AvatarSectionState extends State<AvatarSection> {
                   fontWeight: FontWeight.bold,
                   color: Colors.blue,
                 ),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.location_on, color: Colors.blue),
-                  const SizedBox(width: 5),
-                  Text(
-                    widget.location,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ],
               ),
             ],
           ],

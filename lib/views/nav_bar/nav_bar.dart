@@ -28,10 +28,10 @@ class _NavBarState extends State<NavBar> {
   @override
   void initState() {
     super.initState();
-    fetchData();
+    getUser();
   }
 
-  void fetchData() async {
+  void getUser() async {
     fullName = await AuthenticationService().getCurrentUserName();
     if (mounted) {
       setState(() {});
