@@ -1,4 +1,7 @@
 import 'package:churchapp/views/user_Profile/settings.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/user_Profile/avatar_section.dart';
 import 'package:churchapp/services/auth_service.dart';
@@ -12,18 +15,29 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
-  String? fullName;
+  String fullName = '';
 
   @override
   void initState() {
     super.initState();
-    fetchData();
+    getUser();
   }
 
-  void fetchData() async {
-    fullName = await AuthenticationService().getCurrentUserName();
-    if (mounted) {
-      setState(() {});
+  void getUser() async {
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+
+    if (snapshot.exists) {
+      final data = snapshot.data() as Map<String, dynamic>;
+      setState(() {
+        fullName = data['fullName'];
+      });
+    } else {
+      if (kDebugMode) {
+        print('User document does not exist');
+      }
     }
   }
 
@@ -39,7 +53,7 @@ class _UserProfileState extends State<UserProfile> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SettingsScreen(),
+                  builder: (context) => const SettingsScreen(),
                 ),
               );
             },
