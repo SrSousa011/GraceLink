@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -45,6 +44,16 @@ class StoreData {
         print('Error getting profile image: $err');
       }
       throw err.toString();
+    }
+  }
+
+  Future<String> saveData({required Uint8List file}) async {
+    try {
+      String downloadURL = await uploadImageToStorage('profile_images', file);
+      await saveProfileImage(downloadURL);
+      return 'Success';
+    } catch (err) {
+      return err.toString();
     }
   }
 }
