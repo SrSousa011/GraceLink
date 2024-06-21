@@ -1,4 +1,5 @@
 class Course {
+  final int id;
   final String title;
   final String instructor;
   final String description;
@@ -8,6 +9,7 @@ class Course {
   final String image;
 
   Course({
+    required this.id,
     required this.title,
     required this.instructor,
     required this.description,
@@ -20,6 +22,7 @@ class Course {
 
 final List<Course> coursesList = [
   Course(
+    id: 1,
     title: 'Mulher Única',
     instructor: 'Para Mulheres | ministrado por pessoa fulana',
     description: 'Elevando sua autoestima e maximizando a adição das mulheres.',
@@ -30,6 +33,7 @@ final List<Course> coursesList = [
     image: 'assets/imagens/mulher-unica.jpg',
   ),
   Course(
+    id: 2,
     title: 'Homem ao Máximo',
     instructor: 'Para Homens | ministrado por pessoa fulana',
     description:
@@ -41,6 +45,7 @@ final List<Course> coursesList = [
     image: 'assets/imagens/homen-ao-maximo.jpg',
   ),
   Course(
+    id: 3,
     title: 'Casados para sempre',
     instructor: 'Para casados | ministrado por pessoa fulana',
     description:
