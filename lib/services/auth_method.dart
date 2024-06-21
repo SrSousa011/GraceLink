@@ -9,19 +9,20 @@ class AuthMethods {
   Future<String> registerUser({
     required String email,
     required String password,
-    required String username,
+    required String firstName,
+    required String lastName,
     required String phoneNumber,
     required String address,
   }) async {
-    if (email.isEmpty ||
-        password.isEmpty ||
-        username.isEmpty ||
-        phoneNumber.isEmpty ||
-        address.isEmpty) {
-      return "Error: Please fill in all fields";
+    if (_isEmpty(email) ||
+        _isEmpty(password) ||
+        _isEmpty(firstName) ||
+        _isEmpty(lastName) ||
+        _isEmpty(phoneNumber) ||
+        _isEmpty(address)) {
+      return 'Please fill in all fields';
     }
 
-    // Validate email and password
     String? emailError = _validateEmail(email);
     if (emailError != null) {
       return emailError;
@@ -32,6 +33,24 @@ class AuthMethods {
       return passwordError;
     }
 
+    String? firstNameError =
+        validateFirstName(firstName); // Using the public method here
+    if (firstNameError != null) {
+      return firstNameError;
+    }
+
+    String? lastNameError =
+        validateLastName(lastName); // Using the public method here
+    if (lastNameError != null) {
+      return lastNameError;
+    }
+
+    String? validatePhoneNumberError =
+        validatePhoneNumber(phoneNumber); // Using the public method here
+    if (validatePhoneNumberError != null) {
+      return validatePhoneNumberError;
+    }
+
     try {
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
@@ -39,25 +58,23 @@ class AuthMethods {
         password: password,
       );
 
-      // Create a UserData object
       UserData userData = UserData(
         uid: userCredential.user!.uid,
-        fullName: username,
+        fullName: '$firstName $lastName',
         email: email,
         phoneNumber: phoneNumber,
         address: address,
         password: password,
       );
 
-      // Convert UserData to JSON using its toJson method
       await _firestore
           .collection('users')
           .doc(userCredential.user!.uid)
           .set(userData.toJson());
 
-      return 'User $username registered successfully';
+      return 'User $firstName $lastName registered successfully';
     } catch (err) {
-      return "Error: ${err.toString()}";
+      return 'Error: ${err.toString()}';
     }
   }
 
@@ -65,7 +82,6 @@ class AuthMethods {
     required String email,
     required String password,
   }) async {
-    // Validate email and password
     String? emailError = _validateEmail(email);
     if (emailError != null) {
       return emailError;
@@ -83,32 +99,38 @@ class AuthMethods {
       );
 
       if (userCredential.user != null) {
-        return 'User ${userCredential.user!.displayName ?? 'User'} made login successfully';
+        return 'User ${userCredential.user!.displayName ?? 'User'} logged in successfully';
       } else {
         return 'Error: User not found';
       }
     } catch (err) {
-      return "Error: ${err.toString()}";
+      return 'Error: ${err.toString()}';
     }
   }
 
   String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
+    if (_isEmpty(value)) {
       return 'Please enter your email';
     }
-    if (!value.contains('@')) {
+
+    String pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+    RegExp regex = RegExp(pattern);
+    if (!regex.hasMatch(value!)) {
       return 'Please enter a valid email';
     }
+
     return null;
   }
 
   String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
+    if (_isEmpty(value)) {
       return 'Please enter your password';
     }
-    if (value.length < 6) {
+
+    if (value!.length < 6) {
       return 'Password must be at least 6 characters long';
     }
+
     return null;
   }
 
@@ -118,6 +140,34 @@ class AuthMethods {
 
   String? validatePassword(String? value) {
     return _validatePassword(value);
+  }
+
+  String? validateFirstName(String? value) {
+    // Making this method public
+    if (_isEmpty(value)) {
+      return 'First Name cannot be empty';
+    }
+    return null;
+  }
+
+  String? validateLastName(String? value) {
+    // Making this method public
+    if (_isEmpty(value)) {
+      return 'Last Name cannot be empty';
+    }
+    return null;
+  }
+
+  String? validatePhoneNumber(String value) {
+    // Making this method public
+    if (_isEmpty(value)) {
+      return 'Phone number cannot be empty';
+    }
+    return null;
+  }
+
+  bool _isEmpty(String? value) {
+    return value == null || value.isEmpty;
   }
 
   Future<UserData> getUserDetails() async {
