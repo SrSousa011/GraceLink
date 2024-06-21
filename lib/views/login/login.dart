@@ -18,6 +18,7 @@ class _LoginState extends State<Login> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final AuthMethods _authMethods = AuthMethods(); // Instanciar AuthMethods
   bool _isLoading = false;
   bool _isPasswordVisible = false;
 
@@ -29,7 +30,7 @@ class _LoginState extends State<Login> {
   }
 
   void loginUser() async {
-    String res = await AuthMethods().loginUser(
+    String res = await _authMethods.loginUser(
       email: _emailController.text,
       password: _passwordController.text,
     );
@@ -123,7 +124,8 @@ class _LoginState extends State<Login> {
           decoration: const InputDecoration(
             labelText: 'Email',
           ),
-          validator: _validateEmail,
+          validator: _authMethods
+              .validateEmail, // Atualizado para usar a função pública
         ),
       ],
     );
@@ -149,7 +151,7 @@ class _LoginState extends State<Login> {
             ),
           ),
           obscureText: !_isPasswordVisible,
-          validator: _validatePassword,
+          validator: _authMethods.validatePassword,
           onFieldSubmitted: (_) {
             _validateAndSubmit();
           },
@@ -201,25 +203,5 @@ class _LoginState extends State<Login> {
         }
       }
     }
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your email';
-    }
-    if (!value.contains('@')) {
-      return 'Please enter a valid email';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your password';
-    }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters long';
-    }
-    return null;
   }
 }

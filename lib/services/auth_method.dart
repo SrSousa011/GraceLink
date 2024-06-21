@@ -112,6 +112,14 @@ class AuthMethods {
     return null;
   }
 
+  String? validateEmail(String? value) {
+    return _validateEmail(value);
+  }
+
+  String? validatePassword(String? value) {
+    return _validatePassword(value);
+  }
+
   Future<UserData> getUserDetails() async {
     User currentUser = _auth.currentUser!;
     DocumentSnapshot snap =
