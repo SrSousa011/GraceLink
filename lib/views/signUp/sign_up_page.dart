@@ -1,17 +1,20 @@
-import 'package:churchapp/services/auth_service.dart';
-import 'package:churchapp/views/home/home.dart';
-import 'package:churchapp/views/signUp/date_birth.dart';
-import 'package:churchapp/views/signUp/gender.dart';
-import 'package:churchapp/views/signUp/phone.dart';
-import 'package:churchapp/views/signUp/telephoneNumber.dart';
-import 'package:churchapp/views/signUp/text_field.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:churchapp/services/auth_method.dart'; // Adjust import path based on your project structure
+import 'package:churchapp/services/auth_service.dart'; // Adjust import path based on your project structure
+import 'package:churchapp/views/home/home.dart'; // Adjust import path based on your project structure
+import 'package:churchapp/views/signUp/date_birth.dart'; // Adjust import path based on your project structure
+import 'package:churchapp/views/signUp/gender.dart'; // Adjust import path based on your project structure
+import 'package:churchapp/views/signUp/phone.dart'; // Adjust import path based on your project structure
+import 'package:churchapp/views/signUp/telephoneNumber.dart'; // Adjust import path based on your project structure
+import 'package:churchapp/views/signUp/text_field.dart'; // Adjust import path based on your project structure
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key, required this.auth, required this.onSignedIn});
+  const SignUpPage({Key? key, required this.auth, required this.onSignedIn})
+      : super(key: key);
   final BaseAuth auth;
   final VoidCallback onSignedIn;
 
@@ -32,6 +35,7 @@ class _SignUpPageState extends State<SignUpPage> {
   bool _isLoading = false;
   bool _isPasswordVisible = false;
   bool _isPasswordConfVisible = false;
+  final AuthMethods _authMethods = AuthMethods();
 
   int? selectedDay;
   int? selectedMonth;
@@ -112,13 +116,13 @@ class _SignUpPageState extends State<SignUpPage> {
         TextFieldWidget(
           labelText: 'First Name',
           controller: _firstNameController,
-          validator: _validateName,
+          validator: _authMethods.validateFirstName,
         ),
         const SizedBox(height: 20.0),
         TextFieldWidget(
           labelText: 'Last Name',
           controller: _lastNameController,
-          validator: _validateLastName,
+          validator: _authMethods.validateLastName,
         ),
       ],
     );
@@ -153,7 +157,7 @@ class _SignUpPageState extends State<SignUpPage> {
           child: PhoneTextField(
             maxLength: numberOfPhoneDigits,
             controller: _phoneNumberController,
-            validator: _validatePhoneNumber,
+            validator: _authMethods.validatePhoneNumber,
           ),
         ),
       ],
@@ -190,7 +194,7 @@ class _SignUpPageState extends State<SignUpPage> {
         TextFieldWidget(
           labelText: 'Email',
           controller: _emailController,
-          validator: _validateEmail,
+          validator: _authMethods.validateEmail,
         ),
         const SizedBox(height: 20.0),
         TextFieldWidget(
@@ -224,7 +228,7 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
           ),
           obscureText: !_isPasswordConfVisible,
-          validator: _validatePassword,
+          validator: _authMethods.validatePassword,
         ),
       ],
     );
@@ -281,51 +285,10 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Email cannot be empty';
-    }
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-      return 'Invalid email';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Password cannot be empty';
-    }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters long';
-    }
-    return null;
-  }
-
-  String? _validateName(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Name cannot be empty';
-    }
-    return null;
-  }
-
-  String? _validateLastName(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Last Name cannot be empty';
-    }
-    return null;
-  }
-
-  String? _validatePhoneNumber(String value) {
-    if (value.isEmpty) {
-      return 'Phone number cannot be empty';
-    }
-    return null;
-  }
-
   String? _validateEmailConf(String? value) {
     final String email = _emailController.text.trim();
     if (value != email) {
-      return 'Passwords do not match';
+      return 'Emails do not match';
     }
     return null;
   }

@@ -18,7 +18,7 @@ class _LoginState extends State<Login> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final AuthMethods _authMethods = AuthMethods(); // Instanciar AuthMethods
+  final AuthMethods _authMethods = AuthMethods();
   bool _isLoading = false;
   bool _isPasswordVisible = false;
 
