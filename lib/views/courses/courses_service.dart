@@ -6,7 +6,7 @@ class CoursesService {
       FirebaseFirestore.instance.collection('registrationsCourse');
 
   Future<void> subscribeCourse({
-    required String courseId,
+    required int courseId,
     required String userName,
     required String userId,
     required bool status,
@@ -16,7 +16,7 @@ class CoursesService {
         'courseId': courseId,
         'userName': userName,
         'userId': userId,
-        'Status': status,
+        'status': status,
         'registrationDate': DateTime.now(),
       });
     } catch (e) {
