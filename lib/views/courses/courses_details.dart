@@ -71,7 +71,7 @@ class _CoursesDetailsState extends State<CoursesDetails> {
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
               ),
               child: Text(
-                isClosed ? 'Esgotado' : 'Inscrever-se',
+                isClosed ? 'Inscrito' : 'Inscrever-se',
               ),
             ),
           ],
