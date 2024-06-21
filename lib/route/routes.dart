@@ -36,13 +36,11 @@ class AppRoutes {
       case '/videos':
         return MaterialPageRoute(builder: (_) => const Videos());
       case '/event_page':
-        return MaterialPageRoute(
-            builder: (_) =>
-                const Events()); // Use EventsPage widget for events route
+        return MaterialPageRoute(builder: (_) => const Events());
       case '/donations':
         return MaterialPageRoute(builder: (_) => const Donations());
       case '/courses':
-        return MaterialPageRoute(builder: (_) => const Courses());
+        return MaterialPageRoute(builder: (_) => Courses());
       case '/become_member':
         return MaterialPageRoute(builder: (_) => const BecomeMember());
       case '/about_us':

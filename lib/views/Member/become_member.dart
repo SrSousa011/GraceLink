@@ -1,6 +1,6 @@
 import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/member/firestore_Service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -432,26 +432,6 @@ class GenderDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container();
-  }
-}
-
-class FirestoreService {
-  final CollectionReference _memberCollection =
-      FirebaseFirestore.instance.collection('becomeMember');
-
-  Future<void> addMember(Member member) async {
-    try {
-      await _memberCollection.add({
-        'fullName': member.fullName,
-        'address': member.address,
-        'phoneNumber': member.phoneNumber,
-        'lastVisitedChurch': member.lastVisitedChurch,
-        'reasonForMembership': member.reasonForMembership,
-        'reference': member.reference,
-      });
-    } catch (e) {
-      throw Exception('Failed to add member: $e');
-    }
   }
 }
 
