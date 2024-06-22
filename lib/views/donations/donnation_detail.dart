@@ -50,7 +50,6 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
     if (uploadedFileURL == null) return;
 
     try {
-      // Add donation details to Firestore
       await FirebaseFirestore.instance.collection('donations').add({
         'userId': FirebaseAuth.instance.currentUser!.uid,
         'fullName': widget.fullName,
@@ -60,7 +59,6 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      // Check if the widget is still mounted before showing the SnackBar
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -69,11 +67,9 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
         );
       }
 
-      // Optionally, navigate to another screen or reset the form
-      if (!mounted) return; // Checks `this.mounted`, not `context.mounted`.
+      if (!mounted) return;
       Navigator.of(context).pop();
     } catch (e) {
-      // Check if the widget is still mounted before showing the SnackBar
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -90,8 +86,8 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
       appBar: AppBar(
         title: const Text('Donation Details'),
       ),
-      body: WillPopScope(
-        onWillPop: () async => true, // Remove _clearUploadedImageState call
+      body: PopScope(
+        canPop: false,
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
