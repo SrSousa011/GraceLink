@@ -13,8 +13,7 @@ import 'package:churchapp/views/signUp/telephoneNumber.dart'; // Adjust import p
 import 'package:churchapp/views/signUp/text_field.dart'; // Adjust import path based on your project structure
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({Key? key, required this.auth, required this.onSignedIn})
-      : super(key: key);
+  const SignUpPage({super.key, required this.auth, required this.onSignedIn});
   final BaseAuth auth;
   final VoidCallback onSignedIn;
 
