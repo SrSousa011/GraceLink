@@ -17,17 +17,22 @@ class Courses extends StatefulWidget {
 
 class _CoursesState extends State<Courses> {
   final CoursesService _coursesService = CoursesService();
-  final UserData _userData = UserData(
-      uid: '',
-      fullName: '',
-      email: '',
-      password: '',
-      phoneNumber: '',
-      address: '');
+  UserData _userData = UserData(
+    uid: '',
+    fullName: '',
+    email: '',
+    password: '',
+    phoneNumber: '',
+    address: '',
+  );
 
   updateData() async {
-    UserProvider userProvider = Provider.of(context, listen: false);
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
     await userProvider.refreshUser();
+    setState(() {
+      _userData = userProvider.getUser!;
+    });
   }
 
   @override
