@@ -55,10 +55,10 @@ class _AvatarSectionState extends State<AvatarSection> {
     final XFile? file = await _picker.pickImage(source: ImageSource.gallery);
     if (file != null && mounted) {
       setState(() {
-        _uploadedImageUrl = file.path;
+        _uploadedImageUrl = file.path; // Use local file path
       });
+      await _saveImage();
     }
-    await _saveImage();
   }
 
   Future<void> _saveImage() async {
@@ -110,10 +110,15 @@ class _AvatarSectionState extends State<AvatarSection> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: _uploadedImageUrl != null
-                      ? DecorationImage(
-                          fit: BoxFit.cover,
-                          image: FileImage(File(_uploadedImageUrl!)),
-                        )
+                      ? (_uploadedImageUrl!.startsWith('http')
+                          ? DecorationImage(
+                              fit: BoxFit.cover,
+                              image: NetworkImage(_uploadedImageUrl!),
+                            )
+                          : DecorationImage(
+                              fit: BoxFit.cover,
+                              image: FileImage(File(_uploadedImageUrl!)),
+                            ))
                       : null,
                   color: Colors.grey[200],
                 ),
