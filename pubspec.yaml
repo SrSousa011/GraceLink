@@ -90,8 +90,8 @@ flutter:
       - assets/aboutUs/bible.jpg
       - assets/aboutUs/hands.jpg
       - assets/aboutUs/joaldo.jpg
-
-      - assets/imagens/avatar.png
+      - assets/default_avatar.png
+      
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
