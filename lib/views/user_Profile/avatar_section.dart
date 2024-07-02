@@ -1,6 +1,6 @@
 import 'dart:io';
+import 'package:churchapp/models/user_data.dart';
 import 'package:churchapp/provider/user_provider.dart';
-import 'package:churchapp/services/auth_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,9 +8,13 @@ import 'package:churchapp/views/user_Profile/store_data.dart';
 import 'package:provider/provider.dart';
 
 class AvatarSection extends StatefulWidget {
+  final String fullName;
+  final String address;
+
   const AvatarSection({
     super.key,
-    required String fullName,
+    required this.fullName,
+    required this.address,
   });
 
   @override
@@ -22,20 +26,11 @@ class _AvatarSectionState extends State<AvatarSection> {
   final ImagePicker _picker = ImagePicker();
   String? _uploadedImageUrl;
   bool isLoading = true;
-  String fullName = '';
 
   @override
   void initState() {
     super.initState();
     loadProfileImage();
-    getUser();
-  }
-
-  void getUser() async {
-    fullName = (await AuthenticationService().getCurrentUserName())!;
-    if (mounted) {
-      setState(() {});
-    }
   }
 
   Future<void> loadProfileImage() async {
@@ -101,13 +96,11 @@ class _AvatarSectionState extends State<AvatarSection> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (_) => UserProvider(),
-        )
-      ],
-      child: Container(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Avatar Section'),
+      ),
+      body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -146,20 +139,50 @@ class _AvatarSectionState extends State<AvatarSection> {
                 child: const Text('Remover Imagem'),
               ),
             const SizedBox(height: 20),
-            if (isLoading) ...[
-              const CircularProgressIndicator(),
-              const SizedBox(height: 10),
-              const Text('Carregando...'),
-            ] else ...[
-              Text(
-                fullName,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              ),
-            ],
+            // Check if userData is available
+            Consumer<UserProvider>(
+              builder: (context, userProvider, _) {
+                UserData? userData = userProvider.getUser;
+                if (isLoading) {
+                  return const Column(
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 10),
+                      Text('Carregando...'),
+                    ],
+                  );
+                } else if (userData != null) {
+                  return Column(
+                    children: [
+                      Text(
+                        userData.fullName,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        userData.address,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return const Text(
+                    'Dados do usuário não encontrados',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.red,
+                    ),
+                  );
+                }
+              },
+            ),
           ],
         ),
       ),
