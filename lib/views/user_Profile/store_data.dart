@@ -49,21 +49,11 @@ class StoreData {
 
   Future<String> saveData({required Uint8List file}) async {
     try {
-      // Generate a unique filename based on current timestamp
-      String fileName =
-          'profile_images${DateTime.now().millisecondsSinceEpoch}.jpg';
-
-      // Upload image to Firebase Storage
-      Reference ref = _storage.ref().child('avatars/$fileName');
-      UploadTask uploadTask = ref.putData(file);
-      await uploadTask;
-
-      // Get download URL
-      String downloadURL = await ref.getDownloadURL();
-
-      return downloadURL;
-    } catch (e) {
-      return '';
+      String downloadURL = await uploadImageToStorage('profile_images', file);
+      await saveProfileImage(downloadURL);
+      return 'Success';
+    } catch (err) {
+      return err.toString();
     }
   }
 }

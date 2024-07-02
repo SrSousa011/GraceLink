@@ -1,11 +1,8 @@
 import 'dart:io';
-import 'package:churchapp/models/user_data.dart';
-import 'package:churchapp/provider/user_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:churchapp/views/user_Profile/store_data.dart';
-import 'package:provider/provider.dart';
 
 class AvatarSection extends StatefulWidget {
   final String fullName;
@@ -30,10 +27,10 @@ class _AvatarSectionState extends State<AvatarSection> {
   @override
   void initState() {
     super.initState();
-    loadProfileImage();
+    _loadImage();
   }
 
-  Future<void> loadProfileImage() async {
+  Future<void> _loadImage() async {
     try {
       String imageUrl = await StoreData().getProfileImage();
       if (mounted) {
@@ -96,94 +93,89 @@ class _AvatarSectionState extends State<AvatarSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Avatar Section'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  isAvatarTapped = !isAvatarTapped;
-                });
-              },
-              child: Stack(
-                children: [
-                  CircleAvatar(
-                    radius: isAvatarTapped ? 150 : 100,
-                    backgroundImage: _uploadedImageUrl != null
-                        ? Image.network(_uploadedImageUrl!).image
-                        : const AssetImage('assets/imagens/avatar.png'),
-                  ),
-                  Positioned(
-                    bottom: -10,
-                    left: 150,
-                    child: IconButton(
-                      onPressed: _uploadImage,
-                      icon: const Icon(Icons.add_a_photo),
-                      color: Colors.blue,
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          isAvatarTapped = !isAvatarTapped;
+        });
+      },
+      child: Column(
+        children: <Widget>[
+          Stack(
+            alignment: AlignmentDirectional.bottomEnd,
+            children: <Widget>[
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: _uploadedImageUrl != null
+                      ? DecorationImage(
+                          fit: BoxFit.cover,
+                          image: FileImage(File(_uploadedImageUrl!)),
+                        )
+                      : null,
+                  color: Colors.grey[200],
+                ),
+                child: _uploadedImageUrl == null
+                    ? const Icon(
+                        Icons.account_circle,
+                        size: 120,
+                        color: Colors.grey,
+                      )
+                    : null,
+              ),
+              if (isAvatarTapped)
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    child: PopupMenuButton<String>(
+                      onSelected: (value) {
+                        if (value == 'update') {
+                          _uploadImage();
+                        } else if (value == 'remove') {
+                          _removeImage();
+                        }
+                      },
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuEntry<String>>[
+                        const PopupMenuItem<String>(
+                          value: 'update',
+                          child: ListTile(
+                            leading: Icon(Icons.edit),
+                            title: Text('Atualizar Foto'),
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'remove',
+                          child: ListTile(
+                            leading: Icon(Icons.delete),
+                            title: Text('Remover Foto'),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            if (_uploadedImageUrl != null)
-              ElevatedButton(
-                onPressed: _removeImage,
-                child: const Text('Remover Imagem'),
-              ),
-            const SizedBox(height: 20),
-            Consumer<UserProvider>(
-              builder: (context, userProvider, _) {
-                UserData? userData = userProvider.getUser;
-                if (isLoading) {
-                  return const Column(
-                    children: [
-                      CircularProgressIndicator(),
-                      SizedBox(height: 10),
-                      Text('Carregando...'),
-                    ],
-                  );
-                } else if (userData != null) {
-                  return Column(
-                    children: [
-                      Text(
-                        userData.fullName,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        userData.address,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  return const Text(
-                    'Dados do usuário não encontrados',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.red,
-                    ),
-                  );
-                }
-              },
-            ),
-          ],
-        ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Nome: ${widget.fullName}',
+            style: const TextStyle(fontSize: 18),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Endereço: ${widget.address}',
+            style: const TextStyle(fontSize: 16),
+          ),
+        ],
       ),
     );
   }
