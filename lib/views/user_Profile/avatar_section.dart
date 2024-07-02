@@ -100,7 +100,7 @@ class _AvatarSectionState extends State<AvatarSection> {
       appBar: AppBar(
         title: const Text('Avatar Section'),
       ),
-      body: Container(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -139,7 +139,6 @@ class _AvatarSectionState extends State<AvatarSection> {
                 child: const Text('Remover Imagem'),
               ),
             const SizedBox(height: 20),
-            // Check if userData is available
             Consumer<UserProvider>(
               builder: (context, userProvider, _) {
                 UserData? userData = userProvider.getUser;
