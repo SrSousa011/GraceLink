@@ -76,7 +76,6 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
       - assets/imagens/background_image.jpg
-      - assets/imagens/profile_picture.jpg
       - assets/icons/logo.png
       - assets/imagens/bacground-image-center.jpg
       - assets/imagens/dizimo.jpg
