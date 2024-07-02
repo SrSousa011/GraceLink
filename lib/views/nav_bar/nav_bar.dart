@@ -174,9 +174,15 @@ class DrawerHeaderWidget extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 72,
-                backgroundImage: AssetImage('assets/imagens/avatar.png'),
+                backgroundColor:
+                    Colors.grey[200], // Cor de fundo do CircleAvatar
+                child: const Icon(
+                  Icons.account_circle,
+                  size: 144, // Tamanho do ícone dentro do CircleAvatar
+                  color: Colors.grey, // Cor do ícone
+                ),
               ),
               const SizedBox(height: 12),
               Text(
