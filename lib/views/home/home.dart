@@ -173,43 +173,35 @@ class EventDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(event.title),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Descrição: ${event.description}',
-                style: const TextStyle(fontSize: 18),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Data: ${DateFormat('dd/MM/yyyy').format(event.date)}',
-                style: const TextStyle(fontSize: 18),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Horário: ${DateFormat('HH:mm').format(event.date)}',
-                style: const TextStyle(fontSize: 18),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Local: ${event.location}',
-                style: const TextStyle(fontSize: 18),
-              ),
-            ],
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(event.title),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Descrição: ${event.description}',
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Data: ${DateFormat('dd/MM/yyyy').format(event.date)}',
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Horário: ${DateFormat('HH:mm').format(event.date)}',
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Local: ${event.location}',
+              style: const TextStyle(fontSize: 18),
+            ),
+          ],
         ),
       ),
     );
