@@ -174,6 +174,6 @@ class AuthMethods {
     User currentUser = _auth.currentUser!;
     DocumentSnapshot snap =
         await _firestore.collection('users').doc(currentUser.uid).get();
-    return UserData.fromSnapshot(snap);
+    return UserData.fromDocumentSnapshot(snap);
   }
 }
