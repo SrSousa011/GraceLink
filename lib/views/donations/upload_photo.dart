@@ -7,7 +7,16 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StoragePage extends StatefulWidget {
-  const StoragePage({super.key});
+  final String donationType;
+  final String donationValue;
+  final String fullName;
+
+  const StoragePage({
+    super.key,
+    required this.donationType,
+    required this.donationValue,
+    required this.fullName,
+  });
 
   @override
   State<StoragePage> createState() => _StoragePageState();
@@ -16,8 +25,6 @@ class StoragePage extends StatefulWidget {
 class _StoragePageState extends State<StoragePage> {
   final ImagePicker _picker = ImagePicker();
   String? _uploadedImageUrl;
-  final bool _uploading = false;
-  final bool canReturn = false;
 
   Future<void> _uploadImage() async {
     XFile? file = await _picker.pickImage(source: ImageSource.gallery);
@@ -49,9 +56,9 @@ class _StoragePageState extends State<StoragePage> {
         // Save donation details to Firestore
         await FirebaseFirestore.instance.collection('donations').add({
           'userId': FirebaseAuth.instance.currentUser!.uid,
-          'fullName': 'Sergio Ribas Camargo',
-          'donationType': 'Type',
-          'donationValue': 'Value',
+          'fullName': widget.fullName,
+          'donationType': widget.donationType,
+          'donationValue': widget.donationValue,
           'photoURL': _uploadedImageUrl,
           'timestamp': FieldValue.serverTimestamp(),
         });
@@ -63,7 +70,7 @@ class _StoragePageState extends State<StoragePage> {
         }
 
         if (mounted) {
-          // Navigate to DonationsPage and replace the current page
+          // Navigate back to DonationsPage and replace the current page
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const Donations()),
@@ -89,102 +96,79 @@ class _StoragePageState extends State<StoragePage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Donation Details'),
-          elevation: 0,
-          actions: [
-            if (_uploading)
-              const Padding(
-                padding: EdgeInsets.only(right: 12.0),
-                child: Center(
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator.adaptive(
-                      strokeWidth: 3,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Donation Details'),
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.upload),
+            onPressed: _uploadedImageUrl != null ? null : _uploadImage,
+          ),
+        ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            if (_uploadedImageUrl != null)
+              Card(
+                margin: const EdgeInsets.all(16.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                elevation: 5,
+                child: Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(10.0)),
+                      child: Image.file(
+                        File(_uploadedImageUrl!),
+                        width: double.infinity,
+                        height: 300,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          ElevatedButton(
+                            onPressed: _confirmAndNavigateBack,
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.green,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            child: const Text('Confirm'),
+                          ),
+                          ElevatedButton(
+                            onPressed: _removeImage,
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.red,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            child: const Text('Remove'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            IconButton(
-              icon: const Icon(Icons.upload),
-              onPressed:
-                  _uploading || _uploadedImageUrl != null ? null : _uploadImage,
-            ),
+            if (_uploadedImageUrl == null)
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text('Please upload an image.'),
+              ),
           ],
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              if (_uploadedImageUrl != null)
-                Card(
-                  margin: const EdgeInsets.all(16.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  elevation: 5,
-                  child: Column(
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(10.0)),
-                        child: Image.file(
-                          File(_uploadedImageUrl!),
-                          width: double.infinity,
-                          height: 300,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            ElevatedButton(
-                              onPressed: _confirmAndNavigateBack,
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: Colors.green,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                              ),
-                              child: const Text('Confirm'),
-                            ),
-                            ElevatedButton(
-                              onPressed: _removeImage,
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: Colors.red,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                              ),
-                              child: const Text('Remove'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              if (_uploading)
-                const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: CircularProgressIndicator(),
-                ),
-            ],
-          ),
         ),
       ),
     );
