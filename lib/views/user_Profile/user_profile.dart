@@ -20,12 +20,6 @@ class _UserProfileState extends State<UserProfile> {
   @override
   void initState() {
     super.initState();
-    updateData();
-  }
-
-  updateData() async {
-    UserProvider userProvider = Provider.of(context, listen: false);
-    await userProvider.refreshUser();
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:churchapp/services/auth_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -23,11 +24,22 @@ class _AvatarSectionState extends State<AvatarSection> {
   final ImagePicker _picker = ImagePicker();
   String? _uploadedImageUrl;
   bool isLoading = true;
+  String fullName = '';
+  String address = '';
 
   @override
   void initState() {
     super.initState();
     _loadImage();
+    getDada();
+  }
+
+  void getDada() async {
+    fullName = (await AuthenticationService().getCurrentUserName())!;
+    address = (await AuthenticationService().getAddress())!;
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _loadImage() async {
@@ -172,12 +184,12 @@ class _AvatarSectionState extends State<AvatarSection> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Nome: ${widget.fullName}',
+            fullName,
             style: const TextStyle(fontSize: 18),
           ),
           const SizedBox(height: 4),
           Text(
-            'Endereço: ${widget.address}',
+            address,
             style: const TextStyle(fontSize: 16),
           ),
         ],
