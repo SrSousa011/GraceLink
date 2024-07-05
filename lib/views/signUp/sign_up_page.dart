@@ -24,6 +24,8 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
+  late TextEditingController _cityController;
+  late TextEditingController _countryController;
   late TextEditingController _emailController;
   late TextEditingController _confirmEmailController;
   late TextEditingController _passwordController;
@@ -54,6 +56,8 @@ class _SignUpPageState extends State<SignUpPage> {
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
     _phoneNumberController = TextEditingController();
+    _cityController = TextEditingController();
+    _countryController = TextEditingController();
   }
 
   @override
@@ -65,6 +69,8 @@ class _SignUpPageState extends State<SignUpPage> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _phoneNumberController.dispose();
+    _cityController.dispose();
+    _countryController.dispose();
     super.dispose();
   }
 
@@ -88,15 +94,17 @@ class _SignUpPageState extends State<SignUpPage> {
                   const SizedBox(height: 20.0),
                   _buildDateOfBirthSection(),
                   const SizedBox(height: 20.0),
+                  _buildPhoneNumberSection(),
+                  const SizedBox(height: 20.0),
                   _buildGenderSection(),
+                  const SizedBox(height: 20.0),
+                  _buildCityAndCountry(),
                   const SizedBox(height: 20.0),
                   _buildEmailSection(),
                   const SizedBox(height: 20.0),
                   _buildPasswordSection(),
                   const SizedBox(height: 20.0),
                   _buildPasswordSectionConfirmation(),
-                  const SizedBox(height: 20.0),
-                  _buildPhoneNumberSection(),
                   const SizedBox(height: 20.0),
                   _buildSignUpButton(),
                 ],
@@ -122,6 +130,24 @@ class _SignUpPageState extends State<SignUpPage> {
           labelText: 'Last Name',
           controller: _lastNameController,
           validator: _authMethods.validateLastName,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCityAndCountry() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFieldWidget(
+          labelText: 'City',
+          controller: _cityController,
+        ),
+        const Text(', '),
+        const SizedBox(height: 20.0),
+        TextFieldWidget(
+          labelText: 'Country',
+          controller: _countryController,
         ),
       ],
     );
