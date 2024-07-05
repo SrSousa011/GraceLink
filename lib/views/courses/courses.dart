@@ -1,12 +1,9 @@
-import 'package:churchapp/models/user_data.dart';
-import 'package:churchapp/provider/user_provider.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/courses/courses_details.dart';
 import 'package:churchapp/views/courses/courses_list.dart';
 import 'package:churchapp/views/courses/courses_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class Courses extends StatefulWidget {
   const Courses({super.key});
@@ -17,28 +14,10 @@ class Courses extends StatefulWidget {
 
 class _CoursesState extends State<Courses> {
   final CoursesService _coursesService = CoursesService();
-  UserData _userData = UserData(
-    uid: '',
-    fullName: '',
-    email: '',
-    password: '',
-    phoneNumber: '',
-    address: '',
-  );
-
-  updateData() async {
-    UserProvider userProvider =
-        Provider.of<UserProvider>(context, listen: false);
-    await userProvider.refreshUser();
-    setState(() {
-      _userData = userProvider.getUser!;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    updateData();
   }
 
   @override
@@ -72,7 +51,6 @@ class _CoursesState extends State<Courses> {
                       builder: (context) => CoursesDetails(
                         course: coursesList[index],
                         coursesService: _coursesService,
-                        userData: _userData,
                       ),
                     ),
                   );

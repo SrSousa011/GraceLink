@@ -1,18 +1,17 @@
-import 'package:churchapp/models/user_data.dart';
+import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/courses/courses_list.dart';
 import 'package:churchapp/views/courses/courses_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class CoursesDetails extends StatefulWidget {
   final Course course;
   final CoursesService coursesService;
-  final UserData userData;
 
   const CoursesDetails({
     super.key,
     required this.course,
     required this.coursesService,
-    required this.userData,
   });
 
   @override
@@ -21,11 +20,28 @@ class CoursesDetails extends StatefulWidget {
 
 class _CoursesDetailsState extends State<CoursesDetails> {
   bool isClosed = false;
+  String fullName = '';
+  String uid = '';
 
   @override
   void initState() {
     super.initState();
     isClosed = widget.course.registrationDeadline == 'Encerrado';
+    loadData();
+  }
+
+  void loadData() async {
+    try {
+      fullName = await AuthenticationService().getCurrentUserName() ?? '';
+      uid = await AuthenticationService().getCurrentUserId() ?? '';
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error loading user data: $e');
+      }
+    }
   }
 
   @override
@@ -68,8 +84,8 @@ class _CoursesDetailsState extends State<CoursesDetails> {
                       try {
                         await widget.coursesService.subscribeCourse(
                           courseId: widget.course.id,
-                          userName: widget.userData.fullName,
-                          userId: widget.userData.uid,
+                          userName: fullName,
+                          userId: uid,
                           status: false,
                         );
                         if (!context.mounted) return;
