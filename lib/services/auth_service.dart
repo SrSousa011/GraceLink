@@ -155,6 +155,23 @@ class AuthenticationService implements BaseAuth {
     }
   }
 
+  Future<String?> getAddress() async {
+    try {
+      User? user = _firebaseAuth.currentUser;
+      if (user != null) {
+        DocumentSnapshot snapshot =
+            await _firestore.collection('users').doc(user.uid).get();
+        return snapshot.get('address');
+      }
+      return null;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting address: $e');
+      }
+      rethrow;
+    }
+  }
+
   @override
   Future<void> signOut({VoidCallback? onSignedOut}) async {
     await _firebaseAuth.signOut();
