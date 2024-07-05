@@ -4,7 +4,7 @@ class UserData {
   final String uid;
   final String fullName;
   final String email;
-  final String password;
+  final String password; // Consider using hashed passwords
   final String phoneNumber;
   final String address;
 
@@ -20,7 +20,7 @@ class UserData {
   Map<String, dynamic> toJson() {
     return {
       'uid': uid,
-      'fullname': fullName,
+      'fullName': fullName,
       'email': email,
       'password': password,
       'phoneNumber': phoneNumber,
@@ -28,15 +28,37 @@ class UserData {
     };
   }
 
-  static UserData fromSnapshot(DocumentSnapshot snapshot) {
-    var data = snapshot.data() as Map<String, dynamic>;
+  factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
-      uid: data['uid'] ?? '',
-      fullName: data['fullname'] ?? '',
-      email: data['email'] ?? '',
-      password: data['password'] ?? '',
-      phoneNumber: data['phoneNumber'] ?? '',
-      address: data['address'] ?? '',
+      uid: json['uid'],
+      fullName: json['fullName'],
+      email: json['email'],
+      password: json['password'],
+      phoneNumber: json['phoneNumber'],
+      address: json['address'],
     );
+  }
+
+  factory UserData.fromDocumentSnapshot(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return UserData(
+      uid: data['uid'],
+      fullName: data['fullName'],
+      email: data['email'],
+      password: data['password'],
+      phoneNumber: data['phoneNumber'],
+      address: data['address'],
+    );
+  }
+
+  Map<String, dynamic> toDocumentSnapshot() {
+    return {
+      'uid': uid,
+      'fullName': fullName,
+      'email': email,
+      'password': password,
+      'phoneNumber': phoneNumber,
+      'address': address,
+    };
   }
 }
