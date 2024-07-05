@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:churchapp/views/donations/upload_photo.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:churchapp/views/donations/upload_photo.dart';
 
 class DonationDetailsScreen extends StatefulWidget {
   final String fullName;
@@ -32,7 +32,11 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const StoragePage(),
+        builder: (context) => StoragePage(
+          donationType: widget.donationType,
+          donationValue: widget.donationValue,
+          fullName: widget.fullName,
+        ),
       ),
     );
 
