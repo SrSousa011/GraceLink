@@ -1,8 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/courses/courses_list.dart';
 import 'package:churchapp/views/courses/courses_service.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 class CoursesDetails extends StatefulWidget {
   final Course course;
@@ -21,7 +22,9 @@ class CoursesDetails extends StatefulWidget {
 class _CoursesDetailsState extends State<CoursesDetails> {
   bool isClosed = false;
   String fullName = '';
+  late bool status = false;
   String uid = '';
+  bool isUserSubscribed = false; // New state variable
 
   @override
   void initState() {
@@ -34,9 +37,21 @@ class _CoursesDetailsState extends State<CoursesDetails> {
     try {
       fullName = await AuthenticationService().getCurrentUserName() ?? '';
       uid = await AuthenticationService().getCurrentUserId() ?? '';
+
+      bool subscribed = await widget.coursesService.isUserAlreadySubscribed(
+        courseId: widget.course.id,
+        userId: uid,
+      );
+
       if (mounted) {
-        setState(() {});
+        setState(() {
+          isUserSubscribed = subscribed;
+        });
       }
+
+      // Persist the subscription state using SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setBool('isUserSubscribed_${widget.course.id}_$uid', subscribed);
     } catch (e) {
       if (kDebugMode) {
         print('Error loading user data: $e');
@@ -78,45 +93,51 @@ class _CoursesDetailsState extends State<CoursesDetails> {
             ),
             const SizedBox(height: 32.0),
             ElevatedButton(
-              onPressed: isClosed
+              onPressed: isClosed || isUserSubscribed
                   ? null
                   : () async {
                       try {
-                        await widget.coursesService.subscribeCourse(
+                        await widget.coursesService.registerUserForCourse(
                           courseId: widget.course.id,
-                          userName: fullName,
                           userId: uid,
                           status: false,
+                          userName: fullName,
                         );
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Inscrição realizada com sucesso!'),
-                            duration: Duration(seconds: 3),
-                          ),
-                        );
+
                         setState(() {
-                          widget.course.registrationDeadline =
-                              'Encerrado'; // Mark course as closed
+                          widget.course.registrationDeadline = 'Encerrado';
                           isClosed = true;
+                          isUserSubscribed = true;
                         });
+
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        prefs.setBool(
+                            'isUserSubscribed_${widget.course.id}_$uid', true);
+
+                        const SnackBar(
+                          content: Text('Inscrição realizada com sucesso!'),
+                          duration: Duration(seconds: 3),
+                        );
                       } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Erro ao realizar inscrição: $e'),
-                            duration: const Duration(seconds: 3),
-                          ),
+                        SnackBar(
+                          content: Text('Erro ao realizar inscrição: $e'),
+                          duration: const Duration(seconds: 3),
                         );
                       }
                     },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
-                  isClosed ? Colors.red : Colors.blue,
+                  isClosed || isUserSubscribed ? Colors.red : Colors.blue,
                 ),
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
               ),
               child: Text(
-                isClosed ? 'Inscrito' : 'Inscrever-se',
+                isClosed
+                    ? 'Inscrito'
+                    : isUserSubscribed
+                        ? 'Inscrito'
+                        : 'Inscrever-se',
               ),
             ),
           ],

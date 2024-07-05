@@ -3,25 +3,44 @@ import 'package:flutter/foundation.dart';
 
 class CoursesService {
   final CollectionReference _registrationsCollection =
-      FirebaseFirestore.instance.collection('registrationsCourse');
+      FirebaseFirestore.instance.collection('courseregistration');
 
-  Future<void> subscribeCourse({
+  Future<bool> isUserAlreadySubscribed({
     required int courseId,
-    required String userName,
     required String userId,
+  }) async {
+    try {
+      QuerySnapshot querySnapshot = await _registrationsCollection
+          .where('courseId', isEqualTo: courseId)
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      return querySnapshot.docs.isNotEmpty;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error checking user subscription: $e');
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> registerUserForCourse({
+    required int courseId,
+    required String userId,
+    required String userName,
     required bool status,
   }) async {
     try {
       await _registrationsCollection.add({
         'courseId': courseId,
-        'userName': userName,
         'userId': userId,
+        'userName': userName,
         'status': status,
         'registrationDate': DateTime.now(),
       });
     } catch (e) {
       if (kDebugMode) {
-        print('Error subscribing to course: $e');
+        print('Error registering user for course: $e');
       }
       rethrow;
     }
