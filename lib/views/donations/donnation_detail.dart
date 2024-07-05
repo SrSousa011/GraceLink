@@ -4,14 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/views/donations/upload_photo.dart';
 
-class DonationDetailsScreen extends StatefulWidget {
+class DonationDetails extends StatefulWidget {
   final String fullName;
   final String isbn;
   final String bankName;
   final String donationType;
   final String donationValue;
 
-  const DonationDetailsScreen({
+  const DonationDetails({
     super.key,
     required this.fullName,
     required this.isbn,
@@ -21,10 +21,10 @@ class DonationDetailsScreen extends StatefulWidget {
   });
 
   @override
-  State<DonationDetailsScreen> createState() => _DonationDetailsScreenState();
+  State<DonationDetails> createState() => _DonationDetailsState();
 }
 
-class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
+class _DonationDetailsState extends State<DonationDetails> {
   String? uploadStatus;
   String? uploadedFileURL;
 
@@ -90,8 +90,8 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
       appBar: AppBar(
         title: const Text('Donation Details'),
       ),
-      body: PopScope(
-        canPop: false,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
