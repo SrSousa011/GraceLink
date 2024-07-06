@@ -1,4 +1,4 @@
-import 'package:churchapp/views/notifications.dart';
+import 'package:churchapp/views/notifications/notifications.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/videos.dart';
 import 'package:churchapp/theme/welcome.dart';
