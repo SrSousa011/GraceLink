@@ -14,17 +14,30 @@ class EventDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(event.title),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              _navigateToUpdateEventScreen(context, event);
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'edit') {
+                _navigateToUpdateEventScreen(context, event);
+              } else if (value == 'delete') {
+                _deleteEvent(context, event);
+              }
             },
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () {
-              _deleteEvent(context, event);
-            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'edit',
+                child: ListTile(
+                  leading: Icon(Icons.edit, color: Colors.blue),
+                  title: Text('Editar'),
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'delete',
+                child: ListTile(
+                  leading: Icon(Icons.delete, color: Colors.red),
+                  title: Text('Excluir'),
+                ),
+              ),
+            ],
           ),
         ],
       ),
