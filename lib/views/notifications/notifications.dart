@@ -1,15 +1,54 @@
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
+import 'package:churchapp/views/notifications/chat_arguments.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class Notifications extends StatefulWidget {
   const Notifications({super.key});
 
   @override
-  State<Notifications> createState() => _NotificationsState();
+  State<StatefulWidget> createState() => _Application();
 }
 
-class _NotificationsState extends State<Notifications> {
+class _Application extends State<Notifications> {
+  // It is assumed that all messages contain a data field with the key 'type'
+  Future<void> setupInteractedMessage() async {
+    // Get any messages which caused the application to open from
+    // a terminated state.
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+
+    // If the message also contains a data property with a "type" of "chat",
+    // navigate to a chat screen
+    if (initialMessage != null) {
+      _handleMessage(initialMessage);
+    }
+
+    // Also handle any interaction when the app is in the background via a
+    // Stream listener
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+  }
+
+  void _handleMessage(RemoteMessage message) {
+    if (message.data['type'] == 'chat') {
+      Navigator.pushNamed(
+        context,
+        '/chat',
+        arguments: ChatArguments(message),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Run code required to handle interacted messages in an async function
+    // as initState() must not be async
+    setupInteractedMessage();
+  }
+
   bool _notificationsEnabled = true;
   final bool canReturn = false;
 
