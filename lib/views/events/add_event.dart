@@ -12,9 +12,9 @@ class AddEventForm extends StatefulWidget {
 }
 
 class _AddEventFormState extends State<AddEventForm> {
-  late TextEditingController _idController;
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
+  late TextEditingController _locationController;
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   String _location = '';
@@ -22,18 +22,18 @@ class _AddEventFormState extends State<AddEventForm> {
   @override
   void initState() {
     super.initState();
-    _idController = TextEditingController();
     _titleController = TextEditingController();
     _descriptionController = TextEditingController();
+    _locationController = TextEditingController();
     _selectedDate = DateTime.now();
     _selectedTime = TimeOfDay.now();
   }
 
   @override
   void dispose() {
-    _idController.dispose();
     _titleController.dispose();
     _descriptionController.dispose();
+    _locationController.dispose();
     super.dispose();
   }
 
@@ -71,7 +71,7 @@ class _AddEventFormState extends State<AddEventForm> {
         _selectedTime != null) {
       // Criar um novo evento
       final newEvent = Event(
-        id: _idController.text,
+        id: _titleController.text,
         title: _titleController.text,
         description: _descriptionController.text,
         date: _selectedDate!,
@@ -139,72 +139,93 @@ class _AddEventFormState extends State<AddEventForm> {
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              TextField(
-                controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Título do Evento',
-                  icon: Icon(Icons.title),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTextField(
+                  'Título do Evento',
+                  _titleController,
+                  Icons.title,
                 ),
-              ),
-              const SizedBox(height: 20.0),
-              TextField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Descrição do Evento',
-                  icon: Icon(Icons.description),
+                const SizedBox(height: 20.0),
+                _buildTextField(
+                  'Descrição do Evento',
+                  _descriptionController,
+                  Icons.description,
                 ),
-              ),
-              const SizedBox(height: 20.0),
-              TextField(
-                onTap: () => _selectDate(context),
-                readOnly: true,
-                decoration: InputDecoration(
-                  labelText: _selectedDate != null
-                      ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
-                      : 'Selecionar Data',
-                  icon: const Icon(Icons.calendar_today),
-                ),
-              ),
-              const SizedBox(height: 20.0),
-              TextField(
-                onTap: () => _selectTime(context),
-                readOnly: true,
-                decoration: InputDecoration(
-                  labelText: _selectedTime != null
-                      ? _selectedTime!.format(context)
-                      : 'Selecionar Hora',
-                  icon: const Icon(Icons.access_time),
-                ),
-              ),
-              const SizedBox(height: 20.0),
-              TextField(
-                decoration: const InputDecoration(
-                  labelText: 'Localização do Evento',
-                  icon: Icon(Icons.location_on),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _location = value;
-                  });
-                },
-              ),
-              const SizedBox(height: 20.0),
-              ElevatedButton(
-                onPressed: () => _saveEvent(context),
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.blue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
+                const SizedBox(height: 20.0),
+                _buildDateField(),
+                const SizedBox(height: 20.0),
+                _buildTimeField(),
+                const SizedBox(height: 20.0),
+                _buildLocationField(),
+                const SizedBox(height: 20.0),
+                ElevatedButton(
+                  onPressed: () => _saveEvent(context),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
                   ),
+                  child: const Text('Salvar Evento'),
                 ),
-                child: const Text('Salvar Evento'),
-              ),
-            ]),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+      String labelText, TextEditingController controller, IconData icon) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        icon: Icon(icon),
+      ),
+    );
+  }
+
+  Widget _buildDateField() {
+    return TextField(
+      onTap: () => _selectDate(context),
+      readOnly: true,
+      decoration: InputDecoration(
+        labelText: _selectedDate != null
+            ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
+            : 'Selecionar Data',
+        icon: const Icon(Icons.calendar_today),
+      ),
+    );
+  }
+
+  Widget _buildTimeField() {
+    return TextField(
+      onTap: () => _selectTime(context),
+      readOnly: true,
+      decoration: InputDecoration(
+        labelText: _selectedTime != null
+            ? _selectedTime!.format(context)
+            : 'Selecionar Hora',
+        icon: const Icon(Icons.access_time),
+      ),
+    );
+  }
+
+  Widget _buildLocationField() {
+    return TextField(
+      onChanged: (value) {
+        setState(() {
+          _location = value;
+        });
+      },
+      decoration: const InputDecoration(
+        labelText: 'Localização do Evento',
+        icon: Icon(Icons.location_on),
       ),
     );
   }
