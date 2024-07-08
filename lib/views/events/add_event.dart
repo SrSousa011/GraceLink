@@ -1,6 +1,8 @@
+import 'package:churchapp/provider/user_provider.dart';
 import 'package:churchapp/views/events/event_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class AddEventForm extends StatefulWidget {
   const AddEventForm({super.key});
@@ -62,10 +64,12 @@ class _AddEventFormState extends State<AddEventForm> {
   }
 
   Future<void> _saveEvent(BuildContext context) async {
+    // Verificar se todos os campos estão preenchidos
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty &&
         _selectedDate != null &&
         _selectedTime != null) {
+      // Criar um novo evento
       final newEvent = Event(
         id: _idController.text,
         title: _titleController.text,
@@ -74,8 +78,10 @@ class _AddEventFormState extends State<AddEventForm> {
         time: _selectedTime!,
         location: _location,
       );
+
       try {
         await addEvent(newEvent);
+
         if (!context.mounted) return;
         Navigator.pop(context, true);
       } catch (e) {
@@ -84,7 +90,8 @@ class _AddEventFormState extends State<AddEventForm> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Text('Erro ao salvar evento'),
-              content: const Text('Ocorreu um erro ao tentar salvar o evento.'),
+              content: Text(
+                  'Ocorreu um erro ao tentar salvar o evento: ${e.toString()}'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
@@ -98,6 +105,7 @@ class _AddEventFormState extends State<AddEventForm> {
         );
       }
     } else {
+      // Mostrar um diálogo de erro se algum campo estiver vazio
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -120,15 +128,18 @@ class _AddEventFormState extends State<AddEventForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Novo Evento'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Novo Evento'),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             TextField(
               controller: _titleController,
               decoration: const InputDecoration(
@@ -145,54 +156,52 @@ class _AddEventFormState extends State<AddEventForm> {
               ),
             ),
             const SizedBox(height: 20.0),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.calendar_today),
-                  onPressed: () => _selectDate(context),
-                ),
-                if (_selectedDate != null)
-                  Text(
-                    DateFormat('dd/MM/yyyy').format(_selectedDate!),
-                    style: const TextStyle(fontSize: 18.0),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 20.0),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.access_time),
-                  onPressed: () => _selectTime(context),
-                ),
-                if (_selectedTime != null)
-                  Text(
-                    _selectedTime!.format(context),
-                    style: const TextStyle(fontSize: 18.0),
-                  ),
-              ],
+            TextField(
+              onTap: () => _selectDate(context),
+              readOnly: true,
+              decoration: InputDecoration(
+                labelText: _selectedDate != null
+                    ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
+                    : 'Selecionar Data',
+                icon: const Icon(Icons.calendar_today),
+              ),
             ),
             const SizedBox(height: 20.0),
             TextField(
-              onChanged: (value) => _location = value,
+              onTap: () => _selectTime(context),
+              readOnly: true,
+              decoration: InputDecoration(
+                labelText: _selectedTime != null
+                    ? _selectedTime!.format(context)
+                    : 'Selecionar Hora',
+                icon: const Icon(Icons.access_time),
+              ),
+            ),
+            const SizedBox(height: 20.0),
+            TextField(
               decoration: const InputDecoration(
-                labelText: 'Localização',
+                labelText: 'Localização do Evento',
                 icon: Icon(Icons.location_on),
               ),
+              onChanged: (value) {
+                setState(() {
+                  _location = value;
+                });
+              },
             ),
             const SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: () => _saveEvent(context),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
-                backgroundColor: const Color.fromARGB(255, 90, 175, 249),
+                backgroundColor: Colors.blue,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.0),
                 ),
               ),
-              child: const Text('Salvar'),
+              child: const Text('Salvar Evento'),
             ),
-          ],
+          ]),
         ),
       ),
     );
