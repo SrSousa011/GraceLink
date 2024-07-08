@@ -19,7 +19,7 @@ class EventDetailsScreen extends StatelessWidget {
               if (value == 'edit') {
                 _navigateToUpdateEventScreen(context, event);
               } else if (value == 'delete') {
-                _deleteEvent(context, event);
+                _confirmDeleteEvent(context, event);
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -34,7 +34,10 @@ class EventDetailsScreen extends StatelessWidget {
                 value: 'delete',
                 child: ListTile(
                   leading: Icon(Icons.delete, color: Colors.red),
-                  title: Text('Excluir'),
+                  title: Text(
+                    'Excluir',
+                    style: TextStyle(color: Colors.red),
+                  ),
                 ),
               ),
             ],
@@ -84,7 +87,35 @@ class EventDetailsScreen extends StatelessWidget {
     }
   }
 
-  void _deleteEvent(BuildContext context, Event event) async {
+  void _confirmDeleteEvent(BuildContext context, Event event) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmar exclusão'),
+          content:
+              Text('Tem certeza que deseja excluir o evento "${event.title}"?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Fechar o diálogo
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop(); // Fechar o diálogo
+                await _deleteEvent(context, event);
+              },
+              child: const Text('Excluir'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteEvent(BuildContext context, Event event) async {
     try {
       await deleteEvent(event.id);
       if (!context.mounted) return;
