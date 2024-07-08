@@ -1,12 +1,11 @@
-import 'package:churchapp/views/events/event_service.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/events/add_event.dart';
 import 'package:churchapp/views/events/event_details.dart';
 import 'package:churchapp/views/events/event_list_item.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
+import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/events/event_service.dart';
 
 class Events extends StatefulWidget {
   const Events({super.key});
@@ -21,24 +20,16 @@ class _EventsState extends State<Events> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Eventos'),
-        ),
-        drawer: NavBar(
-          auth: AuthenticationService(),
-          authService: AuthenticationService(),
-        ),
-        body: _buildEventsList(),
-        floatingActionButton: _buildAddEventButton(),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Eventos'),
       ),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+        authService: AuthenticationService(),
+      ),
+      body: _buildEventsList(),
+      floatingActionButton: _buildAddEventButton(),
     );
   }
 
@@ -109,10 +100,11 @@ class _EventsState extends State<Events> {
   Stream<List<Event>> readEvents() {
     CollectionReference events =
         FirebaseFirestore.instance.collection('events');
-    return events.snapshots().map((snapshot) => snapshot.docs
-        .map((doc) =>
-            Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
-        .toList());
+    return events.orderBy('date', descending: true).snapshots().map(
+        (snapshot) => snapshot.docs
+            .map((doc) =>
+                Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
+            .toList());
   }
 }
 
