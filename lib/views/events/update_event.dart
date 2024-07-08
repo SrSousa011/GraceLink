@@ -135,24 +135,26 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
         appBar: AppBar(
           title: const Text('Atualizar Evento'),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTitleEvent(),
-              const SizedBox(height: 20.0),
-              _buildDescriptionEvent(),
-              const SizedBox(height: 20.0),
-              _buildSlectDate(),
-              const SizedBox(height: 20.0),
-              _builSelecTime(),
-              const SizedBox(height: 20.0),
-              _builSelecLocation(),
-              const SizedBox(height: 20.0),
-              _buildUpdateButton(),
-              const SizedBox(height: 20.0),
-            ],
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTitleEvent(),
+                const SizedBox(height: 20.0),
+                _buildDescriptionEvent(),
+                const SizedBox(height: 20.0),
+                _buildSlectDate(),
+                const SizedBox(height: 20.0),
+                _builSelecTime(),
+                const SizedBox(height: 20.0),
+                _builSelecLocation(),
+                const SizedBox(height: 20.0),
+                _buildUpdateButton(),
+                const SizedBox(height: 20.0),
+              ],
+            ),
           ),
         ),
       ),
