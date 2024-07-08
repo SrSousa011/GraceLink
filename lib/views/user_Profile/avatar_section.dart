@@ -165,14 +165,14 @@ class _AvatarSectionState extends State<AvatarSection> {
                         const PopupMenuItem<String>(
                           value: 'update',
                           child: ListTile(
-                            leading: Icon(Icons.edit),
+                            leading: Icon(Icons.edit, color: Colors.blue),
                             title: Text('Atualizar Foto'),
                           ),
                         ),
                         const PopupMenuItem<String>(
                           value: 'remove',
                           child: ListTile(
-                            leading: Icon(Icons.delete),
+                            leading: Icon(Icons.delete, color: Colors.red),
                             title: Text('Remover Foto'),
                           ),
                         ),
