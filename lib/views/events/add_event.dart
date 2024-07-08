@@ -136,72 +136,74 @@ class _AddEventFormState extends State<AddEventForm> {
         appBar: AppBar(
           title: const Text('Novo Evento'),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Título do Evento',
-                icon: Icon(Icons.title),
-              ),
-            ),
-            const SizedBox(height: 20.0),
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Descrição do Evento',
-                icon: Icon(Icons.description),
-              ),
-            ),
-            const SizedBox(height: 20.0),
-            TextField(
-              onTap: () => _selectDate(context),
-              readOnly: true,
-              decoration: InputDecoration(
-                labelText: _selectedDate != null
-                    ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
-                    : 'Selecionar Data',
-                icon: const Icon(Icons.calendar_today),
-              ),
-            ),
-            const SizedBox(height: 20.0),
-            TextField(
-              onTap: () => _selectTime(context),
-              readOnly: true,
-              decoration: InputDecoration(
-                labelText: _selectedTime != null
-                    ? _selectedTime!.format(context)
-                    : 'Selecionar Hora',
-                icon: const Icon(Icons.access_time),
-              ),
-            ),
-            const SizedBox(height: 20.0),
-            TextField(
-              decoration: const InputDecoration(
-                labelText: 'Localização do Evento',
-                icon: Icon(Icons.location_on),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _location = value;
-                });
-              },
-            ),
-            const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () => _saveEvent(context),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.blue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              TextField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Título do Evento',
+                  icon: Icon(Icons.title),
                 ),
               ),
-              child: const Text('Salvar Evento'),
-            ),
-          ]),
+              const SizedBox(height: 20.0),
+              TextField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Descrição do Evento',
+                  icon: Icon(Icons.description),
+                ),
+              ),
+              const SizedBox(height: 20.0),
+              TextField(
+                onTap: () => _selectDate(context),
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: _selectedDate != null
+                      ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
+                      : 'Selecionar Data',
+                  icon: const Icon(Icons.calendar_today),
+                ),
+              ),
+              const SizedBox(height: 20.0),
+              TextField(
+                onTap: () => _selectTime(context),
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: _selectedTime != null
+                      ? _selectedTime!.format(context)
+                      : 'Selecionar Hora',
+                  icon: const Icon(Icons.access_time),
+                ),
+              ),
+              const SizedBox(height: 20.0),
+              TextField(
+                decoration: const InputDecoration(
+                  labelText: 'Localização do Evento',
+                  icon: Icon(Icons.location_on),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _location = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: () => _saveEvent(context),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                ),
+                child: const Text('Salvar Evento'),
+              ),
+            ]),
+          ),
         ),
       ),
     );
