@@ -48,6 +48,7 @@ dependencies:
   image_picker: ^1.1.2  
   firebase_app_check: ^0.2.2+7
   permission_handler: ^11.3.1
+  flutter_local_notifications: ^17.2.1
 
 dev_dependencies:
   flutter_test:
