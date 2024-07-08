@@ -1,6 +1,6 @@
-import 'package:churchapp/views/events/event_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:churchapp/views/events/event_service.dart';
 
 class UpdateEventForm extends StatefulWidget {
   final Event event;
@@ -15,7 +15,6 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
   late TextEditingController _locationController;
-  final bool canReturn = false;
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
 
@@ -77,10 +76,14 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
         time: _selectedTime!,
         location: _locationController.text,
       );
+
       try {
+        // Chamada para atualizar o evento
         await updateEvent(updatedEvent, widget.event.id);
+
+        // Verificar se o contexto está montado antes de tentar navegar de volta
         if (!context.mounted) return;
-        Navigator.pop(context, true); // Return true to indicate success
+        Navigator.pop(context, true); // Retornar true para indicar sucesso
       } catch (e) {
         showDialog(
           context: context,
@@ -124,101 +127,94 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Atualizar Evento'),
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTitleEvent(),
-                const SizedBox(height: 20.0),
-                _buildDescriptionEvent(),
-                const SizedBox(height: 20.0),
-                _buildSlectDate(),
-                const SizedBox(height: 20.0),
-                _builSelecTime(),
-                const SizedBox(height: 20.0),
-                _builSelecLocation(),
-                const SizedBox(height: 20.0),
-                _buildUpdateButton(),
-                const SizedBox(height: 20.0),
-              ],
-            ),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Atualizar Evento'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildTitleField(),
+            const SizedBox(height: 20.0),
+            _buildDescriptionField(),
+            const SizedBox(height: 20.0),
+            _buildDateField(),
+            const SizedBox(height: 20.0),
+            _buildTimeField(),
+            const SizedBox(height: 20.0),
+            _buildLocationField(),
+            const SizedBox(height: 20.0),
+            _buildUpdateButton(),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildTitleEvent() {
+  Widget _buildTitleField() {
     return TextField(
       controller: _titleController,
       decoration: const InputDecoration(
         labelText: 'Título do Evento',
-        icon: Icon(Icons.title),
+        prefixIcon: Icon(Icons.title),
       ),
     );
   }
 
-  Widget _buildDescriptionEvent() {
+  Widget _buildDescriptionField() {
     return TextField(
       controller: _descriptionController,
       decoration: const InputDecoration(
         labelText: 'Descrição do Evento',
-        icon: Icon(Icons.description),
+        prefixIcon: Icon(Icons.description),
       ),
     );
   }
 
-  Widget _buildSlectDate() {
-    return Row(
-      children: [
-        IconButton(
-          icon: const Icon(Icons.calendar_today),
-          onPressed: () => _selectDate(context),
-        ),
-        if (_selectedDate != null)
-          Text(
-            DateFormat('dd/MM/yyyy').format(_selectedDate!),
-            style: const TextStyle(fontSize: 18.0),
+  Widget _buildDateField() {
+    return GestureDetector(
+      onTap: () => _selectDate(context),
+      child: AbsorbPointer(
+        child: TextFormField(
+          controller: TextEditingController(
+            text: _selectedDate != null
+                ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
+                : '',
           ),
-      ],
+          decoration: const InputDecoration(
+            labelText: 'Data do Evento',
+            prefixIcon: Icon(Icons.calendar_today),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _builSelecTime() {
-    return Row(
-      children: [
-        IconButton(
-          icon: const Icon(Icons.access_time),
-          onPressed: () => _selectTime(context),
-        ),
-        if (_selectedTime != null)
-          Text(
-            _selectedTime!.format(context),
-            style: const TextStyle(fontSize: 18.0),
+  Widget _buildTimeField() {
+    return GestureDetector(
+      onTap: () => _selectTime(context),
+      child: AbsorbPointer(
+        child: TextFormField(
+          controller: TextEditingController(
+            text: _selectedTime != null ? _selectedTime!.format(context) : '',
           ),
-      ],
+          decoration: const InputDecoration(
+            labelText: 'Hora do Evento',
+            prefixIcon: Icon(Icons.access_time),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _builSelecLocation() {
+  Widget _buildLocationField() {
     return TextField(
       controller: _locationController,
       decoration: const InputDecoration(
         labelText: 'Localização',
-        icon: Icon(Icons.location_on),
+        prefixIcon: Icon(Icons.location_on),
       ),
     );
   }
