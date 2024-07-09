@@ -103,9 +103,9 @@ class EventDetailsScreen extends StatelessWidget {
               child: const Text('Cancelar'),
             ),
             TextButton(
-              onPressed: () async {
+              onPressed: () {
                 Navigator.of(context).pop(); // Fechar o diálogo
-                await _deleteEvent(context, event);
+                _deleteEventAndNotify(context, event);
               },
               child: const Text('Excluir'),
             ),
@@ -113,6 +113,20 @@ class EventDetailsScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> _deleteEventAndNotify(BuildContext context, Event event) async {
+    await _deleteEvent(context, event);
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Evento "${event.title}" excluído com sucesso!'),
+        ),
+      );
+
+      Navigator.pushReplacementNamed(context, '/event_page');
+    }
   }
 
   Future<void> _deleteEvent(BuildContext context, Event event) async {
