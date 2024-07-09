@@ -1,3 +1,5 @@
+import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as YT;
@@ -59,6 +61,10 @@ class _VideosState extends State<Videos> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('YouTube Links'),
+      ),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+        authService: AuthenticationService(),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
