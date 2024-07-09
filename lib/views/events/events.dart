@@ -20,16 +20,24 @@ class _EventsState extends State<Events> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Eventos'),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) {
+          return;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Eventos'),
+        ),
+        drawer: NavBar(
+          auth: AuthenticationService(),
+          authService: AuthenticationService(),
+        ),
+        body: _buildEventsList(),
+        floatingActionButton: _buildAddEventButton(),
       ),
-      drawer: NavBar(
-        auth: AuthenticationService(),
-        authService: AuthenticationService(),
-      ),
-      body: _buildEventsList(),
-      floatingActionButton: _buildAddEventButton(),
     );
   }
 
