@@ -7,7 +7,7 @@ import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 
 class Videos extends StatefulWidget {
-  const Videos({Key? key}) : super(key: key);
+  const Videos({super.key});
 
   @override
   State<Videos> createState() => _VideosState();
