@@ -10,6 +10,7 @@ class VideosService {
       await _videosCollection.doc(id).set({
         'id': id,
         'url': url,
+        'timestamp': DateTime.now(),
       });
     } catch (e) {
       if (kDebugMode) {
@@ -21,8 +22,9 @@ class VideosService {
 
   Future<List<Map<String, dynamic>>> getVideos() async {
     try {
-      QuerySnapshot querySnapshot = await _videosCollection.get();
-      return querySnapshot.docs
+      var snapshot =
+          await _videosCollection.orderBy('timestamp', descending: true).get();
+      return snapshot.docs
           .map((doc) => doc.data() as Map<String, dynamic>)
           .toList();
     } catch (e) {
