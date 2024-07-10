@@ -207,8 +207,7 @@ class _VideosState extends State<Videos> {
                                 ),
                               ),
                             ),
-                            const SizedBox(
-                                height: 40), // Espaço entre os vídeos
+                            const SizedBox(height: 8), // Espaço entre os vídeos
                           ],
                         );
                       },
