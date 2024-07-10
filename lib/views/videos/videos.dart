@@ -142,7 +142,7 @@ class _VideosState extends State<Videos> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('YouTube Links'),
+        title: const Text('YouTube Videos'),
         actions: [
           IconButton(
             onPressed: _isSelectionMode
