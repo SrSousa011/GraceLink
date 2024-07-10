@@ -28,8 +28,8 @@ class _VideosState extends State<Videos> {
   void _launchURL(String url) async {
     Uri uri = Uri.parse(url);
     try {
-      if (await canLaunch(uri.toString())) {
-        await launch(uri.toString());
+      if (await canLaunchUrl(uri.toString() as Uri)) {
+        await launchUrl(uri.toString() as Uri);
       } else {
         throw 'Could not launch $url';
       }
@@ -190,7 +190,7 @@ class _VideosState extends State<Videos> {
                                               video.title,
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .headline6!
+                                                  .titleLarge!
                                                   .copyWith(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize:
