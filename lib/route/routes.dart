@@ -1,6 +1,5 @@
 import 'package:churchapp/views/notifications/notifications.dart';
 import 'package:churchapp/services/auth_service.dart';
-import 'package:churchapp/views/videos/videos.dart';
 import 'package:churchapp/theme/welcome.dart';
 import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/courses/courses.dart';
@@ -9,6 +8,7 @@ import 'package:churchapp/views/home/home.dart';
 import 'package:churchapp/views/member/become_member.dart';
 import 'package:churchapp/views/events/events.dart';
 import 'package:churchapp/views/user_Profile/user_profile.dart';
+import 'package:churchapp/views/videos/videos.dart';
 import 'package:flutter/material.dart';
 
 class AppRoutes {
