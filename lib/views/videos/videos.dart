@@ -26,9 +26,10 @@ class _VideosState extends State<Videos> {
   }
 
   void _launchURL(String url) async {
+    Uri uri = Uri.parse(url);
     try {
-      if (await canLaunch(url)) {
-        await launch(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
       } else {
         throw 'Could not launch $url';
       }
@@ -113,6 +114,8 @@ class _VideosState extends State<Videos> {
                 ],
               ),
             ),
+            const SizedBox(
+                height: 16), // Espaço entre o cabeçalho e o primeiro vídeo
             Expanded(
               child: FutureBuilder<List<Map<String, dynamic>>>(
                 future: _videosService.getVideos(),
@@ -130,61 +133,65 @@ class _VideosState extends State<Videos> {
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
                         var videoData = snapshot.data![index];
-                        return InkWell(
-                          onTap: () => _launchURL(videoData['url']),
-                          child: Card(
-                            margin: const EdgeInsets.all(8.0),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: FutureBuilder<YT.Video>(
-                                future: _fetchVideo(videoData['url']),
-                                builder: (context, videoSnapshot) {
-                                  if (videoSnapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return const SizedBox(
-                                      height: 200,
-                                      child: Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    );
-                                  } else if (videoSnapshot.hasError) {
-                                    return const Icon(Icons.error_outline);
-                                  } else if (videoSnapshot.hasData) {
-                                    var video = videoSnapshot.data!;
-                                    return Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        Image.network(
-                                          'https://i.ytimg.com/vi/${video.id}/hqdefault.jpg',
-                                          height: 200,
-                                          fit: BoxFit.cover,
+                        return Column(
+                          children: [
+                            InkWell(
+                              onTap: () => _launchURL(videoData['url']),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: FutureBuilder<YT.Video>(
+                                  future: _fetchVideo(videoData['url']),
+                                  builder: (context, videoSnapshot) {
+                                    if (videoSnapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const SizedBox(
+                                        height: 200,
+                                        child: Center(
+                                          child: CircularProgressIndicator(),
                                         ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          video.title,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge!
-                                              .copyWith(
-                                                  fontWeight: FontWeight.bold),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          videoData['url'],
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium,
-                                        ),
-                                      ],
-                                    );
-                                  } else {
-                                    return const SizedBox.shrink();
-                                  }
-                                },
+                                      );
+                                    } else if (videoSnapshot.hasError) {
+                                      return const Icon(Icons.error_outline);
+                                    } else if (videoSnapshot.hasData) {
+                                      var video = videoSnapshot.data!;
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          Image.network(
+                                            'https://i.ytimg.com/vi/${video.id}/hqdefault.jpg',
+                                            height:
+                                                180, // Ajusta a altura da imagem para um formato mais retangular
+                                            width: double.infinity,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text(
+                                              video.title,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge!
+                                                  .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize:
+                                                        16, // Diminui o tamanho do título
+                                                  ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    } else {
+                                      return const SizedBox.shrink();
+                                    }
+                                  },
+                                ),
                               ),
                             ),
-                          ),
+                            const SizedBox(height: 8), // Espaço entre os vídeos
+                          ],
                         );
                       },
                     );
