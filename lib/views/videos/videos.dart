@@ -7,7 +7,7 @@ import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 
 class Videos extends StatefulWidget {
-  const Videos({super.key});
+  const Videos({Key? key}) : super(key: key);
 
   @override
   State<Videos> createState() => _VideosState();
@@ -25,16 +25,11 @@ class _VideosState extends State<Videos> {
     return video;
   }
 
-  void _launchURL(String url) async {
-    Uri uri = Uri.parse(url);
-    try {
-      if (await canLaunchUrl(uri.toString() as Uri)) {
-        await launchUrl(uri.toString() as Uri);
-      } else {
-        throw 'Could not launch $url';
-      }
-    } catch (e) {
-      debugPrint('Error launching URL: $e');
+  Future<void> _launchURL(String url) async {
+    final url0 = Uri.parse(url);
+    if (!await launchUrl(url0, mode: LaunchMode.externalApplication)) {
+      // <--
+      throw Exception('Could not launch $url0');
     }
   }
 
@@ -80,149 +75,139 @@ class _VideosState extends State<Videos> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('YouTube Links'),
-        ),
-        drawer: NavBar(
-          auth: AuthenticationService(),
-          authService: AuthenticationService(),
-        ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      decoration: const InputDecoration(
-                        labelText: 'Insira o link do YouTube',
-                        border: OutlineInputBorder(),
-                      ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('YouTube Links'),
+      ),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+        authService: AuthenticationService(),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      labelText: 'Insira o link do YouTube',
+                      border: OutlineInputBorder(),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: _addLink,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                    child: const Text(
-                      'Adicionar',
-                      style: TextStyle(color: Colors.white),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: _addLink,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
                     ),
                   ),
-                ],
-              ),
+                  child: const Text(
+                    'Adicionar',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(
-                height: 16), // Espaço entre o cabeçalho e o primeiro vídeo
-            Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>>(
-                future: _videosService.getVideos(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text('Erro: ${snapshot.error}'),
-                    );
-                  } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                    // Ordena os vídeos do mais antigo para o mais novo adicionado
-                    List<Map<String, dynamic>> sortedList = snapshot.data!;
+          ),
+          const SizedBox(
+              height: 16), // Espaço entre o cabeçalho e o primeiro vídeo
+          Expanded(
+            child: FutureBuilder<List<Map<String, dynamic>>>(
+              future: _videosService.getVideos(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Erro: ${snapshot.error}'),
+                  );
+                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  // Ordena os vídeos do mais antigo para o mais novo adicionado
+                  List<Map<String, dynamic>> sortedList = snapshot.data!;
 
-                    return ListView.builder(
-                      itemCount: sortedList.length,
-                      itemBuilder: (context, index) {
-                        var videoData = sortedList[index];
-                        return Column(
-                          children: [
-                            InkWell(
-                              onTap: () => _launchURL(videoData['url']),
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: FutureBuilder<YT.Video>(
-                                  future: _fetchVideo(videoData['url']),
-                                  builder: (context, videoSnapshot) {
-                                    if (videoSnapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const SizedBox(
-                                        height: 200,
-                                        child: Center(
-                                          child: CircularProgressIndicator(),
+                  return ListView.builder(
+                    itemCount: sortedList.length,
+                    itemBuilder: (context, index) {
+                      var videoData = sortedList[index];
+                      return Column(
+                        children: [
+                          InkWell(
+                            onTap: () => _launchURL(videoData['url']),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: FutureBuilder<YT.Video>(
+                                future: _fetchVideo(videoData['url']),
+                                builder: (context, videoSnapshot) {
+                                  if (videoSnapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const SizedBox(
+                                      height: 200,
+                                      child: Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    );
+                                  } else if (videoSnapshot.hasError) {
+                                    return const Icon(Icons.error_outline);
+                                  } else if (videoSnapshot.hasData) {
+                                    var video = videoSnapshot.data!;
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        Image.network(
+                                          'https://i.ytimg.com/vi/${video.id}/hqdefault.jpg',
+                                          height:
+                                              180, // Ajusta a altura da imagem para um formato mais retangular
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
                                         ),
-                                      );
-                                    } else if (videoSnapshot.hasError) {
-                                      return const Icon(Icons.error_outline);
-                                    } else if (videoSnapshot.hasData) {
-                                      var video = videoSnapshot.data!;
-                                      return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          Image.network(
-                                            'https://i.ytimg.com/vi/${video.id}/hqdefault.jpg',
-                                            height:
-                                                180, // Ajusta a altura da imagem para um formato mais retangular
-                                            width: double.infinity,
-                                            fit: BoxFit.cover,
+                                        const SizedBox(height: 8),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8.0),
+                                          child: Text(
+                                            video.title,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline6!
+                                                .copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                ),
                                           ),
-                                          const SizedBox(height: 8),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 8.0),
-                                            child: Text(
-                                              video.title,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleLarge!
-                                                  .copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize:
-                                                        16, // Diminui o tamanho do título
-                                                  ),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    } else {
-                                      return const SizedBox.shrink();
-                                    }
-                                  },
-                                ),
+                                        ),
+                                      ],
+                                    );
+                                  } else {
+                                    return const SizedBox.shrink();
+                                  }
+                                },
                               ),
                             ),
-                            const SizedBox(
-                                height: 40), // Espaço entre os vídeos
-                          ],
-                        );
-                      },
-                    );
-                  } else {
-                    return const Center(
-                      child: Text('Nenhum vídeo adicionado ainda.'),
-                    );
-                  }
-                },
-              ),
+                          ),
+                          const SizedBox(height: 40), // Espaço entre os vídeos
+                        ],
+                      );
+                    },
+                  );
+                } else {
+                  return const Center(
+                    child: Text('Nenhum vídeo adicionado ainda.'),
+                  );
+                }
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
