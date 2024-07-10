@@ -7,7 +7,7 @@ import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 
 class Videos extends StatefulWidget {
-  const Videos({super.key});
+  const Videos({Key? key}) : super(key: key);
 
   @override
   State<Videos> createState() => _VideosState();
@@ -18,6 +18,7 @@ class _VideosState extends State<Videos> {
   final TextEditingController _controller = TextEditingController();
   bool _isSelectionMode = false;
   final List<String> _selectedVideos = [];
+  bool _showAddLinkField = false;
 
   Future<YT.Video> _fetchVideo(String url) async {
     var yt = YT.YoutubeExplode();
@@ -30,48 +31,7 @@ class _VideosState extends State<Videos> {
   Future<void> _launchURL(String url) async {
     final url0 = Uri.parse(url);
     if (!await launchUrl(url0, mode: LaunchMode.externalApplication)) {
-      // <--
       throw Exception('Could not launch $url0');
-    }
-  }
-
-  void _addLink() async {
-    final String url = _controller.text.trim();
-    String videoId = '';
-
-    // Verifica se o URL corresponde ao formato https://www.youtube.com/
-    if (url.startsWith('https://www.youtube.com/')) {
-      // Extrai o ID do vídeo
-      videoId = YT.VideoId.parseVideoId(url)!;
-    }
-    // Verifica se o URL corresponde ao formato https://youtu.be/
-    else if (url.startsWith('https://youtu.be/')) {
-      // Extrai o ID do vídeo
-      videoId = url.substring(url.lastIndexOf('/') + 1).split('?').first;
-    }
-
-    if (videoId.isNotEmpty) {
-      try {
-        await _videosService.addVideo(videoId, url);
-
-        // Após adicionar o vídeo, atualiza a lista de vídeos
-        setState(() {
-          _controller.clear();
-        });
-      } catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Erro ao adicionar vídeo.'),
-          ),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, insira um link válido do YouTube.'),
-        ),
-      );
     }
   }
 
@@ -138,17 +98,66 @@ class _VideosState extends State<Videos> {
     );
   }
 
+  void _addLink() async {
+    final String url = _controller.text.trim();
+    String videoId = '';
+
+    // Verifica se o URL corresponde ao formato https://www.youtube.com/
+    if (url.startsWith('https://www.youtube.com/')) {
+      // Extrai o ID do vídeo
+      videoId = YT.VideoId.parseVideoId(url)!;
+    }
+    // Verifica se o URL corresponde ao formato https://youtu.be/
+    else if (url.startsWith('https://youtu.be/')) {
+      // Extrai o ID do vídeo
+      videoId = url.substring(url.lastIndexOf('/') + 1).split('?').first;
+    }
+
+    if (videoId.isNotEmpty) {
+      try {
+        await _videosService.addVideo(videoId, url);
+
+        // Após adicionar o vídeo, atualiza a lista de vídeos
+        setState(() {
+          _controller.clear();
+          _showAddLinkField = false; // Volta o ícone de lupa ao estado original
+        });
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Erro ao adicionar vídeo.'),
+          ),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor, insira um link válido do YouTube.'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('YouTube Videos'),
+        title: const Text('YouTube Links'),
         actions: [
           IconButton(
             onPressed: _isSelectionMode
                 ? () => _deleteSelectedVideos(context)
                 : _toggleSelectionMode,
             icon: Icon(_isSelectionMode ? Icons.delete : Icons.list),
+          ),
+          IconButton(
+            onPressed: () {
+              setState(() {
+                _showAddLinkField = !_showAddLinkField;
+              });
+            },
+            icon: const Icon(Icons.search),
           ),
         ],
       ),
@@ -159,34 +168,41 @@ class _VideosState extends State<Videos> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      labelText: 'Insira o link do YouTube',
-                      border: OutlineInputBorder(),
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 30),
+            crossFadeState: _showAddLinkField
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            firstChild: const SizedBox.shrink(),
+            secondChild: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      decoration: const InputDecoration(
+                        labelText: 'Insira o link do YouTube',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: _addLink,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: _addLink,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
+                    child: const Text(
+                      'Adicionar',
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
-                  child: const Text(
-                    'Adicionar',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           const SizedBox(
@@ -196,9 +212,7 @@ class _VideosState extends State<Videos> {
               future: _videosService.getVideos(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center();
                 } else if (snapshot.hasError) {
                   return Center(
                     child: Text('Erro: ${snapshot.error}'),
@@ -266,11 +280,10 @@ class _VideosState extends State<Videos> {
                                                   video.title,
                                                   style: Theme.of(context)
                                                       .textTheme
-                                                      .titleLarge!
+                                                      .titleMedium!
                                                       .copyWith(
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontSize: 16,
                                                       ),
                                                 ),
                                               ),
