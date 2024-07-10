@@ -20,11 +20,23 @@ class _VideosState extends State<Videos> {
   final List<String> _selectedVideos = [];
   bool _showAddLinkField = false;
 
+  // Cache para armazenar vídeos carregados
+  final VideoCache _videoCache = VideoCache();
+
   Future<YT.Video> _fetchVideo(String url) async {
+    // Verifica se o vídeo já está em cache
+    if (_videoCache.contains(url)) {
+      return _videoCache.get(url)!;
+    }
+
     var yt = YT.YoutubeExplode();
     var videoId = YT.VideoId.parseVideoId(url);
     var video = await yt.videos.get(videoId!);
     yt.close();
+
+    // Adiciona o vídeo ao cache
+    _videoCache.add(url, video);
+
     return video;
   }
 
@@ -169,7 +181,7 @@ class _VideosState extends State<Videos> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           AnimatedCrossFade(
-            duration: const Duration(milliseconds: 30),
+            duration: const Duration(milliseconds: 300),
             crossFadeState: _showAddLinkField
                 ? CrossFadeState.showSecond
                 : CrossFadeState.showFirst,
@@ -251,11 +263,8 @@ class _VideosState extends State<Videos> {
                                             ConnectionState.waiting) {
                                           return const SizedBox(
                                             height: 200,
-                                            child: Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            ),
-                                          );
+                                            child: Center(),
+                                          ); // Sem CircularProgressIndicator
                                         } else if (videoSnapshot.hasError) {
                                           return const Icon(
                                               Icons.error_outline);
@@ -280,7 +289,7 @@ class _VideosState extends State<Videos> {
                                                   video.title,
                                                   style: Theme.of(context)
                                                       .textTheme
-                                                      .titleMedium!
+                                                      .titleLarge!
                                                       .copyWith(
                                                         fontWeight:
                                                             FontWeight.bold,
@@ -315,5 +324,17 @@ class _VideosState extends State<Videos> {
         ],
       ),
     );
+  }
+}
+
+class VideoCache {
+  final Map<String, YT.Video> _cache = {};
+
+  bool contains(String url) => _cache.containsKey(url);
+
+  YT.Video? get(String url) => _cache[url];
+
+  void add(String url, YT.Video video) {
+    _cache[url] = video;
   }
 }
