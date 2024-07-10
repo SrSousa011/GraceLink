@@ -159,17 +159,20 @@ class _VideosState extends State<Videos> {
         actions: [
           IconButton(
             onPressed: _isSelectionMode
-                ? () => _deleteSelectedVideos(context)
-                : _toggleSelectionMode,
-            icon: Icon(_isSelectionMode ? Icons.delete : Icons.list),
+                ? null // Desativa o ícone de busca quando em modo de seleção
+                : () {
+                    setState(() {
+                      _showAddLinkField = !_showAddLinkField;
+                    });
+                  }, // Ativa o campo de adicionar vídeos quando não estiver em modo de seleção
+            icon: const Icon(Icons.add_outlined),
           ),
           IconButton(
-            onPressed: () {
-              setState(() {
-                _showAddLinkField = !_showAddLinkField;
-              });
-            },
-            icon: const Icon(Icons.search),
+            onPressed: _isSelectionMode
+                ? () => _deleteSelectedVideos(
+                    context) // Ativa a função de deletar vídeos quando em modo de seleção
+                : _toggleSelectionMode, // Ativa a função de alternar modo de seleção quando não estiver em modo de seleção
+            icon: Icon(_isSelectionMode ? Icons.delete : Icons.list),
           ),
         ],
       ),
@@ -289,7 +292,7 @@ class _VideosState extends State<Videos> {
                                                   video.title,
                                                   style: Theme.of(context)
                                                       .textTheme
-                                                      .titleLarge!
+                                                      .titleMedium!
                                                       .copyWith(
                                                         fontWeight:
                                                             FontWeight.bold,
