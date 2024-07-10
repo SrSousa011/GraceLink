@@ -1,10 +1,10 @@
-import 'package:churchapp/services/auth_service.dart';
-import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as YT;
 
 import 'videos_service.dart';
+import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/nav_bar/nav_bar.dart';
 
 class Videos extends StatefulWidget {
   const Videos({super.key});
@@ -28,8 +28,8 @@ class _VideosState extends State<Videos> {
   void _launchURL(String url) async {
     Uri uri = Uri.parse(url);
     try {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri);
+      if (await canLaunch(uri.toString())) {
+        await launch(uri.toString());
       } else {
         throw 'Could not launch $url';
       }
@@ -40,10 +40,24 @@ class _VideosState extends State<Videos> {
 
   void _addLink() async {
     final String url = _controller.text.trim();
-    if (url.isNotEmpty && url.startsWith('https://www.youtube.com/')) {
-      String videoId = YT.VideoId.parseVideoId(url)!;
+    String videoId = '';
+
+    // Verifica se o URL corresponde ao formato https://www.youtube.com/
+    if (url.startsWith('https://www.youtube.com/')) {
+      // Extrai o ID do vídeo
+      videoId = YT.VideoId.parseVideoId(url)!;
+    }
+    // Verifica se o URL corresponde ao formato https://youtu.be/
+    else if (url.startsWith('https://youtu.be/')) {
+      // Extrai o ID do vídeo
+      videoId = url.substring(url.lastIndexOf('/') + 1).split('?').first;
+    }
+
+    if (videoId.isNotEmpty) {
       try {
         await _videosService.addVideo(videoId, url);
+
+        // Após adicionar o vídeo, atualiza a lista de vídeos
         setState(() {
           _controller.clear();
         });
@@ -129,10 +143,13 @@ class _VideosState extends State<Videos> {
                       child: Text('Erro: ${snapshot.error}'),
                     );
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    // Ordena os vídeos do mais antigo para o mais novo adicionado
+                    List<Map<String, dynamic>> sortedList = snapshot.data!;
+
                     return ListView.builder(
-                      itemCount: snapshot.data!.length,
+                      itemCount: sortedList.length,
                       itemBuilder: (context, index) {
-                        var videoData = snapshot.data![index];
+                        var videoData = sortedList[index];
                         return Column(
                           children: [
                             InkWell(
@@ -173,7 +190,7 @@ class _VideosState extends State<Videos> {
                                               video.title,
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .titleLarge!
+                                                  .headline6!
                                                   .copyWith(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize:
