@@ -1,70 +1,146 @@
-import 'package:churchapp/provider/user_provider.dart';
-import 'package:churchapp/views/user_Profile/settings.dart';
 import 'package:flutter/material.dart';
-import 'package:churchapp/views/user_Profile/avatar_section.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
-import 'package:provider/provider.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:churchapp/views/user_Profile/profile_menu.dart';
+import 'package:churchapp/views/user_Profile/settings.dart';
+import 'package:churchapp/views/user_Profile/update_profile.dart'; // Import the UpdateProfileScreen
 
-class UserProfile extends StatefulWidget {
-  const UserProfile({super.key});
+const double tDefaultSize = 16.0; // Define a default size
+const String tProfileImage =
+    'assets/images/default_avatar.png'; // Define a profile image path
+const String tProfileHeading = 'Profile Heading'; // Example heading text
+const String tProfileSubHeading =
+    'Profile Subheading'; // Example subheading text
+const String tEditProfile = 'Edit Profile'; // Example button text
+const Color tDarkColor = Colors.black; // Example dark color
+const Color tPrimaryColor = Colors.blue; // Example primary color
+const Color tAccentColor =
+    Color.fromARGB(255, 251, 251, 251); // Example accent color
 
-  @override
-  State<UserProfile> createState() => _UserProfileState();
-}
-
-class _UserProfileState extends State<UserProfile> {
-  String fullName = '';
-  String address = '';
-
-  @override
-  void initState() {
-    super.initState();
-  }
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (_) => UserProvider(),
-        )
-      ],
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('User Profile'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.settings),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SettingsScreen(),
+    var isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {},
+          icon: const Icon(LineAwesomeIcons.angle_left_solid),
+        ),
+        title: Text(
+          'User Profile',
+          style: Theme.of(context).textTheme.headlineMedium!,
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(isDark ? LineAwesomeIcons.sun : LineAwesomeIcons.moon),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Stack(
+                children: [
+                  SizedBox(
+                    width: 120,
+                    height: 120,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: Image.asset(tProfileImage),
+                    ),
                   ),
-                );
-              },
-            ),
-          ],
-        ),
-        drawer: NavBar(
-          auth: AuthenticationService(),
-          authService: AuthenticationService(),
-        ),
-        body: Center(
-          child: Container(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                AvatarSection(
-                  fullName: fullName,
-                  address: address,
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                      width: 35,
+                      height: 35,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: tPrimaryColor,
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          LineAwesomeIcons.pencil_alt_solid,
+                          color: Colors.black,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                tProfileHeading,
+                style: Theme.of(context).textTheme.titleLarge!,
+              ),
+              Text(
+                tProfileSubHeading,
+                style: Theme.of(context).textTheme.titleMedium!,
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: 200,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const UpdateProfileScreen(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: tPrimaryColor,
+                    shape: const StadiumBorder(),
+                  ),
+                  child: const Text(
+                    tEditProfile,
+                    style: TextStyle(color: tDarkColor),
+                  ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 30),
+              const Divider(),
+              const SizedBox(height: 10),
+              ProfileMenuWidget(
+                title: 'Settings',
+                icon: LineAwesomeIcons.cog_solid,
+                onPress: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SettingsScreen(),
+                    ),
+                  );
+                },
+              ),
+              ProfileMenuWidget(
+                title: 'User Management',
+                icon: LineAwesomeIcons.user_check_solid,
+                onPress: () {},
+              ),
+              ProfileMenuWidget(
+                title: 'Info',
+                icon: LineAwesomeIcons.info_solid,
+                onPress: () {},
+              ),
+            ],
           ),
         ),
+      ),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+        authService: AuthenticationService(),
       ),
     );
   }
