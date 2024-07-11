@@ -3,23 +3,17 @@ import 'package:churchapp/services/auth_service.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:churchapp/views/user_Profile/update_profile.dart';
 
-const Color tPrimaryColor = Colors.blue; // Example primary color
-const Color tDarkColor =
-    Color.fromARGB(255, 255, 255, 255); // Example dark color
-
-class ChangeEmailScreen extends StatelessWidget {
+class ChangeNameScreen extends StatelessWidget {
   final TextEditingController _currentEmailController = TextEditingController();
   final TextEditingController _newEmailController = TextEditingController();
   final TextEditingController _confirmEmailController = TextEditingController();
 
-  ChangeEmailScreen({super.key});
+  ChangeNameScreen({super.key});
 
   void _changeEmail(BuildContext context) async {
     String currentEmail = _currentEmailController.text.trim();
     String newEmail = _newEmailController.text.trim();
     String confirmEmail = _confirmEmailController.text.trim();
-
-    Color.fromARGB(255, 255, 255, 255); // Example dark color
 
     if (newEmail != confirmEmail) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -50,10 +44,7 @@ class ChangeEmailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(LineAwesomeIcons.angle_left_solid),
-        ),
+        title: const Text('Change Email'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -85,18 +76,25 @@ class ChangeEmailScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: tFormHeight - 20),
-            const SizedBox(height: tFormHeight),
+            const SizedBox(height: 16),
             SizedBox(
-              width: double.infinity,
+              height: 40, // Reduzi a altura para 40
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () => _changeEmail(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: tPrimaryColor,
-                  shape: const StadiumBorder(),
+                  backgroundColor:
+                      const Color(0xFF5AAFf9), // Cor de fundo do botão
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(16.0), // Raio das bordas do botão
+                  ),
+                  elevation: 0, // Reduzi a elevação para 0
                 ),
                 child: const Text(
-                  tEditProfile,
-                  style: TextStyle(color: tDarkColor),
+                  'Change Email',
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white), // Estilo do texto do botão
                 ),
               ),
             ),

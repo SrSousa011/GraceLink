@@ -52,7 +52,7 @@ class DrawerHeaderWidget extends StatelessWidget {
             Navigator.pop(context); // Close the drawer before navigating
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const UserProfile()),
+              MaterialPageRoute(builder: (context) => const ProfileScreen()),
             );
           },
           child: Column(

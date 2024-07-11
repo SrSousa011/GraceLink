@@ -30,7 +30,7 @@ class AppRoutes {
           ),
         );
       case '/user_profile':
-        return MaterialPageRoute(builder: (_) => const UserProfile());
+        return MaterialPageRoute(builder: (_) => const ProfileScreen());
       case '/notifications':
         return MaterialPageRoute(builder: (_) => const Notifications());
       case '/videos':

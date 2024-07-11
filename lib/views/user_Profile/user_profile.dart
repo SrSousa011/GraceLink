@@ -8,7 +8,7 @@ import 'package:churchapp/views/user_Profile/update_profile.dart'; // Import the
 
 const double tDefaultSize = 16.0; // Define a default size
 const String tProfileImage =
-    'assets/images/default_avatar.png'; // Define a profile image path
+    'assets/imagens/default_avatar.png'; // Define a profile image path
 const String tProfileHeading = 'Profile Heading'; // Example heading text
 const String tProfileSubHeading =
     'Profile Subheading'; // Example subheading text
@@ -91,14 +91,7 @@ class ProfileScreen extends StatelessWidget {
               SizedBox(
                 width: 200,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const UpdateProfileScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: tPrimaryColor,
                     shape: const StadiumBorder(),
@@ -127,7 +120,14 @@ class ProfileScreen extends StatelessWidget {
               ProfileMenuWidget(
                 title: 'User Management',
                 icon: LineAwesomeIcons.user_check_solid,
-                onPress: () {},
+                onPress: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const UpdateProfileScreen(),
+                    ),
+                  );
+                },
               ),
               ProfileMenuWidget(
                 title: 'Info',
