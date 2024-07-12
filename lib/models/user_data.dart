@@ -1,25 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserData {
-  final String uid;
+  final String id;
   final String fullName;
   final String email;
-  final String password; // Consider using hashed passwords
+  final String password;
   final String phoneNumber;
   final String address;
 
   UserData({
-    required this.uid,
+    required this.id,
     required this.fullName,
     required this.email,
     required this.password,
     required this.phoneNumber,
     required this.address,
+    required String imageUrl,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'uid': uid,
+      'uid': id,
       'fullName': fullName,
       'email': email,
       'password': password,
@@ -30,30 +31,32 @@ class UserData {
 
   factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
-      uid: json['uid'],
+      id: json['uid'],
       fullName: json['fullName'],
       email: json['email'],
       password: json['password'],
       phoneNumber: json['phoneNumber'],
       address: json['address'],
+      imageUrl: json['url'],
     );
   }
 
   factory UserData.fromDocumentSnapshot(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return UserData(
-      uid: data['uid'],
+      id: doc.id,
       fullName: data['fullName'],
       email: data['email'],
       password: data['password'],
       phoneNumber: data['phoneNumber'],
       address: data['address'],
+      imageUrl: data['imageUrl'],
     );
   }
 
   Map<String, dynamic> toDocumentSnapshot() {
     return {
-      'uid': uid,
+      'uid': id,
       'fullName': fullName,
       'email': email,
       'password': password,
