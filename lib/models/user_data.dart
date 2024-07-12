@@ -7,6 +7,7 @@ class UserData {
   final String password;
   final String phoneNumber;
   final String address;
+  final String imageUrl;
 
   UserData({
     required this.id,
@@ -15,7 +16,7 @@ class UserData {
     required this.password,
     required this.phoneNumber,
     required this.address,
-    required String imageUrl,
+    required this.imageUrl,
   });
 
   Map<String, dynamic> toJson() {
