@@ -1,3 +1,4 @@
+import 'package:churchapp/models/user_data.dart';
 import 'package:churchapp/views/user_Profile/user_profile.dart';
 import 'package:flutter/material.dart';
 
@@ -52,7 +53,14 @@ class DrawerHeaderWidget extends StatelessWidget {
             Navigator.pop(context); // Close the drawer before navigating
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              MaterialPageRoute(
+                  builder: (context) => ProfileScreen(
+                          userData: UserData(
+                        fullName: fullName ?? '',
+                        id: '', email: '', password: '', phoneNumber: '',
+                        address: '', imageUrl: '',
+                        // Add other necessary fields from UserData model
+                      ))),
             );
           },
           child: Column(

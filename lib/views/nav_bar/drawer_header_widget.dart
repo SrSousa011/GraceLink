@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:churchapp/models/user_data.dart';
 import 'package:churchapp/views/user_Profile/user_profile.dart';
 import 'package:flutter/material.dart';
 
@@ -8,11 +9,10 @@ class DrawerHeaderWidget extends StatelessWidget {
   final String? uploadedImageUrl;
 
   const DrawerHeaderWidget({
-    super.key,
+    Key? key,
     required this.fullName,
     this.uploadedImageUrl,
-    String? imageUrl,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +29,18 @@ class DrawerHeaderWidget extends StatelessWidget {
         ),
         child: GestureDetector(
           onTap: () {
-            Navigator.pop(context);
+            Navigator.pop(context); // Close the drawer
+            // Navigate to ProfileScreen with userData
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              MaterialPageRoute(
+                  builder: (context) => ProfileScreen(
+                          userData: UserData(
+                        fullName: fullName ?? '',
+                        imageUrl: uploadedImageUrl ?? '', id: '', email: '',
+                        password: '', phoneNumber: '', address: '',
+                        // Add other necessary fields from UserData model
+                      ))),
             );
           },
           child: Column(

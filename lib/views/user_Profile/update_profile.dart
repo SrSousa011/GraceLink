@@ -1,3 +1,5 @@
+import 'package:churchapp/models/user_data.dart';
+import 'package:churchapp/views/user_Profile/user_profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
@@ -13,11 +15,66 @@ const String tJoinedAt = '25 Jan 2022'; // Example date
 const String tDelete = 'Delete'; // Example delete button text
 
 const Color tPrimaryColor = Colors.blue; // Example primary color
-const Color tDarkColor =
-    Color.fromARGB(255, 255, 255, 255); // Example dark color
+const Color tDarkColor = Colors.white; // Example dark color
 
-class UpdateProfileScreen extends StatelessWidget {
-  const UpdateProfileScreen({super.key});
+class UpdateProfileScreen extends StatefulWidget {
+  final UserData userData;
+
+  const UpdateProfileScreen({super.key, required this.userData});
+
+  @override
+  State<UpdateProfileScreen> createState() => _UpdateProfileScreenState();
+}
+
+class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
+  late TextEditingController _fullNameController;
+  late TextEditingController _emailController;
+  late TextEditingController _phoneNoController;
+  late TextEditingController _passwordController;
+
+  @override
+  void initState() {
+    super.initState();
+    _fullNameController = TextEditingController(text: widget.userData.fullName);
+    _emailController = TextEditingController(text: widget.userData.email);
+    _phoneNoController =
+        TextEditingController(text: widget.userData.phoneNumber);
+    _passwordController = TextEditingController(text: widget.userData.password);
+  }
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _phoneNoController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _saveProfileChanges() {
+    String fullName = _fullNameController.text;
+    String email = _emailController.text;
+    String phoneNo = _phoneNoController.text;
+    String password = _passwordController.text;
+
+    // Instantiate the service class
+    UserProfileService userProfileService = UserProfileService();
+
+    // Call the method to update user profile
+    userProfileService
+        .updateUserProfile(fullName, email, phoneNo, password)
+        .then((_) {
+      // Show a SnackBar to indicate success
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile updated successfully')),
+      );
+    }).catchError((error) {
+      // Handle error (e.g., show error message)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update profile: $error')),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +86,7 @@ class UpdateProfileScreen extends StatelessWidget {
         ),
         title: Text(
           tEditProfile,
-          style: Theme.of(context).textTheme.titleLarge!,
+          style: Theme.of(context).textTheme.titleLarge,
         ),
       ),
       body: SingleChildScrollView(
@@ -47,6 +104,7 @@ class UpdateProfileScreen extends StatelessWidget {
               child: Column(
                 children: [
                   TextFormField(
+                    controller: _fullNameController,
                     decoration: const InputDecoration(
                       labelText: tFullName,
                       prefixIcon: Icon(LineAwesomeIcons.user),
@@ -54,6 +112,7 @@ class UpdateProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: tFormHeight - 20),
                   TextFormField(
+                    controller: _emailController,
                     decoration: const InputDecoration(
                       labelText: tEmail,
                       prefixIcon: Icon(LineAwesomeIcons.envelope_solid),
@@ -61,6 +120,7 @@ class UpdateProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: tFormHeight - 20),
                   TextFormField(
+                    controller: _phoneNoController,
                     decoration: const InputDecoration(
                       labelText: tPhoneNo,
                       prefixIcon: Icon(LineAwesomeIcons.phone_alt_solid),
@@ -68,6 +128,7 @@ class UpdateProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: tFormHeight - 20),
                   TextFormField(
+                    controller: _passwordController,
                     decoration: const InputDecoration(
                       labelText: tPassword,
                       prefixIcon: Icon(Icons.fingerprint),
@@ -77,7 +138,7 @@ class UpdateProfileScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: _saveProfileChanges,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: tPrimaryColor,
                         shape: const StadiumBorder(),
@@ -108,13 +169,14 @@ class UpdateProfileScreen extends StatelessWidget {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          // Implement delete logic here
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.redAccent.withOpacity(0.1),
                           elevation: 0,
                           foregroundColor: Colors.red,
                           shape: const StadiumBorder(),
-                          side: BorderSide.none,
                         ),
                         child: const Text(tDelete),
                       ),

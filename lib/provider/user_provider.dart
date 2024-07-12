@@ -22,20 +22,6 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateUserData(Map<String, dynamic> newData) {
-    if (_user != null) {
-      _user = UserData(
-        uid: newData['uid'] ?? _user!.uid,
-        fullName: newData['fullName'] ?? _user!.fullName,
-        email: newData['email'] ?? _user!.email,
-        password: newData['password'] ?? _user!.password,
-        phoneNumber: newData['phoneNumber'] ?? _user!.phoneNumber,
-        address: newData['address'] ?? _user!.address,
-      );
-      notifyListeners();
-    }
-  }
-
   Future<void> fetchUserData(String uid) async {
     try {
       DocumentSnapshot doc =

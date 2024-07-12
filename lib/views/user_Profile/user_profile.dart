@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:churchapp/services/auth_service.dart';
-import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/user_Profile/profile_menu.dart';
 import 'package:churchapp/views/user_Profile/settings.dart';
 import 'package:churchapp/views/user_Profile/update_profile.dart'; // Import the UpdateProfileScreen
+import 'package:churchapp/models/user_data.dart'; // Import UserData model
+import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/user_Profile/user_profile_service.dart'; // Import UserProfileService
 
 const double tDefaultSize = 16.0; // Define a default size
 const String tProfileImage =
@@ -18,12 +20,69 @@ const Color tPrimaryColor = Colors.blue; // Example primary color
 const Color tAccentColor =
     Color.fromARGB(255, 251, 251, 251); // Example accent color
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+class ProfileScreen extends StatefulWidget {
+  final UserData userData; // Required parameter
+
+  const ProfileScreen({super.key, required this.userData});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  late TextEditingController _fullNameController;
+  late TextEditingController _emailController;
+  late TextEditingController _phoneNoController;
+  late TextEditingController _passwordController;
+
+  @override
+  void initState() {
+    super.initState();
+    _fullNameController = TextEditingController(text: widget.userData.fullName);
+    _emailController = TextEditingController(text: widget.userData.email);
+    _phoneNoController =
+        TextEditingController(text: widget.userData.phoneNumber);
+    _passwordController = TextEditingController(text: widget.userData.password);
+  }
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _phoneNoController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _saveProfileChanges() {
+    String fullName = _fullNameController.text;
+    String email = _emailController.text;
+    String phoneNo = _phoneNoController.text;
+    String password = _passwordController.text;
+
+    // Instantiate the service class
+    UserProfileService userProfileService = UserProfileService();
+
+    // Call the method to update user profile
+    userProfileService
+        .updateUserProfile(fullName, email, phoneNo, password)
+        .then((_) {
+      // Show a SnackBar to indicate success
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile updated successfully')),
+      );
+    }).catchError((error) {
+      // Handle error (e.g., show error message)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update profile: $error')),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     var isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -32,7 +91,7 @@ class ProfileScreen extends StatelessWidget {
         ),
         title: Text(
           'User Profile',
-          style: Theme.of(context).textTheme.headlineMedium!,
+          style: Theme.of(context).textTheme.titleLarge!,
         ),
         actions: [
           IconButton(
@@ -80,18 +139,18 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                tProfileHeading,
-                style: Theme.of(context).textTheme.titleLarge!,
+                widget.userData.fullName,
+                style: Theme.of(context).textTheme.headlineSmall!,
               ),
               Text(
-                tProfileSubHeading,
+                widget.userData.address, // Displaying address
                 style: Theme.of(context).textTheme.titleMedium!,
               ),
               const SizedBox(height: 20),
               SizedBox(
                 width: 200,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _saveProfileChanges, // Call save method
                   style: ElevatedButton.styleFrom(
                     backgroundColor: tPrimaryColor,
                     shape: const StadiumBorder(),
@@ -124,7 +183,8 @@ class ProfileScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const UpdateProfileScreen(),
+                      builder: (context) =>
+                          UpdateProfileScreen(userData: widget.userData),
                     ),
                   );
                 },
