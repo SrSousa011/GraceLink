@@ -13,6 +13,7 @@ class AuthMethods {
     required String lastName,
     required String phoneNumber,
     required String address,
+    required String imageUrl,
   }) async {
     if (_isEmpty(email) ||
         _isEmpty(password) ||
@@ -59,12 +60,13 @@ class AuthMethods {
       );
 
       UserData userData = UserData(
-        uid: userCredential.user!.uid,
+        id: userCredential.user!.uid,
         fullName: '$firstName $lastName',
         email: email,
         phoneNumber: phoneNumber,
         address: address,
         password: password,
+        imageUrl: imageUrl,
       );
 
       await _firestore
