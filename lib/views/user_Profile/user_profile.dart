@@ -31,13 +31,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late TextEditingController _fullNameController;
   late TextEditingController _addressController;
   Uint8List? _image;
-  late String _imageUrl;
+  late String _imagePath;
 
   @override
   void initState() {
     super.initState();
     _fullNameController = TextEditingController(text: widget.userData.fullName);
     _addressController = TextEditingController(text: widget.userData.address);
+    _imagePath =
+        widget.userData.imagePath; // Initialize _imageUrl with an empty string
   }
 
   @override
@@ -98,10 +100,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               radius: 64,
                               backgroundImage: MemoryImage(_image!),
                             )
-                          : _imageUrl.isNotEmpty
+                          : _imagePath.isNotEmpty
                               ? CircleAvatar(
                                   radius: 64,
-                                  backgroundImage: NetworkImage(_imageUrl),
+                                  backgroundImage: NetworkImage(_imagePath),
                                 )
                               : Image.asset(tProfileImage),
                     ),
