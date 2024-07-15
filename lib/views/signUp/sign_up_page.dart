@@ -353,6 +353,7 @@ class _SignUpPageState extends State<SignUpPage> {
               _firstNameController.text + _lastNameController.text.trim(),
           'email': email,
           'phoneNumber': selectedDDD + _phoneNumberController.text.trim(),
+          'address': _cityController.text + _countryController.text.trim(),
           'dateOfBirth': DateTime(
             selectedYear!,
             selectedMonth!,
