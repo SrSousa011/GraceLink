@@ -3,42 +3,30 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class UserData {
   final String id;
   final String fullName;
-  final String email;
-  final String password;
-  final String phoneNumber;
   final String address;
-  final String imageUrl;
+  final String imagePath;
 
   UserData({
     required this.id,
     required this.fullName,
-    required this.email,
-    required this.password,
-    required this.phoneNumber,
     required this.address,
-    required this.imageUrl,
+    required this.imagePath,
   });
-
   Map<String, dynamic> toJson() {
     return {
-      'uid': id,
+      'id': id,
       'fullName': fullName,
-      'email': email,
-      'password': password,
-      'phoneNumber': phoneNumber,
       'address': address,
+      'imageUrl': imagePath,
     };
   }
 
   factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
-      id: json['uid'],
+      id: json['id'],
       fullName: json['fullName'],
-      email: json['email'],
-      password: json['password'],
-      phoneNumber: json['phoneNumber'],
       address: json['address'],
-      imageUrl: json['url'],
+      imagePath: json['imageUrl'],
     );
   }
 
@@ -47,22 +35,17 @@ class UserData {
     return UserData(
       id: doc.id,
       fullName: data['fullName'],
-      email: data['email'],
-      password: data['password'],
-      phoneNumber: data['phoneNumber'],
       address: data['address'],
-      imageUrl: data['imageUrl'],
+      imagePath: data['imageUrl'],
     );
   }
 
   Map<String, dynamic> toDocumentSnapshot() {
     return {
-      'uid': id,
+      'id': id,
       'fullName': fullName,
-      'email': email,
-      'password': password,
-      'phoneNumber': phoneNumber,
       'address': address,
+      'imageUrl': imagePath,
     };
   }
 }

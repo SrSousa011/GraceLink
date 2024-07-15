@@ -1,8 +1,8 @@
-import 'package:churchapp/views/user_Profile/change_name.dart';
+import 'package:churchapp/views/user_Profile/settings/change_name.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:churchapp/views/user_Profile/change_email.dart';
-import 'package:churchapp/views/user_Profile/change_password.dart';
+import 'package:churchapp/views/user_Profile/settings/change_email.dart';
+import 'package:churchapp/views/user_Profile/settings/change_password.dart';
 import 'package:churchapp/services/auth_service.dart';
 
 const Color tPrimaryColor = Colors.blue; // Example primary color

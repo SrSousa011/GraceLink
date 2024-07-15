@@ -8,7 +8,7 @@ class StoreData {
 
   Future<String> uploadImageToStorage(String childName, Uint8List file) async {
     try {
-      Reference ref = _storage.ref().child(childName);
+      Reference ref = _storage.ref().child('userProfile');
       UploadTask uploadTask = ref.putData(file);
       TaskSnapshot snapshot = await uploadTask;
       String downloadURL = await snapshot.ref.getDownloadURL();
@@ -21,39 +21,20 @@ class StoreData {
     }
   }
 
-  Future<void> saveProfileImage(String downloadURL) async {
-    try {
-      await _firestore.collection("userProfile").doc("profile").set({
-        'imageLink': downloadURL,
-      });
-    } catch (err) {
-      if (kDebugMode) {
-        print('Error saving profile image: $err');
-      }
-      throw err.toString();
-    }
-  }
-
-  Future<String> getProfileImage() async {
-    try {
-      String downloadURL =
-          await _storage.ref().child('profile_images').getDownloadURL();
-      return downloadURL;
-    } catch (err) {
-      if (kDebugMode) {
-        print('Error getting profile image: $err');
-      }
-      throw err.toString();
-    }
-  }
-
   Future<String> saveData({required Uint8List file}) async {
+    String resp = "Some Error Occurred";
     try {
-      String downloadURL = await uploadImageToStorage('profile_images', file);
-      await saveProfileImage(downloadURL);
+      String imageUrl = await uploadImageToStorage('profile_images', file);
+      await _firestore.collection('userProfile').add({
+        'imageLink': imageUrl,
+      });
       return 'Success';
     } catch (err) {
-      return err.toString();
+      if (kDebugMode) {
+        print('Error saving data: $err');
+      }
+      resp = err.toString();
     }
+    return resp;
   }
 }

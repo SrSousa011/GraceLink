@@ -1,15 +1,17 @@
+import 'package:churchapp/views/user_Profile/store_data.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/user_Profile/profile_menu.dart';
-import 'package:churchapp/views/user_Profile/settings.dart';
+import 'package:churchapp/views/user_Profile/settings/settings.dart';
 import 'package:churchapp/views/user_Profile/update_profile.dart'; // Import the UpdateProfileScreen
 import 'package:churchapp/models/user_data.dart'; // Import UserData model
 import 'package:churchapp/services/auth_service.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter/foundation.dart';
 
 const Color tAccentColor =
     Color.fromARGB(255, 251, 251, 251); // Example accent color
-
 const double tDefaultSize = 16.0; // Define a default size
 const String tProfileImage =
     'assets/imagens/default_avatar.png'; // Define a profile image path
@@ -28,12 +30,15 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   late TextEditingController _fullNameController;
   late TextEditingController _addressController;
+  Uint8List? _image;
+  late String _imageUrl;
 
   @override
   void initState() {
     super.initState();
     _fullNameController = TextEditingController(text: widget.userData.fullName);
     _addressController = TextEditingController(text: widget.userData.address);
+    _imageUrl = widget.userData.imageUrl;
   }
 
   @override
@@ -41,6 +46,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _fullNameController.dispose();
     _addressController.dispose();
     super.dispose();
+  }
+
+  Future<void> selectImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      Uint8List img = await image.readAsBytes();
+      setState(() {
+        _image = img;
+      });
+      saveImage();
+    }
+  }
+
+  Future<void> saveImage() async {
+    String resp = await StoreData().saveData(file: _image!);
   }
 
   @override
@@ -73,7 +94,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     height: 120,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(100),
-                      child: Image.asset(tProfileImage),
+                      child: _image != null
+                          ? CircleAvatar(
+                              radius: 64,
+                              backgroundImage: MemoryImage(_image!),
+                            )
+                          : _imageUrl.isNotEmpty
+                              ? CircleAvatar(
+                                  radius: 64,
+                                  backgroundImage: NetworkImage(_imageUrl),
+                                )
+                              : Image.asset(tProfileImage),
                     ),
                   ),
                   Positioned(
@@ -86,12 +117,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         shape: BoxShape.circle,
                         color: tPrimaryColor,
                       ),
-                      child: const Center(
-                        child: Icon(
+                      child: IconButton(
+                        icon: const Icon(
                           LineAwesomeIcons.pencil_alt_solid,
                           color: Colors.black,
                           size: 20,
                         ),
+                        onPressed: selectImage,
                       ),
                     ),
                   ),
