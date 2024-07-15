@@ -57,8 +57,8 @@ class DrawerHeaderWidget extends StatelessWidget {
                   builder: (context) => ProfileScreen(
                           userData: UserData(
                         fullName: fullName ?? '',
-                        id: '', email: '', password: '', phoneNumber: '',
-                        address: '', imageUrl: '',
+                        id: '',
+                        address: '', imagePath: '',
                         // Add other necessary fields from UserData model
                       ))),
             );

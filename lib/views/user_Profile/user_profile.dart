@@ -38,7 +38,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _fullNameController = TextEditingController(text: widget.userData.fullName);
     _addressController = TextEditingController(text: widget.userData.address);
-    _imageUrl = widget.userData.imageUrl;
   }
 
   @override

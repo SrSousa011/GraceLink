@@ -36,10 +36,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   void initState() {
     super.initState();
     _fullNameController = TextEditingController(text: widget.userData.fullName);
-    _emailController = TextEditingController(text: widget.userData.email);
-    _phoneNoController =
-        TextEditingController(text: widget.userData.phoneNumber);
-    _passwordController = TextEditingController(text: widget.userData.password);
   }
 
   @override

@@ -30,7 +30,6 @@ class _AvatarSectionState extends State<AvatarSection> {
   @override
   void initState() {
     super.initState();
-    _loadImage();
     getDada();
   }
 
@@ -39,27 +38,6 @@ class _AvatarSectionState extends State<AvatarSection> {
     address = (await AuthenticationService().getAddress())!;
     if (mounted) {
       setState(() {});
-    }
-  }
-
-  Future<void> _loadImage() async {
-    try {
-      String imageUrl = await StoreData().getProfileImage();
-      if (mounted) {
-        setState(() {
-          _uploadedImageUrl = imageUrl;
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error loading profile image: $e');
-      }
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
     }
   }
 
