@@ -22,19 +22,21 @@ class StoreData {
   }
 
   Future<String> saveData({required Uint8List file}) async {
-    String resp = "Some Error Occurred";
     try {
-      String imageUrl = await uploadImageToStorage('profile_images', file);
-      await _firestore.collection('userProfile').add({
-        'imageLink': imageUrl,
-      });
+      // Upload image to Firebase Storage
+      String imagePath = await uploadImageToStorage('profile_images', file);
+
+      // Save image link to Firestore
+      await _firestore.collection('userProfile').doc().set({
+        'imagePath': imagePath,
+      }, SetOptions(merge: true)); // Merge with existing data if any
+
       return 'Success';
     } catch (err) {
       if (kDebugMode) {
         print('Error saving data: $err');
       }
-      resp = err.toString();
+      throw err.toString();
     }
-    return resp;
   }
 }
