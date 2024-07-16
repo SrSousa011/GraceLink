@@ -24,7 +24,7 @@ class _AvatarSectionState extends State<AvatarSection> {
   String? _uploadedImageUrl;
   bool isLoading = true;
   String fullName = '';
-  String address = '';
+  String bio = '';
 
   @override
   void initState() {
@@ -34,7 +34,7 @@ class _AvatarSectionState extends State<AvatarSection> {
 
   void getDada() async {
     fullName = (await AuthenticationService().getCurrentUserName())!;
-    address = (await AuthenticationService().getAddress())!;
+    bio = (await AuthenticationService().getAddress())!;
     if (mounted) {
       setState(() {});
     }
@@ -166,7 +166,7 @@ class _AvatarSectionState extends State<AvatarSection> {
           ),
           const SizedBox(height: 4),
           Text(
-            address,
+            bio,
             style: const TextStyle(fontSize: 16),
           ),
         ],

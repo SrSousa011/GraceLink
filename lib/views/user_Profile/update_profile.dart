@@ -3,11 +3,11 @@ import 'package:churchapp/views/user_Profile/user_profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
-const String tEditProfile = 'Edit Profile'; // Example button text
+const String tEditProfile = 'Save'; // Example button text
 const double tDefaultSize = 16.0; // Define a default size
 const double tFormHeight = 20.0; // Example form field height
 const String tFullName = 'Full Name'; // Example label text
-const String tBio = 'bio'; // Example label text
+const String tBio = 'Bio'; // Example label text
 const String tJoined = 'Joined '; // Example text for joined
 const String tJoinedAt = '25 Jan 2022'; // Example date
 const String tDelete = 'Delete'; // Example delete button text
@@ -32,6 +32,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   void initState() {
     super.initState();
     _fullNameController = TextEditingController(text: widget.userData.fullName);
+    _bioController = TextEditingController(text: widget.userData.bio);
   }
 
   @override

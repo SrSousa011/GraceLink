@@ -58,7 +58,7 @@ class DrawerHeaderWidget extends StatelessWidget {
                           userData: UserData(
                         fullName: fullName ?? '',
                         id: '',
-                        address: '', imagePath: '',
+                        bio: '', imagePath: '',
                         // Add other necessary fields from UserData model
                       ))),
             );
