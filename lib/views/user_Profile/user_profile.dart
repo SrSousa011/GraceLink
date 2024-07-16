@@ -31,7 +31,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   late TextEditingController _fullNameController;
   Uint8List? _image;
-  late String _imagePath;
+  late String _imagePath = ''; // Initialize _imagePath with an empty string
 
   @override
   void initState() {
