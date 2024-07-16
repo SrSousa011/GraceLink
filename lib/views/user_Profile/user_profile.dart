@@ -50,8 +50,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> selectImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       Uint8List img = await image.readAsBytes();
       setState(() {
@@ -84,7 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: Text(
           'User Profile',
-          style: Theme.of(context).textTheme.headline6,
+          style: Theme.of(context).textTheme.titleLarge,
         ),
         actions: [
           IconButton(
@@ -148,11 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 10),
               Text(
                 widget.userData.fullName,
-                style: Theme.of(context).textTheme.headline6,
-              ),
-              Text(
-                widget.userData.address,
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 20),
               SizedBox(
