@@ -33,7 +33,7 @@ class ChangePhoneScreen extends StatelessWidget {
           .changePhoneWithConfirmation(currentPhone, newPhone);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email changed successfully')),
+        const SnackBar(content: Text('Phone changed successfully')),
       );
       Navigator.pop(
           context); // Navigate back to UserProfile after successful change
@@ -62,7 +62,7 @@ class ChangePhoneScreen extends StatelessWidget {
             TextFormField(
               controller: _currentPhoneController,
               decoration: const InputDecoration(
-                labelText: 'Current Email',
+                labelText: 'Current Phone',
                 prefixIcon: Icon(LineAwesomeIcons.envelope),
               ),
             ),
@@ -70,7 +70,7 @@ class ChangePhoneScreen extends StatelessWidget {
             TextFormField(
               controller: _newPhoneController,
               decoration: const InputDecoration(
-                labelText: 'New Email',
+                labelText: 'New Phone',
                 prefixIcon: Icon(LineAwesomeIcons.envelope),
               ),
             ),
@@ -78,7 +78,7 @@ class ChangePhoneScreen extends StatelessWidget {
             TextFormField(
               controller: _confirmPhoneController,
               decoration: const InputDecoration(
-                labelText: 'Confirm New Email',
+                labelText: 'Confirm New Phone',
                 prefixIcon: Icon(LineAwesomeIcons.envelope),
               ),
             ),
