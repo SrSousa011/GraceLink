@@ -32,6 +32,9 @@ abstract class BaseAuth {
   Future<void> changeEmailWithConfirmation(
       String currentEmail, String newEmail);
 
+  Future<void> changePhoneWithConfirmation(
+      String currentEmail, String newEmail);
+
   Future<void> changePasswordWithConfirmation(
       String currentPassword, String newPassword);
 
@@ -286,6 +289,46 @@ class AuthenticationService implements BaseAuth {
       await user?.delete();
     } catch (e) {
       throw Exception('Failed to delete account: $e');
+    }
+  }
+
+  @override
+  Future<void> changePhoneWithConfirmation(
+      String currentPhone, String newPhone) async {
+    User? user = _firebaseAuth.currentUser;
+
+    try {
+      // Confirm that the user wants to change the phone number
+      // Here you might implement a confirmation step, such as sending a verification code to the current phone number
+
+      // Example: Sending SMS verification to current phone number (pseudo-code)
+      // await sendVerificationCodeToCurrentPhone(currentPhone);
+
+      // Re-authenticate the user before changing the phone number
+      // Assuming the user is authenticated with password or another method
+      // Implement your own logic for re-authentication based on your app's flow
+      // For simplicity, reauthentication is not shown in detail here
+
+      // Update the phone number
+      await user?.updatePhoneNumber(PhoneAuthProvider.credential(
+        verificationId:
+            '<verificationId>', // Use the verification ID received from SMS if applicable
+        smsCode: '<smsCode>', // SMS code entered by user
+      ));
+
+      // Update the phone number in Firestore or any other database
+      await _firestore.collection('users').doc(user?.uid).update({
+        'phone': newPhone,
+      });
+
+      if (kDebugMode) {
+        print("Successfully changed phone number");
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print("Phone number can't be changed: ${error.toString()}");
+      }
+      rethrow;
     }
   }
 
