@@ -39,7 +39,7 @@ class ChangePhoneScreen extends StatelessWidget {
           context); // Navigate back to UserProfile after successful change
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to change email: $e')),
+        SnackBar(content: Text('Failed to change phone: $e')),
       );
     }
   }
@@ -63,7 +63,7 @@ class ChangePhoneScreen extends StatelessWidget {
               controller: _currentPhoneController,
               decoration: const InputDecoration(
                 labelText: 'Current Phone',
-                prefixIcon: Icon(LineAwesomeIcons.envelope),
+                prefixIcon: Icon(LineAwesomeIcons.phone_solid),
               ),
             ),
             const SizedBox(height: tFormHeight - 20),
@@ -71,7 +71,7 @@ class ChangePhoneScreen extends StatelessWidget {
               controller: _newPhoneController,
               decoration: const InputDecoration(
                 labelText: 'New Phone',
-                prefixIcon: Icon(LineAwesomeIcons.envelope),
+                prefixIcon: Icon(LineAwesomeIcons.phone_solid),
               ),
             ),
             const SizedBox(height: tFormHeight - 20),
@@ -79,7 +79,7 @@ class ChangePhoneScreen extends StatelessWidget {
               controller: _confirmPhoneController,
               decoration: const InputDecoration(
                 labelText: 'Confirm New Phone',
-                prefixIcon: Icon(LineAwesomeIcons.envelope),
+                prefixIcon: Icon(LineAwesomeIcons.phone_solid),
               ),
             ),
             const SizedBox(height: tFormHeight - 20),
