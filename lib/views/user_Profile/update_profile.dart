@@ -3,7 +3,7 @@ import 'package:churchapp/views/user_Profile/user_profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
-const String tEditProfile = 'Save'; // Example button text
+const String tEditProfile = 'Update Profile'; // Example button text
 const double tDefaultSize = 16.0; // Define a default size
 const double tFormHeight = 20.0; // Example form field height
 const String tFullName = 'Full Name'; // Example label text
