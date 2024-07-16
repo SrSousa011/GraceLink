@@ -7,9 +7,7 @@ const String tEditProfile = 'Edit Profile'; // Example button text
 const double tDefaultSize = 16.0; // Define a default size
 const double tFormHeight = 20.0; // Example form field height
 const String tFullName = 'Full Name'; // Example label text
-const String tEmail = 'Email'; // Example label text
-const String tPhoneNo = 'Phone Number'; // Example label text
-const String tPassword = 'Password'; // Example label text
+const String tBio = 'bio'; // Example label text
 const String tJoined = 'Joined '; // Example text for joined
 const String tJoinedAt = '25 Jan 2022'; // Example date
 const String tDelete = 'Delete'; // Example delete button text
@@ -28,9 +26,7 @@ class UpdateProfileScreen extends StatefulWidget {
 
 class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   late TextEditingController _fullNameController;
-  late TextEditingController _emailController;
-  late TextEditingController _phoneNoController;
-  late TextEditingController _passwordController;
+  late TextEditingController _bioController;
 
   @override
   void initState() {
@@ -41,25 +37,19 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   @override
   void dispose() {
     _fullNameController.dispose();
-    _emailController.dispose();
-    _phoneNoController.dispose();
-    _passwordController.dispose();
+    _bioController.dispose();
     super.dispose();
   }
 
   void _saveProfileChanges() {
     String fullName = _fullNameController.text;
-    String email = _emailController.text;
-    String phoneNo = _phoneNoController.text;
-    String password = _passwordController.text;
+    String bio = _bioController.text;
 
     // Instantiate the service class
     UserProfileService userProfileService = UserProfileService();
 
     // Call the method to update user profile
-    userProfileService
-        .updateUserProfile(fullName, email, phoneNo, password)
-        .then((_) {
+    userProfileService.updateUserProfile(fullName, bio).then((_) {
       // Show a SnackBar to indicate success
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profile updated successfully')),
@@ -108,26 +98,10 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   ),
                   const SizedBox(height: tFormHeight - 20),
                   TextFormField(
-                    controller: _emailController,
+                    controller: _bioController,
                     decoration: const InputDecoration(
-                      labelText: tEmail,
+                      labelText: tBio,
                       prefixIcon: Icon(LineAwesomeIcons.envelope_solid),
-                    ),
-                  ),
-                  const SizedBox(height: tFormHeight - 20),
-                  TextFormField(
-                    controller: _phoneNoController,
-                    decoration: const InputDecoration(
-                      labelText: tPhoneNo,
-                      prefixIcon: Icon(LineAwesomeIcons.phone_alt_solid),
-                    ),
-                  ),
-                  const SizedBox(height: tFormHeight - 20),
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: const InputDecoration(
-                      labelText: tPassword,
-                      prefixIcon: Icon(Icons.fingerprint),
                     ),
                   ),
                   const SizedBox(height: tFormHeight),
