@@ -30,7 +30,6 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late TextEditingController _fullNameController;
-  late TextEditingController _addressController;
   Uint8List? _image;
   late String _imagePath;
 
@@ -38,14 +37,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _fullNameController = TextEditingController(text: widget.userData.fullName);
-    _addressController = TextEditingController(text: widget.userData.address);
-    _imagePath = widget.userData.imagePath;
   }
 
   @override
   void dispose() {
     _fullNameController.dispose();
-    _addressController.dispose();
     super.dispose();
   }
 
@@ -66,7 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       String resp = await StoreData().saveData(file: _image!);
       if (resp == 'Success') {
         setState(() {
-          _imagePath = widget.userData.imagePath; // Update _imagePath
+          _imagePath = resp; // Update _imagePath with the new image path
         });
       } else {
         // Handle error
@@ -112,10 +108,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               backgroundImage: MemoryImage(_image!),
                             )
                           : _imagePath.isNotEmpty
-                              ? CircleAvatar(
-                                  radius: 64,
-                                  backgroundImage:
-                                      CachedNetworkImageProvider(_imagePath),
+                              ? CachedNetworkImage(
+                                  imageUrl: _imagePath,
+                                  placeholder: (context, url) =>
+                                      const CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
+                                  fit: BoxFit.cover,
                                 )
                               : const CircleAvatar(
                                   radius: 64,
