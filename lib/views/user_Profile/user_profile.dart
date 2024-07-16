@@ -190,15 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ProfileMenuWidget(
                 title: 'User Management',
                 icon: LineAwesomeIcons.user_check_solid,
-                onPress: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          UpdateProfileScreen(userData: widget.userData),
-                    ),
-                  );
-                },
+                onPress: () {},
               ),
               ProfileMenuWidget(
                 title: 'Info',
