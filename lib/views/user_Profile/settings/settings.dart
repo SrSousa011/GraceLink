@@ -33,7 +33,7 @@ class SettingsScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ChangePhoneScreen(),
+                    builder: (context) => ChangeEmailScreen(),
                   ),
                 );
               },
@@ -57,7 +57,7 @@ class SettingsScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ChangeEmailScreen(),
+                    builder: (context) => ChangePhoneScreen(),
                   ),
                 );
               },
