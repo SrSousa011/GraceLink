@@ -89,7 +89,7 @@ class ChangeEmailScreen extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () => _changeEmail(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: tPrimaryColor,
                   shape: const StadiumBorder(),
