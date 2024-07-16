@@ -19,8 +19,6 @@ class ChangeEmailScreen extends StatelessWidget {
     String newEmail = _newEmailController.text.trim();
     String confirmEmail = _confirmEmailController.text.trim();
 
-    Color.fromARGB(255, 255, 255, 255); // Example dark color
-
     if (newEmail != confirmEmail) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
