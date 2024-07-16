@@ -1,4 +1,3 @@
-import 'package:churchapp/views/user_Profile/store_data.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
@@ -9,6 +8,8 @@ import 'package:churchapp/models/user_data.dart'; // Import UserData model
 import 'package:churchapp/services/auth_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:churchapp/views/user_Profile/store_data.dart'; // Import StoreData for image saving
 
 const Color tAccentColor =
     Color.fromARGB(255, 251, 251, 251); // Example accent color
@@ -38,8 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _fullNameController = TextEditingController(text: widget.userData.fullName);
     _addressController = TextEditingController(text: widget.userData.address);
-    _imagePath =
-        widget.userData.imagePath; // Initialize _imageUrl with an empty string
+    _imagePath = widget.userData.imagePath;
   }
 
   @override
@@ -62,7 +62,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> saveImage() async {
-    String resp = await StoreData().saveData(file: _image!);
+    try {
+      String resp = await StoreData().saveData(file: _image!);
+      if (resp == 'Success') {
+        setState(() {
+          _imagePath = widget.userData.imagePath; // Update _imagePath
+        });
+      } else {
+        // Handle error
+      }
+    } catch (err) {
+      // Handle error
+    }
   }
 
   @override
@@ -73,7 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: Text(
           'User Profile',
-          style: Theme.of(context).textTheme.titleLarge!,
+          style: Theme.of(context).textTheme.headline6,
         ),
         actions: [
           IconButton(
@@ -103,9 +114,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           : _imagePath.isNotEmpty
                               ? CircleAvatar(
                                   radius: 64,
-                                  backgroundImage: NetworkImage(_imagePath),
+                                  backgroundImage:
+                                      CachedNetworkImageProvider(_imagePath),
                                 )
-                              : Image.asset(tProfileImage),
+                              : const CircleAvatar(
+                                  radius: 64,
+                                  backgroundImage: AssetImage(tProfileImage),
+                                ),
                     ),
                   ),
                   Positioned(
@@ -133,11 +148,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 10),
               Text(
                 widget.userData.fullName,
-                style: Theme.of(context).textTheme.headlineSmall!,
+                style: Theme.of(context).textTheme.headline6,
               ),
               Text(
                 widget.userData.address,
-                style: Theme.of(context).textTheme.titleMedium!,
+                style: Theme.of(context).textTheme.subtitle1,
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -158,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                   child: const Text(
                     'Edit Profile',
-                    style: TextStyle(color: tDarkColor),
+                    style: TextStyle(color: Colors.black),
                   ),
                 ),
               ),
