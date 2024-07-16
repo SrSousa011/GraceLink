@@ -6,19 +6,13 @@ class UserProfileService {
   static const String baseUrl = 'https://example.com/api';
 
   // Method to update user profile
-  Future<void> updateUserProfile(
-      String fullName, String email, String phoneNo, String password) async {
+  Future<void> updateUserProfile(String fullName, String bio) async {
     try {
       // Example API endpoint for updating user profile
       const String apiUrl = '$baseUrl/update_profile';
 
       // Example JSON payload for the request body
-      Map<String, String> requestBody = {
-        'full_name': fullName,
-        'email': email,
-        'phone_number': phoneNo,
-        'password': password,
-      };
+      Map<String, String> requestBody = {'fullName': fullName, 'bio': bio};
 
       // Encode the request body into JSON format
       String requestBodyJson = json.encode(requestBody);
