@@ -8,6 +8,7 @@ class AuthMethods {
 
   Future<String> registerUser({
     required String email,
+    required String bio,
     required String password,
     required String firstName,
     required String lastName,
@@ -62,7 +63,7 @@ class AuthMethods {
       UserData userData = UserData(
         id: userCredential.user!.uid,
         fullName: '$firstName $lastName',
-        address: address,
+        bio: bio,
         imagePath: imagePath,
       );
 
