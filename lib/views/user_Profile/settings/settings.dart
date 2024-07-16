@@ -1,4 +1,4 @@
-import 'package:churchapp/views/user_Profile/settings/change_name.dart';
+import 'package:churchapp/views/user_Profile/settings/change_phone.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:churchapp/views/user_Profile/settings/change_email.dart';
@@ -28,24 +28,12 @@ class SettingsScreen extends StatelessWidget {
           children: [
             ListTile(
               leading: const Icon(LineAwesomeIcons.envelope),
-              title: const Text('Change Name'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChangeNameScreen(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(LineAwesomeIcons.envelope),
               title: const Text('Change Email'),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ChangeEmailScreen(),
+                    builder: (context) => ChangePhoneScreen(),
                   ),
                 );
               },
