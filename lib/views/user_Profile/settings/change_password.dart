@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:churchapp/views/user_Profile/update_profile.dart';
+
+const Color tPrimaryColor = Colors.blue; // Example primary color
+const Color tDarkColor =
+    Color.fromARGB(255, 255, 255, 255); // Example dark color
 
 class ChangePasswordScreen extends StatelessWidget {
   final TextEditingController _currentPasswordController =
@@ -18,8 +24,8 @@ class ChangePasswordScreen extends StatelessWidget {
     if (newPassword != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content:
-                Text('New password and confirmation password do not match')),
+          content: Text('New Password and confirmation Password do not match'),
+        ),
       );
       return;
     }
@@ -35,7 +41,7 @@ class ChangePasswordScreen extends StatelessWidget {
           context); // Navigate back to UserProfile after successful change
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to change password: $e')),
+        SnackBar(content: Text('Failed to change Password: $e')),
       );
     }
   }
@@ -44,44 +50,58 @@ class ChangePasswordScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Change Password'),
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(LineAwesomeIcons.angle_left_solid),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const SizedBox(height: tFormHeight - 20),
             TextFormField(
               controller: _currentPasswordController,
               decoration: const InputDecoration(
                 labelText: 'Current Password',
+                prefixIcon: Icon(LineAwesomeIcons.lock_solid),
               ),
               obscureText: true,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: tFormHeight - 20),
             TextFormField(
               controller: _newPasswordController,
               decoration: const InputDecoration(
                 labelText: 'New Password',
+                prefixIcon: Icon(LineAwesomeIcons.lock_solid),
               ),
               obscureText: true,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: tFormHeight - 20),
             TextFormField(
               controller: _confirmPasswordController,
               decoration: const InputDecoration(
                 labelText: 'Confirm New Password',
+                prefixIcon: Icon(LineAwesomeIcons.lock_solid),
               ),
               obscureText: true,
             ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => _changePassword(context),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: const Color(0xFF5AAFf9),
+            const SizedBox(height: tFormHeight - 20),
+            const SizedBox(height: tFormHeight),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => _changePassword(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: tPrimaryColor,
+                  shape: const StadiumBorder(),
+                ),
+                child: const Text(
+                  tEditProfile,
+                  style: TextStyle(color: tDarkColor),
+                ),
               ),
-              child: const Text('Change Password'),
             ),
           ],
         ),
