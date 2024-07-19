@@ -1,45 +1,19 @@
-import 'dart:convert'; // Import for JSON encoding/decoding
-import 'package:http/http.dart' as http; // Import for making HTTP requests
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserProfileService {
-  // Base URL of your API
-  static const String baseUrl = 'https://example.com/api';
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Method to update user profile
-  Future<void> updateUserProfile(String fullName, String bio) async {
+  Future<void> updateUserProfile(
+      String userId, String fullName, String address) async {
     try {
-      // Example API endpoint for updating user profile
-      const String apiUrl = '$baseUrl/update_profile';
-
-      // Example JSON payload for the request body
-      Map<String, String> requestBody = {'fullName': fullName, 'bio': bio};
-
-      // Encode the request body into JSON format
-      String requestBodyJson = json.encode(requestBody);
-
-      // Make a PUT request to update user profile
-      final response = await http.put(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          // Add any required headers (e.g., authorization token)
-        },
-        body: requestBodyJson,
-      );
-
-      // Check the response status code
-      if (response.statusCode == 200) {
-        // Successful update
-        print('User profile updated successfully');
-      } else {
-        // Handle other status codes (e.g., 4xx, 5xx)
-        throw Exception(
-            'Failed to update user profile (${response.statusCode})');
-      }
+      await _firestore.collection('users').doc(userId).update({
+        'fullName': fullName,
+        'address': address, // Atualizado para salvar o endereço
+      });
     } catch (e) {
-      // Handle network errors or exceptions
-      print('Error updating user profile: $e');
-      throw e; // Propagate the error up for UI handling
+      throw Exception('Failed to update profile: $e');
     }
   }
 }

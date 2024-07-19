@@ -3,17 +3,17 @@ import 'package:churchapp/views/user_Profile/user_profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
-const String tEditProfile = 'Edit Profile'; // Example button text
-const double tDefaultSize = 16.0; // Define a default size
-const double tFormHeight = 20.0; // Example form field height
-const String tFullName = 'Full Name'; // Example label text
-const String tBio = 'bio'; // Example label text
-const String tJoined = 'Joined '; // Example text for joined
-const String tJoinedAt = '25 Jan 2022'; // Example date
-const String tDelete = 'Delete'; // Example delete button text
+const String tEditProfile = 'Edit Profile';
+const double tDefaultSize = 16.0;
+const double tFormHeight = 20.0;
+const String tFullName = 'Full Name';
+const String tAddress = 'Address'; // Atualizado de 'Bio' para 'Address'
+const String tJoined = 'Joined ';
+const String tJoinedAt = '25 Jan 2022';
+const String tDelete = 'Delete';
 
-const Color tPrimaryColor = Colors.blue; // Example primary color
-const Color tDarkColor = Colors.white; // Example dark color
+const Color tPrimaryColor = Colors.blue;
+const Color tDarkColor = Colors.white;
 
 class UpdateProfileScreen extends StatefulWidget {
   final UserData userData;
@@ -26,36 +26,38 @@ class UpdateProfileScreen extends StatefulWidget {
 
 class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   late TextEditingController _fullNameController;
-  late TextEditingController _bioController;
+  late TextEditingController _addressController;
 
   @override
   void initState() {
     super.initState();
     _fullNameController = TextEditingController(text: widget.userData.fullName);
+    _addressController = TextEditingController(
+        text: widget.userData.address); // Inicialize o controlador de endereço
   }
 
   @override
   void dispose() {
     _fullNameController.dispose();
-    _bioController.dispose();
+    _addressController.dispose(); // Dispose do controlador de endereço
     super.dispose();
   }
 
   void _saveProfileChanges() {
     String fullName = _fullNameController.text;
-    String bio = _bioController.text;
+    String address = _addressController.text; // Use address em vez de bio
 
     // Instantiate the service class
     UserProfileService userProfileService = UserProfileService();
 
     // Call the method to update user profile
-    userProfileService.updateUserProfile(fullName, bio).then((_) {
-      // Show a SnackBar to indicate success
+    userProfileService
+        .updateUserProfile(widget.userData.id, fullName, address)
+        .then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profile updated successfully')),
       );
     }).catchError((error) {
-      // Handle error (e.g., show error message)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to update profile: $error')),
       );
@@ -80,11 +82,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Stack(
-              children: [
-                // Your stack content here
-              ],
-            ),
             const SizedBox(height: 50),
             Form(
               child: Column(
@@ -98,9 +95,10 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   ),
                   const SizedBox(height: tFormHeight - 20),
                   TextFormField(
-                    controller: _bioController,
+                    controller:
+                        _addressController, // Use o controlador para endereço
                     decoration: const InputDecoration(
-                      labelText: tBio,
+                      labelText: tAddress, // Atualizado para endereço
                       prefixIcon: Icon(LineAwesomeIcons.envelope_solid),
                     ),
                   ),
