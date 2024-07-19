@@ -3,24 +3,22 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/user_Profile/profile_menu.dart';
 import 'package:churchapp/views/user_Profile/settings/settings.dart';
-import 'package:churchapp/views/user_Profile/update_profile.dart'; // Import the UpdateProfileScreen
-import 'package:churchapp/models/user_data.dart'; // Import UserData model
+import 'package:churchapp/views/user_Profile/update_profile.dart';
+import 'package:churchapp/models/user_data.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:churchapp/views/user_Profile/store_data.dart'; // Import StoreData for image saving
+import 'package:churchapp/views/user_Profile/store_data.dart';
 
-const Color tAccentColor =
-    Color.fromARGB(255, 251, 251, 251); // Example accent color
-const double tDefaultSize = 16.0; // Define a default size
-const String tProfileImage =
-    'assets/imagens/default_avatar.png'; // Define a profile image path
-const Color tDarkColor = Colors.black; // Example dark color
-const Color tPrimaryColor = Colors.blue; // Example primary color
+const Color tAccentColor = Color.fromARGB(255, 251, 251, 251);
+const double tDefaultSize = 16.0;
+const String tProfileImage = 'assets/imagens/default_avatar.png';
+const Color tDarkColor = Colors.black;
+const Color tPrimaryColor = Colors.blue;
 
 class ProfileScreen extends StatefulWidget {
-  final UserData userData; // Required parameter
+  final UserData userData;
 
   const ProfileScreen({super.key, required this.userData});
 
@@ -31,7 +29,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   late TextEditingController _fullNameController;
   Uint8List? _image;
-  late String _imagePath;
 
   @override
   void initState() {
@@ -59,13 +56,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> saveImage() async {
     try {
-      String resp = await StoreData().saveData(file: _image!);
-      if (resp == 'Success') {
-        setState(() {
-          _imagePath = resp; // Update _imagePath with the new image path
-        });
-      } else {
-        // Handle error
+      if (_image != null) {
+        String resp = await StoreData().saveData(file: _image!);
+        if (resp == 'Success') {
+          setState(() {
+            // Image saved successfully
+          });
+        } else {
+          // Handle error
+        }
       }
     } catch (err) {
       // Handle error
@@ -107,19 +106,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               radius: 64,
                               backgroundImage: MemoryImage(_image!),
                             )
-                          : _imagePath.isNotEmpty
-                              ? CachedNetworkImage(
-                                  imageUrl: _imagePath,
-                                  placeholder: (context, url) =>
-                                      const CircularProgressIndicator(),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
-                                  fit: BoxFit.cover,
-                                )
-                              : const CircleAvatar(
-                                  radius: 64,
-                                  backgroundImage: AssetImage(tProfileImage),
-                                ),
+                          : CachedNetworkImage(
+                              imageUrl: widget.userData.imagePath,
+                              placeholder: (context, url) =>
+                                  const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  const CircleAvatar(
+                                radius: 64,
+                                backgroundImage: AssetImage(tProfileImage),
+                              ),
+                              fit: BoxFit.cover,
+                            ),
                     ),
                   ),
                   Positioned(
@@ -134,7 +131,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       child: IconButton(
                         icon: const Icon(
-                          LineAwesomeIcons.pencil_alt_solid,
+                          LineAwesomeIcons.camera_retro_solid,
                           color: Colors.black,
                           size: 20,
                         ),
@@ -190,15 +187,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ProfileMenuWidget(
                 title: 'User Management',
                 icon: LineAwesomeIcons.user_check_solid,
-                onPress: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          UpdateProfileScreen(userData: widget.userData),
-                    ),
-                  );
-                },
+                onPress: () {},
               ),
               ProfileMenuWidget(
                 title: 'Info',
