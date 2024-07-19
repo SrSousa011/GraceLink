@@ -1,3 +1,4 @@
+import 'package:churchapp/views/nav_bar/drawer_header_widget.dart';
 import 'package:churchapp/views/nav_bar/drawer_menu_item.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
