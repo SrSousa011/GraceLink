@@ -1,22 +1,22 @@
+import 'package:churchapp/models/user_data.dart';
 import 'package:churchapp/views/nav_bar/drawer_header_widget.dart';
 import 'package:churchapp/views/nav_bar/drawer_menu_item.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/theme/welcome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Add Firestore import
 
 class NavBar extends StatefulWidget {
   final BaseAuth auth;
   final AuthenticationService authService;
   final VoidCallback? notLoggedIn;
-  final String? fullName;
 
   const NavBar({
     super.key,
     required this.auth,
     required this.authService,
     this.notLoggedIn,
-    this.fullName,
   });
 
   @override
@@ -24,18 +24,44 @@ class NavBar extends StatefulWidget {
 }
 
 class _NavBarState extends State<NavBar> {
-  String? fullName;
+  UserData? userData;
 
   @override
   void initState() {
     super.initState();
-    getUser();
+    getUserData();
   }
 
-  void getUser() async {
-    fullName = await AuthenticationService().getCurrentUserName();
-    if (mounted) {
-      setState(() {});
+  Future<void> getUserData() async {
+    // Get the current user ID
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId != null) {
+      try {
+        // Fetch the user data from Firestore
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .get();
+        if (userDoc.exists) {
+          setState(() {
+            userData = UserData.fromDocumentSnapshot(userDoc);
+          });
+        } else {
+          // Handle the case where user document does not exist
+          setState(() {
+            userData = UserData(
+              id: userId,
+              fullName: 'Unknown',
+              address: '',
+              imagePath: '',
+            );
+          });
+        }
+      } catch (e) {
+        // Handle errors here
+        print('Error fetching user data: $e');
+      }
     }
   }
 
@@ -46,7 +72,7 @@ class _NavBarState extends State<NavBar> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeaderWidget(
-            fullName: fullName,
+            userData: userData,
           ),
           const DrawerMenuItem(
             title: 'Home',
