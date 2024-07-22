@@ -1,5 +1,6 @@
 import 'package:churchapp/models/user_data.dart';
 import 'package:churchapp/views/user_Profile/user_profile_service.dart';
+import 'package:churchapp/views/user_profile/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
@@ -7,7 +8,7 @@ const String tEditProfile = 'Edit Profile';
 const double tDefaultSize = 16.0;
 const double tFormHeight = 20.0;
 const String tFullName = 'Full Name';
-const String tAddress = 'Address'; // Atualizado de 'Bio' para 'Address'
+const String tAddress = 'Address'; // Updated from 'Bio' to 'Address'
 const String tJoined = 'Joined ';
 const String tJoinedAt = '25 Jan 2022';
 const String tDelete = 'Delete';
@@ -32,20 +33,19 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   void initState() {
     super.initState();
     _fullNameController = TextEditingController(text: widget.userData.fullName);
-    _addressController = TextEditingController(
-        text: widget.userData.address); // Inicialize o controlador de endereço
+    _addressController = TextEditingController(text: widget.userData.address);
   }
 
   @override
   void dispose() {
     _fullNameController.dispose();
-    _addressController.dispose(); // Dispose do controlador de endereço
+    _addressController.dispose();
     super.dispose();
   }
 
   void _saveProfileChanges() {
     String fullName = _fullNameController.text;
-    String address = _addressController.text; // Use address em vez de bio
+    String address = _addressController.text;
 
     // Instantiate the service class
     UserProfileService userProfileService = UserProfileService();
@@ -56,6 +56,20 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         .then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profile updated successfully')),
+      );
+
+      // Navigate to the UserProfileScreen
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => ProfileScreen(
+            userData: UserData(
+              id: widget.userData.id,
+              fullName: fullName,
+              address: address,
+              imagePath: widget.userData.imagePath,
+            ),
+          ),
+        ),
       );
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -95,10 +109,9 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   ),
                   const SizedBox(height: tFormHeight - 20),
                   TextFormField(
-                    controller:
-                        _addressController, // Use o controlador para endereço
+                    controller: _addressController,
                     decoration: const InputDecoration(
-                      labelText: tAddress, // Atualizado para endereço
+                      labelText: tAddress,
                       prefixIcon: Icon(LineAwesomeIcons.envelope_solid),
                     ),
                   ),

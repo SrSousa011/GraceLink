@@ -14,7 +14,7 @@ import 'package:churchapp/views/user_Profile/store_data.dart';
 const Color tAccentColor = Color.fromARGB(255, 251, 251, 251);
 const double tDefaultSize = 16.0;
 const String tProfileImage = 'assets/imagens/default_avatar.png';
-const Color tDarkColor = Colors.black;
+const Color tDarkColor = Color.fromARGB(255, 255, 255, 255);
 const Color tPrimaryColor = Colors.blue;
 
 class ProfileScreen extends StatefulWidget {
