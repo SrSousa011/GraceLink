@@ -32,12 +32,23 @@ class UserData {
   }
 
   factory UserData.fromDocumentSnapshot(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>? ?? {};
+    // Safely cast the data from DocumentSnapshot to Map<String, dynamic>
+    final data = doc.data() as Map<String, dynamic>?;
     return UserData(
       id: doc.id,
-      fullName: data['fullName'] ?? '',
-      address: data['address'] ?? '',
-      imagePath: data['imagePath'] ?? '',
+      fullName: data?['fullName'] ?? '',
+      address: data?['address'] ?? '',
+      imagePath: data?['imagePath'] ?? '',
+    );
+  }
+
+  factory UserData.fromDocument(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>?;
+    return UserData(
+      id: doc.id,
+      fullName: data?['fullName'] ?? '',
+      address: data?['address'] ?? '',
+      imagePath: data?['imagePath'] ?? '',
     );
   }
 }
