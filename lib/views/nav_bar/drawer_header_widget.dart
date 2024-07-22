@@ -3,11 +3,11 @@ import 'package:churchapp/views/user_Profile/user_profile.dart';
 import 'package:flutter/material.dart';
 
 class DrawerHeaderWidget extends StatelessWidget {
-  final String? fullName;
+  final UserData? userData;
 
   const DrawerHeaderWidget({
     super.key,
-    required this.fullName,
+    this.userData,
   });
 
   @override
@@ -29,13 +29,16 @@ class DrawerHeaderWidget extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => ProfileScreen(
-                          userData: UserData(
-                        fullName: fullName ?? '',
+                builder: (context) => ProfileScreen(
+                  userData: userData ??
+                      UserData(
                         id: '',
-                        address: '', imagePath: '',
-                        // Add other necessary fields from UserData model
-                      ))),
+                        fullName: 'Guest',
+                        address: '',
+                        imagePath: '',
+                      ),
+                ),
+              ),
             );
           },
           child: Column(
@@ -44,16 +47,21 @@ class DrawerHeaderWidget extends StatelessWidget {
               CircleAvatar(
                 radius: 72,
                 backgroundColor:
-                    Colors.grey[200], // Cor de fundo do CircleAvatar
-                child: const Icon(
-                  Icons.account_circle,
-                  size: 144, // Tamanho do ícone dentro do CircleAvatar
-                  color: Colors.grey, // Cor do ícone
-                ),
+                    Colors.grey[200], // Background color of CircleAvatar
+                child: userData?.imagePath.isNotEmpty ?? false
+                    ? CircleAvatar(
+                        radius: 72,
+                        backgroundImage: NetworkImage(userData!.imagePath),
+                      )
+                    : const Icon(
+                        Icons.account_circle,
+                        size: 144, // Icon size inside CircleAvatar
+                        color: Colors.grey, // Icon color
+                      ),
               ),
               const SizedBox(height: 12),
               Text(
-                fullName ?? 'Loading...',
+                userData?.fullName ?? 'Loading...',
                 style: const TextStyle(fontSize: 20, color: Colors.white),
               ),
             ],
