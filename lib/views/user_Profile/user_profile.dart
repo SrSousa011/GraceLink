@@ -11,7 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:churchapp/views/user_Profile/store_data.dart';
 
-const Color tAccentColor = Color.fromARGB(255, 251, 251, 251);
+const Color tAccentColor = Color.fromARGB(255, 0, 0, 0);
 const double tDefaultSize = 16.0;
 const String tProfileImage = 'assets/imagens/default_avatar.png';
 const Color tDarkColor = Color.fromARGB(255, 255, 255, 255);
@@ -141,10 +141,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
               Text(
                 widget.userData.fullName,
-                style: Theme.of(context).textTheme.titleLarge,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: tPrimaryColor,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                widget.userData.address,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Colors.grey[600],
+                    ),
               ),
               const SizedBox(height: 20),
               SizedBox(
