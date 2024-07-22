@@ -1,3 +1,4 @@
+import 'package:churchapp/models/user_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -135,24 +136,6 @@ class AuthenticationService implements BaseAuth {
     } catch (e) {
       if (kDebugMode) {
         print('Error getting current user ID: $e');
-      }
-      rethrow;
-    }
-  }
-
-  @override
-  Future<String?> getCurrentUserName() async {
-    try {
-      User? user = _firebaseAuth.currentUser;
-      if (user != null) {
-        DocumentSnapshot snapshot =
-            await _firestore.collection('users').doc(user.uid).get();
-        return snapshot.get('fullName');
-      }
-      return null;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error getting current user name: $e');
       }
       rethrow;
     }
@@ -390,6 +373,34 @@ class AuthenticationService implements BaseAuth {
       }
       rethrow;
     }
+  }
+
+  Future<UserData?> getCurrentUserData() async {
+    try {
+      User? user = _firebaseAuth.currentUser;
+      if (user != null) {
+        DocumentSnapshot snapshot =
+            await _firestore.collection('users').doc(user.uid).get();
+        if (snapshot.exists) {
+          return UserData.fromDocument(snapshot);
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting user data: $e');
+      }
+      return null;
+    }
+  }
+
+  @override
+  Future<String?> getCurrentUserName() async {
+    UserData? userData = await getCurrentUserData();
+    return userData?.fullName;
   }
 
   @override
