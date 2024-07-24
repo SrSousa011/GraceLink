@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Event {
-  final String id; // Unique ID of the event
+  final String id;
   final String title;
   final String description;
   final DateTime date;

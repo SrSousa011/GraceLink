@@ -1,7 +1,26 @@
-import 'package:churchapp/views/member/become_member.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FirestoreService {
+class Member {
+  final String id;
+  final String fullName;
+  final String address;
+  final String phoneNumber;
+  final String lastVisitedChurch;
+  final String reasonForMembership;
+  final String reference;
+
+  Member({
+    required this.id,
+    required this.phoneNumber,
+    required this.address,
+    required this.lastVisitedChurch,
+    required this.reasonForMembership,
+    required this.reference,
+    required this.fullName,
+  });
+}
+
+class BecomeMmemberService {
   final CollectionReference _memberCollection =
       FirebaseFirestore.instance.collection('becomeMember');
 

@@ -1,5 +1,5 @@
 import 'package:churchapp/services/auth_service.dart';
-import 'package:churchapp/views/member/firestore_Service.dart';
+import 'package:churchapp/views/Member/firestore_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -333,7 +333,7 @@ class _BecomeMemberState extends State<BecomeMember> {
         fullName: fullName,
       );
 
-      final firestoreService = FirestoreService();
+      final firestoreService = BecomeMmemberService();
       try {
         await firestoreService.addMember(member);
 
@@ -359,26 +359,6 @@ class _BecomeMemberState extends State<BecomeMember> {
       }
     }
   }
-}
-
-class Member {
-  final String id;
-  final String fullName;
-  final String address;
-  final String phoneNumber;
-  final String lastVisitedChurch;
-  final String reasonForMembership;
-  final String reference;
-
-  Member({
-    required this.id,
-    required this.phoneNumber,
-    required this.address,
-    required this.lastVisitedChurch,
-    required this.reasonForMembership,
-    required this.reference,
-    required this.fullName,
-  });
 }
 
 class DDDCountryItem {
