@@ -80,11 +80,6 @@ class _NavBarState extends State<NavBar> {
             route: '/home',
           ),
           const DrawerMenuItem(
-            title: 'User Profile',
-            icon: Icons.person_outlined,
-            route: '/user_profile',
-          ),
-          const DrawerMenuItem(
             title: 'Events',
             icon: Icons.event,
             route: '/event_page',

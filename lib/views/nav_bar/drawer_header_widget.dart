@@ -27,7 +27,7 @@ class DrawerHeaderWidget extends StatelessWidget {
         ),
         child: GestureDetector(
           onTap: () {
-            Navigator.pop(context); // Close the drawer before navigating
+            Navigator.pop(context);
             Navigator.push(
               context,
               MaterialPageRoute(

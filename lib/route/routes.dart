@@ -1,4 +1,3 @@
-import 'package:churchapp/models/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/theme/welcome.dart';
@@ -9,7 +8,6 @@ import 'package:churchapp/views/events/events.dart';
 import 'package:churchapp/views/home/home.dart';
 import 'package:churchapp/views/member/become_member.dart';
 import 'package:churchapp/views/notifications/notifications.dart';
-import 'package:churchapp/views/user_Profile/user_profile.dart';
 import 'package:churchapp/views/videos/videos.dart';
 
 class AppRoutes {
@@ -30,11 +28,6 @@ class AppRoutes {
             onSignedOut: () {},
           ),
         );
-      case '/user_profile':
-        // Extract arguments if provided
-        final args = settings.arguments;
-        return MaterialPageRoute(
-            builder: (_) => ProfileScreen(userData: args as UserData));
       case '/notifications':
         return MaterialPageRoute(builder: (_) => const Notifications());
       case '/videos':
