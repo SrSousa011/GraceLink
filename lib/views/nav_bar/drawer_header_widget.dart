@@ -2,6 +2,8 @@ import 'package:churchapp/models/user_data.dart';
 import 'package:churchapp/views/user_Profile/user_profile.dart';
 import 'package:flutter/material.dart';
 
+const String tImageBackground = 'assets/imagens/bacground-image-center.jpg';
+
 class DrawerHeaderWidget extends StatelessWidget {
   final UserData? userData;
 
@@ -19,7 +21,7 @@ class DrawerHeaderWidget extends StatelessWidget {
         decoration: const BoxDecoration(
           color: Colors.blue,
           image: DecorationImage(
-            image: AssetImage('assets/imagens/bacground-image-center.jpg'),
+            image: AssetImage(tImageBackground),
             fit: BoxFit.cover,
           ),
         ),
@@ -46,8 +48,7 @@ class DrawerHeaderWidget extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 72,
-                backgroundColor:
-                    Colors.grey[200], // Background color of CircleAvatar
+                backgroundColor: Colors.grey[200],
                 child: userData?.imagePath.isNotEmpty ?? false
                     ? CircleAvatar(
                         radius: 72,
@@ -55,8 +56,8 @@ class DrawerHeaderWidget extends StatelessWidget {
                       )
                     : const Icon(
                         Icons.account_circle,
-                        size: 144, // Icon size inside CircleAvatar
-                        color: Colors.grey, // Icon color
+                        size: 144,
+                        color: Colors.grey,
                       ),
               ),
               const SizedBox(height: 12),
