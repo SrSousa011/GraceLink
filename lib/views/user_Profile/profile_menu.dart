@@ -1,6 +1,8 @@
-import 'package:churchapp/views/user_Profile/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+
+const Color tPrimaryColor = Colors.blue;
+const Color tAccentColor = Color.fromARGB(255, 230, 153, 1);
 
 class ProfileMenuWidget extends StatelessWidget {
   const ProfileMenuWidget({
