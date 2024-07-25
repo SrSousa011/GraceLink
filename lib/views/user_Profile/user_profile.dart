@@ -15,6 +15,8 @@ import 'package:churchapp/views/user_Profile/update_profile.dart';
 import 'package:churchapp/views/user_Profile/profile_menu.dart';
 import 'package:churchapp/views/user_Profile/settings/settings.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'user_management_screen.dart'; // Import the new screens
+import 'info_screen.dart';
 
 const String tAvatar = 'assets/imagens/default_avatar.png';
 const Color tPrimaryColor = Colors.blue;
@@ -154,7 +156,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                   child: const Text(
                     'Edit Profile',
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(color: Colors.white), // Updated text color
                   ),
                 ),
               ),
@@ -176,12 +178,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ProfileMenuWidget(
                 title: 'User Management',
                 icon: LineAwesomeIcons.user_check_solid,
-                onPress: () {},
+                onPress: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const UserManagementScreen(),
+                    ),
+                  );
+                },
               ),
               ProfileMenuWidget(
                 title: 'Info',
                 icon: LineAwesomeIcons.info_solid,
-                onPress: () {},
+                onPress: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const InfoScreen(),
+                    ),
+                  );
+                },
               ),
             ],
           ),
