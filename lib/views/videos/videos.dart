@@ -1,6 +1,9 @@
+import 'package:churchapp/views/videos/extended_video.dart';
+import 'package:churchapp/views/videos/video_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as YT;
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'videos_service.dart';
 import 'package:churchapp/services/auth_service.dart';
@@ -20,24 +23,27 @@ class _VideosState extends State<Videos> {
   final List<String> _selectedVideos = [];
   bool _showAddLinkField = false;
 
-  // Cache para armazenar vídeos carregados
   final VideoCache _videoCache = VideoCache();
 
-  Future<YT.Video> _fetchVideo(String url) async {
-    // Verifica se o vídeo já está em cache
+  Future<ExtendedVideo> _fetchExtendedVideo(String url) async {
     if (_videoCache.contains(url)) {
       return _videoCache.get(url)!;
     }
 
     var yt = YT.YoutubeExplode();
     var videoId = YT.VideoId.parseVideoId(url);
-    var video = await yt.videos.get(videoId!);
+    if (videoId == null) {
+      throw Exception('Invalid video URL');
+    }
+    var video = await yt.videos.get(videoId);
+
+    int viewCount = 1000; // Replace with real view count
+
+    var extendedVideo = ExtendedVideo(video, viewCount);
+    _videoCache.add(url, extendedVideo);
+
     yt.close();
-
-    // Adiciona o vídeo ao cache
-    _videoCache.add(url, video);
-
-    return video;
+    return extendedVideo;
   }
 
   Future<void> _launchURL(String url) async {
@@ -114,25 +120,18 @@ class _VideosState extends State<Videos> {
     final String url = _controller.text.trim();
     String videoId = '';
 
-    // Verifica se o URL corresponde ao formato https://www.youtube.com/
     if (url.startsWith('https://www.youtube.com/')) {
-      // Extrai o ID do vídeo
-      videoId = YT.VideoId.parseVideoId(url)!;
-    }
-    // Verifica se o URL corresponde ao formato https://youtu.be/
-    else if (url.startsWith('https://youtu.be/')) {
-      // Extrai o ID do vídeo
+      videoId = YT.VideoId.parseVideoId(url) ?? '';
+    } else if (url.startsWith('https://youtu.be/')) {
       videoId = url.substring(url.lastIndexOf('/') + 1).split('?').first;
     }
 
     if (videoId.isNotEmpty) {
       try {
         await _videosService.addVideo(videoId, url);
-
-        // Após adicionar o vídeo, atualiza a lista de vídeos
         setState(() {
           _controller.clear();
-          _showAddLinkField = false; // Volta o ícone de lupa ao estado original
+          _showAddLinkField = false;
         });
       } catch (e) {
         if (!mounted) return;
@@ -151,6 +150,37 @@ class _VideosState extends State<Videos> {
     }
   }
 
+  String _formatDuration(Duration? duration) {
+    if (duration == null) {
+      return 'Desconhecido';
+    }
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds % 60;
+    return '${minutes}m ${seconds}s';
+  }
+
+  String _timeAgo(DateTime? dateTime) {
+    if (dateTime == null) {
+      return 'Desconhecido';
+    }
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inDays > 365) {
+      return '${(difference.inDays / 365).floor()} ano(s) atrás';
+    } else if (difference.inDays > 30) {
+      return '${(difference.inDays / 30).floor()} mês(es) atrás';
+    } else if (difference.inDays > 0) {
+      return '${difference.inDays} dia(s) atrás';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} hora(s) atrás';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} minuto(s) atrás';
+    } else {
+      return 'Agora';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,19 +189,18 @@ class _VideosState extends State<Videos> {
         actions: [
           IconButton(
             onPressed: _isSelectionMode
-                ? null // Desativa o ícone de busca quando em modo de seleção
+                ? null
                 : () {
                     setState(() {
                       _showAddLinkField = !_showAddLinkField;
                     });
-                  }, // Ativa o campo de adicionar vídeos quando não estiver em modo de seleção
+                  },
             icon: const Icon(Icons.add_outlined),
           ),
           IconButton(
             onPressed: _isSelectionMode
-                ? () => _deleteSelectedVideos(
-                    context) // Ativa a função de deletar vídeos quando em modo de seleção
-                : _toggleSelectionMode, // Ativa a função de alternar modo de seleção quando não estiver em modo de seleção
+                ? () => _deleteSelectedVideos(context)
+                : _toggleSelectionMode,
             icon: Icon(_isSelectionMode ? Icons.delete : Icons.list),
           ),
         ],
@@ -220,22 +249,19 @@ class _VideosState extends State<Videos> {
               ),
             ),
           ),
-          const SizedBox(
-              height: 16), // Espaço entre o cabeçalho e o primeiro vídeo
+          const SizedBox(height: 16),
           Expanded(
             child: FutureBuilder<List<Map<String, dynamic>>>(
               future: _videosService.getVideos(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center();
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(
                     child: Text('Erro: ${snapshot.error}'),
                   );
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                  // Ordena os vídeos do mais antigo para o mais novo adicionado
                   List<Map<String, dynamic>> sortedList = snapshot.data!;
-
                   return ListView.builder(
                     itemCount: sortedList.length,
                     itemBuilder: (context, index) {
@@ -251,6 +277,7 @@ class _VideosState extends State<Videos> {
                             child: SizedBox(
                               width: double.infinity,
                               child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   if (_isSelectionMode)
                                     Checkbox(
@@ -259,15 +286,17 @@ class _VideosState extends State<Videos> {
                                           _toggleVideoSelection(videoId),
                                     ),
                                   Expanded(
-                                    child: FutureBuilder<YT.Video>(
-                                      future: _fetchVideo(videoUrl),
+                                    child: FutureBuilder<ExtendedVideo>(
+                                      future: _fetchExtendedVideo(videoUrl),
                                       builder: (context, videoSnapshot) {
                                         if (videoSnapshot.connectionState ==
                                             ConnectionState.waiting) {
                                           return const SizedBox(
-                                            height: 200,
-                                            child: Center(),
-                                          ); // Sem CircularProgressIndicator
+                                            height: 120,
+                                            child: Center(
+                                                child:
+                                                    CircularProgressIndicator()),
+                                          );
                                         } else if (videoSnapshot.hasError) {
                                           return const Icon(
                                               Icons.error_outline);
@@ -275,29 +304,65 @@ class _VideosState extends State<Videos> {
                                           var video = videoSnapshot.data!;
                                           return Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Image.network(
-                                                'https://i.ytimg.com/vi/${video.id}/hqdefault.jpg',
-                                                height: 180,
-                                                width: double.infinity,
-                                                fit: BoxFit.cover,
+                                              Stack(
+                                                children: [
+                                                  CachedNetworkImage(
+                                                    imageUrl:
+                                                        'https://i.ytimg.com/vi/${video.video.id}/hqdefault.jpg',
+                                                    height: 120,
+                                                    width: double.infinity,
+                                                    fit: BoxFit.cover,
+                                                    placeholder: (context,
+                                                            url) =>
+                                                        const Center(
+                                                            child:
+                                                                CircularProgressIndicator()),
+                                                    errorWidget: (context, url,
+                                                            error) =>
+                                                        const Icon(Icons.error),
+                                                  ),
+                                                  Positioned(
+                                                    bottom: 8,
+                                                    right: 8,
+                                                    child: Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 6,
+                                                          vertical: 2),
+                                                      color: Colors.black
+                                                          .withOpacity(0.7),
+                                                      child: Text(
+                                                        _formatDuration(video
+                                                            .video.duration),
+                                                        style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                               const SizedBox(height: 8),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 8.0),
-                                                child: Text(
-                                                  video.title,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleMedium!
-                                                      .copyWith(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                ),
+                                              Text(
+                                                video.video.title,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleMedium!
+                                                    .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                '${video.video.author} • ${video.viewCount} views • ${_timeAgo(video.video.uploadDate)}',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall,
                                               ),
                                             ],
                                           );
@@ -311,7 +376,7 @@ class _VideosState extends State<Videos> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 40), // Espaço entre os vídeos
+                          const SizedBox(height: 20),
                         ],
                       );
                     },
@@ -327,17 +392,5 @@ class _VideosState extends State<Videos> {
         ],
       ),
     );
-  }
-}
-
-class VideoCache {
-  final Map<String, YT.Video> _cache = {};
-
-  bool contains(String url) => _cache.containsKey(url);
-
-  YT.Video? get(String url) => _cache[url];
-
-  void add(String url, YT.Video video) {
-    _cache[url] = video;
   }
 }
