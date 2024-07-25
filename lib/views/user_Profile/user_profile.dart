@@ -106,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       height: 35,
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.blue,
+                        color: tPrimaryColor,
                       ),
                       child: IconButton(
                         icon: const Icon(
@@ -120,20 +120,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16.0),
-              Text(
-                _userData.fullName,
-                style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue),
-                textAlign: TextAlign.center,
+              const SizedBox(height: 20),
+              SizedBox(
+                width: 200,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: tPrimaryColor,
+                    shape: const StadiumBorder(),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            UpdateProfileScreen(userData: widget.userData),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    'Edit Profile',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
               ),
-              const SizedBox(height: 8.0),
-              Text(
-                _userData.address,
-                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-                textAlign: TextAlign.center,
+              const SizedBox(height: 30),
+              const Divider(),
+              const SizedBox(height: 10),
+              ProfileMenuWidget(
+                title: 'Settings',
+                icon: LineAwesomeIcons.cog_solid,
+                onPress: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SettingsScreen(),
+                    ),
+                  );
+                },
+              ),
+              ProfileMenuWidget(
+                title: 'User Management',
+                icon: LineAwesomeIcons.user_check_solid,
+                onPress: () {},
+              ),
+              ProfileMenuWidget(
+                title: 'Info',
+                icon: LineAwesomeIcons.info_solid,
+                onPress: () {},
               ),
             ],
           ),
