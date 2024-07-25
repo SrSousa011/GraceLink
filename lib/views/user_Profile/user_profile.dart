@@ -1,20 +1,22 @@
-import 'package:flutter/material.dart';
-import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
+import 'package:churchapp/views/user_Profile/inof_scree.dart';
+import 'package:churchapp/views/user_Profile/user_management_scree.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:churchapp/models/user_data.dart';
+import 'package:churchapp/views/user_Profile/update_profile.dart';
 import 'package:churchapp/views/user_Profile/profile_menu.dart';
 import 'package:churchapp/views/user_Profile/settings/settings.dart';
-import 'package:churchapp/views/user_Profile/update_profile.dart';
-import 'package:churchapp/models/user_data.dart';
-import 'package:churchapp/services/auth_service.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:flutter/foundation.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:churchapp/views/user_Profile/store_data.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
-const Color tAccentColor = Color.fromARGB(255, 0, 0, 0);
-const double tDefaultSize = 16.0;
-const String tProfileImage = 'assets/imagens/default_avatar.png';
-const Color tDarkColor = Color.fromARGB(255, 255, 255, 255);
+const String tAvatar = 'assets/imagens/default_avatar.png';
 const Color tPrimaryColor = Colors.blue;
 
 class ProfileScreen extends StatefulWidget {
@@ -27,66 +29,56 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late TextEditingController _fullNameController;
-  Uint8List? _image;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final ImagePicker _picker = ImagePicker();
+
+  late User _user;
+  late UserData _userData;
+  String? _imageUrl;
 
   @override
   void initState() {
     super.initState();
-    _fullNameController = TextEditingController(text: widget.userData.fullName);
+    _user = _auth.currentUser!;
+    _userData = widget.userData;
+    _imageUrl = _userData.imagePath;
   }
 
-  @override
-  void dispose() {
-    _fullNameController.dispose();
-    super.dispose();
-  }
+  Future<void> _updateProfilePicture() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      File file = File(pickedFile.path);
+      try {
+        UploadTask uploadTask = _storage
+            .ref()
+            .child('userProfilePictures/${_user.uid}/profilePicture.jpg')
+            .putFile(file);
 
-  Future<void> selectImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      Uint8List img = await image.readAsBytes();
-      setState(() {
-        _image = img;
-      });
-      saveImage();
-    }
-  }
+        TaskSnapshot taskSnapshot = await uploadTask;
+        String downloadURL = await taskSnapshot.ref.getDownloadURL();
 
-  Future<void> saveImage() async {
-    try {
-      if (_image != null) {
-        String resp = await StoreData().saveData(file: _image!);
-        if (resp == 'Success') {
-          setState(() {
-            // Image saved successfully
-          });
-        } else {
-          // Handle error
+        await _firestore
+            .collection('users')
+            .doc(_user.uid)
+            .update({'imagePath': downloadURL});
+        setState(() {
+          _imageUrl = downloadURL;
+        });
+      } catch (e) {
+        if (kDebugMode) {
+          print("Error uploading image: $e");
         }
       }
-    } catch (err) {
-      // Handle error
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    var isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'User Profile',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(isDark ? LineAwesomeIcons.sun : LineAwesomeIcons.moon),
-          ),
-        ],
+        title: const Text('User Profile'),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -96,27 +88,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Stack(
                 children: [
-                  SizedBox(
-                    width: 120,
-                    height: 120,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: _image != null
-                          ? CircleAvatar(
-                              radius: 64,
-                              backgroundImage: MemoryImage(_image!),
-                            )
-                          : CachedNetworkImage(
-                              imageUrl: widget.userData.imagePath,
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  const CircleAvatar(
-                                radius: 64,
-                                backgroundImage: AssetImage(tProfileImage),
-                              ),
-                              fit: BoxFit.cover,
-                            ),
+                  GestureDetector(
+                    onTap: _updateProfilePicture,
+                    child: CircleAvatar(
+                      radius: 72,
+                      backgroundColor: Colors.grey[200],
+                      backgroundImage: _imageUrl != null
+                          ? CachedNetworkImageProvider(_imageUrl!)
+                          : const AssetImage(tAvatar) as ImageProvider,
                     ),
                   ),
                   Positioned(
@@ -131,30 +110,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       child: IconButton(
                         icon: const Icon(
-                          LineAwesomeIcons.camera_retro_solid,
-                          color: Colors.black,
+                          Icons.camera_alt,
+                          color: Colors.white,
                           size: 20,
                         ),
-                        onPressed: selectImage,
+                        onPressed: _updateProfilePicture,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16.0),
               Text(
-                widget.userData.fullName,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: tPrimaryColor,
-                    ),
+                _userData.fullName,
+                style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue),
+                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 8.0),
               Text(
-                widget.userData.address,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                _userData.address,
+                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -175,7 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                   child: const Text(
                     'Edit Profile',
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(color: Colors.white), // Updated text color
                   ),
                 ),
               ),
@@ -197,12 +176,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ProfileMenuWidget(
                 title: 'User Management',
                 icon: LineAwesomeIcons.user_check_solid,
-                onPress: () {},
+                onPress: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const UserManagementScreen(),
+                    ),
+                  );
+                },
               ),
               ProfileMenuWidget(
                 title: 'Info',
                 icon: LineAwesomeIcons.info_solid,
-                onPress: () {},
+                onPress: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const InfoScreen(),
+                    ),
+                  );
+                },
               ),
             ],
           ),
