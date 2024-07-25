@@ -15,8 +15,6 @@ import 'package:churchapp/views/user_Profile/update_profile.dart';
 import 'package:churchapp/views/user_Profile/profile_menu.dart';
 import 'package:churchapp/views/user_Profile/settings/settings.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'user_management_screen.dart'; // Import the new screens
-import 'info_screen.dart';
 
 const String tAvatar = 'assets/imagens/default_avatar.png';
 const Color tPrimaryColor = Colors.blue;
@@ -82,38 +80,96 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: const Text('User Profile'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 16.0),
-            GestureDetector(
-              onTap: _updateProfilePicture,
-              child: CircleAvatar(
-                radius: 72,
-                backgroundColor: Colors.grey[200],
-                backgroundImage: _imageUrl != null
-                    ? CachedNetworkImageProvider(_imageUrl!)
-                    : const AssetImage(tAvatar) as ImageProvider,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Stack(
+                children: [
+                  GestureDetector(
+                    onTap: _updateProfilePicture,
+                    child: CircleAvatar(
+                      radius: 72,
+                      backgroundColor: Colors.grey[200],
+                      backgroundImage: _imageUrl != null
+                          ? CachedNetworkImageProvider(_imageUrl!)
+                          : const AssetImage(tAvatar) as ImageProvider,
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                      width: 35,
+                      height: 35,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: tPrimaryColor,
+                      ),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.camera_alt,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        onPressed: _updateProfilePicture,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 16.0),
-            Text(
-              _userData.fullName,
-              style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              _userData.address,
-              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              const SizedBox(height: 20),
+              SizedBox(
+                width: 200,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: tPrimaryColor,
+                    shape: const StadiumBorder(),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            UpdateProfileScreen(userData: widget.userData),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    'Edit Profile',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 30),
+              const Divider(),
+              const SizedBox(height: 10),
+              ProfileMenuWidget(
+                title: 'Settings',
+                icon: LineAwesomeIcons.cog_solid,
+                onPress: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SettingsScreen(),
+                    ),
+                  );
+                },
+              ),
+              ProfileMenuWidget(
+                title: 'User Management',
+                icon: LineAwesomeIcons.user_check_solid,
+                onPress: () {},
+              ),
+              ProfileMenuWidget(
+                title: 'Info',
+                icon: LineAwesomeIcons.info_solid,
+                onPress: () {},
+              ),
+            ],
+          ),
         ),
       ),
       drawer: NavBar(
