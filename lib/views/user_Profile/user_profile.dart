@@ -106,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       height: 35,
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
-                        color: tPrimaryColor,
+                        color: Colors.blue,
                       ),
                       child: IconButton(
                         icon: const Icon(
@@ -134,68 +134,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _userData.address,
                 style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                 textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: 200,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: tPrimaryColor,
-                    shape: const StadiumBorder(),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            UpdateProfileScreen(userData: widget.userData),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    'Edit Profile',
-                    style: TextStyle(color: Colors.white), // Updated text color
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-              const Divider(),
-              const SizedBox(height: 10),
-              ProfileMenuWidget(
-                title: 'Settings',
-                icon: LineAwesomeIcons.cog_solid,
-                onPress: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SettingsScreen(),
-                    ),
-                  );
-                },
-              ),
-              ProfileMenuWidget(
-                title: 'User Management',
-                icon: LineAwesomeIcons.user_check_solid,
-                onPress: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const UserManagementScreen(),
-                    ),
-                  );
-                },
-              ),
-              ProfileMenuWidget(
-                title: 'Info',
-                icon: LineAwesomeIcons.info_solid,
-                onPress: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const InfoScreen(),
-                    ),
-                  );
-                },
               ),
             ],
           ),
