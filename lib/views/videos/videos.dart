@@ -1,4 +1,3 @@
-import 'package:churchapp/views/videos/extended_video.dart';
 import 'package:churchapp/views/videos/video_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -25,7 +24,7 @@ class _VideosState extends State<Videos> {
 
   final VideoCache _videoCache = VideoCache();
 
-  Future<ExtendedVideo> _fetchExtendedVideo(String url) async {
+  Future<YT.Video> _fetchVideo(String url) async {
     if (_videoCache.contains(url)) {
       return _videoCache.get(url)!;
     }
@@ -36,14 +35,11 @@ class _VideosState extends State<Videos> {
       throw Exception('Invalid video URL');
     }
     var video = await yt.videos.get(videoId);
-
-    int viewCount = 1000; // Replace with real view count
-
-    var extendedVideo = ExtendedVideo(video, viewCount);
-    _videoCache.add(url, extendedVideo);
-
     yt.close();
-    return extendedVideo;
+
+    _videoCache.add(url, video);
+
+    return video;
   }
 
   Future<void> _launchURL(String url) async {
@@ -121,7 +117,7 @@ class _VideosState extends State<Videos> {
     String videoId = '';
 
     if (url.startsWith('https://www.youtube.com/')) {
-      videoId = YT.VideoId.parseVideoId(url) ?? '';
+      videoId = YT.VideoId.parseVideoId(url)!;
     } else if (url.startsWith('https://youtu.be/')) {
       videoId = url.substring(url.lastIndexOf('/') + 1).split('?').first;
     }
@@ -166,16 +162,24 @@ class _VideosState extends State<Videos> {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
 
-    if (difference.inDays > 365) {
-      return '${(difference.inDays / 365).floor()} ano(s) atrás';
-    } else if (difference.inDays > 30) {
-      return '${(difference.inDays / 30).floor()} mês(es) atrás';
-    } else if (difference.inDays > 0) {
-      return '${difference.inDays} dia(s) atrás';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours} hora(s) atrás';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes} minuto(s) atrás';
+    if (difference.inDays >= 365) {
+      final years = (difference.inDays / 365).floor();
+      return '$years ano${years > 1 ? 's' : ''} atrás';
+    } else if (difference.inDays >= 30) {
+      final months = (difference.inDays / 30).floor();
+      return '$months mês${months > 1 ? 'es' : ''} atrás';
+    } else if (difference.inDays > 1) {
+      return '${difference.inDays} dias atrás';
+    } else if (difference.inDays == 1) {
+      return '1 dia atrás';
+    } else if (difference.inHours > 1) {
+      return '${difference.inHours} horas atrás';
+    } else if (difference.inHours == 1) {
+      return '1 hora atrás';
+    } else if (difference.inMinutes > 1) {
+      return '${difference.inMinutes} minutos atrás';
+    } else if (difference.inMinutes == 1) {
+      return '1 minuto atrás';
     } else {
       return 'Agora';
     }
@@ -286,13 +290,13 @@ class _VideosState extends State<Videos> {
                                           _toggleVideoSelection(videoId),
                                     ),
                                   Expanded(
-                                    child: FutureBuilder<ExtendedVideo>(
-                                      future: _fetchExtendedVideo(videoUrl),
+                                    child: FutureBuilder<YT.Video>(
+                                      future: _fetchVideo(videoUrl),
                                       builder: (context, videoSnapshot) {
                                         if (videoSnapshot.connectionState ==
                                             ConnectionState.waiting) {
                                           return const SizedBox(
-                                            height: 120,
+                                            height: 180, // Increased height
                                             child: Center(
                                                 child:
                                                     CircularProgressIndicator()),
@@ -310,8 +314,9 @@ class _VideosState extends State<Videos> {
                                                 children: [
                                                   CachedNetworkImage(
                                                     imageUrl:
-                                                        'https://i.ytimg.com/vi/${video.video.id}/hqdefault.jpg',
-                                                    height: 120,
+                                                        'https://i.ytimg.com/vi/${video.id}/hqdefault.jpg',
+                                                    height:
+                                                        180, // Increased height
                                                     width: double.infinity,
                                                     fit: BoxFit.cover,
                                                     placeholder: (context,
@@ -334,8 +339,8 @@ class _VideosState extends State<Videos> {
                                                       color: Colors.black
                                                           .withOpacity(0.7),
                                                       child: Text(
-                                                        _formatDuration(video
-                                                            .video.duration),
+                                                        _formatDuration(
+                                                            video.duration),
                                                         style: const TextStyle(
                                                           color: Colors.white,
                                                           fontWeight:
@@ -347,22 +352,30 @@ class _VideosState extends State<Videos> {
                                                 ],
                                               ),
                                               const SizedBox(height: 8),
-                                              Text(
-                                                video.video.title,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleMedium!
-                                                    .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 8.0, right: 8.0),
+                                                child: Text(
+                                                  video.title,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .titleMedium!
+                                                      .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                ),
                                               ),
                                               const SizedBox(height: 4),
-                                              Text(
-                                                '${video.video.author} • ${video.viewCount} views • ${_timeAgo(video.video.uploadDate)}',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodySmall,
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10.0, right: 10.0),
+                                                child: Text(
+                                                  '${video.author} • ${_timeAgo(video.uploadDate)}',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall,
+                                                ),
                                               ),
                                             ],
                                           );
