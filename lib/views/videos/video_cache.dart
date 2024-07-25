@@ -1,13 +1,13 @@
-import 'package:churchapp/views/videos/extended_video.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart' as YT;
 
 class VideoCache {
-  final Map<String, ExtendedVideo> _cache = {};
+  final Map<String, YT.Video> _cache = {};
 
   bool contains(String url) => _cache.containsKey(url);
 
-  ExtendedVideo? get(String url) => _cache[url];
+  YT.Video? get(String url) => _cache[url];
 
-  void add(String url, ExtendedVideo video) {
+  void add(String url, YT.Video video) {
     _cache[url] = video;
   }
 }
