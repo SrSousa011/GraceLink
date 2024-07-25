@@ -1,5 +1,5 @@
 import 'package:churchapp/models/user_data.dart';
-import 'package:churchapp/views/user_Profile/user_profile.dart';
+import 'package:churchapp/views/user_profile/user_profile.dart';
 import 'package:flutter/material.dart';
 
 const String tImageBackground = 'assets/imagens/bacground-image-center.jpg';
@@ -35,7 +35,7 @@ class DrawerHeaderWidget extends StatelessWidget {
                   userData: userData ??
                       UserData(
                         id: '',
-                        fullName: 'Guest',
+                        fullName: 'Loading...',
                         address: '',
                         imagePath: '',
                       ),
