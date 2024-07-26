@@ -460,8 +460,3 @@ class AuthenticationService implements BaseAuth {
     }
   }
 }
-
-
-
-// Commit name
-// Add verifyCurrentPassword
