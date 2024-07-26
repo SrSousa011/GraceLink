@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:churchapp/views/user_Profile/update_profile.dart';
 
-const Color tPrimaryColor = Colors.blue; // Example primary color
-const Color tDarkColor =
-    Color.fromARGB(255, 255, 255, 255); // Example dark color
+const Color tPrimaryColor = Colors.blue;
+const Color tDarkColor = Color.fromARGB(255, 255, 255, 255);
+const double tFormHeight = 50.0;
+const String tEditProfile = 'Update Email';
 
 class ChangeEmailScreen extends StatelessWidget {
   final TextEditingController _currentEmailController = TextEditingController();
@@ -14,7 +14,7 @@ class ChangeEmailScreen extends StatelessWidget {
 
   ChangeEmailScreen({super.key});
 
-  void _changeEmail(BuildContext context) async {
+  Future<void> _changeEmail(BuildContext context) async {
     String currentEmail = _currentEmailController.text.trim();
     String newEmail = _newEmailController.text.trim();
     String confirmEmail = _confirmEmailController.text.trim();
@@ -29,14 +29,24 @@ class ChangeEmailScreen extends StatelessWidget {
     }
 
     try {
+      String? userEmail = await AuthenticationService().getCurrentUserEmail();
+      if (userEmail != currentEmail) {
+        const SnackBar(
+          content: Text(
+              'Current email does not match the email associated with this account'),
+        );
+        return;
+      }
+
       await AuthenticationService()
           .changeEmailWithConfirmation(currentEmail, newEmail);
+
       if (!context.mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Email changed successfully')),
       );
-      Navigator.pop(
-          context); // Navigate back to UserProfile after successful change
+      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to change email: $e')),
