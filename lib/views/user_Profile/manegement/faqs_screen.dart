@@ -11,7 +11,7 @@ class FAQScreen extends StatelessWidget {
         title: const Text('FAQs'),
       ),
       body: Container(
-        color: Colors.black, // Fundo escuro para melhor contraste
+        color: Colors.black,
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [

@@ -1,5 +1,5 @@
 import 'package:churchapp/views/about_us.dart';
-import 'package:churchapp/views/user_Profile/faqs_screen.dart';
+import 'package:churchapp/views/user_Profile/manegement/faqs_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 

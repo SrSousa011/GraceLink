@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
-import 'package:churchapp/views/user_Profile/user_management_screen.dart';
+import 'package:churchapp/views/user_Profile/manegement/user_management_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -14,7 +14,7 @@ import 'package:churchapp/views/user_Profile/update_profile.dart';
 import 'package:churchapp/views/user_Profile/profile_menu.dart';
 import 'package:churchapp/views/user_Profile/settings/settings.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'info_screen.dart';
+import 'manegement/info_screen.dart';
 
 const String tAvatar = 'assets/imagens/default_avatar.png';
 const Color tPrimaryColor = Colors.blue;
@@ -154,7 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                   child: const Text(
                     'Edit Profile',
-                    style: TextStyle(color: Colors.white), // Updated text color
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
