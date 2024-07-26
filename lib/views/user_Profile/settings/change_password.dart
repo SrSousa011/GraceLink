@@ -1,11 +1,10 @@
+import 'package:churchapp/views/user_Profile/editProfile/update_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:churchapp/views/user_Profile/update_profile.dart';
 
-const Color tPrimaryColor = Colors.blue; // Example primary color
-const Color tDarkColor =
-    Color.fromARGB(255, 255, 255, 255); // Example dark color
+const Color tPrimaryColor = Colors.blue;
+const Color tDarkColor = Color.fromARGB(255, 255, 255, 255);
 
 class ChangePasswordScreen extends StatelessWidget {
   final TextEditingController _currentPasswordController =
