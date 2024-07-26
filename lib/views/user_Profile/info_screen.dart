@@ -1,5 +1,7 @@
+import 'package:churchapp/views/about_us.dart';
+import 'package:churchapp/views/user_Profile/faqs_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart'; // Para links externos
+import 'package:url_launcher/url_launcher.dart';
 
 class InfoScreen extends StatelessWidget {
   const InfoScreen({super.key});
@@ -11,7 +13,7 @@ class InfoScreen extends StatelessWidget {
         title: const Text('App Info'),
       ),
       body: Container(
-        color: Colors.black, // Fundo escuro para melhor contraste
+        color: Colors.black, // Dark background for better contrast
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
@@ -21,7 +23,7 @@ class InfoScreen extends StatelessWidget {
                 style: TextStyle(color: Colors.white),
               ),
               onTap: () {
-                // Navegar para o histórico de atualizações se necessário
+                // Navigate to update history if needed
               },
             ),
             ListTile(
@@ -57,7 +59,26 @@ class InfoScreen extends StatelessWidget {
                 style: TextStyle(color: Colors.white),
               ),
               onTap: () {
-                // Navegar para FAQs se necessário
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const FAQScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text(
+                'About Us',
+                style: TextStyle(color: Colors.white),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AboutUs(),
+                  ),
+                );
               },
             ),
             const SizedBox(height: 20),
