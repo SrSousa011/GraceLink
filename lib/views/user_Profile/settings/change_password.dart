@@ -31,14 +31,23 @@ class ChangePasswordScreen extends StatelessWidget {
     }
 
     try {
+      bool isCurrentPasswordValid =
+          await AuthenticationService().verifyCurrentPassword(currentPassword);
+
+      if (!isCurrentPasswordValid) {
+        const SnackBar(
+          content: Text('Current Password is incorrect'),
+        );
+        return;
+      }
+
       await AuthenticationService()
           .changePasswordWithConfirmation(currentPassword, newPassword);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Password changed successfully')),
       );
-      Navigator.pop(
-          context); // Navigate back to UserProfile after successful change
+      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to change Password: $e')),
@@ -98,7 +107,7 @@ class ChangePasswordScreen extends StatelessWidget {
                   shape: const StadiumBorder(),
                 ),
                 child: const Text(
-                  tEditProfile,
+                  'Change Password',
                   style: TextStyle(color: tDarkColor),
                 ),
               ),
