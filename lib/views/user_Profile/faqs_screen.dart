@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class FAQScreen extends StatelessWidget {
   const FAQScreen({super.key});
@@ -9,49 +10,119 @@ class FAQScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('FAQs'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          _buildFAQTile(
-            'What is this app about?',
-            'This app provides users with the ability to manage their profiles, update their information, and more.',
-          ),
-          _buildFAQTile(
-            'How do I reset my password?',
-            'You can reset your password by going to the settings page and selecting "Change Password". Follow the prompts to reset it.',
-          ),
-          _buildFAQTile(
-            'Who can I contact for support?',
-            'For support, you can email us at info@resplandecendonacoes.org or call +352 691 240 908.',
-          ),
-          _buildFAQTile(
-            'Where can I find the privacy policy?',
-            'You can find our privacy policy on our website at https://example.com/privacy-policy.',
-          ),
-          _buildFAQTile(
-            'How can I update my phone number?',
-            'To update your phone number, go to the settings page, select "Change Phone", and follow the instructions.',
-          ),
-        ],
+      body: Container(
+        color: Colors.black, // Fundo escuro para melhor contraste
+        child: ListView(
+          padding: const EdgeInsets.all(16.0),
+          children: [
+            const Text(
+              'Perguntas Frequentes',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            const ExpansionTile(
+              title: Text(
+                'Qual é o horário dos cultos?',
+                style: TextStyle(color: Colors.white),
+              ),
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    'Os cultos ocorrem aos domingos às 10h e às quartas-feiras às 19h.',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                ),
+              ],
+            ),
+            const ExpansionTile(
+              title: Text(
+                'Como posso me envolver com os grupos de estudo?',
+                style: TextStyle(color: Colors.white),
+              ),
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    'Você pode se inscrever nos grupos de estudo através do nosso site ou entrando em contato com o escritório da igreja.',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                ),
+              ],
+            ),
+            const ExpansionTile(
+              title: Text(
+                'Onde posso encontrar informações sobre eventos?',
+                style: TextStyle(color: Colors.white),
+              ),
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    'As informações sobre eventos estão disponíveis no nosso site e no mural de avisos da igreja.',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                ),
+              ],
+            ),
+            const ExpansionTile(
+              title: Text(
+                'Como posso fazer uma doação?',
+                style: TextStyle(color: Colors.white),
+              ),
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    'Você pode fazer uma doação através do nosso site ou diretamente na igreja durante os horários de culto.',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Não encontrou a resposta para sua pergunta?',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            ListTile(
+              title: const Text(
+                'Entre em contato conosco',
+                style: TextStyle(color: Colors.white),
+              ),
+              leading: const Icon(Icons.contact_mail, color: Colors.white),
+              onTap: () {
+                // Navegar para tela de contato ou abrir email
+                _launchEmail();
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildFAQTile(String question, String answer) {
-    return ExpansionTile(
-      title: Text(
-        question,
-        style: const TextStyle(color: Colors.white),
-      ),
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            answer,
-            style: const TextStyle(color: Colors.white70),
-          ),
-        ),
-      ],
+  Future<void> _launchEmail() async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'info@churchapp.org',
+      queryParameters: {'subject': 'Dúvidas sobre o aplicativo'},
     );
+
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    } else {
+      throw 'Não foi possível abrir o cliente de e-mail';
+    }
   }
 }
