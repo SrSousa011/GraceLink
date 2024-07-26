@@ -30,6 +30,8 @@ abstract class BaseAuth {
 
   Future<void> changePassword(String password);
 
+  Future<bool> verifyCurrentPassword(String currentPassword);
+
   Future<void> changeEmailWithConfirmation(
       String currentEmail, String newEmail);
 
@@ -415,4 +417,51 @@ class AuthenticationService implements BaseAuth {
       rethrow;
     }
   }
+
+  @override
+  Future<bool> verifyCurrentPassword(String currentPassword) async {
+    User? user = _firebaseAuth.currentUser;
+
+    if (user == null) {
+      return false;
+    }
+
+    try {
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: user.email ?? '',
+        password: currentPassword,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Failed to verify current password: $e');
+      }
+      return false;
+    }
+  }
+
+  Future<String?> getCurrentUserPhone() async {
+    try {
+      User? user = _firebaseAuth.currentUser;
+      if (user != null) {
+        DocumentSnapshot snapshot =
+            await _firestore.collection('users').doc(user.uid).get();
+        return snapshot.get('phone'); // Adjust field name as needed
+      }
+      return null;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting current user phone: $e');
+      }
+      return null;
+    }
+  }
 }
+
+
+
+// Commit name
+// Add verifyCurrentPassword
