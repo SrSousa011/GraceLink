@@ -3,9 +3,8 @@ import 'package:churchapp/services/auth_service.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:churchapp/views/user_Profile/update_profile.dart';
 
-const Color tPrimaryColor = Colors.blue; // Example primary color
-const Color tDarkColor =
-    Color.fromARGB(255, 255, 255, 255); // Example dark color
+const Color tPrimaryColor = Colors.blue;
+const Color tDarkColor = Color.fromARGB(255, 255, 255, 255);
 
 class ChangePhoneScreen extends StatelessWidget {
   final TextEditingController _currentPhoneController = TextEditingController();
@@ -29,14 +28,22 @@ class ChangePhoneScreen extends StatelessWidget {
     }
 
     try {
+      final currentUserPhone =
+          await AuthenticationService().getCurrentUserPhone();
+      if (currentPhone != currentUserPhone) {
+        const SnackBar(
+          content: Text('Current phone number is incorrect'),
+        );
+        return;
+      }
+
       await AuthenticationService()
           .changePhoneWithConfirmation(currentPhone, newPhone);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Phone changed successfully')),
       );
-      Navigator.pop(
-          context); // Navigate back to UserProfile after successful change
+      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to change phone: $e')),
@@ -93,7 +100,7 @@ class ChangePhoneScreen extends StatelessWidget {
                   shape: const StadiumBorder(),
                 ),
                 child: const Text(
-                  tEditProfile,
+                  'Update Phone',
                   style: TextStyle(color: tDarkColor),
                 ),
               ),
