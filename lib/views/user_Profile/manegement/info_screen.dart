@@ -8,55 +8,74 @@ class InfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('App Info'),
       ),
       body: Container(
-        color: Colors.black, // Dark background for better contrast
+        color: isDarkMode
+            ? Colors.grey[900]
+            : Colors.white, // Set background color based on theme
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
             ListTile(
-              title: const Text(
+              title: Text(
                 'Update History',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                    color: isDarkMode
+                        ? Colors.white
+                        : Colors.black), // Text color based on theme
               ),
               onTap: () {
                 // Navigate to update history if needed
               },
             ),
             ListTile(
-              title: const Text(
+              title: Text(
                 'Privacy Policy',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                    color: isDarkMode
+                        ? Colors.white
+                        : Colors.black), // Text color based on theme
               ),
               onTap: () {
                 _launchURL('https://example.com/privacy-policy');
               },
             ),
             ListTile(
-              title: const Text(
+              title: Text(
                 'Terms of Service',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                    color: isDarkMode
+                        ? Colors.white
+                        : Colors.black), // Text color based on theme
               ),
               onTap: () {
                 _launchURL('https://example.com/terms-of-service');
               },
             ),
             ListTile(
-              title: const Text(
+              title: Text(
                 'Contact Support',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                    color: isDarkMode
+                        ? Colors.white
+                        : Colors.black), // Text color based on theme
               ),
               onTap: () {
                 _launchEmail();
               },
             ),
             ListTile(
-              title: const Text(
+              title: Text(
                 'FAQs',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                    color: isDarkMode
+                        ? Colors.white
+                        : Colors.black), // Text color based on theme
               ),
               onTap: () {
                 Navigator.push(
@@ -68,9 +87,12 @@ class InfoScreen extends StatelessWidget {
               },
             ),
             ListTile(
-              title: const Text(
+              title: Text(
                 'About Us',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                    color: isDarkMode
+                        ? Colors.white
+                        : Colors.black), // Text color based on theme
               ),
               onTap: () {
                 Navigator.push(
@@ -82,70 +104,101 @@ class InfoScreen extends StatelessWidget {
               },
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'About Us',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: isDarkMode
+                    ? Colors.white
+                    : Colors.black, // Text color based on theme
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
-            const Text(
+            Text(
               'Welcome to our app. We are committed to providing you with the best experience. For more information, please visit our website or contact us.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(
+                  color: isDarkMode
+                      ? Colors.white
+                      : Colors.black), // Text color based on theme
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Contact Us',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: isDarkMode
+                    ? Colors.white
+                    : Colors.black, // Text color based on theme
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
-            const ListTile(
+            ListTile(
               title: Text(
                 '281 Route de Thionville, Hesperange, Luxembourg',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                    color: isDarkMode
+                        ? Colors.white
+                        : Colors.black), // Text color based on theme
               ),
-              leading: Icon(Icons.location_on, color: Colors.white),
+              leading: Icon(Icons.location_on,
+                  color: isDarkMode
+                      ? Colors.white
+                      : Colors.black), // Icon color based on theme
             ),
             ListTile(
-              title: const Text(
+              title: Text(
                 'info@resplandecendonacoes.org',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                    color: isDarkMode
+                        ? Colors.white
+                        : Colors.black), // Text color based on theme
               ),
-              leading: const Icon(Icons.email, color: Colors.white),
+              leading: Icon(Icons.email,
+                  color: isDarkMode
+                      ? Colors.white
+                      : Colors.black), // Icon color based on theme
               onTap: () {
                 _launchEmail();
               },
             ),
             ListTile(
-              title: const Text(
+              title: Text(
                 '+352 691 240 908',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                    color: isDarkMode
+                        ? Colors.white
+                        : Colors.black), // Text color based on theme
               ),
-              leading: const Icon(Icons.phone, color: Colors.white),
+              leading: Icon(Icons.phone,
+                  color: isDarkMode
+                      ? Colors.white
+                      : Colors.black), // Icon color based on theme
               onTap: () {
                 _launchPhone();
               },
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Last updated: July 2024',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(
+                  color: isDarkMode
+                      ? Colors.grey
+                      : Colors.grey[800]), // Text color based on theme
             ),
             const SizedBox(height: 10),
-            const Text(
+            Text(
               '© 2024 Your Company. All rights reserved.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(
+                  color: isDarkMode
+                      ? Colors.grey
+                      : Colors.grey[800]), // Text color based on theme
             ),
           ],
         ),
