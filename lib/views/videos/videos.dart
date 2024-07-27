@@ -1,5 +1,7 @@
+import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/videos/video_cache.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as YT;
 import 'package:cached_network_image/cached_network_image.dart';
@@ -187,6 +189,8 @@ class _VideosState extends State<Videos> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
       appBar: AppBar(
         title: const Text('YouTube Links'),
@@ -239,7 +243,8 @@ class _VideosState extends State<Videos> {
                   ElevatedButton(
                     onPressed: _addLink,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[800],
+                      backgroundColor:
+                          isDarkMode ? Colors.grey[800] : Colors.blue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0),
                       ),
