@@ -2,21 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-class DonationValue extends StatefulWidget {
+class DonationValue extends StatelessWidget {
   const DonationValue({
     super.key,
-    required this.donationController,
-    required TextEditingController controller,
-    required void Function(String value) onValueChanged,
+    required this.controller,
+    required this.onValueChanged,
   });
 
-  final TextEditingController donationController;
+  final TextEditingController controller;
+  final void Function(String value) onValueChanged;
 
-  @override
-  State<DonationValue> createState() => _DonationValueState();
-}
-
-class _DonationValueState extends State<DonationValue> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -33,7 +28,7 @@ class _DonationValueState extends State<DonationValue> {
             ),
           ),
           TextField(
-            controller: widget.donationController,
+            controller: controller,
             keyboardType: TextInputType.number,
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,
@@ -42,6 +37,7 @@ class _DonationValueState extends State<DonationValue> {
             decoration: const InputDecoration(
               hintText: 'Digite o valor da sua doação',
             ),
+            onChanged: onValueChanged,
           ),
           const SizedBox(height: 20.0),
         ],

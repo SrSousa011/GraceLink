@@ -13,8 +13,9 @@ const String tJoined = 'Joined ';
 const String tJoinedAt = '25 Jan 2022';
 const String tDelete = 'Delete';
 
-const Color tPrimaryColor = Colors.blue;
-const Color tDarkColor = Colors.white;
+// Updated color constants
+const Color tPrimaryColor = Colors.grey; // Changed to gray
+const Color tDarkColor = Colors.black; // Changed to black for contrast
 
 class UpdateProfileScreen extends StatefulWidget {
   final UserData userData;

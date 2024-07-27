@@ -15,8 +15,8 @@ class Donations extends StatefulWidget {
 }
 
 class _DonationsState extends State<Donations> {
-  String donationType = '';
   late TextEditingController donationController;
+  String donationType = '';
 
   @override
   void initState() {
@@ -151,7 +151,6 @@ class _DonationsState extends State<Donations> {
               const SizedBox(height: 20.0),
               DonationValue(
                 controller: donationController,
-                donationController: donationController,
                 onValueChanged: (value) {},
               ),
               DonationType(
