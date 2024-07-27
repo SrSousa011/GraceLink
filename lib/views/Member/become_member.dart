@@ -66,48 +66,46 @@ class _BecomeMemberState extends State<BecomeMember> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Become a Member'),
-        ),
-        drawer: NavBar(
-          auth: AuthenticationService(),
-          authService: AuthenticationService(),
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildDateOfBirthSection(),
-                  const SizedBox(height: 20.0),
-                  _buildFullNameSection(),
-                  const SizedBox(height: 20.0),
-                  _buildPhoneNumberSection(),
-                  const SizedBox(height: 20.0),
-                  _buildLastVisitedChurchSection(),
-                  const SizedBox(height: 20.0),
-                  _buildCivilStatusSection(),
-                  const SizedBox(height: 20.0),
-                  _buildAdressSection(),
-                  const SizedBox(height: 20.0),
-                  _buildReasonForMembershipSection(),
-                  const SizedBox(height: 20.0),
-                  _buildReferenceSection(),
-                  const SizedBox(height: 20.0),
-                  _buildSignUpButton(),
-                ],
-              ),
+    final ThemeData theme = Theme.of(context);
+    final Color buttonColor =
+        theme.brightness == Brightness.light ? Colors.blue : Colors.grey;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Become a Member'),
+        backgroundColor:
+            theme.brightness == Brightness.light ? Colors.blue : Colors.grey,
+      ),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+        authService: AuthenticationService(),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildDateOfBirthSection(),
+                const SizedBox(height: 20.0),
+                _buildFullNameSection(),
+                const SizedBox(height: 20.0),
+                _buildPhoneNumberSection(),
+                const SizedBox(height: 20.0),
+                _buildLastVisitedChurchSection(),
+                const SizedBox(height: 20.0),
+                _buildCivilStatusSection(),
+                const SizedBox(height: 20.0),
+                _buildAdressSection(),
+                const SizedBox(height: 20.0),
+                _buildReasonForMembershipSection(),
+                const SizedBox(height: 20.0),
+                _buildReferenceSection(),
+                const SizedBox(height: 20.0),
+                _buildSignUpButton(buttonColor),
+              ],
             ),
           ),
         ),
@@ -209,7 +207,7 @@ class _BecomeMemberState extends State<BecomeMember> {
         if (value == null || value.isEmpty) {
           return 'Full name cannot be empty';
         }
-        // Additional validation logic can be added here
+        // Additional validation logic can be added aqui
         return null;
       },
     );
@@ -226,7 +224,7 @@ class _BecomeMemberState extends State<BecomeMember> {
         if (value == null || value.isEmpty) {
           return 'Address cannot be empty';
         }
-        // Additional validation logic can be added here
+        // Additional validation logic can be added aqui
         return null;
       },
     );
@@ -281,7 +279,7 @@ class _BecomeMemberState extends State<BecomeMember> {
         if (value == null || value.isEmpty) {
           return 'Reason for membership cannot be empty';
         }
-        // Additional validation logic can be added here
+        // Additional validation logic can be added aqui
         return null;
       },
     );
@@ -297,12 +295,12 @@ class _BecomeMemberState extends State<BecomeMember> {
     );
   }
 
-  Widget _buildSignUpButton() {
+  Widget _buildSignUpButton(Color buttonColor) {
     return ElevatedButton(
       onPressed: _isLoading ? null : _validateAndSubmit,
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
-        backgroundColor: const Color(0xFF5AAFf9),
+        backgroundColor: buttonColor, // Change button color based on theme
       ),
       child: const Text('Submit'),
     );
@@ -421,6 +419,7 @@ void main() {
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        // Define your theme here
       ),
       home: const BecomeMember(),
     ),
