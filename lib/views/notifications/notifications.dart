@@ -68,9 +68,6 @@ class _Application extends State<Notifications> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Notificações'),
-          backgroundColor: theme.brightness == Brightness.light
-              ? Colors.blue
-              : Colors.grey, // Change AppBar color based on theme
         ),
         drawer: NavBar(
           auth: AuthenticationService(),

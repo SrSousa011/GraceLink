@@ -73,8 +73,6 @@ class _BecomeMemberState extends State<BecomeMember> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Become a Member'),
-        backgroundColor:
-            theme.brightness == Brightness.light ? Colors.blue : Colors.grey,
       ),
       drawer: NavBar(
         auth: AuthenticationService(),
@@ -378,7 +376,6 @@ class DateOfBirthDropdowns extends StatelessWidget {
   final ValueChanged<int?> onChangedDay;
   final ValueChanged<int?> onChangedMonth;
   final ValueChanged<int?> onChangedYear;
-  final bool canReturn = false;
 
   const DateOfBirthDropdowns({
     super.key,
