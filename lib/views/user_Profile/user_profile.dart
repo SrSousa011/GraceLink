@@ -80,6 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
     final iconColor = isDarkMode ? Colors.white : Colors.blue;
+    final userNameColor = isDarkMode ? Colors.white : Colors.blue;
 
     return Scaffold(
       appBar: AppBar(
@@ -143,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black),
+                    color: userNameColor),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8.0),
