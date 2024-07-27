@@ -34,7 +34,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
-      // Rest of your ProfileScreen code
     );
   }
 }
