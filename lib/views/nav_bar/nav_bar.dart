@@ -3,7 +3,7 @@ import 'package:churchapp/views/nav_bar/drawer_header_widget.dart';
 import 'package:churchapp/views/nav_bar/drawer_menu_item.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
-import 'package:churchapp/theme/welcome.dart';
+import 'package:churchapp/views/welcome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Add Firestore import
 
