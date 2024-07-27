@@ -18,7 +18,7 @@ class DrawerMenuItem extends StatelessWidget {
       title: Text(title),
       leading: Icon(icon),
       onTap: () {
-        Navigator.pop(context); // Close the drawer before navigating
+        Navigator.pop(context);
         Navigator.pushReplacementNamed(context, route);
       },
     );

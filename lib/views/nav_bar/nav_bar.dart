@@ -1,11 +1,10 @@
 import 'package:churchapp/models/user_data.dart';
 import 'package:churchapp/views/nav_bar/drawer_header_widget.dart';
-import 'package:churchapp/views/nav_bar/drawer_menu_item.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/welcome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Add Firestore import
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NavBar extends StatefulWidget {
   final BaseAuth auth;
@@ -33,12 +32,10 @@ class _NavBarState extends State<NavBar> {
   }
 
   Future<void> getUserData() async {
-    // Get the current user ID
     final userId = FirebaseAuth.instance.currentUser?.uid;
 
     if (userId != null) {
       try {
-        // Fetch the user data from Firestore
         final userDoc = await FirebaseFirestore.instance
             .collection('users')
             .doc(userId)
@@ -48,7 +45,6 @@ class _NavBarState extends State<NavBar> {
             userData = UserData.fromDocumentSnapshot(userDoc);
           });
         } else {
-          // Handle the case where user document does not exist
           setState(() {
             userData = UserData(
               id: userId,
@@ -59,7 +55,6 @@ class _NavBarState extends State<NavBar> {
           });
         }
       } catch (e) {
-        // Handle errors here
         print('Error fetching user data: $e');
       }
     }
@@ -67,52 +62,75 @@ class _NavBarState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final bool isDarkMode = theme.brightness == Brightness.dark;
+    final Color iconColor = isDarkMode ? Colors.white : Colors.black;
+    final Color tileColor = isDarkMode ? Colors.black : Colors.white;
+    final Color textColor = isDarkMode ? Colors.white : Colors.black;
+
     return Drawer(
+      backgroundColor: tileColor,
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeaderWidget(
             userData: userData,
           ),
-          const DrawerMenuItem(
-            title: 'Home',
-            icon: Icons.home_outlined,
-            route: '/home',
+          ListTile(
+            leading: Icon(Icons.home_outlined, color: iconColor),
+            title: Text('Home', style: TextStyle(color: textColor)),
+            onTap: () {
+              Navigator.pushNamed(context, '/home');
+            },
           ),
-          const DrawerMenuItem(
-            title: 'Events',
-            icon: Icons.event,
-            route: '/event_page',
+          ListTile(
+            leading: Icon(Icons.event, color: iconColor),
+            title: Text('Events', style: TextStyle(color: textColor)),
+            onTap: () {
+              Navigator.pushNamed(context, '/event_page');
+            },
           ),
-          const DrawerMenuItem(
-            title: 'Donations',
-            icon: Icons.volunteer_activism_outlined,
-            route: '/donations',
+          ListTile(
+            leading: Icon(Icons.volunteer_activism_outlined, color: iconColor),
+            title: Text('Donations', style: TextStyle(color: textColor)),
+            onTap: () {
+              Navigator.pushNamed(context, '/donations');
+            },
           ),
-          const DrawerMenuItem(
-            title: 'Courses',
-            icon: Icons.school_outlined,
-            route: '/courses',
+          ListTile(
+            leading: Icon(Icons.school_outlined, color: iconColor),
+            title: Text('Courses', style: TextStyle(color: textColor)),
+            onTap: () {
+              Navigator.pushNamed(context, '/courses');
+            },
           ),
-          const DrawerMenuItem(
-            title: 'Become member',
-            icon: Icons.group_add_outlined,
-            route: '/become_member',
+          ListTile(
+            leading: Icon(Icons.group_add_outlined, color: iconColor),
+            title: Text('Become member', style: TextStyle(color: textColor)),
+            onTap: () {
+              Navigator.pushNamed(context, '/become_member');
+            },
           ),
-          const DrawerMenuItem(
-            title: 'Notifications',
-            icon: Icons.notifications_outlined,
-            route: '/notifications',
+          ListTile(
+            leading: Icon(Icons.notifications_outlined, color: iconColor),
+            title: Text('Notifications', style: TextStyle(color: textColor)),
+            onTap: () {
+              Navigator.pushNamed(context, '/notifications');
+            },
           ),
-          const DrawerMenuItem(
-            title: 'Videos',
-            icon: Icons.video_library_outlined,
-            route: '/videos',
+          ListTile(
+            leading: Icon(Icons.video_library_outlined, color: iconColor),
+            title: Text('Videos', style: TextStyle(color: textColor)),
+            onTap: () {
+              Navigator.pushNamed(context, '/videos');
+            },
           ),
-          const DrawerMenuItem(
-            title: 'About Us',
-            icon: Icons.info_outlined,
-            route: '/about_us',
+          ListTile(
+            leading: Icon(Icons.info_outlined, color: iconColor),
+            title: Text('About Us', style: TextStyle(color: textColor)),
+            onTap: () {
+              Navigator.pushNamed(context, '/about_us');
+            },
           ),
           ListTile(
             leading: const Icon(Icons.logout),
