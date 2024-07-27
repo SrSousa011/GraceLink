@@ -132,7 +132,7 @@ class FAQScreen extends StatelessWidget {
   Future<void> _launchEmail() async {
     final Uri emailUri = Uri(
       scheme: 'mailto',
-      path: 'info@churchapp.org',
+      path: 'info@resplandecendonacoes.org',
       queryParameters: {'subject': 'Dúvidas sobre o aplicativo'},
     );
 
