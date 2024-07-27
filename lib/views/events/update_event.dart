@@ -78,12 +78,10 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
       );
 
       try {
-        // Chamada para atualizar o evento
         await updateEvent(updatedEvent, widget.event.id);
 
-        // Verificar se o contexto está montado antes de tentar navegar de volta
         if (!context.mounted) return;
-        Navigator.pop(context, true); // Retornar true para indicar sucesso
+        Navigator.pop(context, true);
       } catch (e) {
         showDialog(
           context: context,
@@ -130,6 +128,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Atualizar Evento'),
+        backgroundColor: Colors.grey[800], // Updated color
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -156,9 +155,9 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   Widget _buildTitleField() {
     return TextField(
       controller: _titleController,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         labelText: 'Título do Evento',
-        prefixIcon: Icon(Icons.title),
+        prefixIcon: Icon(Icons.title, color: Colors.grey[700]), // Updated color
       ),
     );
   }
@@ -166,9 +165,10 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   Widget _buildDescriptionField() {
     return TextField(
       controller: _descriptionController,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         labelText: 'Descrição do Evento',
-        prefixIcon: Icon(Icons.description),
+        prefixIcon:
+            Icon(Icons.description, color: Colors.grey[700]), // Updated color
       ),
     );
   }
@@ -183,9 +183,10 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
                 ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
                 : '',
           ),
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Data do Evento',
-            prefixIcon: Icon(Icons.calendar_today),
+            prefixIcon: Icon(Icons.calendar_today,
+                color: Colors.grey[700]), // Updated color
           ),
         ),
       ),
@@ -200,9 +201,10 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
           controller: TextEditingController(
             text: _selectedTime != null ? _selectedTime!.format(context) : '',
           ),
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Hora do Evento',
-            prefixIcon: Icon(Icons.access_time),
+            prefixIcon: Icon(Icons.access_time,
+                color: Colors.grey[700]), // Updated color
           ),
         ),
       ),
@@ -212,9 +214,10 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   Widget _buildLocationField() {
     return TextField(
       controller: _locationController,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         labelText: 'Localização',
-        prefixIcon: Icon(Icons.location_on),
+        prefixIcon:
+            Icon(Icons.location_on, color: Colors.grey[700]), // Updated color
       ),
     );
   }
@@ -224,7 +227,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
       onPressed: () => _updateEvent(context),
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
-        backgroundColor: const Color(0xFF5AAFf9),
+        backgroundColor: Colors.grey[800], // Updated color
       ),
       child: const Text('Atualizar'),
     );

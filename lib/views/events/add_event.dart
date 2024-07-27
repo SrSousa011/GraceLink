@@ -1,4 +1,5 @@
 import 'package:churchapp/provider/user_provider.dart';
+import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/event_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -64,12 +65,10 @@ class _AddEventFormState extends State<AddEventForm> {
   }
 
   Future<void> _saveEvent(BuildContext context) async {
-    // Verificar se todos os campos estão preenchidos
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty &&
         _selectedDate != null &&
         _selectedTime != null) {
-      // Criar um novo evento
       final newEvent = Event(
         id: _titleController.text,
         title: _titleController.text,
@@ -105,7 +104,6 @@ class _AddEventFormState extends State<AddEventForm> {
         );
       }
     } else {
-      // Mostrar um diálogo de erro se algum campo estiver vazio
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -128,6 +126,9 @@ class _AddEventFormState extends State<AddEventForm> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
@@ -135,6 +136,7 @@ class _AddEventFormState extends State<AddEventForm> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Novo Evento'),
+          backgroundColor: isDarkMode ? Colors.grey[850] : Colors.blue,
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -146,25 +148,28 @@ class _AddEventFormState extends State<AddEventForm> {
                   'Título do Evento',
                   _titleController,
                   Icons.title,
+                  isDarkMode: isDarkMode,
                 ),
                 const SizedBox(height: 20.0),
                 _buildTextField(
                   'Descrição do Evento',
                   _descriptionController,
                   Icons.description,
+                  isDarkMode: isDarkMode,
                 ),
                 const SizedBox(height: 20.0),
-                _buildDateField(),
+                _buildDateField(isDarkMode: isDarkMode),
                 const SizedBox(height: 20.0),
-                _buildTimeField(),
+                _buildTimeField(isDarkMode: isDarkMode),
                 const SizedBox(height: 20.0),
-                _buildLocationField(),
+                _buildLocationField(isDarkMode: isDarkMode),
                 const SizedBox(height: 20.0),
                 ElevatedButton(
                   onPressed: () => _saveEvent(context),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: Colors.blue,
+                    backgroundColor:
+                        isDarkMode ? Colors.grey[800] : Colors.blue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
@@ -180,17 +185,21 @@ class _AddEventFormState extends State<AddEventForm> {
   }
 
   Widget _buildTextField(
-      String labelText, TextEditingController controller, IconData icon) {
+      String labelText, TextEditingController controller, IconData icon,
+      {required bool isDarkMode}) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
-        icon: Icon(icon),
+        icon: Icon(
+          icon,
+          color: isDarkMode ? Colors.white : Colors.blue,
+        ),
       ),
     );
   }
 
-  Widget _buildDateField() {
+  Widget _buildDateField({required bool isDarkMode}) {
     return TextField(
       onTap: () => _selectDate(context),
       readOnly: true,
@@ -198,12 +207,15 @@ class _AddEventFormState extends State<AddEventForm> {
         labelText: _selectedDate != null
             ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
             : 'Selecionar Data',
-        icon: const Icon(Icons.calendar_today),
+        icon: Icon(
+          Icons.calendar_today,
+          color: isDarkMode ? Colors.white : Colors.blue,
+        ),
       ),
     );
   }
 
-  Widget _buildTimeField() {
+  Widget _buildTimeField({required bool isDarkMode}) {
     return TextField(
       onTap: () => _selectTime(context),
       readOnly: true,
@@ -211,21 +223,27 @@ class _AddEventFormState extends State<AddEventForm> {
         labelText: _selectedTime != null
             ? _selectedTime!.format(context)
             : 'Selecionar Hora',
-        icon: const Icon(Icons.access_time),
+        icon: Icon(
+          Icons.access_time,
+          color: isDarkMode ? Colors.white : Colors.blue,
+        ),
       ),
     );
   }
 
-  Widget _buildLocationField() {
+  Widget _buildLocationField({required bool isDarkMode}) {
     return TextField(
       onChanged: (value) {
         setState(() {
           _location = value;
         });
       },
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         labelText: 'Localização do Evento',
-        icon: Icon(Icons.location_on),
+        icon: Icon(
+          Icons.location_on,
+          color: isDarkMode ? Colors.white : Colors.blue,
+        ),
       ),
     );
   }
