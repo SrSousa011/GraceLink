@@ -75,6 +75,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     });
   }
 
+  void _clearFields() {
+    setState(() {
+      _fullNameController.clear();
+      _addressController.clear();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -156,9 +163,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: () {
-                          // Implement delete logic here
-                        },
+                        onPressed: _clearFields, // Clear the fields
                         style: ElevatedButton.styleFrom(
                           backgroundColor: theme.brightness == Brightness.light
                               ? Colors.redAccent.withOpacity(0.1)
