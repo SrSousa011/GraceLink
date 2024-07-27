@@ -13,10 +13,6 @@ const String tJoined = 'Joined ';
 const String tJoinedAt = '25 Jan 2022';
 const String tDelete = 'Delete';
 
-// Updated color constants
-const Color tPrimaryColor = Colors.grey; // Changed to gray
-const Color tDarkColor = Colors.black; // Changed to black for contrast
-
 class UpdateProfileScreen extends StatefulWidget {
   final UserData userData;
 
@@ -81,6 +77,15 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final Color buttonColor = theme.brightness == Brightness.light
+        ? Colors.blue // Azul no modo claro
+        : Colors.grey; // Cinza no modo escuro
+
+    final Color buttonTextColor = theme.brightness == Brightness.light
+        ? Colors.white // Branco no modo claro
+        : Colors.black; // Preto no modo escuro
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -122,12 +127,12 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                     child: ElevatedButton(
                       onPressed: _saveProfileChanges,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: tPrimaryColor,
+                        backgroundColor: buttonColor,
                         shape: const StadiumBorder(),
                       ),
-                      child: const Text(
+                      child: Text(
                         tEditProfile,
-                        style: TextStyle(color: tDarkColor),
+                        style: TextStyle(color: buttonTextColor),
                       ),
                     ),
                   ),
@@ -155,9 +160,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                           // Implement delete logic here
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent.withOpacity(0.1),
+                          backgroundColor: theme.brightness == Brightness.light
+                              ? Colors.redAccent.withOpacity(0.1)
+                              : Colors.grey, // Cinza para o modo escuro
                           elevation: 0,
-                          foregroundColor: Colors.red,
+                          foregroundColor: theme.brightness == Brightness.light
+                              ? Colors.red
+                              : Colors.black, // Preto para o modo escuro
                           shape: const StadiumBorder(),
                         ),
                         child: const Text(tDelete),
