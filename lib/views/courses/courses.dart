@@ -22,12 +22,11 @@ class _CoursesState extends State<Courses> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return WillPopScope(
+      onWillPop: () async {
+        return false; // Prevent pop
       },
       child: Scaffold(
         appBar: AppBar(
@@ -60,11 +59,17 @@ class _CoursesState extends State<Courses> {
                   margin: const EdgeInsets.symmetric(
                       vertical: 4.0, horizontal: 10.0),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFFFD59C), Color(0xFF62CFF7)],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
+                    gradient: isDarkMode
+                        ? LinearGradient(
+                            colors: [Color(0xFF3C3C3C), Color(0xFF5A5A5A)],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          )
+                        : LinearGradient(
+                            colors: [Color(0xFFFFD59C), Color(0xFF62CFF7)],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
                     borderRadius: BorderRadius.circular(16.0),
                   ),
                   child: Row(
@@ -88,33 +93,43 @@ class _CoursesState extends State<Courses> {
                           children: [
                             Text(
                               coursesList[index].title,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 20.0,
                                 fontWeight: FontWeight.bold,
+                                color: isDarkMode ? Colors.white : Colors.black,
                               ),
                             ),
                             const SizedBox(height: 8.0),
                             Text(
                               coursesList[index].instructor,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.normal,
+                                color: isDarkMode
+                                    ? Colors.white70
+                                    : Colors.black54,
                               ),
                             ),
                             const SizedBox(height: 8.0),
                             Text(
                               coursesList[index].description,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 15.0,
                                 fontWeight: FontWeight.normal,
+                                color: isDarkMode
+                                    ? Colors.white70
+                                    : Colors.black87,
                               ),
                             ),
                             const SizedBox(height: 8.0),
                             Text(
                               '${coursesList[index].price} €',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.normal,
+                                color: isDarkMode
+                                    ? Colors.white70
+                                    : Colors.black54,
                               ),
                             ),
                           ],
