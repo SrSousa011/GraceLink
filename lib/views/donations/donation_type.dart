@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 
 class DonationType extends StatefulWidget {
   final void Function(String) onTypeSelected;
+  final String donationType;
+  final Color donationTypeButtonColor;
+  final Color donationTypeTextColor;
 
   const DonationType({
     super.key,
     required this.onTypeSelected,
-    required String? donationType,
+    required this.donationType,
+    required this.donationTypeButtonColor,
+    required this.donationTypeTextColor,
   });
 
   @override
@@ -66,7 +71,6 @@ class _DonationTypeState extends State<DonationType> {
                 child: ElevatedButton.icon(
                   onPressed: () async {
                     if (selectedFoodType!.isNotEmpty) {
-                      // Show warning message and return
                       showWarningDialog(context);
                       return;
                     }
@@ -95,6 +99,8 @@ class _DonationTypeState extends State<DonationType> {
                       ? "Escolha o tipo de doação"
                       : selectedDonationType!),
                   style: ElevatedButton.styleFrom(
+                    foregroundColor: widget.donationTypeTextColor,
+                    backgroundColor: widget.donationTypeButtonColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(22.0),
                     ),
@@ -110,7 +116,6 @@ class _DonationTypeState extends State<DonationType> {
                 child: ElevatedButton.icon(
                   onPressed: () async {
                     if (selectedDonationType!.isNotEmpty) {
-                      // Show warning message and return
                       showWarningDialog(context);
                       return;
                     }
@@ -139,6 +144,8 @@ class _DonationTypeState extends State<DonationType> {
                       ? "Selecione o tipo de alimento"
                       : selectedFoodType!),
                   style: ElevatedButton.styleFrom(
+                    foregroundColor: widget.donationTypeTextColor,
+                    backgroundColor: widget.donationTypeButtonColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(22.0),
                     ),
@@ -147,7 +154,7 @@ class _DonationTypeState extends State<DonationType> {
               ),
             ],
           ),
-          const SizedBox(height: 70.0), // Adicionando o SizedBox aqui
+          const SizedBox(height: 70.0),
         ],
       ),
     );

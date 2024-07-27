@@ -12,37 +12,24 @@ class DonateButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final Color buttonColor = theme.brightness == Brightness.light
+        ? const Color(0xFF007BFF) // Azul claro
+        : Colors.grey; // Cinza no modo escuro
+
     return ElevatedButton(
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Confirmation'),
-              content: const Text('You have successfully made a donation!'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Close'),
-                ),
-              ],
-            );
-          },
-        );
-      },
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         minimumSize: const Size.fromHeight(60),
         padding: const EdgeInsets.all(20),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
-        backgroundColor: Colors.blue, // Changed background color to blue
+        backgroundColor: buttonColor,
       ),
       child: Text(
         text,
-        style: const TextStyle(color: Colors.white), // Set text color to white
+        style: const TextStyle(color: Colors.white),
       ),
     );
   }

@@ -7,7 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Donations extends StatefulWidget {
-  const Donations({super.key});
+  const Donations({super.key, this.donationType});
+  final String? donationType;
 
   @override
   State<Donations> createState() => _DonationsState();
@@ -36,7 +37,6 @@ class _DonationsState extends State<Donations> {
   }
 
   void navigateToDonationDetailsScreen(BuildContext context) async {
-    // Validate donation information
     if (donationType.isEmpty || donationController.text.isEmpty) {
       showDialog(
         context: context,
@@ -58,11 +58,9 @@ class _DonationsState extends State<Donations> {
       );
     } else {
       try {
-        // Fetch the current user's full name
         String? fullName = await AuthenticationService().getCurrentUserName();
 
         if (fullName != null && fullName.isNotEmpty) {
-          // Navigate to donation details screen
           if (!context.mounted) return;
           Navigator.push(
             context,
@@ -71,13 +69,12 @@ class _DonationsState extends State<Donations> {
                 donationType: donationType,
                 donationValue: donationController.text,
                 fullName: fullName,
-                isbn: '978-3-16-148410-0', // Example ISBN
-                bankName: 'Bank of Luxembourg', // Example bank name
+                isbn: '978-3-16-148410-0',
+                bankName: 'Bank of Luxembourg',
               ),
             ),
           );
         } else {
-          // Handle case where full name is not available
           if (!context.mounted) return;
           showDialog(
             context: context,
@@ -98,7 +95,6 @@ class _DonationsState extends State<Donations> {
           );
         }
       } catch (e) {
-        // Handle errors
         if (kDebugMode) {
           print('Error fetching user full name: $e');
         }
@@ -126,53 +122,59 @@ class _DonationsState extends State<Donations> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Donations'),
-        ),
-        drawer: NavBar(
-          auth: AuthenticationService(),
-          authService: AuthenticationService(),
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const SizedBox(height: 20.0),
-                DonationValue(
-                  controller: donationController,
-                  donationController: donationController,
-                  onValueChanged: (value) {},
-                ),
-                DonationType(
-                  onTypeSelected: onTypeSelected,
-                  donationType: donationType,
-                ),
-                const SizedBox(height: 20.0),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      navigateToDonationDetailsScreen(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: const Color(0xFF5AAFf9),
-                    ),
-                    child: const Text('Next'),
+    final ThemeData theme = Theme.of(context);
+    final Color buttonColor = theme.brightness == Brightness.light
+        ? const Color(0xFF007BFF) // Azul no modo claro
+        : Colors.grey; // Cinza no modo escuro
+
+    final Color donationTypeButtonColor =
+        theme.brightness == Brightness.light ? Colors.white : Colors.grey[800]!;
+
+    final Color donationTypeTextColor = theme.brightness == Brightness.light
+        ? const Color(0xFF007BFF) // Azul no modo claro
+        : Colors.white; // Branco no modo escuro
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Donations'),
+      ),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+        authService: AuthenticationService(),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const SizedBox(height: 20.0),
+              DonationValue(
+                controller: donationController,
+                donationController: donationController,
+                onValueChanged: (value) {},
+              ),
+              DonationType(
+                onTypeSelected: onTypeSelected,
+                donationType: donationType,
+                donationTypeButtonColor: donationTypeButtonColor,
+                donationTypeTextColor: donationTypeTextColor,
+              ),
+              const SizedBox(height: 20.0),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    navigateToDonationDetailsScreen(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: buttonColor,
                   ),
+                  child: const Text('Next'),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
