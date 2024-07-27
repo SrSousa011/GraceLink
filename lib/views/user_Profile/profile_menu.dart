@@ -12,7 +12,7 @@ class ProfileMenuWidget extends StatelessWidget {
     required this.onPress,
     this.endIcon = true,
     this.textColor,
-    required Color iconColor,
+    required this.iconColor,
   });
 
   final String title;
@@ -20,11 +20,14 @@ class ProfileMenuWidget extends StatelessWidget {
   final VoidCallback onPress;
   final bool endIcon;
   final Color? textColor;
+  final Color iconColor;
 
   @override
   Widget build(BuildContext context) {
-    var isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
-    var iconColor = isDark ? tPrimaryColor : tAccentColor;
+    var isDarkMode =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
+    var backgroundColor = iconColor.withOpacity(0.1);
+    var arrowColor = isDarkMode ? Colors.grey[400]! : Colors.grey[600]!;
 
     return ListTile(
       onTap: onPress,
@@ -33,7 +36,7 @@ class ProfileMenuWidget extends StatelessWidget {
         height: 40,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(100),
-          color: iconColor.withOpacity(0.1),
+          color: backgroundColor,
         ),
         child: Icon(icon, color: iconColor),
       ),
@@ -49,10 +52,10 @@ class ProfileMenuWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(100),
                 color: Colors.grey.withOpacity(0.1),
               ),
-              child: const Icon(
+              child: Icon(
                 LineAwesomeIcons.angle_left_solid,
                 size: 18.0,
-                color: Colors.grey,
+                color: arrowColor,
               ),
             )
           : null,

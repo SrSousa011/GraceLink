@@ -79,6 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
+    final iconColor = isDarkMode ? Colors.white : Colors.blue;
 
     return Scaffold(
       appBar: AppBar(
@@ -122,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       height: 35,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: isDarkMode ? Colors.blueAccent : Colors.blue,
+                        color: isDarkMode ? Colors.grey[600] : Colors.blue,
                       ),
                       child: IconButton(
                         icon: const Icon(
@@ -159,8 +160,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
-                        isDarkMode ? Colors.blueAccent : Colors.blue,
+                        isDarkMode ? const Color(0xFF333333) : Colors.blue,
                     shape: const StadiumBorder(),
+                    foregroundColor: Colors.white,
                   ),
                   onPressed: () {
                     Navigator.push(
@@ -173,7 +175,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                   child: const Text(
                     'Edit Profile',
-                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
@@ -183,7 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ProfileMenuWidget(
                 title: 'Settings',
                 icon: LineAwesomeIcons.cog_solid,
-                iconColor: isDarkMode ? Colors.white : Colors.black,
+                iconColor: iconColor,
                 onPress: () {
                   Navigator.push(
                     context,
@@ -196,7 +197,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ProfileMenuWidget(
                 title: 'User Management',
                 icon: LineAwesomeIcons.user_check_solid,
-                iconColor: isDarkMode ? Colors.white : Colors.black,
+                iconColor: iconColor,
                 onPress: () {
                   Navigator.push(
                     context,
@@ -209,7 +210,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ProfileMenuWidget(
                 title: 'Info',
                 icon: LineAwesomeIcons.info_solid,
-                iconColor: isDarkMode ? Colors.white : Colors.black,
+                iconColor: iconColor,
                 onPress: () {
                   Navigator.push(
                     context,
