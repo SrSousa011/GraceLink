@@ -54,6 +54,10 @@ class _Application extends State<Notifications> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final Color switchActiveColor =
+        theme.brightness == Brightness.light ? Colors.blue : Colors.grey;
+
     return PopScope(
       canPop: false,
       onPopInvoked: (bool didPop) async {
@@ -64,6 +68,9 @@ class _Application extends State<Notifications> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Notificações'),
+          backgroundColor: theme.brightness == Brightness.light
+              ? Colors.blue
+              : Colors.grey, // Change AppBar color based on theme
         ),
         drawer: NavBar(
           auth: AuthenticationService(),
@@ -82,6 +89,11 @@ class _Application extends State<Notifications> {
                     _notificationsEnabled = value;
                   });
                 },
+                activeColor: switchActiveColor,
+                secondary: Icon(
+                  Icons.notifications,
+                  color: switchActiveColor,
+                ),
               ),
               if (_notificationsEnabled)
                 const Text('Notificações estão ativadas.')
