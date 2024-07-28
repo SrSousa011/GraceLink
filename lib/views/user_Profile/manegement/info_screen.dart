@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/user_Profile/manegement/faqs_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class InfoScreen extends StatelessWidget {
   const InfoScreen({super.key});
@@ -67,7 +66,12 @@ class InfoScreen extends StatelessWidget {
                         : Colors.black), // Text color based on theme
               ),
               onTap: () {
-                Get.to(() => const FAQScreen());
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const FAQScreen(),
+                  ),
+                );
               },
             ),
             ListTile(
@@ -79,7 +83,12 @@ class InfoScreen extends StatelessWidget {
                         : Colors.black), // Text color based on theme
               ),
               onTap: () {
-                Get.to(() => const AboutUs());
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AboutUs(),
+                  ),
+                );
               },
             ),
             const SizedBox(height: 20),
