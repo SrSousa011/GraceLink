@@ -172,7 +172,7 @@ class InfoScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              '© 2024 Resplandecendo as nações. All rights reserved.',
+              'Copyright © 2024 Resplandecendo Nações All rights reserved.',
               textAlign: TextAlign.center,
               style: TextStyle(
                   color: isDarkMode
