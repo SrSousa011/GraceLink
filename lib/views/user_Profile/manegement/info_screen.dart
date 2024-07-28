@@ -172,7 +172,7 @@ class InfoScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              '© 2024 Your Company. All rights reserved.',
+              '© 2024 Resplandecendo as nações. All rights reserved.',
               textAlign: TextAlign.center,
               style: TextStyle(
                   color: isDarkMode
@@ -183,15 +183,6 @@ class InfoScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _launchURL(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      throw 'Could not launch $url';
-    }
   }
 
   Future<void> _launchEmail() async {
