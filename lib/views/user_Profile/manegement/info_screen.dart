@@ -23,18 +23,6 @@ class InfoScreen extends StatelessWidget {
           children: [
             ListTile(
               title: Text(
-                'Update History',
-                style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black), // Text color based on theme
-              ),
-              onTap: () {
-                // Navigate to update history if needed
-              },
-            ),
-            ListTile(
-              title: Text(
                 'Privacy Policy',
                 style: TextStyle(
                     color: isDarkMode
@@ -102,27 +90,6 @@ class InfoScreen extends StatelessWidget {
                   ),
                 );
               },
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'About Us',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode
-                    ? Colors.white
-                    : Colors.black, // Text color based on theme
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Welcome to our app. We are committed to providing you with the best experience. For more information, please visit our website or contact us.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: isDarkMode
-                      ? Colors.white
-                      : Colors.black), // Text color based on theme
             ),
             const SizedBox(height: 20),
             Text(
