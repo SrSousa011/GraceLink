@@ -1,5 +1,7 @@
 import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/user_Profile/manegement/faqs_screen.dart';
+import 'package:churchapp/views/user_Profile/manegement/privacy_policy.dart';
+import 'package:churchapp/views/user_Profile/manegement/terms_of_service.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -30,7 +32,12 @@ class InfoScreen extends StatelessWidget {
                         : Colors.black), // Text color based on theme
               ),
               onTap: () {
-                _launchURL('https://example.com/privacy-policy');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PrivacyPolicy(),
+                  ),
+                );
               },
             ),
             ListTile(
@@ -42,7 +49,12 @@ class InfoScreen extends StatelessWidget {
                         : Colors.black), // Text color based on theme
               ),
               onTap: () {
-                _launchURL('https://example.com/terms-of-service');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TermsOfService(),
+                  ),
+                );
               },
             ),
             ListTile(
