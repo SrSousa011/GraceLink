@@ -1,5 +1,5 @@
 import 'package:churchapp/services/auth_service.dart';
-import 'package:churchapp/views/Member/firestore_service.dart';
+import 'package:churchapp/views/member/become_member_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
