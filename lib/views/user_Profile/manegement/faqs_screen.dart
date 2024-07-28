@@ -14,7 +14,6 @@ class FAQScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('FAQs'),
-        backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.blue,
       ),
       body: Container(
         color: isDarkMode ? Colors.grey[900] : Colors.white,
