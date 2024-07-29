@@ -9,7 +9,7 @@ import 'package:churchapp/views/home/home.dart';
 import 'package:churchapp/views/signUp/date_birth.dart';
 import 'package:churchapp/views/signUp/gender.dart';
 import 'package:churchapp/views/signUp/phone.dart';
-import 'package:churchapp/views/signUp/telephoneNumber.dart';
+import 'package:churchapp/views/signUp/telephone_number.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key, required this.auth, required this.onSignedIn});
