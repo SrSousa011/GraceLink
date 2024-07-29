@@ -1,4 +1,3 @@
-import 'package:churchapp/provider/user_provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/event_service.dart';
 import 'package:churchapp/views/notifications/notification_service.dart';
@@ -30,9 +29,7 @@ class _AddEventFormState extends State<AddEventForm> {
     _locationController = TextEditingController();
     _selectedDate = DateTime.now();
     _selectedTime = TimeOfDay.now();
-
     _notificationService.initialize();
-
     _notificationService.requestNotificationPermission();
   }
 
@@ -96,44 +93,33 @@ class _AddEventFormState extends State<AddEventForm> {
         if (!context.mounted) return;
         Navigator.pop(context, true);
       } catch (e) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Erro ao salvar evento'),
-              content: Text(
-                  'Ocorreu um erro ao tentar salvar o evento: ${e.toString()}'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+        _showErrorDialog(context, 'Erro ao salvar evento',
+            'Ocorreu um erro ao tentar salvar o evento: ${e.toString()}');
       }
     } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Erro ao salvar evento'),
-            content: const Text('Por favor, preencha todos os campos.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      _showErrorDialog(context, 'Erro ao salvar evento',
+          'Por favor, preencha todos os campos.');
     }
+  }
+
+  void _showErrorDialog(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -141,55 +127,30 @@ class _AddEventFormState extends State<AddEventForm> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => UserProvider()),
-      ],
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Novo Evento'),
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTextField(
-                  'Título do Evento',
-                  _titleController,
-                  Icons.title,
-                  isDarkMode: isDarkMode,
-                ),
-                const SizedBox(height: 20.0),
-                _buildTextField(
-                  'Descrição do Evento',
-                  _descriptionController,
-                  Icons.description,
-                  isDarkMode: isDarkMode,
-                ),
-                const SizedBox(height: 20.0),
-                _buildDateField(isDarkMode: isDarkMode),
-                const SizedBox(height: 20.0),
-                _buildTimeField(isDarkMode: isDarkMode),
-                const SizedBox(height: 20.0),
-                _buildLocationField(isDarkMode: isDarkMode),
-                const SizedBox(height: 20.0),
-                ElevatedButton(
-                  onPressed: () => _saveEvent(context),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor:
-                        isDarkMode ? Colors.grey[800] : Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
-                  child: const Text('Salvar Evento'),
-                ),
-              ],
-            ),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Novo Evento'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildTextField('Título do Evento', _titleController, Icons.title,
+                isDarkMode: isDarkMode),
+            const SizedBox(height: 20.0),
+            _buildTextField('Descrição do Evento', _descriptionController,
+                Icons.description,
+                isDarkMode: isDarkMode),
+            const SizedBox(height: 20.0),
+            _buildDateField(isDarkMode: isDarkMode),
+            const SizedBox(height: 20.0),
+            _buildTimeField(isDarkMode: isDarkMode),
+            const SizedBox(height: 20.0),
+            _buildLocationField(isDarkMode: isDarkMode),
+            const SizedBox(height: 20.0),
+            _buildSaveButton(isDarkMode: isDarkMode),
+          ],
         ),
       ),
     );
@@ -202,10 +163,7 @@ class _AddEventFormState extends State<AddEventForm> {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
-        icon: Icon(
-          icon,
-          color: isDarkMode ? Colors.white : Colors.blue,
-        ),
+        icon: Icon(icon, color: isDarkMode ? Colors.white : Colors.blue),
       ),
     );
   }
@@ -218,10 +176,8 @@ class _AddEventFormState extends State<AddEventForm> {
         labelText: _selectedDate != null
             ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
             : 'Selecionar Data',
-        icon: Icon(
-          Icons.calendar_today,
-          color: isDarkMode ? Colors.white : Colors.blue,
-        ),
+        icon: Icon(Icons.calendar_today,
+            color: isDarkMode ? Colors.white : Colors.blue),
       ),
     );
   }
@@ -234,10 +190,8 @@ class _AddEventFormState extends State<AddEventForm> {
         labelText: _selectedTime != null
             ? _selectedTime!.format(context)
             : 'Selecionar Hora',
-        icon: Icon(
-          Icons.access_time,
-          color: isDarkMode ? Colors.white : Colors.blue,
-        ),
+        icon: Icon(Icons.access_time,
+            color: isDarkMode ? Colors.white : Colors.blue),
       ),
     );
   }
@@ -251,11 +205,23 @@ class _AddEventFormState extends State<AddEventForm> {
       },
       decoration: InputDecoration(
         labelText: 'Localização do Evento',
-        icon: Icon(
-          Icons.location_on,
-          color: isDarkMode ? Colors.white : Colors.blue,
+        icon: Icon(Icons.location_on,
+            color: isDarkMode ? Colors.white : Colors.blue),
+      ),
+    );
+  }
+
+  Widget _buildSaveButton({required bool isDarkMode}) {
+    return ElevatedButton(
+      onPressed: () => _saveEvent(context),
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
         ),
       ),
+      child: const Text('Salvar Evento'),
     );
   }
 }
