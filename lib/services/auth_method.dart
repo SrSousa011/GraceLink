@@ -175,14 +175,14 @@ class AuthMethods {
     return null;
   }
 
-  String? validateCity(String value) {
+  String? validateCity(String? value) {
     if (_isEmpty(value)) {
       return 'City cannot be empty';
     }
     return null;
   }
 
-  String? validateCountry(String value) {
+  String? validateCountry(String? value) {
     if (_isEmpty(value)) {
       return 'Country cannot be empty';
     }
