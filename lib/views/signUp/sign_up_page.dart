@@ -143,7 +143,6 @@ class _SignUpPageState extends State<SignUpPage> {
           labelText: 'City',
           controller: _cityController,
         ),
-        const Text(', '),
         const SizedBox(height: 20.0),
         TextFieldWidget(
           labelText: 'Country',
