@@ -34,15 +34,9 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
-        <queries>
+        <!-- Notification Icon -->
         <meta-data
-        android:name="com.google.firebase.messaging.default_notification_icon"
-        android:resource="@drawable/your_notification_icon"/>
-        <queries>
-            <intent>
-                <action android:name="android.intent.action.PROCESS_TEXT"/>
-                <data android:mimeType="text/plain"/>c
-            </intent>
-        </queries>
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/app_icon"/> <!-- Corrija aqui para o nome real do ícone -->
     </application>
 </manifest>
