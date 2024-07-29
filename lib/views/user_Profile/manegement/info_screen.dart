@@ -1,4 +1,4 @@
-import 'package:churchapp/views/about_us.dart';
+import 'package:churchapp/views/user_Profile/manegement/about_us.dart';
 import 'package:churchapp/views/user_Profile/manegement/faqs_screen.dart';
 import 'package:churchapp/views/user_Profile/manegement/privacy_policy.dart';
 import 'package:churchapp/views/user_Profile/manegement/terms_of_service.dart';

@@ -1,7 +1,7 @@
+import 'package:churchapp/views/user_Profile/manegement/about_us.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/welcome.dart';
-import 'package:churchapp/views/about_us.dart';
 import 'package:churchapp/views/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
 import 'package:churchapp/views/events/events.dart';
