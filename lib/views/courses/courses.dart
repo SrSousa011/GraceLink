@@ -60,12 +60,12 @@ class _CoursesState extends State<Courses> {
                       vertical: 4.0, horizontal: 10.0),
                   decoration: BoxDecoration(
                     gradient: isDarkMode
-                        ? LinearGradient(
+                        ? const LinearGradient(
                             colors: [Color(0xFF3C3C3C), Color(0xFF5A5A5A)],
                             begin: Alignment.centerLeft,
                             end: Alignment.centerRight,
                           )
-                        : LinearGradient(
+                        : const LinearGradient(
                             colors: [Color(0xFFFFD59C), Color(0xFF62CFF7)],
                             begin: Alignment.centerLeft,
                             end: Alignment.centerRight,
