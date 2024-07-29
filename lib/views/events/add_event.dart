@@ -2,7 +2,6 @@ import 'package:churchapp/provider/user_provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/event_service.dart';
 import 'package:churchapp/views/notifications/notification_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -35,15 +34,6 @@ class _AddEventFormState extends State<AddEventForm> {
     _notificationService.initialize();
 
     _notificationService.requestNotificationPermission();
-    _notificationService.getDeviceToken().then((value) {
-      if (kDebugMode) {
-        print('Device token: $value');
-      }
-    }).catchError((error) {
-      if (kDebugMode) {
-        print('Failed to get device token: $error');
-      }
-    });
   }
 
   @override
@@ -96,10 +86,12 @@ class _AddEventFormState extends State<AddEventForm> {
 
       try {
         await addEvent(newEvent);
-        await _notificationService.sendNotification(
-          _titleController.text,
-          _descriptionController.text,
-        );
+        if (_notificationService.notificationsEnabled) {
+          await _notificationService.sendNotification(
+            _titleController.text,
+            _descriptionController.text,
+          );
+        }
 
         if (!context.mounted) return;
         Navigator.pop(context, true);

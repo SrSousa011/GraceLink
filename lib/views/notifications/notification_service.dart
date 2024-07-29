@@ -1,16 +1,30 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
+  bool notificationsEnabled = true;
+
   Future<void> initialize() async {
     await _initializeLocalNotifications();
     await requestNotificationPermission();
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+    await loadNotificationSettings();
+  }
+
+  Future<void> loadNotificationSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    notificationsEnabled = prefs.getBool('notificationsEnabled') ?? true;
+  }
+
+  Future<void> _saveNotificationSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('notificationsEnabled', notificationsEnabled);
   }
 
   Future<void> requestNotificationPermission() async {
@@ -40,11 +54,6 @@ class NotificationService {
     }
   }
 
-  Future<String?> getDeviceToken() async {
-    String? tokenNotifications = await _firebaseMessaging.getToken();
-    return tokenNotifications;
-  }
-
   Future<void> _initializeLocalNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@drawable/app_icon');
@@ -58,6 +67,8 @@ class NotificationService {
   }
 
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
+    if (!notificationsEnabled) return;
+
     if (kDebugMode) {
       print('Message title: ${message.notification?.title}');
       print('Message body: ${message.notification?.body}');
@@ -83,6 +94,8 @@ class NotificationService {
   }
 
   Future<void> sendNotification(String title, String body) async {
+    if (!notificationsEnabled) return;
+
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'your_channel_id',
@@ -99,5 +112,10 @@ class NotificationService {
       body,
       platformChannelSpecifics,
     );
+  }
+
+  void setNotificationsEnabled(bool enabled) {
+    notificationsEnabled = enabled;
+    _saveNotificationSettings();
   }
 }

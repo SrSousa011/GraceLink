@@ -1,6 +1,7 @@
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/notifications/chat_arguments.dart';
+import 'package:churchapp/views/notifications/notification_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
@@ -12,10 +13,17 @@ class Notifications extends StatefulWidget {
 }
 
 class _Application extends State<Notifications> {
-  // It is assumed that all messages contain a data field with the key 'type'
+  late NotificationService _notificationService;
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationService = NotificationService();
+    _notificationService.initialize();
+    setupInteractedMessage();
+  }
+
   Future<void> setupInteractedMessage() async {
-    // Get any messages which caused the application to open from
-    // a terminated state.
     RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();
 
@@ -35,16 +43,6 @@ class _Application extends State<Notifications> {
       );
     }
   }
-
-  @override
-  void initState() {
-    super.initState();
-
-    setupInteractedMessage();
-  }
-
-  bool _notificationsEnabled = true;
-  final bool canReturn = false;
 
   @override
   Widget build(BuildContext context) {
@@ -69,28 +67,37 @@ class _Application extends State<Notifications> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SwitchListTile(
-                title: const Text('Ativar Notificações'),
-                value: _notificationsEnabled,
-                onChanged: (bool value) {
-                  setState(() {
-                    _notificationsEnabled = value;
-                  });
-                },
-                activeColor: switchActiveColor,
-                secondary: Icon(
-                  Icons.notifications,
-                  color: switchActiveColor,
-                ),
-              ),
-              if (_notificationsEnabled)
-                const Text('Notificações estão ativadas.')
-              else
-                const Text('Notificações estão desativadas.'),
-            ],
+          child: FutureBuilder(
+            future: _notificationService.loadNotificationSettings(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SwitchListTile(
+                    title: const Text('Ativar Notificações'),
+                    value: _notificationService.notificationsEnabled,
+                    onChanged: (bool value) {
+                      setState(() {
+                        _notificationService.setNotificationsEnabled(value);
+                      });
+                    },
+                    activeColor: switchActiveColor,
+                    secondary: Icon(
+                      Icons.notifications,
+                      color: switchActiveColor,
+                    ),
+                  ),
+                  if (_notificationService.notificationsEnabled)
+                    const Text('Notificações estão ativadas.')
+                  else
+                    const Text('Notificações estão desativadas.'),
+                ],
+              );
+            },
           ),
         ),
       ),
