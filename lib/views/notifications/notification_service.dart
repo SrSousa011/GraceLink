@@ -87,7 +87,6 @@ class NotificationService {
         AndroidNotificationDetails(
       'your_channel_id',
       'your_channel_name',
-      channelDescription: 'your_channel_description',
       importance: Importance.max,
       priority: Priority.high,
       showWhen: false,

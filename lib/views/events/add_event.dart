@@ -97,8 +97,8 @@ class _AddEventFormState extends State<AddEventForm> {
       try {
         await addEvent(newEvent);
         await _notificationService.sendNotification(
-          'Novo Evento Adicionado',
-          'Título: ${_titleController.text}\nDescrição: ${_descriptionController.text}',
+          _titleController.text,
+          _descriptionController.text,
         );
 
         if (!context.mounted) return;

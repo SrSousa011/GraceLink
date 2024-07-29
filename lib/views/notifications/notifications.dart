@@ -19,14 +19,10 @@ class _Application extends State<Notifications> {
     RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();
 
-    // If the message also contains a data property with a "type" of "chat",
-    // navigate to a chat screen
     if (initialMessage != null) {
       _handleMessage(initialMessage);
     }
 
-    // Also handle any interaction when the app is in the background via a
-    // Stream listener
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
   }
 
@@ -44,8 +40,6 @@ class _Application extends State<Notifications> {
   void initState() {
     super.initState();
 
-    // Run code required to handle interacted messages in an async function
-    // as initState() must not be async
     setupInteractedMessage();
   }
 
