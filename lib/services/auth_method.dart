@@ -9,48 +9,62 @@ class AuthMethods {
   Future<String> registerUser({
     required String email,
     required String password,
+    required String confirmPassword,
     required String firstName,
     required String lastName,
     required String phoneNumber,
     required String address,
     required String imagePath,
+    required String gender,
+    required String city,
+    required String country,
+    required int day,
+    required int month,
+    required int year,
   }) async {
     if (_isEmpty(email) ||
         _isEmpty(password) ||
+        _isEmpty(confirmPassword) ||
         _isEmpty(firstName) ||
         _isEmpty(lastName) ||
         _isEmpty(phoneNumber) ||
-        _isEmpty(address)) {
+        _isEmpty(address) ||
+        _isEmpty(gender) ||
+        _isEmpty(city) ||
+        _isEmpty(country) ||
+        day == 0 ||
+        month == 0 ||
+        year == 0) {
       return 'Please fill in all fields';
     }
 
     String? emailError = _validateEmail(email);
-    if (emailError != null) {
-      return emailError;
-    }
+    if (emailError != null) return emailError;
 
     String? passwordError = _validatePassword(password);
-    if (passwordError != null) {
-      return passwordError;
-    }
+    if (passwordError != null) return passwordError;
 
-    String? firstNameError =
-        validateFirstName(firstName); // Using the public method here
-    if (firstNameError != null) {
-      return firstNameError;
-    }
+    String? confirmPasswordError =
+        _validateConfirmPassword(password, confirmPassword);
+    if (confirmPasswordError != null) return confirmPasswordError;
 
-    String? lastNameError =
-        validateLastName(lastName); // Using the public method here
-    if (lastNameError != null) {
-      return lastNameError;
-    }
+    String? firstNameError = validateFirstName(firstName);
+    if (firstNameError != null) return firstNameError;
 
-    String? validatePhoneNumberError =
-        validatePhoneNumber(phoneNumber); // Using the public method here
-    if (validatePhoneNumberError != null) {
-      return validatePhoneNumberError;
-    }
+    String? lastNameError = validateLastName(lastName);
+    if (lastNameError != null) return lastNameError;
+
+    String? phoneNumberError = validatePhoneNumber(phoneNumber);
+    if (phoneNumberError != null) return phoneNumberError;
+
+    String? cityError = validateCity(city);
+    if (cityError != null) return cityError;
+
+    String? countryError = validateCountry(country);
+    if (countryError != null) return countryError;
+
+    String? genderError = validateGender(gender);
+    if (genderError != null) return genderError;
 
     try {
       UserCredential userCredential =
@@ -82,14 +96,10 @@ class AuthMethods {
     required String password,
   }) async {
     String? emailError = _validateEmail(email);
-    if (emailError != null) {
-      return emailError;
-    }
+    if (emailError != null) return emailError;
 
     String? passwordError = _validatePassword(password);
-    if (passwordError != null) {
-      return passwordError;
-    }
+    if (passwordError != null) return passwordError;
 
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
@@ -97,11 +107,7 @@ class AuthMethods {
         password: password,
       );
 
-      if (userCredential.user != null) {
-        return 'User ${userCredential.user!.displayName ?? 'User'} logged in successfully';
-      } else {
-        return 'Error: User not found';
-      }
+      return 'User ${userCredential.user!.displayName ?? 'User'} logged in successfully';
     } catch (err) {
       return 'Error: ${err.toString()}';
     }
@@ -133,6 +139,13 @@ class AuthMethods {
     return null;
   }
 
+  String? _validateConfirmPassword(String password, String confirmPassword) {
+    if (password != confirmPassword) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+
   String? validateEmail(String? value) {
     return _validateEmail(value);
   }
@@ -142,7 +155,6 @@ class AuthMethods {
   }
 
   String? validateFirstName(String? value) {
-    // Making this method public
     if (_isEmpty(value)) {
       return 'First Name cannot be empty';
     }
@@ -150,7 +162,6 @@ class AuthMethods {
   }
 
   String? validateLastName(String? value) {
-    // Making this method public
     if (_isEmpty(value)) {
       return 'Last Name cannot be empty';
     }
@@ -158,9 +169,29 @@ class AuthMethods {
   }
 
   String? validatePhoneNumber(String value) {
-    // Making this method public
     if (_isEmpty(value)) {
       return 'Phone number cannot be empty';
+    }
+    return null;
+  }
+
+  String? validateCity(String value) {
+    if (_isEmpty(value)) {
+      return 'City cannot be empty';
+    }
+    return null;
+  }
+
+  String? validateCountry(String value) {
+    if (_isEmpty(value)) {
+      return 'Country cannot be empty';
+    }
+    return null;
+  }
+
+  String? validateGender(String value) {
+    if (_isEmpty(value)) {
+      return 'Gender cannot be empty';
     }
     return null;
   }
