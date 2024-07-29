@@ -24,7 +24,7 @@ class _CoursesDetailsState extends State<CoursesDetails> {
   String fullName = '';
   late bool status = false;
   String uid = '';
-  bool isUserSubscribed = false; // New state variable
+  bool isUserSubscribed = false;
 
   @override
   void initState() {
@@ -49,7 +49,6 @@ class _CoursesDetailsState extends State<CoursesDetails> {
         });
       }
 
-      // Persist the subscription state using SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool('isUserSubscribed_${widget.course.id}_$uid', subscribed);
     } catch (e) {
@@ -61,6 +60,8 @@ class _CoursesDetailsState extends State<CoursesDetails> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.course.title),
@@ -128,16 +129,18 @@ class _CoursesDetailsState extends State<CoursesDetails> {
                     },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
-                  isClosed || isUserSubscribed ? Colors.red : Colors.blue,
+                  isDarkMode
+                      ? Colors.grey
+                      : (isClosed || isUserSubscribed
+                          ? Colors.red
+                          : Colors.blue),
                 ),
-                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                foregroundColor: MaterialStateProperty.all<Color>(
+                  isDarkMode ? Colors.white : Colors.black,
+                ),
               ),
               child: Text(
-                isClosed
-                    ? 'Inscrito'
-                    : isUserSubscribed
-                        ? 'Inscrito'
-                        : 'Inscrever-se',
+                isClosed || isUserSubscribed ? 'Inscrito' : 'Inscrever-se',
               ),
             ),
           ],
