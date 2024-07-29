@@ -25,7 +25,6 @@ class AppRoutes {
           builder: (_) => Home(
             auth: AuthenticationService(),
             userId: '',
-            onSignedOut: () {},
           ),
         );
       case '/notifications':

@@ -27,7 +27,6 @@ class Root extends StatelessWidget {
             return Home(
               auth: auth,
               userId: snapshot.data!.uid,
-              onSignedOut: () {},
             );
           } else {
             return Login(
