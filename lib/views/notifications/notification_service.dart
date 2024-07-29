@@ -8,15 +8,9 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   Future<void> initialize() async {
-    await _requestPermissions();
     await _initializeLocalNotifications();
     await requestNotificationPermission();
-
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
-  }
-
-  Future<void> _requestPermissions() async {
-    await _firebaseMessaging.requestPermission();
   }
 
   Future<void> requestNotificationPermission() async {
@@ -46,9 +40,15 @@ class NotificationService {
     }
   }
 
+  Future<String?> getDeviceToken() async {
+    String? tokenNotifications = await _firebaseMessaging.getToken();
+    return tokenNotifications;
+  }
+
   Future<void> _initializeLocalNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('app_icon');
+        AndroidInitializationSettings('@drawable/app_icon');
+
     const InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
@@ -58,6 +58,11 @@ class NotificationService {
   }
 
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
+    if (kDebugMode) {
+      print('Message title: ${message.notification?.title}');
+      print('Message body: ${message.notification?.body}');
+    }
+
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'your_channel_id',

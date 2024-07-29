@@ -2,6 +2,7 @@ import 'package:churchapp/provider/user_provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/event_service.dart';
 import 'package:churchapp/views/notifications/notification_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +32,18 @@ class _AddEventFormState extends State<AddEventForm> {
     _selectedDate = DateTime.now();
     _selectedTime = TimeOfDay.now();
 
+    _notificationService.initialize();
+
     _notificationService.requestNotificationPermission();
+    _notificationService.getDeviceToken().then((value) {
+      if (kDebugMode) {
+        print('Device token: $value');
+      }
+    }).catchError((error) {
+      if (kDebugMode) {
+        print('Failed to get device token: $error');
+      }
+    });
   }
 
   @override
@@ -84,12 +96,10 @@ class _AddEventFormState extends State<AddEventForm> {
 
       try {
         await addEvent(newEvent);
-
-        // Optionally send a notification here if needed
-        // await _notificationService.sendNotification(
-        //   'Novo Evento Adicionado',
-        //   'Evento: ${_titleController.text} foi adicionado com sucesso!',
-        // );
+        await _notificationService.sendNotification(
+          'Novo Evento Adicionado',
+          'Título: ${_titleController.text}\nDescrição: ${_descriptionController.text}',
+        );
 
         if (!context.mounted) return;
         Navigator.pop(context, true);
