@@ -146,7 +146,6 @@ class _AddEventFormState extends State<AddEventForm> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Novo Evento'),
-          backgroundColor: isDarkMode ? Colors.grey[850] : Colors.blue,
         ),
         body: SingleChildScrollView(
           child: Padding(
