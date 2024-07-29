@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
@@ -9,12 +10,40 @@ class NotificationService {
   Future<void> initialize() async {
     await _requestPermissions();
     await _initializeLocalNotifications();
+    await requestNotificationPermission();
 
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
   }
 
   Future<void> _requestPermissions() async {
     await _firebaseMessaging.requestPermission();
+  }
+
+  Future<void> requestNotificationPermission() async {
+    NotificationSettings settings = await _firebaseMessaging.requestPermission(
+      alert: true,
+      announcement: true,
+      badge: true,
+      carPlay: true,
+      criticalAlert: true,
+      provisional: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      if (kDebugMode) {
+        print('User granted permission');
+      }
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
+      if (kDebugMode) {
+        print('User granted provisional permission');
+      }
+    } else {
+      if (kDebugMode) {
+        print('User denied permission');
+      }
+    }
   }
 
   Future<void> _initializeLocalNotifications() async {
@@ -49,12 +78,11 @@ class NotificationService {
   }
 
   Future<void> sendNotification(String title, String body) async {
-    // Local notification example
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'your_channel_id',
       'your_channel_name',
-      channelDescription: 'your_channel_description', // Corrected argument
+      channelDescription: 'your_channel_description',
       importance: Importance.max,
       priority: Priority.high,
       showWhen: false,

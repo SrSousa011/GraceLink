@@ -1,6 +1,7 @@
 import 'package:churchapp/provider/user_provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/event_service.dart';
+import 'package:churchapp/views/notifications/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +20,7 @@ class _AddEventFormState extends State<AddEventForm> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   String _location = '';
+  final NotificationService _notificationService = NotificationService();
 
   @override
   void initState() {
@@ -28,6 +30,8 @@ class _AddEventFormState extends State<AddEventForm> {
     _locationController = TextEditingController();
     _selectedDate = DateTime.now();
     _selectedTime = TimeOfDay.now();
+
+    _notificationService.requestNotificationPermission();
   }
 
   @override
@@ -80,6 +84,12 @@ class _AddEventFormState extends State<AddEventForm> {
 
       try {
         await addEvent(newEvent);
+
+        // Optionally send a notification here if needed
+        // await _notificationService.sendNotification(
+        //   'Novo Evento Adicionado',
+        //   'Evento: ${_titleController.text} foi adicionado com sucesso!',
+        // );
 
         if (!context.mounted) return;
         Navigator.pop(context, true);
