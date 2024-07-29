@@ -384,9 +384,6 @@ class _SignUpPageState extends State<SignUpPage> {
             builder: (context) => Home(
               auth: widget.auth,
               userId: userCredential.user!.uid,
-              onSignedOut: () {
-                // Implement logout if needed
-              },
             ),
           ));
         }

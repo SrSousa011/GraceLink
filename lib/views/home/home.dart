@@ -9,12 +9,10 @@ class Home extends StatefulWidget {
     super.key,
     required this.auth,
     required this.userId,
-    required this.onSignedOut,
   });
 
   final BaseAuth auth;
   final String userId;
-  final VoidCallback onSignedOut;
   final bool canReturn = false;
 
   void sigUerOut() {

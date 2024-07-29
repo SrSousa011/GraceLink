@@ -52,7 +52,6 @@ class _LoginState extends State<Login> {
           builder: (context) => Home(
             auth: widget.auth,
             userId: FirebaseAuth.instance.currentUser!.uid,
-            onSignedOut: () {},
           ),
         ),
       );
