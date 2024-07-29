@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:churchapp/services/auth_method.dart'; // Adjust import path based on your project structure
-import 'package:churchapp/services/auth_service.dart'; // Adjust import path based on your project structure
-import 'package:churchapp/views/home/home.dart'; // Adjust import path based on your project structure
-import 'package:churchapp/views/signUp/date_birth.dart'; // Adjust import path based on your project structure
-import 'package:churchapp/views/signUp/gender.dart'; // Adjust import path based on your project structure
-import 'package:churchapp/views/signUp/phone.dart'; // Adjust import path based on your project structure
-import 'package:churchapp/views/signUp/telephoneNumber.dart'; // Adjust import path based on your project structure
-import 'package:churchapp/views/signUp/text_field.dart'; // Adjust import path based on your project structure
+import 'package:churchapp/services/auth_method.dart';
+import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/home/home.dart';
+import 'package:churchapp/views/signUp/date_birth.dart';
+import 'package:churchapp/views/signUp/gender.dart';
+import 'package:churchapp/views/signUp/phone.dart';
+import 'package:churchapp/views/signUp/telephoneNumber.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key, required this.auth, required this.onSignedIn});
@@ -42,7 +41,6 @@ class _SignUpPageState extends State<SignUpPage> {
   int? selectedMonth;
   int? selectedYear;
   String selectedGender = 'Male';
-  String selectedCivilState = 'Single';
   String selectedDDD = '+1';
   int numberOfPhoneDigits = 10;
 
@@ -120,13 +118,13 @@ class _SignUpPageState extends State<SignUpPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextFieldWidget(
+        _buildTextField(
           labelText: 'First Name',
           controller: _firstNameController,
           validator: _authMethods.validateFirstName,
         ),
         const SizedBox(height: 20.0),
-        TextFieldWidget(
+        _buildTextField(
           labelText: 'Last Name',
           controller: _lastNameController,
           validator: _authMethods.validateLastName,
@@ -139,12 +137,12 @@ class _SignUpPageState extends State<SignUpPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextFieldWidget(
+        _buildTextField(
           labelText: 'City',
           controller: _cityController,
         ),
         const SizedBox(height: 20.0),
-        TextFieldWidget(
+        _buildTextField(
           labelText: 'Country',
           controller: _countryController,
         ),
@@ -215,13 +213,13 @@ class _SignUpPageState extends State<SignUpPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextFieldWidget(
+        _buildTextField(
           labelText: 'Email',
           controller: _emailController,
           validator: _authMethods.validateEmail,
         ),
         const SizedBox(height: 20.0),
-        TextFieldWidget(
+        _buildTextField(
           labelText: 'Confirm Email',
           controller: _confirmEmailController,
           validator: _validateEmailConf,
@@ -231,56 +229,32 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Widget _buildPasswordSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextFormField(
-          controller: _passwordController,
-          decoration: InputDecoration(
-            labelText: 'Password',
-            suffixIcon: IconButton(
-              icon: Icon(
-                _isPasswordConfVisible
-                    ? Icons.visibility
-                    : Icons.visibility_off,
-              ),
-              onPressed: () {
-                setState(() {
-                  _isPasswordConfVisible = !_isPasswordConfVisible;
-                });
-              },
-            ),
-          ),
-          obscureText: !_isPasswordConfVisible,
-          validator: _authMethods.validatePassword,
-        ),
-      ],
+    return _buildPasswordField(
+      controller: _passwordController,
+      obscureText: !_isPasswordConfVisible,
+      labelText: 'Password',
+      onVisibilityToggle: () {
+        setState(() {
+          _isPasswordConfVisible = !_isPasswordConfVisible;
+        });
+      },
+      isPasswordVisible: _isPasswordConfVisible,
+      validator: _authMethods.validatePassword,
     );
   }
 
   Widget _buildPasswordSectionConfirmation() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextFormField(
-          controller: _confirmPasswordController,
-          decoration: InputDecoration(
-            labelText: 'Confirm Password ',
-            suffixIcon: IconButton(
-              icon: Icon(
-                _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-              ),
-              onPressed: () {
-                setState(() {
-                  _isPasswordVisible = !_isPasswordVisible;
-                });
-              },
-            ),
-          ),
-          obscureText: !_isPasswordVisible,
-          validator: _validatePasswordConf,
-        ),
-      ],
+    return _buildPasswordField(
+      controller: _confirmPasswordController,
+      obscureText: !_isPasswordVisible,
+      labelText: 'Confirm Password',
+      onVisibilityToggle: () {
+        setState(() {
+          _isPasswordVisible = !_isPasswordVisible;
+        });
+      },
+      isPasswordVisible: _isPasswordVisible,
+      validator: _validatePasswordConf,
     );
   }
 
@@ -309,6 +283,42 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
+  Widget _buildTextField({
+    required String labelText,
+    required TextEditingController controller,
+    FormFieldValidator<String>? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(labelText: labelText),
+      validator: validator,
+    );
+  }
+
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required bool obscureText,
+    required String labelText,
+    required VoidCallback onVisibilityToggle,
+    required bool isPasswordVisible,
+    required FormFieldValidator<String>? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        suffixIcon: IconButton(
+          icon: Icon(
+            isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+          ),
+          onPressed: onVisibilityToggle,
+        ),
+      ),
+      obscureText: obscureText,
+      validator: validator,
+    );
+  }
+
   String? _validateEmailConf(String? value) {
     final String email = _emailController.text.trim();
     if (value != email) {
@@ -328,22 +338,20 @@ class _SignUpPageState extends State<SignUpPage> {
   Future<void> _validateAndSubmit() async {
     final form = _formKey.currentState;
     if (form != null && form.validate()) {
-      // Form is valid, process sign up here.
+      setState(() {
+        _isLoading = true;
+      });
+
       String email = _emailController.text.trim();
       String password = _passwordController.text;
-      try {
-        setState(() {
-          _isLoading = true;
-        });
 
-        // Create user in Firebase Authentication
+      try {
         UserCredential userCredential =
             await widget.auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
 
-        // Save user data to Firestore
         await FirebaseFirestore.instance
             .collection('users')
             .doc(userCredential.user!.uid)
@@ -365,8 +373,7 @@ class _SignUpPageState extends State<SignUpPage> {
           _isLoading = false;
         });
 
-        widget
-            .onSignedIn(); // Calling the onSignedIn method to indicate that the user is signed in
+        widget.onSignedIn();
 
         if (kDebugMode) {
           print('User created: ${userCredential.user!.uid}');
