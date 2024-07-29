@@ -141,13 +141,13 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDarkMode ? Colors.white : Colors.black;
-    final iconColor = isDarkMode ? Colors.white54 : Colors.black54;
+    final iconColor =
+        isDarkMode ? const Color.fromARGB(255, 255, 255, 255) : Colors.black54;
     final buttonColor = isDarkMode ? Colors.grey[800] : Colors.blue;
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Atualizar Evento', style: TextStyle(color: textColor)),
-        backgroundColor: buttonColor,
         iconTheme: IconThemeData(color: textColor),
       ),
       body: SingleChildScrollView(
