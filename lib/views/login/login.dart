@@ -1,7 +1,7 @@
 import 'package:churchapp/services/auth_method.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
+import 'package:flutter/material.dart';
 import 'package:churchapp/views/home/home.dart';
 
 class Login extends StatefulWidget {
@@ -29,11 +29,12 @@ class _LoginState extends State<Login> {
     super.dispose();
   }
 
-  void loginUser() async {
+  void _loginUser() async {
     String res = await _authMethods.loginUser(
-      email: _emailController.text,
+      email: _emailController.text.trim(),
       password: _passwordController.text,
     );
+
     if (res.startsWith('Error')) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -43,10 +44,7 @@ class _LoginState extends State<Login> {
         ),
       );
     } else {
-      // Navigate to Home screen or perform any other actions after successful login
-      if (widget.onLoggedIn != null) {
-        widget.onLoggedIn!();
-      }
+      widget.onLoggedIn?.call();
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
@@ -67,9 +65,7 @@ class _LoginState extends State<Login> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xFFB98B54)),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text('Login'),
       ),
@@ -100,12 +96,11 @@ class _LoginState extends State<Login> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                _buildEmailField(),
                 const SizedBox(height: 20),
-                _buildEmailSection(),
+                _buildPasswordField(),
                 const SizedBox(height: 20),
-                _buildPasswordSection(),
-                const SizedBox(height: 20.0),
-                _buildSignUpButton(),
+                _buildLoginButton(),
               ],
             ),
           ),
@@ -114,53 +109,38 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Widget _buildEmailSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextFormField(
-          controller: _emailController,
-          keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(
-            labelText: 'Email',
-          ),
-          validator: _authMethods
-              .validateEmail, // Atualizado para usar a função pública
-        ),
-      ],
+  Widget _buildEmailField() {
+    return TextFormField(
+      controller: _emailController,
+      keyboardType: TextInputType.emailAddress,
+      decoration: const InputDecoration(
+        labelText: 'Email',
+      ),
+      validator: _authMethods.validateEmail,
     );
   }
 
-  Widget _buildPasswordSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextFormField(
-          controller: _passwordController,
-          decoration: InputDecoration(
-            labelText: 'Password',
-            suffixIcon: IconButton(
-              icon: Icon(
-                _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-              ),
-              onPressed: () {
-                setState(() {
-                  _isPasswordVisible = !_isPasswordVisible;
-                });
-              },
-            ),
+  Widget _buildPasswordField() {
+    return TextFormField(
+      controller: _passwordController,
+      decoration: InputDecoration(
+        labelText: 'Password',
+        suffixIcon: IconButton(
+          icon: Icon(
+            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
           ),
-          obscureText: !_isPasswordVisible,
-          validator: _authMethods.validatePassword,
-          onFieldSubmitted: (_) {
-            _validateAndSubmit();
-          },
+          onPressed: () => setState(() {
+            _isPasswordVisible = !_isPasswordVisible;
+          }),
         ),
-      ],
+      ),
+      obscureText: !_isPasswordVisible,
+      validator: _authMethods.validatePassword,
+      onFieldSubmitted: (_) => _validateAndSubmit(),
     );
   }
 
-  Widget _buildSignUpButton() {
+  Widget _buildLoginButton() {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
@@ -176,7 +156,7 @@ class _LoginState extends State<Login> {
   }
 
   Future<void> _validateAndSubmit() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _isLoading = true;
       });
@@ -185,7 +165,7 @@ class _LoginState extends State<Login> {
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
-        loginUser(); // Call loginUser method after successful sign-in
+        _loginUser();
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
