@@ -87,7 +87,10 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Erro ao atualizar evento'),
+              title: Text(
+                'Erro ao atualizar evento',
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
               content:
                   const Text('Ocorreu um erro ao tentar atualizar o evento.'),
               actions: <Widget>[
@@ -95,7 +98,11 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('OK'),
+                  child: Text(
+                    'OK',
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.primary),
+                  ),
                 ),
               ],
             );
@@ -107,14 +114,21 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Erro ao atualizar evento'),
+            title: Text(
+              'Erro ao atualizar evento',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
             content: const Text('Por favor, preencha todos os campos.'),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text('OK'),
+                child: Text(
+                  'OK',
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.primary),
+                ),
               ),
             ],
           );
@@ -125,55 +139,62 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final iconColor = isDarkMode ? Colors.white54 : Colors.black54;
+    final buttonColor = isDarkMode ? Colors.grey[800] : Colors.blue;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Atualizar Evento'),
-        backgroundColor: Colors.grey[800], // Updated color
+        title: Text('Atualizar Evento', style: TextStyle(color: textColor)),
+        backgroundColor: buttonColor,
+        iconTheme: IconThemeData(color: textColor),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTitleField(),
+            _buildTitleField(iconColor),
             const SizedBox(height: 20.0),
-            _buildDescriptionField(),
+            _buildDescriptionField(iconColor),
             const SizedBox(height: 20.0),
-            _buildDateField(),
+            _buildDateField(iconColor),
             const SizedBox(height: 20.0),
-            _buildTimeField(),
+            _buildTimeField(iconColor),
             const SizedBox(height: 20.0),
-            _buildLocationField(),
+            _buildLocationField(iconColor),
             const SizedBox(height: 20.0),
-            _buildUpdateButton(),
+            _buildUpdateButton(buttonColor!),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTitleField() {
+  Widget _buildTitleField(Color iconColor) {
     return TextField(
       controller: _titleController,
       decoration: InputDecoration(
         labelText: 'Título do Evento',
-        prefixIcon: Icon(Icons.title, color: Colors.grey[700]), // Updated color
+        prefixIcon: Icon(Icons.title, color: iconColor),
+        labelStyle: TextStyle(color: iconColor),
       ),
     );
   }
 
-  Widget _buildDescriptionField() {
+  Widget _buildDescriptionField(Color iconColor) {
     return TextField(
       controller: _descriptionController,
       decoration: InputDecoration(
         labelText: 'Descrição do Evento',
-        prefixIcon:
-            Icon(Icons.description, color: Colors.grey[700]), // Updated color
+        prefixIcon: Icon(Icons.description, color: iconColor),
+        labelStyle: TextStyle(color: iconColor),
       ),
     );
   }
 
-  Widget _buildDateField() {
+  Widget _buildDateField(Color iconColor) {
     return GestureDetector(
       onTap: () => _selectDate(context),
       child: AbsorbPointer(
@@ -185,15 +206,15 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
           ),
           decoration: InputDecoration(
             labelText: 'Data do Evento',
-            prefixIcon: Icon(Icons.calendar_today,
-                color: Colors.grey[700]), // Updated color
+            prefixIcon: Icon(Icons.calendar_today, color: iconColor),
+            labelStyle: TextStyle(color: iconColor),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTimeField() {
+  Widget _buildTimeField(Color iconColor) {
     return GestureDetector(
       onTap: () => _selectTime(context),
       child: AbsorbPointer(
@@ -203,31 +224,31 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
           ),
           decoration: InputDecoration(
             labelText: 'Hora do Evento',
-            prefixIcon: Icon(Icons.access_time,
-                color: Colors.grey[700]), // Updated color
+            prefixIcon: Icon(Icons.access_time, color: iconColor),
+            labelStyle: TextStyle(color: iconColor),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildLocationField() {
+  Widget _buildLocationField(Color iconColor) {
     return TextField(
       controller: _locationController,
       decoration: InputDecoration(
         labelText: 'Localização',
-        prefixIcon:
-            Icon(Icons.location_on, color: Colors.grey[700]), // Updated color
+        prefixIcon: Icon(Icons.location_on, color: iconColor),
+        labelStyle: TextStyle(color: iconColor),
       ),
     );
   }
 
-  Widget _buildUpdateButton() {
+  Widget _buildUpdateButton(Color buttonColor) {
     return ElevatedButton(
       onPressed: () => _updateEvent(context),
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
-        backgroundColor: Colors.grey[800], // Updated color
+        backgroundColor: buttonColor,
       ),
       child: const Text('Atualizar'),
     );
