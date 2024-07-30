@@ -56,8 +56,6 @@ class _HomeState extends State<Home> {
             const SizedBox(height: 20),
             _buildUpcomingEventsSection(),
             const SizedBox(height: 20),
-            _buildRecentHighlightsSection(),
-            const SizedBox(height: 20),
             _buildImportantInfoSection(),
           ],
         ),
@@ -135,23 +133,6 @@ class _HomeState extends State<Home> {
               ],
             );
           },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRecentHighlightsSection() {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Destaques Recentes:',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 10),
-        Text(
-          'Evento Destacado - 20/07/2024\nNotícia Importante',
-          style: TextStyle(fontSize: 16),
         ),
       ],
     );
