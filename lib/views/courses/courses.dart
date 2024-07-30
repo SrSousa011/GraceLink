@@ -23,11 +23,8 @@ class _CoursesState extends State<Courses> {
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    return WillPopScope(
-      onWillPop: () async {
-        return false; // Prevent pop
-      },
+    return PopScope(
+      canPop: false,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Cursos'),

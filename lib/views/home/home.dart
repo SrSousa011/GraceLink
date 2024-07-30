@@ -48,36 +48,39 @@ class _HomeState extends State<Home> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Página Inicial'),
-        actions: [
-          IconButton(
-            icon: Icon(
-              isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              color: isDarkMode ? Colors.white : Colors.black,
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Página Inicial'),
+          actions: [
+            IconButton(
+              icon: Icon(
+                isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+              onPressed: () {
+                themeProvider.toggleTheme();
+              },
             ),
-            onPressed: () {
-              themeProvider.toggleTheme();
-            },
-          ),
-        ],
-      ),
-      drawer: NavBar(
-        auth: widget.auth,
-        authService: AuthenticationService(),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(),
-            const SizedBox(height: 20),
-            _buildUpcomingEventsSection(isDarkMode),
-            const SizedBox(height: 20),
-            _buildImportantInfoSection(),
           ],
+        ),
+        drawer: NavBar(
+          auth: widget.auth,
+          authService: AuthenticationService(),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(),
+              const SizedBox(height: 20),
+              _buildUpcomingEventsSection(isDarkMode),
+              const SizedBox(height: 20),
+              _buildImportantInfoSection(),
+            ],
+          ),
         ),
       ),
     );

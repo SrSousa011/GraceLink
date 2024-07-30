@@ -82,152 +82,160 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final iconColor = isDarkMode ? Colors.white : Colors.blue;
     final userNameColor = isDarkMode ? Colors.white : Colors.blue;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('User Profile'),
-        actions: [
-          IconButton(
-            icon: Icon(
-              isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              color: isDarkMode ? Colors.white : Colors.black,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) {
+          return;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('User Profile'),
+          actions: [
+            IconButton(
+              icon: Icon(
+                isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+              onPressed: () {
+                themeProvider.toggleTheme();
+              },
             ),
-            onPressed: () {
-              themeProvider.toggleTheme();
-            },
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Stack(
-                children: [
-                  GestureDetector(
-                    onTap: _updateProfilePicture,
-                    child: CircleAvatar(
-                      radius: 72,
-                      backgroundColor:
-                          isDarkMode ? Colors.grey[800] : Colors.grey[200],
-                      backgroundImage: _imageUrl != null
-                          ? CachedNetworkImageProvider(_imageUrl!)
-                          : const AssetImage(tAvatar) as ImageProvider,
-                    ),
-                  ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: Container(
-                      width: 35,
-                      height: 35,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isDarkMode ? Colors.grey[600] : Colors.blue,
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Stack(
+                  children: [
+                    GestureDetector(
+                      onTap: _updateProfilePicture,
+                      child: CircleAvatar(
+                        radius: 72,
+                        backgroundColor:
+                            isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                        backgroundImage: _imageUrl != null
+                            ? CachedNetworkImageProvider(_imageUrl!)
+                            : const AssetImage(tAvatar) as ImageProvider,
                       ),
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                          size: 20,
+                    ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: Container(
+                        width: 35,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isDarkMode ? Colors.grey[600] : Colors.blue,
                         ),
-                        onPressed: _updateProfilePicture,
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.camera_alt,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          onPressed: _updateProfilePicture,
+                        ),
                       ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 16.0),
+                Text(
+                  _userData.fullName,
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: userNameColor),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8.0),
+                Text(
+                  _userData.address,
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: isDarkMode ? Colors.white70 : Colors.grey[700]),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: 200,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          isDarkMode ? const Color(0xFF333333) : Colors.blue,
+                      shape: const StadiumBorder(),
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              UpdateProfileScreen(userData: widget.userData),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Edit Profile',
+                    ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 16.0),
-              Text(
-                _userData.fullName,
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: userNameColor),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8.0),
-              Text(
-                _userData.address,
-                style: TextStyle(
-                    fontSize: 16,
-                    color: isDarkMode ? Colors.white70 : Colors.grey[700]),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: 200,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        isDarkMode ? const Color(0xFF333333) : Colors.blue,
-                    shape: const StadiumBorder(),
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () {
+                ),
+                const SizedBox(height: 30),
+                const Divider(),
+                const SizedBox(height: 10),
+                ProfileMenuWidget(
+                  title: 'Settings',
+                  icon: LineAwesomeIcons.cog_solid,
+                  iconColor: iconColor,
+                  onPress: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            UpdateProfileScreen(userData: widget.userData),
+                        builder: (context) => const SettingsScreen(),
                       ),
                     );
                   },
-                  child: const Text(
-                    'Edit Profile',
-                  ),
                 ),
-              ),
-              const SizedBox(height: 30),
-              const Divider(),
-              const SizedBox(height: 10),
-              ProfileMenuWidget(
-                title: 'Settings',
-                icon: LineAwesomeIcons.cog_solid,
-                iconColor: iconColor,
-                onPress: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SettingsScreen(),
-                    ),
-                  );
-                },
-              ),
-              ProfileMenuWidget(
-                title: 'User Management',
-                icon: LineAwesomeIcons.user_check_solid,
-                iconColor: iconColor,
-                onPress: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const UserManagementScreen(),
-                    ),
-                  );
-                },
-              ),
-              ProfileMenuWidget(
-                title: 'Info',
-                icon: LineAwesomeIcons.info_solid,
-                iconColor: iconColor,
-                onPress: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const InfoScreen(),
-                    ),
-                  );
-                },
-              ),
-            ],
+                ProfileMenuWidget(
+                  title: 'User Management',
+                  icon: LineAwesomeIcons.user_check_solid,
+                  iconColor: iconColor,
+                  onPress: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const UserManagementScreen(),
+                      ),
+                    );
+                  },
+                ),
+                ProfileMenuWidget(
+                  title: 'Info',
+                  icon: LineAwesomeIcons.info_solid,
+                  iconColor: iconColor,
+                  onPress: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const InfoScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-      drawer: NavBar(
-        auth: AuthenticationService(),
-        authService: AuthenticationService(),
+        drawer: NavBar(
+          auth: AuthenticationService(),
+          authService: AuthenticationService(),
+        ),
       ),
     );
   }

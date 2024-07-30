@@ -191,223 +191,239 @@ class _VideosState extends State<Videos> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('YouTube Links'),
-        actions: [
-          IconButton(
-            onPressed: _isSelectionMode
-                ? null
-                : () {
-                    setState(() {
-                      _showAddLinkField = !_showAddLinkField;
-                    });
-                  },
-            icon: const Icon(Icons.add_outlined),
-          ),
-          IconButton(
-            onPressed: _isSelectionMode
-                ? () => _deleteSelectedVideos(context)
-                : _toggleSelectionMode,
-            icon: Icon(_isSelectionMode ? Icons.delete : Icons.list),
-          ),
-        ],
-      ),
-      drawer: NavBar(
-        auth: AuthenticationService(),
-        authService: AuthenticationService(),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AnimatedCrossFade(
-            duration: const Duration(milliseconds: 300),
-            crossFadeState: _showAddLinkField
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
-            firstChild: const SizedBox.shrink(),
-            secondChild: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      decoration: const InputDecoration(
-                        labelText: 'Insira o link do YouTube',
-                        border: OutlineInputBorder(),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) {
+          return;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('YouTube Links'),
+          actions: [
+            IconButton(
+              onPressed: _isSelectionMode
+                  ? null
+                  : () {
+                      setState(() {
+                        _showAddLinkField = !_showAddLinkField;
+                      });
+                    },
+              icon: const Icon(Icons.add_outlined),
+            ),
+            IconButton(
+              onPressed: _isSelectionMode
+                  ? () => _deleteSelectedVideos(context)
+                  : _toggleSelectionMode,
+              icon: Icon(_isSelectionMode ? Icons.delete : Icons.list),
+            ),
+          ],
+        ),
+        drawer: NavBar(
+          auth: AuthenticationService(),
+          authService: AuthenticationService(),
+        ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AnimatedCrossFade(
+              duration: const Duration(milliseconds: 300),
+              crossFadeState: _showAddLinkField
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              firstChild: const SizedBox.shrink(),
+              secondChild: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        decoration: const InputDecoration(
+                          labelText: 'Insira o link do YouTube',
+                          border: OutlineInputBorder(),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: _addLink,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          isDarkMode ? Colors.grey[800] : Colors.blue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: _addLink,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            isDarkMode ? Colors.grey[800] : Colors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                      ),
+                      child: const Text(
+                        'Adicionar',
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
-                    child: const Text(
-                      'Adicionar',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: FutureBuilder<List<Map<String, dynamic>>>(
-              future: _videosService.getVideos(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Erro: ${snapshot.error}'),
-                  );
-                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                  List<Map<String, dynamic>> sortedList = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: sortedList.length,
-                    itemBuilder: (context, index) {
-                      var videoData = sortedList[index];
-                      var videoId = videoData['id'] as String;
-                      var videoUrl = videoData['url'] as String;
-                      return Column(
-                        children: [
-                          InkWell(
-                            onTap: _isSelectionMode
-                                ? () => _toggleVideoSelection(videoId)
-                                : () => _launchURL(videoUrl),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (_isSelectionMode)
-                                    Checkbox(
-                                      value: _selectedVideos.contains(videoId),
-                                      onChanged: (_) =>
-                                          _toggleVideoSelection(videoId),
-                                    ),
-                                  Expanded(
-                                    child: FutureBuilder<YT.Video>(
-                                      future: _fetchVideo(videoUrl),
-                                      builder: (context, videoSnapshot) {
-                                        if (videoSnapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return const SizedBox(
-                                            height: 180, // Increased height
-                                            child: Center(
-                                                child:
-                                                    CircularProgressIndicator()),
-                                          );
-                                        } else if (videoSnapshot.hasError) {
-                                          return const Icon(
-                                              Icons.error_outline);
-                                        } else if (videoSnapshot.hasData) {
-                                          var video = videoSnapshot.data!;
-                                          return Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Stack(
-                                                children: [
-                                                  CachedNetworkImage(
-                                                    imageUrl:
-                                                        'https://i.ytimg.com/vi/${video.id}/hqdefault.jpg',
-                                                    height:
-                                                        180, // Increased height
-                                                    width: double.infinity,
-                                                    fit: BoxFit.cover,
-                                                    placeholder: (context,
-                                                            url) =>
-                                                        const Center(
-                                                            child:
-                                                                CircularProgressIndicator()),
-                                                    errorWidget: (context, url,
-                                                            error) =>
-                                                        const Icon(Icons.error),
-                                                  ),
-                                                  Positioned(
-                                                    bottom: 8,
-                                                    right: 8,
-                                                    child: Container(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 6,
-                                                          vertical: 2),
-                                                      color: Colors.black
-                                                          .withOpacity(0.7),
-                                                      child: Text(
-                                                        _formatDuration(
-                                                            video.duration),
-                                                        style: const TextStyle(
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold,
+            const SizedBox(height: 16),
+            Expanded(
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: _videosService.getVideos(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Text('Erro: ${snapshot.error}'),
+                    );
+                  } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    List<Map<String, dynamic>> sortedList = snapshot.data!;
+                    return ListView.builder(
+                      itemCount: sortedList.length,
+                      itemBuilder: (context, index) {
+                        var videoData = sortedList[index];
+                        var videoId = videoData['id'] as String;
+                        var videoUrl = videoData['url'] as String;
+                        return Column(
+                          children: [
+                            InkWell(
+                              onTap: _isSelectionMode
+                                  ? () => _toggleVideoSelection(videoId)
+                                  : () => _launchURL(videoUrl),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (_isSelectionMode)
+                                      Checkbox(
+                                        value:
+                                            _selectedVideos.contains(videoId),
+                                        onChanged: (_) =>
+                                            _toggleVideoSelection(videoId),
+                                      ),
+                                    Expanded(
+                                      child: FutureBuilder<YT.Video>(
+                                        future: _fetchVideo(videoUrl),
+                                        builder: (context, videoSnapshot) {
+                                          if (videoSnapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return const SizedBox(
+                                              height: 180, // Increased height
+                                              child: Center(
+                                                  child:
+                                                      CircularProgressIndicator()),
+                                            );
+                                          } else if (videoSnapshot.hasError) {
+                                            return const Icon(
+                                                Icons.error_outline);
+                                          } else if (videoSnapshot.hasData) {
+                                            var video = videoSnapshot.data!;
+                                            return Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Stack(
+                                                  children: [
+                                                    CachedNetworkImage(
+                                                      imageUrl:
+                                                          'https://i.ytimg.com/vi/${video.id}/hqdefault.jpg',
+                                                      height:
+                                                          180, // Increased height
+                                                      width: double.infinity,
+                                                      fit: BoxFit.cover,
+                                                      placeholder: (context,
+                                                              url) =>
+                                                          const Center(
+                                                              child:
+                                                                  CircularProgressIndicator()),
+                                                      errorWidget: (context,
+                                                              url, error) =>
+                                                          const Icon(
+                                                              Icons.error),
+                                                    ),
+                                                    Positioned(
+                                                      bottom: 8,
+                                                      right: 8,
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 6,
+                                                                vertical: 2),
+                                                        color: Colors.black
+                                                            .withOpacity(0.7),
+                                                        child: Text(
+                                                          _formatDuration(
+                                                              video.duration),
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 8.0,
+                                                          right: 8.0),
+                                                  child: Text(
+                                                    video.title,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .titleMedium!
+                                                        .copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
                                                   ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 8),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 8.0, right: 8.0),
-                                                child: Text(
-                                                  video.title,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleMedium!
-                                                      .copyWith(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
                                                 ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 10.0, right: 10.0),
-                                                child: Text(
-                                                  '${video.author} • ${_timeAgo(video.uploadDate)}',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodySmall,
+                                                const SizedBox(height: 4),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10.0,
+                                                          right: 10.0),
+                                                  child: Text(
+                                                    '${video.author} • ${_timeAgo(video.uploadDate)}',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodySmall,
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
-                                          );
-                                        } else {
-                                          return const SizedBox.shrink();
-                                        }
-                                      },
+                                              ],
+                                            );
+                                          } else {
+                                            return const SizedBox.shrink();
+                                          }
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 20),
-                        ],
-                      );
-                    },
-                  );
-                } else {
-                  return const Center(
-                    child: Text('Nenhum vídeo adicionado ainda.'),
-                  );
-                }
-              },
+                            const SizedBox(height: 20),
+                          ],
+                        );
+                      },
+                    );
+                  } else {
+                    return const Center(
+                      child: Text('Nenhum vídeo adicionado ainda.'),
+                    );
+                  }
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

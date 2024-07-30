@@ -35,41 +35,44 @@ class _EventsState extends State<Events> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Eventos'),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Eventos'),
+        ),
+        drawer: NavBar(
+          auth: AuthenticationService(),
+          authService: AuthenticationService(),
+        ),
+        body: FutureBuilder<List<Event>>(
+          future: _eventsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return const Center(child: Text('Erro ao carregar eventos'));
+            }
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('Nenhum evento encontrado'));
+            }
+            final events = snapshot.data!;
+            return ListView.builder(
+              itemCount: events.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    _navigateToEventDetailsScreen(context, events[index]);
+                  },
+                  child: EventListItem(event: events[index]),
+                );
+              },
+            );
+          },
+        ),
+        floatingActionButton: _buildAddEventButton(),
       ),
-      drawer: NavBar(
-        auth: AuthenticationService(),
-        authService: AuthenticationService(),
-      ),
-      body: FutureBuilder<List<Event>>(
-        future: _eventsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return const Center(child: Text('Erro ao carregar eventos'));
-          }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Nenhum evento encontrado'));
-          }
-          final events = snapshot.data!;
-          return ListView.builder(
-            itemCount: events.length,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  _navigateToEventDetailsScreen(context, events[index]);
-                },
-                child: EventListItem(event: events[index]),
-              );
-            },
-          );
-        },
-      ),
-      floatingActionButton: _buildAddEventButton(),
     );
   }
 

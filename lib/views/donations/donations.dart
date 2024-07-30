@@ -124,56 +124,58 @@ class _DonationsState extends State<Donations> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final Color buttonColor = theme.brightness == Brightness.light
-        ? const Color(0xFF007BFF) // Azul no modo claro
-        : Colors.grey; // Cinza no modo escuro
-
+        ? const Color(0xFF007BFF)
+        : Colors.grey;
     final Color donationTypeButtonColor =
         theme.brightness == Brightness.light ? Colors.white : Colors.grey[800]!;
 
     final Color donationTypeTextColor = theme.brightness == Brightness.light
-        ? const Color(0xFF007BFF) // Azul no modo claro
-        : Colors.white; // Branco no modo escuro
+        ? const Color(0xFF007BFF)
+        : Colors.white;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Donations'),
-      ),
-      drawer: NavBar(
-        auth: AuthenticationService(),
-        authService: AuthenticationService(),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const SizedBox(height: 20.0),
-              DonationValue(
-                controller: donationController,
-                onValueChanged: (value) {},
-              ),
-              DonationType(
-                onTypeSelected: onTypeSelected,
-                donationType: donationType,
-                donationTypeButtonColor: donationTypeButtonColor,
-                donationTypeTextColor: donationTypeTextColor,
-              ),
-              const SizedBox(height: 20.0),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    navigateToDonationDetailsScreen(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: buttonColor,
-                  ),
-                  child: const Text('Next'),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Donations'),
+        ),
+        drawer: NavBar(
+          auth: AuthenticationService(),
+          authService: AuthenticationService(),
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const SizedBox(height: 20.0),
+                DonationValue(
+                  controller: donationController,
+                  onValueChanged: (value) {},
                 ),
-              ),
-            ],
+                DonationType(
+                  onTypeSelected: onTypeSelected,
+                  donationType: donationType,
+                  donationTypeButtonColor: donationTypeButtonColor,
+                  donationTypeTextColor: donationTypeTextColor,
+                ),
+                const SizedBox(height: 20.0),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      navigateToDonationDetailsScreen(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: buttonColor,
+                    ),
+                    child: const Text('Next'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
