@@ -43,11 +43,15 @@ class EventDetailsScreen extends StatelessWidget {
                 value: 'delete',
                 child: ListTile(
                   leading: Icon(Icons.delete,
-                      color: isDarkMode ? Colors.redAccent : Colors.red),
+                      color: isDarkMode
+                          ? const Color.fromARGB(255, 255, 253, 253)
+                          : Colors.red),
                   title: Text(
                     'Excluir',
                     style: TextStyle(
-                        color: isDarkMode ? Colors.redAccent : Colors.red),
+                        color: isDarkMode
+                            ? const Color.fromARGB(255, 255, 255, 255)
+                            : Colors.red),
                   ),
                 ),
               ),
