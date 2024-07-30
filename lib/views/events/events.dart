@@ -15,6 +15,24 @@ class Events extends StatefulWidget {
 }
 
 class _EventsState extends State<Events> {
+  Future<List<Event>>? _eventsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _eventsFuture = _fetchEvents();
+  }
+
+  Future<List<Event>> _fetchEvents() async {
+    CollectionReference events =
+        FirebaseFirestore.instance.collection('events');
+    var snapshot = await events.orderBy('date', descending: true).get();
+    return snapshot.docs
+        .map((doc) =>
+            Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,37 +43,33 @@ class _EventsState extends State<Events> {
         auth: AuthenticationService(),
         authService: AuthenticationService(),
       ),
-      body: _buildEventsList(),
+      body: FutureBuilder<List<Event>>(
+        future: _eventsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return const Center(child: Text('Erro ao carregar eventos'));
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Nenhum evento encontrado'));
+          }
+          final events = snapshot.data!;
+          return ListView.builder(
+            itemCount: events.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  _navigateToEventDetailsScreen(context, events[index]);
+                },
+                child: EventListItem(event: events[index]),
+              );
+            },
+          );
+        },
+      ),
       floatingActionButton: _buildAddEventButton(),
-    );
-  }
-
-  Widget _buildEventsList() {
-    return StreamBuilder<List<Event>>(
-      stream: readEvents(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) {
-          return const Center(child: Text('Erro ao carregar eventos'));
-        }
-        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('Nenhum evento encontrado'));
-        }
-        final events = snapshot.data!;
-        return ListView.builder(
-          itemCount: events.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                _navigateToEventDetailsScreen(context, events[index]);
-              },
-              child: EventListItem(event: events[index]),
-            );
-          },
-        );
-      },
     );
   }
 
@@ -79,6 +93,9 @@ class _EventsState extends State<Events> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Evento adicionado com sucesso')),
       );
+      setState(() {
+        _eventsFuture = _fetchEvents();
+      });
     }
   }
 
@@ -89,20 +106,12 @@ class _EventsState extends State<Events> {
     );
 
     if (updatedEvent != null && context.mounted) {
-      setState(() {});
+      setState(() {
+        _eventsFuture = _fetchEvents();
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Evento atualizado')),
       );
     }
-  }
-
-  Stream<List<Event>> readEvents() {
-    CollectionReference events =
-        FirebaseFirestore.instance.collection('events');
-    return events.orderBy('date', descending: true).snapshots().map(
-        (snapshot) => snapshot.docs
-            .map((doc) =>
-                Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
-            .toList());
   }
 }

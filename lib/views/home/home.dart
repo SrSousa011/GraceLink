@@ -1,4 +1,5 @@
 import 'package:churchapp/views/events/events.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/views/events/event_details.dart';
@@ -23,6 +24,25 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Future<List<Event>>? _eventsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _eventsFuture = _fetchEvents();
+  }
+
+  Future<List<Event>> _fetchEvents() async {
+    CollectionReference events =
+        FirebaseFirestore.instance.collection('events');
+    var snapshot =
+        await events.orderBy('date', descending: true).limit(5).get();
+    return snapshot.docs
+        .map((doc) =>
+            Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -91,28 +111,28 @@ class _HomeState extends State<Home> {
   }
 
   Widget _buildUpcomingEventsSection(bool isDarkMode) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Próximos Eventos:',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 10),
-        StreamBuilder<List<Event>>(
-          stream: _readEvents(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return const Center(child: Text('Erro ao carregar eventos'));
-            }
-            if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text('Nenhum evento encontrado'));
-            }
-            final events = snapshot.data!.take(5).toList();
-            return Column(
+    return FutureBuilder<List<Event>>(
+      future: _eventsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return const Center(child: Text('Erro ao carregar eventos'));
+        }
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('Nenhum evento encontrado'));
+        }
+        final events = snapshot.data!;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Próximos Eventos:',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Column(
               children: [
                 ...events.map((event) => GestureDetector(
                       onTap: () {
@@ -137,10 +157,10 @@ class _HomeState extends State<Home> {
                   child: const Text('Ver Todos os Eventos'),
                 ),
               ],
-            );
-          },
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -196,17 +216,8 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Stream<List<Event>> _readEvents() {
-    CollectionReference events =
-        FirebaseFirestore.instance.collection('events');
-    return events.orderBy('date', descending: true).snapshots().map(
-        (snapshot) => snapshot.docs
-            .map((doc) =>
-                Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
-            .toList());
-  }
-
-  void _navigateToEventDetailsScreen(BuildContext context, Event event) async {
+  Future<void> _navigateToEventDetailsScreen(
+      BuildContext context, Event event) async {
     await Navigator.push<Event>(
       context,
       MaterialPageRoute(builder: (context) => EventDetailsScreen(event: event)),
@@ -220,7 +231,9 @@ class _HomeState extends State<Home> {
     try {
       await launchUrlString(nativeUrl, mode: LaunchMode.externalApplication);
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
       await launchUrlString(webUrl, mode: LaunchMode.platformDefault);
     }
   }
