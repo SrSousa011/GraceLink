@@ -11,7 +11,7 @@ class EventListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(8.0), // Location: EventListItem
+      margin: const EdgeInsets.all(8.0),
       child: buildListTile(context),
     );
   }

@@ -20,7 +20,7 @@ class EventDetailsScreen extends StatelessWidget {
               if (value == 'edit') {
                 _navigateToUpdateEventScreen(context, event);
               } else if (value == 'delete') {
-                EventDelete.confirmDeleteEvent(context, event);
+                EventDelete.confirmDeleteEvent(context, event.id, event.title);
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
