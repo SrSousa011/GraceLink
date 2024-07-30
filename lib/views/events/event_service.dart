@@ -94,3 +94,44 @@ Future<void> deleteEvent(String eventId) async {
     rethrow;
   }
 }
+
+Future<Event> getEventById(String eventId) async {
+  try {
+    DocumentReference eventRef =
+        FirebaseFirestore.instance.collection('events').doc(eventId);
+    DocumentSnapshot snapshot = await eventRef.get();
+
+    if (snapshot.exists) {
+      return Event.fromFirestore(
+          eventId, snapshot.data() as Map<String, dynamic>);
+    } else {
+      throw Exception('Event not found');
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error fetching event: $e');
+    }
+    rethrow;
+  }
+}
+
+Future<List<Event>> getAllEvents() async {
+  try {
+    CollectionReference events =
+        FirebaseFirestore.instance.collection('events');
+    QuerySnapshot snapshot = await events.get();
+
+    if (snapshot.docs.isEmpty) {
+      return [];
+    } else {
+      return snapshot.docs.map((doc) {
+        return Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>);
+      }).toList();
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error fetching events: $e');
+    }
+    rethrow;
+  }
+}
