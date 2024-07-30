@@ -8,7 +8,7 @@ import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/events/event_service.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 const String tLogo = 'assets/icons/logo.png';
 const String tInsta = 'assets/icons/insta.png';
@@ -54,7 +54,7 @@ class _HomeState extends State<Home> {
           children: [
             _buildHeader(),
             const SizedBox(height: 20),
-            _buildUpcomingEventsSection(),
+            _buildUpcomingEventsSection(isDarkMode),
             const SizedBox(height: 20),
             _buildImportantInfoSection(),
           ],
@@ -90,7 +90,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildUpcomingEventsSection() {
+  Widget _buildUpcomingEventsSection(bool isDarkMode) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -122,6 +122,12 @@ class _HomeState extends State<Home> {
                     )),
                 const SizedBox(height: 10),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        isDarkMode ? const Color(0xFF333333) : Colors.blue,
+                    shape: const StadiumBorder(),
+                    foregroundColor: Colors.white,
+                  ),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -165,7 +171,7 @@ class _HomeState extends State<Home> {
         ),
         const SizedBox(height: 10),
         GestureDetector(
-          onTap: () => _launchURL('https://resplandecendonacoes.org/'),
+          onTap: _launchInstagram,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -207,12 +213,15 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Future<void> _launchURL(String uri) async {
-    final url = Uri.parse(uri);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      throw 'Não foi possível abrir o link $uri';
+  Future<void> _launchInstagram() async {
+    const nativeUrl = "instagram://user?username=igrejaresplandecendoathus";
+    const webUrl = "https://www.instagram.com/igrejaresplandecendoathus/";
+
+    try {
+      await launchUrlString(nativeUrl, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      print(e);
+      await launchUrlString(webUrl, mode: LaunchMode.platformDefault);
     }
   }
 }
