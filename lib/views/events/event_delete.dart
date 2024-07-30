@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:churchapp/views/events/event_service.dart';
 
 class EventDelete {
-  static void confirmDeleteEvent(BuildContext context, Event event) {
+  static void confirmDeleteEvent(
+      BuildContext context, String eventId, String eventTitle) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirmar exclusão'),
           content:
-              Text('Tem certeza que deseja excluir o evento "${event.title}"?'),
+              Text('Tem certeza que deseja excluir o evento "$eventTitle"?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -20,7 +21,7 @@ class EventDelete {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Fechar o diálogo
-                _deleteEventAndNotify(context, event);
+                _deleteEventAndNotify(context, eventId);
               },
               child: const Text('Excluir'),
             ),
@@ -31,13 +32,13 @@ class EventDelete {
   }
 
   static Future<void> _deleteEventAndNotify(
-      BuildContext context, Event event) async {
-    await _deleteEvent(context, event);
+      BuildContext context, String eventId) async {
+    await _deleteEvent(context, eventId);
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Evento "${event.title}" excluído com sucesso!'),
+        const SnackBar(
+          content: Text('Evento excluído com sucesso!'),
         ),
       );
 
@@ -45,9 +46,9 @@ class EventDelete {
     }
   }
 
-  static Future<void> _deleteEvent(BuildContext context, Event event) async {
+  static Future<void> _deleteEvent(BuildContext context, String eventId) async {
     try {
-      await deleteEvent(event.id);
+      await deleteEvent(eventId);
       if (!context.mounted) return;
       Navigator.pop(context, true); // Return true to indicate success
     } catch (e) {

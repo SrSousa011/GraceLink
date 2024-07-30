@@ -72,8 +72,11 @@ class _AddEventFormState extends State<AddEventForm> {
         _descriptionController.text.isNotEmpty &&
         _selectedDate != null &&
         _selectedTime != null) {
+
+      final eventId = DateTime.now().millisecondsSinceEpoch.toString();
+
       final newEvent = Event(
-        id: _titleController.text,
+        id: eventId,
         title: _titleController.text,
         description: _descriptionController.text,
         date: _selectedDate!,

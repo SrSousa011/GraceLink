@@ -69,7 +69,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
         _selectedDate != null &&
         _selectedTime != null) {
       final updatedEvent = Event(
-        id: widget.event.id,
+        id: widget.event.id, // Use eventId here
         title: _titleController.text,
         description: _descriptionController.text,
         date: _selectedDate!,
@@ -78,7 +78,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
       );
 
       try {
-        await updateEvent(updatedEvent, widget.event.id);
+        await updateEvent(updatedEvent, widget.event.id); // Pass eventId
 
         if (!context.mounted) return;
         Navigator.pop(context, true);
