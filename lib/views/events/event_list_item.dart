@@ -35,13 +35,13 @@ class EventListItem extends StatelessWidget {
               fontSize: 14.0,
             ),
           ),
-          const SizedBox(height: 4), // Spacer between date and description
+          const SizedBox(height: 4),
           Text(
             event.description,
-            maxLines: 2, // Adjust as needed
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 4), // Spacer between description and location
+          const SizedBox(height: 4),
           Text(
             event.location,
             style: TextStyle(
