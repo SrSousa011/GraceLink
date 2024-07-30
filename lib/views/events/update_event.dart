@@ -69,7 +69,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
         _selectedDate != null &&
         _selectedTime != null) {
       final updatedEvent = Event(
-        id: widget.event.id, // Use eventId here
+        id: widget.event.id,
         title: _titleController.text,
         description: _descriptionController.text,
         date: _selectedDate!,
@@ -78,10 +78,11 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
       );
 
       try {
-        await updateEvent(updatedEvent, widget.event.id); // Pass eventId
+        await updateEvent(updatedEvent, widget.event.id);
 
         if (!context.mounted) return;
-        Navigator.pop(context, true);
+        Navigator.pop(
+            context, updatedEvent); // Passa o evento atualizado de volta
       } catch (e) {
         showDialog(
           context: context,

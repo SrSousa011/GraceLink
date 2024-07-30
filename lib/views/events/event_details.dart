@@ -1,10 +1,10 @@
 import 'package:churchapp/views/events/event_delete.dart';
-import 'package:churchapp/views/events/event_service.dart';
 import 'package:churchapp/views/events/update_event.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
+import 'package:churchapp/views/events/event_service.dart';
 
 class EventDetailsScreen extends StatelessWidget {
   final Event event;
@@ -100,14 +100,14 @@ class EventDetailsScreen extends StatelessWidget {
   }
 
   void _navigateToUpdateEventScreen(BuildContext context, Event event) async {
-    final result = await Navigator.push(
+    final updatedEvent = await Navigator.push<Event>(
       context,
       MaterialPageRoute(builder: (context) => UpdateEventForm(event: event)),
     );
-    if (result != null && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Evento atualizado')),
-      );
+
+    if (updatedEvent != null && context.mounted) {
+      Navigator.pop(
+          context, updatedEvent); // Passar o evento atualizado de volta
     }
   }
 }

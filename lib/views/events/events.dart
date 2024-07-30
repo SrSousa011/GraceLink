@@ -15,29 +15,18 @@ class Events extends StatefulWidget {
 }
 
 class _EventsState extends State<Events> {
-  final GlobalKey<_EventsState> myWidgetKey = GlobalKey();
-  final bool canReturn = false;
-
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Eventos'),
-        ),
-        drawer: NavBar(
-          auth: AuthenticationService(),
-          authService: AuthenticationService(),
-        ),
-        body: _buildEventsList(),
-        floatingActionButton: _buildAddEventButton(),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Eventos'),
       ),
+      drawer: NavBar(
+        auth: AuthenticationService(),
+        authService: AuthenticationService(),
+      ),
+      body: _buildEventsList(),
+      floatingActionButton: _buildAddEventButton(),
     );
   }
 
@@ -94,11 +83,13 @@ class _EventsState extends State<Events> {
   }
 
   void _navigateToEventDetailsScreen(BuildContext context, Event event) async {
-    final result = await Navigator.push(
+    final updatedEvent = await Navigator.push<Event>(
       context,
       MaterialPageRoute(builder: (context) => EventDetailsScreen(event: event)),
     );
-    if (result != null && context.mounted) {
+
+    if (updatedEvent != null && context.mounted) {
+      setState(() {});
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Evento atualizado')),
       );
@@ -114,11 +105,4 @@ class _EventsState extends State<Events> {
                 Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
             .toList());
   }
-}
-
-void main() {
-  runApp(const MaterialApp(
-    title: 'Flutter Firestore Events',
-    home: Events(),
-  ));
 }
