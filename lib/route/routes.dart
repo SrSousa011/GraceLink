@@ -51,4 +51,6 @@ class AppRoutes {
         );
     }
   }
+
+  static GlobalKey<NavigatorState>? navigatorKey = GlobalKey<NavigatorState>();
 }
