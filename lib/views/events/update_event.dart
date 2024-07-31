@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:churchapp/views/events/event_service.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:churchapp/theme/theme_provider.dart';
 
 class UpdateEventForm extends StatefulWidget {
   final Event event;
@@ -8,15 +10,16 @@ class UpdateEventForm extends StatefulWidget {
   const UpdateEventForm({super.key, required this.event});
 
   @override
-  State<StatefulWidget> createState() => _UpdateEventFormState();
+  State<UpdateEventForm> createState() => _UpdateEventFormState();
 }
 
 class _UpdateEventFormState extends State<UpdateEventForm> {
+  final _formKey = GlobalKey<FormState>();
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
+  late DateTime _date;
+  late TimeOfDay _time;
   late TextEditingController _locationController;
-  DateTime? _selectedDate;
-  TimeOfDay? _selectedTime;
 
   @override
   void initState() {
@@ -24,9 +27,9 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
     _titleController = TextEditingController(text: widget.event.title);
     _descriptionController =
         TextEditingController(text: widget.event.description);
+    _date = widget.event.date;
+    _time = widget.event.time;
     _locationController = TextEditingController(text: widget.event.location);
-    _selectedDate = widget.event.date;
-    _selectedTime = widget.event.time;
   }
 
   @override
@@ -37,16 +40,128 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
     super.dispose();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Update Event'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildTextField('Title', _titleController, Icons.title,
+                isDarkMode: isDarkMode),
+            const SizedBox(height: 20.0),
+            _buildTextField(
+                'Description', _descriptionController, Icons.description,
+                isDarkMode: isDarkMode),
+            const SizedBox(height: 20.0),
+            _buildDateField(isDarkMode: isDarkMode),
+            const SizedBox(height: 20.0),
+            _buildTimeField(isDarkMode: isDarkMode),
+            const SizedBox(height: 20.0),
+            _buildLocationField(isDarkMode: isDarkMode),
+            const SizedBox(height: 20.0),
+            _buildSaveButton(isDarkMode: isDarkMode),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+      String labelText, TextEditingController controller, IconData icon,
+      {required bool isDarkMode}) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        icon: Icon(icon, color: isDarkMode ? Colors.white : Colors.blue),
+        labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+      ),
+      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a $labelText';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildDateField({required bool isDarkMode}) {
+    return TextFormField(
+      onTap: () => _selectDate(context),
+      readOnly: true,
+      decoration: InputDecoration(
+        labelText: _date != null
+            ? DateFormat('dd/MM/yyyy').format(_date)
+            : 'Select Date',
+        icon: Icon(Icons.calendar_today,
+            color: isDarkMode ? Colors.white : Colors.blue),
+        labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+      ),
+      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+    );
+  }
+
+  Widget _buildTimeField({required bool isDarkMode}) {
+    return TextFormField(
+      onTap: () => _selectTime(context),
+      readOnly: true,
+      decoration: InputDecoration(
+        // ignore: unnecessary_null_comparison
+        labelText: _time != null ? _time.format(context) : 'Select Time',
+        icon: Icon(Icons.access_time,
+            color: isDarkMode ? Colors.white : Colors.blue),
+        labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+      ),
+      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+    );
+  }
+
+  Widget _buildLocationField({required bool isDarkMode}) {
+    return TextFormField(
+      controller: _locationController,
+      decoration: InputDecoration(
+        labelText: 'Location',
+        icon: Icon(Icons.location_on,
+            color: isDarkMode ? Colors.white : Colors.blue),
+        labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+      ),
+      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+    );
+  }
+
+  Widget _buildSaveButton({required bool isDarkMode}) {
+    return ElevatedButton(
+      onPressed: _saveEvent,
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+      ),
+      child: const Text('Save Event'),
+    );
+  }
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: _date,
+      firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != _selectedDate) {
+    if (picked != null && picked != _date) {
       setState(() {
-        _selectedDate = picked;
+        _date = picked;
       });
     }
   }
@@ -54,204 +169,27 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   Future<void> _selectTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: _selectedTime ?? TimeOfDay.now(),
+      initialTime: _time,
     );
-    if (picked != null && picked != _selectedTime) {
+    if (picked != null && picked != _time) {
       setState(() {
-        _selectedTime = picked;
+        _time = picked;
       });
     }
   }
 
-  Future<void> _updateEvent(BuildContext context) async {
-    if (_titleController.text.isNotEmpty &&
-        _descriptionController.text.isNotEmpty &&
-        _selectedDate != null &&
-        _selectedTime != null) {
+  void _saveEvent() {
+    if (_formKey.currentState?.validate() ?? false) {
       final updatedEvent = Event(
         id: widget.event.id,
         title: _titleController.text,
         description: _descriptionController.text,
-        date: _selectedDate!,
-        time: _selectedTime!,
+        date: _date,
+        time: _time,
         location: _locationController.text,
       );
 
-      try {
-        await updateEvent(updatedEvent, widget.event.id);
-
-        if (!context.mounted) return;
-        Navigator.pop(
-            context, updatedEvent); // Passa o evento atualizado de volta
-      } catch (e) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text(
-                'Erro ao atualizar evento',
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-              content:
-                  const Text('Ocorreu um erro ao tentar atualizar o evento.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    'OK',
-                    style:
-                        TextStyle(color: Theme.of(context).colorScheme.primary),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      }
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(
-              'Erro ao atualizar evento',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-            content: const Text('Por favor, preencha todos os campos.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  'OK',
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.primary),
-                ),
-              ),
-            ],
-          );
-        },
-      );
+      Navigator.pop(context, updatedEvent);
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDarkMode ? Colors.white : Colors.black;
-    final iconColor =
-        isDarkMode ? const Color.fromARGB(255, 255, 255, 255) : Colors.black54;
-    final buttonColor = isDarkMode ? Colors.grey[800] : Colors.blue;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Atualizar Evento', style: TextStyle(color: textColor)),
-        iconTheme: IconThemeData(color: textColor),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTitleField(iconColor),
-            const SizedBox(height: 20.0),
-            _buildDescriptionField(iconColor),
-            const SizedBox(height: 20.0),
-            _buildDateField(iconColor),
-            const SizedBox(height: 20.0),
-            _buildTimeField(iconColor),
-            const SizedBox(height: 20.0),
-            _buildLocationField(iconColor),
-            const SizedBox(height: 20.0),
-            _buildUpdateButton(buttonColor!),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTitleField(Color iconColor) {
-    return TextField(
-      controller: _titleController,
-      decoration: InputDecoration(
-        labelText: 'Título do Evento',
-        prefixIcon: Icon(Icons.title, color: iconColor),
-        labelStyle: TextStyle(color: iconColor),
-      ),
-    );
-  }
-
-  Widget _buildDescriptionField(Color iconColor) {
-    return TextField(
-      controller: _descriptionController,
-      decoration: InputDecoration(
-        labelText: 'Descrição do Evento',
-        prefixIcon: Icon(Icons.description, color: iconColor),
-        labelStyle: TextStyle(color: iconColor),
-      ),
-    );
-  }
-
-  Widget _buildDateField(Color iconColor) {
-    return GestureDetector(
-      onTap: () => _selectDate(context),
-      child: AbsorbPointer(
-        child: TextFormField(
-          controller: TextEditingController(
-            text: _selectedDate != null
-                ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
-                : '',
-          ),
-          decoration: InputDecoration(
-            labelText: 'Data do Evento',
-            prefixIcon: Icon(Icons.calendar_today, color: iconColor),
-            labelStyle: TextStyle(color: iconColor),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTimeField(Color iconColor) {
-    return GestureDetector(
-      onTap: () => _selectTime(context),
-      child: AbsorbPointer(
-        child: TextFormField(
-          controller: TextEditingController(
-            text: _selectedTime != null ? _selectedTime!.format(context) : '',
-          ),
-          decoration: InputDecoration(
-            labelText: 'Hora do Evento',
-            prefixIcon: Icon(Icons.access_time, color: iconColor),
-            labelStyle: TextStyle(color: iconColor),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLocationField(Color iconColor) {
-    return TextField(
-      controller: _locationController,
-      decoration: InputDecoration(
-        labelText: 'Localização',
-        prefixIcon: Icon(Icons.location_on, color: iconColor),
-        labelStyle: TextStyle(color: iconColor),
-      ),
-    );
-  }
-
-  Widget _buildUpdateButton(Color buttonColor) {
-    return ElevatedButton(
-      onPressed: () => _updateEvent(context),
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: buttonColor,
-      ),
-      child: const Text('Atualizar'),
-    );
   }
 }
