@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:churchapp/views/events/event_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
+import 'package:churchapp/views/events/event_service.dart';
 
 class UpdateEventForm extends StatefulWidget {
-  final Event event;
+  final Event event; // Recebe os detalhes do evento existente
 
   const UpdateEventForm({super.key, required this.event});
 
@@ -14,22 +14,22 @@ class UpdateEventForm extends StatefulWidget {
 }
 
 class _UpdateEventFormState extends State<UpdateEventForm> {
-  final _formKey = GlobalKey<FormState>();
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
-  late DateTime _date;
-  late TimeOfDay _time;
   late TextEditingController _locationController;
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
 
   @override
   void initState() {
     super.initState();
+    // Inicializa os controladores com os dados do evento existente
     _titleController = TextEditingController(text: widget.event.title);
     _descriptionController =
         TextEditingController(text: widget.event.description);
-    _date = widget.event.date;
-    _time = widget.event.time;
     _locationController = TextEditingController(text: widget.event.location);
+    _selectedDate = widget.event.date;
+    _selectedTime = widget.event.time;
   }
 
   @override
@@ -40,6 +40,86 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
     super.dispose();
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime ?? TimeOfDay.now(),
+    );
+    if (picked != null && picked != _selectedTime) {
+      setState(() {
+        _selectedTime = picked;
+      });
+    }
+  }
+
+  Future<void> _updateEvent(BuildContext context) async {
+    if (_titleController.text.isNotEmpty &&
+        _descriptionController.text.isNotEmpty &&
+        _selectedDate != null &&
+        _selectedTime != null) {
+      final updatedEvent = Event(
+        id: widget.event.id,
+        title: _titleController.text,
+        description: _descriptionController.text,
+        date: _selectedDate!,
+        time: _selectedTime!,
+        location: _locationController.text,
+      );
+
+      try {
+        await updateEvent(updatedEvent, widget.event.id);
+
+        // Retorne para a tela anterior passando o evento atualizado
+        Navigator.pop(context, updatedEvent);
+      } catch (e) {
+        _showErrorDialog(context, 'Erro ao atualizar evento',
+            'Ocorreu um erro ao tentar atualizar o evento: ${e.toString()}');
+      }
+    } else {
+      _showErrorDialog(context, 'Erro ao atualizar evento',
+          'Por favor, preencha todos os campos.');
+    }
+  }
+
+  void _showErrorDialog(BuildContext context, String title, String message) {
+    // Envolva a exibição do diálogo em um Future.microtask para evitar o erro
+    Future.microtask(() {
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(title),
+              content: Text(message),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -47,18 +127,18 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Update Event'),
+        title: const Text('Atualizar Evento'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTextField('Title', _titleController, Icons.title,
+            _buildTextField('Título do Evento', _titleController, Icons.title,
                 isDarkMode: isDarkMode),
             const SizedBox(height: 20.0),
-            _buildTextField(
-                'Description', _descriptionController, Icons.description,
+            _buildTextField('Descrição do Evento', _descriptionController,
+                Icons.description,
                 isDarkMode: isDarkMode),
             const SizedBox(height: 20.0),
             _buildDateField(isDarkMode: isDarkMode),
@@ -67,7 +147,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
             const SizedBox(height: 20.0),
             _buildLocationField(isDarkMode: isDarkMode),
             const SizedBox(height: 20.0),
-            _buildSaveButton(isDarkMode: isDarkMode),
+            _buildUpdateButton(isDarkMode: isDarkMode),
           ],
         ),
       ),
@@ -77,70 +157,57 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   Widget _buildTextField(
       String labelText, TextEditingController controller, IconData icon,
       {required bool isDarkMode}) {
-    return TextFormField(
+    return TextField(
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
         icon: Icon(icon, color: isDarkMode ? Colors.white : Colors.blue),
-        labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
       ),
-      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter a $labelText';
-        }
-        return null;
-      },
     );
   }
 
   Widget _buildDateField({required bool isDarkMode}) {
-    return TextFormField(
+    return TextField(
       onTap: () => _selectDate(context),
       readOnly: true,
       decoration: InputDecoration(
-        labelText: _date != null
-            ? DateFormat('dd/MM/yyyy').format(_date)
-            : 'Select Date',
+        labelText: _selectedDate != null
+            ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
+            : 'Selecionar Data',
         icon: Icon(Icons.calendar_today,
             color: isDarkMode ? Colors.white : Colors.blue),
-        labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
       ),
-      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
     );
   }
 
   Widget _buildTimeField({required bool isDarkMode}) {
-    return TextFormField(
+    return TextField(
       onTap: () => _selectTime(context),
       readOnly: true,
       decoration: InputDecoration(
-        // ignore: unnecessary_null_comparison
-        labelText: _time != null ? _time.format(context) : 'Select Time',
+        labelText: _selectedTime != null
+            ? _selectedTime!.format(context)
+            : 'Selecionar Hora',
         icon: Icon(Icons.access_time,
             color: isDarkMode ? Colors.white : Colors.blue),
-        labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
       ),
-      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
     );
   }
 
   Widget _buildLocationField({required bool isDarkMode}) {
-    return TextFormField(
+    return TextField(
       controller: _locationController,
       decoration: InputDecoration(
-        labelText: 'Location',
+        labelText: 'Localização do Evento',
         icon: Icon(Icons.location_on,
             color: isDarkMode ? Colors.white : Colors.blue),
-        labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
       ),
-      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
     );
   }
 
-  Widget _buildSaveButton({required bool isDarkMode}) {
+  Widget _buildUpdateButton({required bool isDarkMode}) {
     return ElevatedButton(
-      onPressed: _saveEvent,
+      onPressed: () => _updateEvent(context),
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
         backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
@@ -148,48 +215,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
           borderRadius: BorderRadius.circular(20.0),
         ),
       ),
-      child: const Text('Save Event'),
+      child: const Text('Atualizar Evento'),
     );
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null && picked != _date) {
-      setState(() {
-        _date = picked;
-      });
-    }
-  }
-
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: _time,
-    );
-    if (picked != null && picked != _time) {
-      setState(() {
-        _time = picked;
-      });
-    }
-  }
-
-  void _saveEvent() {
-    if (_formKey.currentState?.validate() ?? false) {
-      final updatedEvent = Event(
-        id: widget.event.id,
-        title: _titleController.text,
-        description: _descriptionController.text,
-        date: _date,
-        time: _time,
-        location: _locationController.text,
-      );
-
-      Navigator.pop(context, updatedEvent);
-    }
   }
 }

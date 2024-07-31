@@ -6,10 +6,23 @@ import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/event_service.dart';
 
-class EventDetailsScreen extends StatelessWidget {
+class EventDetailsScreen extends StatefulWidget {
   final Event event;
 
   const EventDetailsScreen({super.key, required this.event});
+
+  @override
+  _EventDetailsScreenState createState() => _EventDetailsScreenState();
+}
+
+class _EventDetailsScreenState extends State<EventDetailsScreen> {
+  late Event _event;
+
+  @override
+  void initState() {
+    super.initState();
+    _event = widget.event;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,14 +31,15 @@ class EventDetailsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(event.title),
+        title: Text(_event.title),
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'edit') {
-                _navigateToUpdateEventScreen(context, event);
+                _navigateToUpdateEventScreen(context, _event);
               } else if (value == 'delete') {
-                EventDelete.confirmDeleteEvent(context, event.id, event.title);
+                EventDelete.confirmDeleteEvent(
+                    context, _event.id, _event.title);
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -65,21 +79,21 @@ class EventDetailsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Título: ${event.title}',
+              'Título: ${_event.title}',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: isDarkMode ? Colors.white : Colors.black,
               ),
             ),
-            _buildDetailsText('Descrição: ${event.description}', isDarkMode),
+            _buildDetailsText('Descrição: ${_event.description}', isDarkMode),
             _buildDetailsText(
-              'Data: ${DateFormat('dd/MM/yyyy').format(event.date)}',
+              'Data: ${DateFormat('dd/MM/yyyy').format(_event.date)}',
               isDarkMode,
             ),
             _buildDetailsText(
-                'Hora: ${event.time.format(context)}', isDarkMode),
-            _buildDetailsText('Localização: ${event.location}', isDarkMode),
+                'Hora: ${_event.time.format(context)}', isDarkMode),
+            _buildDetailsText('Localização: ${_event.location}', isDarkMode),
           ],
         ),
       ),
@@ -106,8 +120,9 @@ class EventDetailsScreen extends StatelessWidget {
     );
 
     if (updatedEvent != null && context.mounted) {
-      Navigator.pop(
-          context, updatedEvent); // Passar o evento atualizado de volta
+      setState(() {
+        _event = updatedEvent;
+      });
     }
   }
 }
