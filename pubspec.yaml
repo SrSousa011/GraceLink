@@ -84,6 +84,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
       - assets/imagens/background_image.jpg
       
+      - assets/icons/rlogo.png
       - assets/icons/logo.png
       - assets/icons/insta.png
       - 'assets/icons/face.png'
