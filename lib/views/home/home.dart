@@ -52,7 +52,7 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Página Inicial'),
+        title: const Text('Home'),
         actions: [
           IconButton(
             icon: Icon(
@@ -95,10 +95,10 @@ class _HomeState extends State<Home> {
           fit: BoxFit.contain,
         ),
       ),
-      child: Stack(
+      child: const Stack(
         alignment: Alignment.center,
         children: [
-          const Center(
+          Center(
             child: Text(
               'Bem-vindo à Igreja',
               style: TextStyle(
@@ -111,18 +111,6 @@ class _HomeState extends State<Home> {
                 ],
               ),
               textAlign: TextAlign.center,
-            ),
-          ),
-          Positioned(
-            bottom: 10,
-            right: 10,
-            child: GestureDetector(
-              onTap: _launchDonationPage,
-              child: Image.asset(
-                trLogo,
-                width: 50,
-                height: 50,
-              ),
             ),
           ),
         ],
@@ -217,8 +205,8 @@ class _HomeState extends State<Home> {
               onTap: _launchInstagram,
               child: Image.asset(
                 tInsta,
-                width: 40,
-                height: 40,
+                width: 50,
+                height: 50,
               ),
             ),
             const SizedBox(width: 10),
@@ -226,8 +214,17 @@ class _HomeState extends State<Home> {
               onTap: _launchFacebook,
               child: Image.asset(
                 tFace,
-                width: 40,
-                height: 40,
+                width: 50,
+                height: 50,
+              ),
+            ),
+            const SizedBox(width: 10),
+            GestureDetector(
+              onTap: _launchDonationPage,
+              child: Image.asset(
+                trLogo,
+                width: 50,
+                height: 50,
               ),
             ),
           ],
