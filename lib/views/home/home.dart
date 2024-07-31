@@ -139,7 +139,7 @@ class _HomeState extends State<Home> {
                       onTap: () {
                         _navigateToEventDetailsScreen(context, event);
                       },
-                      child: EventListItem(event: event, isAdmin: false),
+                      child: EventListItem(event: event),
                     )),
                 const SizedBox(height: 10),
                 ElevatedButton(
