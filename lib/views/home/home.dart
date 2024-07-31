@@ -12,6 +12,7 @@ import 'package:churchapp/theme/theme_provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 const String tLogo = 'assets/icons/logo.png';
+const String trLogo = 'assets/icons/rlogo.png';
 const String tInsta = 'assets/icons/insta.png';
 const String tFace = 'assets/icons/face.png';
 
@@ -94,19 +95,37 @@ class _HomeState extends State<Home> {
           fit: BoxFit.contain,
         ),
       ),
-      child: const Center(
-        child: Text(
-          'Bem-vindo à Igreja',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            shadows: [
-              Shadow(blurRadius: 10, color: Colors.black, offset: Offset(2, 2))
-            ],
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          const Center(
+            child: Text(
+              'Bem-vindo à Igreja',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                shadows: [
+                  Shadow(
+                      blurRadius: 10, color: Colors.black, offset: Offset(2, 2))
+                ],
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
-          textAlign: TextAlign.center,
-        ),
+          Positioned(
+            bottom: 10,
+            right: 10,
+            child: GestureDetector(
+              onTap: _launchDonationPage,
+              child: Image.asset(
+                trLogo,
+                width: 50,
+                height: 50,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -245,6 +264,17 @@ class _HomeState extends State<Home> {
 
     try {
       await launchUrlString(facebookUrl, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+  }
+
+  Future<void> _launchDonationPage() async {
+    const donationUrl = "https://resplandecendonacoes.org/";
+    try {
+      await launchUrlString(donationUrl, mode: LaunchMode.externalApplication);
     } catch (e) {
       if (kDebugMode) {
         print(e);
