@@ -1,10 +1,11 @@
-import 'package:churchapp/models/user_data.dart';
-import 'package:churchapp/views/nav_bar/drawer_header_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:churchapp/services/auth_service.dart';
-import 'package:churchapp/views/welcome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/welcome.dart';
+import 'package:churchapp/models/user_data.dart';
+import 'package:churchapp/views/nav_bar/drawer_header_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NavBar extends StatefulWidget {
   final BaseAuth auth;
@@ -58,6 +59,26 @@ class _NavBarState extends State<NavBar> {
         print('Error fetching user data: $e');
       }
     }
+  }
+
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('is_logged_in');
+
+    await FirebaseAuth.instance.signOut();
+
+    if (!context.mounted) return;
+    Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Welcome(
+            title: '',
+            onSignedIn: () {},
+          );
+        },
+      ),
+      (route) => false,
+    );
   }
 
   @override
@@ -135,21 +156,7 @@ class _NavBarState extends State<NavBar> {
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
-            onTap: () async {
-              await FirebaseAuth.instance.signOut();
-              if (!context.mounted) return;
-              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (BuildContext context) {
-                    return Welcome(
-                      title: '',
-                      onSignedIn: () {},
-                    );
-                  },
-                ),
-                (route) => false,
-              );
-            },
+            onTap: _logout,
           ),
         ],
       ),

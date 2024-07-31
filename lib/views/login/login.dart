@@ -1,7 +1,8 @@
+import 'package:churchapp/views/login/local_settings.dart';
+import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_method.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:churchapp/services/auth_service.dart';
-import 'package:flutter/material.dart';
 import 'package:churchapp/views/home/home.dart';
 
 class Login extends StatefulWidget {
@@ -21,6 +22,13 @@ class _LoginState extends State<Login> {
   final AuthMethods _authMethods = AuthMethods();
   bool _isLoading = false;
   bool _isPasswordVisible = false;
+  final LocalSettings _localSettings = LocalSettings();
+
+  @override
+  void initState() {
+    super.initState();
+    _localSettings.init();
+  }
 
   @override
   void dispose() {
@@ -44,6 +52,7 @@ class _LoginState extends State<Login> {
         ),
       );
     } else {
+      await _localSettings.setUserLoggedIn(true);
       widget.onLoggedIn?.call();
       if (!mounted) return;
       Navigator.pushReplacement(
