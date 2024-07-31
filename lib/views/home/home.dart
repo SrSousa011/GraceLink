@@ -1,7 +1,7 @@
-import 'package:churchapp/views/events/events.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:churchapp/views/events/events.dart';
 import 'package:churchapp/views/events/event_details.dart';
 import 'package:churchapp/views/events/event_list_item.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 const String tLogo = 'assets/icons/logo.png';
 const String tInsta = 'assets/icons/insta.png';
+const String tFace = 'assets/icons/face.png';
 
 class Home extends StatefulWidget {
   final BaseAuth auth;
@@ -48,39 +49,36 @@ class _HomeState extends State<Home> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    return PopScope(
-      canPop: false,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Página Inicial'),
-          actions: [
-            IconButton(
-              icon: Icon(
-                isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                color: isDarkMode ? Colors.white : Colors.black,
-              ),
-              onPressed: () {
-                themeProvider.toggleTheme();
-              },
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Página Inicial'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
-          ],
-        ),
-        drawer: NavBar(
-          auth: widget.auth,
-          authService: AuthenticationService(),
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              const SizedBox(height: 20),
-              _buildUpcomingEventsSection(isDarkMode),
-              const SizedBox(height: 20),
-              _buildImportantInfoSection(),
-            ],
+            onPressed: () {
+              themeProvider.toggleTheme();
+            },
           ),
+        ],
+      ),
+      drawer: NavBar(
+        auth: widget.auth,
+        authService: AuthenticationService(),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            const SizedBox(height: 20),
+            _buildUpcomingEventsSection(isDarkMode),
+            const SizedBox(height: 20),
+            _buildImportantInfoSection(),
+          ],
         ),
       ),
     );
@@ -141,7 +139,7 @@ class _HomeState extends State<Home> {
                       onTap: () {
                         _navigateToEventDetailsScreen(context, event);
                       },
-                      child: EventListItem(event: event),
+                      child: EventListItem(event: event, isAdmin: false),
                     )),
                 const SizedBox(height: 10),
                 ElevatedButton(
@@ -193,27 +191,27 @@ class _HomeState extends State<Home> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 10),
-        GestureDetector(
-          onTap: _launchInstagram,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Igreja Resplandecendo',
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 18,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(width: 5),
-              Image.asset(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: _launchInstagram,
+              child: Image.asset(
                 tInsta,
                 width: 40,
                 height: 40,
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 10),
+            GestureDetector(
+              onTap: _launchFacebook,
+              child: Image.asset(
+                tFace,
+                width: 40,
+                height: 40,
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -238,6 +236,19 @@ class _HomeState extends State<Home> {
         print(e);
       }
       await launchUrlString(webUrl, mode: LaunchMode.platformDefault);
+    }
+  }
+
+  Future<void> _launchFacebook() async {
+    const facebookUrl =
+        "https://www.facebook.com/igrejaevangelicaresplandecendoasnacoes/?locale=pt_BR";
+
+    try {
+      await launchUrlString(facebookUrl, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 }
