@@ -6,7 +6,7 @@ import 'package:churchapp/models/user_data.dart';
 class SubscribersList extends StatefulWidget {
   final int courseId;
 
-  const SubscribersList({super.key, required this.courseId});
+  const SubscribersList({Key? key, required this.courseId}) : super(key: key);
 
   @override
   State<SubscribersList> createState() => _SubscribersListState();
@@ -123,7 +123,8 @@ class _SubscribersListState extends State<SubscribersList> {
                               'userId': userData.id,
                               'userName': userData.fullName,
                               'status': status,
-                              'registrationDate': registrationDate,
+                              'registrationDate':
+                                  registrationDate, // Pass DateTime
                             },
                           );
                         },

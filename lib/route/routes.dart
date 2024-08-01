@@ -1,6 +1,5 @@
 import 'package:churchapp/views/courses/adminDashboard/courses_dashboard.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/views/admin/admin_painel.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscriber_viewer.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscribers_list.dart';
@@ -66,16 +65,16 @@ class AppRoutes {
         final userId = args['userId'] as String;
         final userName = args['userName'] as String;
         final status = args['status'] as bool;
-        final registrationDate = args['registrationDate'] as Timestamp;
+        final registrationDate = args['registrationDate'] as DateTime;
         return MaterialPageRoute(
           builder: (_) => SubscriberViewer(
             userId: userId,
             userName: userName,
             status: status,
-            registrationDate:
-                registrationDate.toDate(), // Convert Timestamp to DateTime
+            registrationDate: registrationDate, // Already DateTime
           ),
         );
+
       case '/member_list':
         return MaterialPageRoute(builder: (_) => const BecomeMemberList());
       case '/about_us':
