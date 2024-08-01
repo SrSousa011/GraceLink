@@ -56,8 +56,7 @@ class _BecomeMemberListState extends State<BecomeMemberList> {
                 final member = _members[index];
                 return ListTile(
                   title: Text(member.fullName),
-                  subtitle: Text(
-                      'Phone: ${member.phoneNumber}\nAddress: ${member.address}'),
+                  subtitle: Text('Address: ${member.address}'),
                   trailing: ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
