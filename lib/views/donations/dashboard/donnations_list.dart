@@ -78,7 +78,7 @@ class _DonationsListState extends State<DonationsList> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DonationViwer(
+                          builder: (context) => DonationViewer(
                             fullName: fullName,
                             donationType: donationType,
                             donationValue: donationValue,

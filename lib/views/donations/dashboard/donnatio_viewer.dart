@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class DonationViwer extends StatelessWidget {
+class DonationViewer extends StatelessWidget {
   final String fullName;
   final String donationType;
   final String donationValue;
   final String photoURL;
 
-  const DonationViwer({
+  const DonationViewer({
     super.key,
     required this.fullName,
     required this.donationType,
@@ -18,7 +18,7 @@ class DonationViwer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Donationtior Info'),
+        title: const Text('Donation Info'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -52,10 +52,27 @@ class DonationViwer extends StatelessWidget {
                       ),
                     );
                   },
-                  child: Image.network(
-                    photoURL,
-                    height: 200,
-                    fit: BoxFit.cover,
+                  child: Container(
+                    width: double.infinity,
+                    height: 300,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12.0),
+                      image: DecorationImage(
+                        image: NetworkImage(photoURL),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    child: const Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Icon(
+                          Icons.zoom_in,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               if (photoURL.isEmpty) const Text('No image available.'),
