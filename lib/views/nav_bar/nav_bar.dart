@@ -43,7 +43,7 @@ class _NavBarState extends State<NavBar> {
             .get();
         if (userDoc.exists) {
           setState(() {
-            userData = UserData.fromDocumentSnapshot(userDoc);
+            userData = UserData.fromDocument(userDoc);
           });
         } else {
           setState(() {
@@ -153,6 +153,15 @@ class _NavBarState extends State<NavBar> {
               Navigator.pushNamed(context, '/about_us');
             },
           ),
+          if (userData?.role ==
+              'admin') // Show Admin Panel link only for admins
+            ListTile(
+              leading: Icon(Icons.admin_panel_settings, color: iconColor),
+              title: Text('Admin Panel', style: TextStyle(color: textColor)),
+              onTap: () {
+                Navigator.pushNamed(context, '/admin_panel');
+              },
+            ),
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),

@@ -36,7 +36,7 @@ abstract class BaseAuth {
       String currentEmail, String newEmail);
 
   Future<void> changePhoneWithConfirmation(
-      String currentEmail, String newEmail);
+      String currentPhone, String newPhone);
 
   Future<void> changePasswordWithConfirmation(
       String currentPassword, String newPassword);
@@ -47,7 +47,6 @@ abstract class BaseAuth {
 
   Future<String?> getCurrentUserEmail();
 
-  // New methods for signing up
   Future<void> signUpWithPersonalInfo({
     required String firstName,
     required String lastName,
@@ -93,19 +92,16 @@ class AuthenticationService implements BaseAuth {
     required String email,
     required String emailConfirmation,
   }) async {
-    // Validate email and email confirmation
     if (email != emailConfirmation) {
       return false;
     }
     try {
-      // Implement sign-up with email and password
       await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
-        password: email, // Use email as password for demonstration purpose
+        password: email,
       );
       return true;
     } catch (error) {
-      // Handle any errors that occur during sign-up
       if (kDebugMode) {
         print('Error signing up: $error');
       }
@@ -215,9 +211,6 @@ class AuthenticationService implements BaseAuth {
     User? user = _firebaseAuth.currentUser;
     try {
       await user?.verifyBeforeUpdateEmail(email);
-      if (kDebugMode) {
-        print("Successfully changed email");
-      }
     } catch (error) {
       if (kDebugMode) {
         print("Email can't be changed: ${error.toString()}");
@@ -230,9 +223,6 @@ class AuthenticationService implements BaseAuth {
     User? user = _firebaseAuth.currentUser;
     try {
       await user?.updatePassword(password);
-      if (kDebugMode) {
-        print("Successfully changed password");
-      }
     } catch (error) {
       if (kDebugMode) {
         print("Password can't be changed: ${error.toString()}");
@@ -245,9 +235,6 @@ class AuthenticationService implements BaseAuth {
     User? user = _firebaseAuth.currentUser;
     try {
       await user?.delete();
-      if (kDebugMode) {
-        print("Successfully deleted user");
-      }
     } catch (error) {
       if (kDebugMode) {
         print("User can't be deleted: ${error.toString()}");
@@ -281,34 +268,14 @@ class AuthenticationService implements BaseAuth {
   Future<void> changePhoneWithConfirmation(
       String currentPhone, String newPhone) async {
     User? user = _firebaseAuth.currentUser;
-
     try {
-      // Confirm that the user wants to change the phone number
-      // Here you might implement a confirmation step, such as sending a verification code to the current phone number
-
-      // Example: Sending SMS verification to current phone number (pseudo-code)
-      // await sendVerificationCodeToCurrentPhone(currentPhone);
-
-      // Re-authenticate the user before changing the phone number
-      // Assuming the user is authenticated with password or another method
-      // Implement your own logic for re-authentication based on your app's flow
-      // For simplicity, reauthentication is not shown in detail here
-
-      // Update the phone number
       await user?.updatePhoneNumber(PhoneAuthProvider.credential(
-        verificationId:
-            '<verificationId>', // Use the verification ID received from SMS if applicable
-        smsCode: '<smsCode>', // SMS code entered by user
+        verificationId: '<verificationId>',
+        smsCode: '<smsCode>',
       ));
-
-      // Update the phone number in Firestore or any other database
       await _firestore.collection('users').doc(user?.uid).update({
         'phone': newPhone,
       });
-
-      if (kDebugMode) {
-        print("Successfully changed phone number");
-      }
     } catch (error) {
       if (kDebugMode) {
         print("Phone number can't be changed: ${error.toString()}");
@@ -321,27 +288,12 @@ class AuthenticationService implements BaseAuth {
   Future<void> changeEmailWithConfirmation(
       String currentEmail, String newEmail) async {
     User? user = _firebaseAuth.currentUser;
-
     try {
-      // Confirmar que o usuário quer alterar o email
       await user?.verifyBeforeUpdateEmail(newEmail);
-
-      // Aqui você poderia também implementar um sistema de confirmação para o email atual
-
-      // Atualizar o email no perfil do usuário
-      await user?.verifyBeforeUpdateEmail(newEmail);
-
-      // Atualizar o nome de usuário no Firestore, supondo que você tenha armazenado o nome de usuário lá
       await _firestore.collection('users').doc(user?.uid).update({
         'email': newEmail,
       });
-
-      // Enviar um email de verificação para o novo email
       await user?.sendEmailVerification();
-
-      if (kDebugMode) {
-        print("Successfully changed email");
-      }
     } catch (error) {
       if (kDebugMode) {
         print("Email can't be changed: ${error.toString()}");
@@ -354,21 +306,13 @@ class AuthenticationService implements BaseAuth {
   Future<void> changePasswordWithConfirmation(
       String currentPassword, String newPassword) async {
     User? user = _firebaseAuth.currentUser;
-
     try {
-      // Reautenticar o usuário antes de mudar a senha
       AuthCredential credential = EmailAuthProvider.credential(
         email: user?.email ?? '',
         password: currentPassword,
       );
       await user?.reauthenticateWithCredential(credential);
-
-      // Atualizar a senha do usuário
       await user?.updatePassword(newPassword);
-
-      if (kDebugMode) {
-        print("Successfully changed password");
-      }
     } catch (error) {
       if (kDebugMode) {
         print("Password can't be changed: ${error.toString()}");
@@ -421,19 +365,15 @@ class AuthenticationService implements BaseAuth {
   @override
   Future<bool> verifyCurrentPassword(String currentPassword) async {
     User? user = _firebaseAuth.currentUser;
-
     if (user == null) {
       return false;
     }
-
     try {
       AuthCredential credential = EmailAuthProvider.credential(
         email: user.email ?? '',
         password: currentPassword,
       );
-
       await user.reauthenticateWithCredential(credential);
-
       return true;
     } catch (e) {
       if (kDebugMode) {
@@ -449,7 +389,7 @@ class AuthenticationService implements BaseAuth {
       if (user != null) {
         DocumentSnapshot snapshot =
             await _firestore.collection('users').doc(user.uid).get();
-        return snapshot.get('phone'); // Adjust field name as needed
+        return snapshot.get('phone');
       }
       return null;
     } catch (e) {
@@ -457,6 +397,42 @@ class AuthenticationService implements BaseAuth {
         print('Error getting current user phone: $e');
       }
       return null;
+    }
+  }
+
+  Future<String?> getUserRole() async {
+    try {
+      User? user = _firebaseAuth.currentUser;
+      if (user != null) {
+        DocumentSnapshot userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
+          return data['role'] as String?;
+        }
+      }
+      return null;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting user role: $e');
+      }
+      return null;
+    }
+  }
+
+  Future<void> setUserRole(String role) async {
+    try {
+      User? user = _firebaseAuth.currentUser;
+      if (user != null) {
+        await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .update({'role': role});
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error setting user role: $e');
+      }
     }
   }
 }

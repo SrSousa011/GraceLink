@@ -1,3 +1,4 @@
+import 'package:churchapp/views/admin/admin_painel.dart';
 import 'package:churchapp/views/user_Profile/manegement/about_us.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
@@ -41,6 +42,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const BecomeMember());
       case '/about_us':
         return MaterialPageRoute(builder: (_) => const AboutUs());
+      case '/admin_panel':
+        return MaterialPageRoute(builder: (_) => AdminPanel());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

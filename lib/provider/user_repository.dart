@@ -10,8 +10,7 @@ class UserRepository {
     if (snapshot.docs.isEmpty) {
       throw Exception('User not found');
     }
-    final userData =
-        snapshot.docs.map((e) => UserData.fromDocumentSnapshot(e)).single;
+    final userData = snapshot.docs.map((e) => UserData.fromDocument(e)).single;
     return userData;
   }
 
@@ -19,7 +18,7 @@ class UserRepository {
   Future<List<UserData>> allUser() async {
     final snapshot = await _db.collection("Users").get();
     final userData =
-        snapshot.docs.map((e) => UserData.fromDocumentSnapshot(e)).toList();
+        snapshot.docs.map((e) => UserData.fromDocument(e)).toList();
     return userData;
   }
 }
