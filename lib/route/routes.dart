@@ -47,7 +47,7 @@ class AppRoutes {
       case '/about_us':
         return MaterialPageRoute(builder: (_) => const AboutUs());
       case '/bembers_dashboard':
-        return MaterialPageRoute(builder: (_) => const AdminDashboard());
+        return MaterialPageRoute(builder: (_) => const MembersDashboard());
       case '/admin_panel':
         return MaterialPageRoute(builder: (_) => const AdminPanel());
       default:
