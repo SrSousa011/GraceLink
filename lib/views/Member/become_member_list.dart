@@ -1,4 +1,5 @@
 import 'package:churchapp/views/member/member.dart';
+import 'package:churchapp/views/member/members_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +43,7 @@ class _BecomeMemberListState extends State<BecomeMemberList> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Membership Applications'),
@@ -57,7 +59,26 @@ class _BecomeMemberListState extends State<BecomeMemberList> {
                   subtitle: Text(
                       'Phone: ${member.phoneNumber}\nAddress: ${member.address}'),
                   trailing: ElevatedButton(
-                    onPressed: () {},
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                        isDarkMode ? Colors.grey : Colors.blue,
+                      ),
+                      foregroundColor: MaterialStateProperty.all<Color>(
+                        isDarkMode
+                            ? Colors.white
+                            : const Color.fromARGB(255, 255, 255, 255),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MemberDetailsScreen(
+                            memberId: member.id,
+                          ),
+                        ),
+                      );
+                    },
                     child: const Text('View Details'),
                   ),
                 );
