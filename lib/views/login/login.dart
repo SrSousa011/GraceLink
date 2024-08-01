@@ -69,21 +69,53 @@ class _LoginState extends State<Login> {
     }
   }
 
+  Future<void> _validateAndSubmit() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        await widget.auth.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
+        _loginUser();
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Login failed. Please try again.'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
+    final backgroundColor = isDarkMode ? Colors.black : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final buttonColor = isDarkMode ? const Color(0xFF333333) : Colors.blue;
+
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(
-            isDarkMode ? Icons.light_mode : Icons.dark_mode,
-            color: isDarkMode ? Colors.white : Colors.black,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
+        title: Text(
+          'Login',
+          style: TextStyle(color: textColor),
         ),
-        title: const Text('Login'),
+        backgroundColor: buttonColor,
       ),
+      backgroundColor: backgroundColor,
       body: Stack(
         children: [
           _buildLoginForm(),
@@ -125,28 +157,51 @@ class _LoginState extends State<Login> {
   }
 
   Widget _buildEmailField() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+    final borderColor = isDarkMode ? Colors.grey[700] : Colors.grey[400];
+
     return TextFormField(
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         labelText: 'Email',
+        labelStyle: TextStyle(color: borderColor),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: borderColor!),
+        ),
+        focusedBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.blue),
+        ),
       ),
       validator: _authMethods.validateEmail,
     );
   }
 
   Widget _buildPasswordField() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+    final iconColor = isDarkMode ? Colors.grey[700] : Colors.grey[700];
+
     return TextFormField(
       controller: _passwordController,
       decoration: InputDecoration(
         labelText: 'Password',
+        labelStyle: TextStyle(color: iconColor),
         suffixIcon: IconButton(
           icon: Icon(
             _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+            color: iconColor,
           ),
           onPressed: () => setState(() {
             _isPasswordVisible = !_isPasswordVisible;
           }),
+        ),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey[400]!),
+        ),
+        focusedBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.blue),
         ),
       ),
       obscureText: !_isPasswordVisible,
@@ -156,47 +211,20 @@ class _LoginState extends State<Login> {
   }
 
   Widget _buildLoginButton() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+    final buttonColor = isDarkMode ? const Color(0xFF333333) : Colors.blue;
+
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
-        backgroundColor: const Color.fromARGB(255, 90, 175, 249),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
-        ),
+        backgroundColor: buttonColor,
+        shape: const StadiumBorder(),
+        padding: const EdgeInsets.symmetric(vertical: 15.0),
       ),
       onPressed: _isLoading ? null : _validateAndSubmit,
       child:
           _isLoading ? const CircularProgressIndicator() : const Text('Login'),
     );
-  }
-
-  Future<void> _validateAndSubmit() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      setState(() {
-        _isLoading = true;
-      });
-      try {
-        await widget.auth.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
-        _loginUser();
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Login failed. Please try again.'),
-              duration: Duration(seconds: 3),
-            ),
-          );
-        }
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      }
-    }
   }
 }
