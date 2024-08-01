@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscribers_list.dart';
 import 'package:churchapp/views/courses/courses.dart';
 
@@ -24,31 +24,32 @@ class _CoursesDashboardState extends State<CoursesDashboard> {
   @override
   void initState() {
     super.initState();
-    _fetchStats();
+    _fetchDashboardData();
   }
 
-  Future<void> _fetchStats() async {
+  Future<void> _fetchDashboardData() async {
     try {
-      final subscriberSnapshot = await _firestore
+      final totalSubscribersSnapshot = await _firestore
           .collection('courseregistration')
           .where('courseId', isEqualTo: widget.courseId)
           .get();
       setState(() {
-        _totalSubscribers = subscriberSnapshot.docs.length;
+        _totalSubscribers = totalSubscribersSnapshot.docs.length;
       });
 
       final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
       final newSignUpsSnapshot = await _firestore
           .collection('courseregistration')
           .where('courseId', isEqualTo: widget.courseId)
-          .where('registrationDate', isGreaterThanOrEqualTo: thirtyDaysAgo)
+          .where('registrationDate',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(thirtyDaysAgo))
           .get();
       setState(() {
         _newSignUps = newSignUpsSnapshot.docs.length;
       });
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching stats: $e');
+        print('Error fetching dashboard data: $e');
       }
     }
   }
