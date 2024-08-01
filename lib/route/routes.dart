@@ -1,4 +1,6 @@
 import 'package:churchapp/views/admin/admin_painel.dart';
+import 'package:churchapp/views/donations/dashboard/donnation_dashboard.dart';
+import 'package:churchapp/views/donations/dashboard/donnations_list.dart';
 import 'package:churchapp/views/member/become_member_list.dart';
 import 'package:churchapp/views/member/become_option.dart';
 import 'package:churchapp/views/user_Profile/manegement/about_us.dart';
@@ -38,6 +40,10 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const Events());
       case '/donations':
         return MaterialPageRoute(builder: (_) => const Donations());
+      case '/donations_list':
+        return MaterialPageRoute(builder: (_) => const DonationsList());
+      case '/donations_dashboard':
+        return MaterialPageRoute(builder: (_) => const DonationsDashboard());
       case '/courses':
         return MaterialPageRoute(builder: (_) => const Courses());
       case '/become_member':

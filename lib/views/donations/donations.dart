@@ -69,8 +69,6 @@ class _DonationsState extends State<Donations> {
                 donationType: donationType,
                 donationValue: donationController.text,
                 fullName: fullName,
-                isbn: '978-3-16-148410-0',
-                bankName: 'Bank of Luxembourg',
               ),
             ),
           );
