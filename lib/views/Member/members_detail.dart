@@ -35,7 +35,6 @@ class MemberDetailsScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Member Details'),
-            backgroundColor: isDarkMode ? Colors.black : Colors.blue,
           ),
           body: Padding(
             padding: const EdgeInsets.all(16.0),
