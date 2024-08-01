@@ -30,9 +30,8 @@ class _StoragePageState extends State<StoragePage> {
     XFile? file = await _picker.pickImage(source: ImageSource.gallery);
     if (file != null && context.mounted) {
       try {
-        // Example of how to use the picked image (not uploading it)
         setState(() {
-          _uploadedImageUrl = file.path; // Use the local file path
+          _uploadedImageUrl = file.path;
         });
       } catch (e) {
         if (mounted) {
@@ -53,7 +52,6 @@ class _StoragePageState extends State<StoragePage> {
   Future<void> _confirmAndNavigateBack() async {
     if (_uploadedImageUrl != null) {
       try {
-        // Save donation details to Firestore
         await FirebaseFirestore.instance.collection('donations').add({
           'userId': FirebaseAuth.instance.currentUser!.uid,
           'fullName': widget.fullName,
@@ -70,7 +68,6 @@ class _StoragePageState extends State<StoragePage> {
         }
 
         if (mounted) {
-          // Navigate back to DonationsPage and replace the current page
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const Donations()),
