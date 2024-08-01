@@ -4,8 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/models/user_data.dart';
 
 class AdminPanel extends StatefulWidget {
+  const AdminPanel({super.key});
+
   @override
-  _AdminPanelState createState() => _AdminPanelState();
+  State<AdminPanel> createState() => _AdminPanelState();
 }
 
 class _AdminPanelState extends State<AdminPanel> {
@@ -43,7 +45,7 @@ class _AdminPanelState extends State<AdminPanel> {
           .collection('users')
           .doc(userId)
           .update({'role': 'admin'});
-      _fetchUsers(); // Refresh the list
+      _fetchUsers();
     } catch (e) {
       if (kDebugMode) {
         print('Error promoting user to admin: $e');
@@ -54,7 +56,7 @@ class _AdminPanelState extends State<AdminPanel> {
   Future<void> _demoteFromAdmin(String userId) async {
     try {
       await _firestore.collection('users').doc(userId).update({'role': 'user'});
-      _fetchUsers(); // Refresh the list
+      _fetchUsers();
     } catch (e) {
       if (kDebugMode) {
         print('Error demoting user from admin: $e');
