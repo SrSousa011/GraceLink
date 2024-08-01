@@ -1,9 +1,11 @@
+import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/login/local_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_method.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/home/home.dart';
+import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
   final BaseAuth auth;
@@ -69,10 +71,15 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFB98B54)),
+          icon: Icon(
+            isDarkMode ? Icons.light_mode : Icons.dark_mode,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text('Login'),
