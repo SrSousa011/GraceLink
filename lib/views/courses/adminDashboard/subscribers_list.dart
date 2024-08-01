@@ -6,7 +6,7 @@ import 'package:churchapp/models/user_data.dart';
 class SubscribersList extends StatefulWidget {
   final int courseId;
 
-  const SubscribersList({Key? key, required this.courseId}) : super(key: key);
+  const SubscribersList({super.key, required this.courseId});
 
   @override
   State<SubscribersList> createState() => _SubscribersListState();
@@ -16,11 +16,13 @@ class _SubscribersListState extends State<SubscribersList> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<DocumentSnapshot> _subscribers = [];
   bool _loading = true;
+  String? _courseName;
 
   @override
   void initState() {
     super.initState();
     _fetchSubscribers();
+    _fetchCourseName(); // Fetch the course name when initializing
   }
 
   Future<void> _fetchSubscribers() async {
@@ -40,6 +42,22 @@ class _SubscribersListState extends State<SubscribersList> {
       setState(() {
         _loading = false;
       });
+    }
+  }
+
+  Future<void> _fetchCourseName() async {
+    try {
+      final courseDoc = await _firestore
+          .collection('courses')
+          .doc(widget.courseId.toString())
+          .get();
+      setState(() {
+        _courseName = courseDoc.data()?['name'] ?? 'Unknown Course';
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching course name: $e');
+      }
     }
   }
 
@@ -93,8 +111,8 @@ class _SubscribersListState extends State<SubscribersList> {
                     }
 
                     if (!snapshot.hasData) {
-                      return ListTile(
-                        title: const Text('Error fetching user data'),
+                      return const ListTile(
+                        title: Text('Error fetching user data'),
                       );
                     }
 
@@ -123,8 +141,8 @@ class _SubscribersListState extends State<SubscribersList> {
                               'userId': userData.id,
                               'userName': userData.fullName,
                               'status': status,
-                              'registrationDate':
-                                  registrationDate, // Pass DateTime
+                              'registrationDate': registrationDate,
+                              'courseName': _courseName ?? 'Unknown Course',
                             },
                           );
                         },

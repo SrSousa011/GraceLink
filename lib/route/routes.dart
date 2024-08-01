@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/views/admin/admin_painel.dart';
 import 'package:churchapp/views/courses/adminDashboard/courses_dashboard.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscriber_viewer.dart';
