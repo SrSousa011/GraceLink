@@ -11,6 +11,7 @@ class BecomeMemberService {
     required String reasonForMembership,
     required String reference,
     required String civilStatus,
+    required DateTime membershipDate,
   }) async {
     try {
       await _memberCollection.add({
@@ -20,6 +21,8 @@ class BecomeMemberService {
         'reasonForMembership': reasonForMembership,
         'reference': reference,
         'civilStatus': civilStatus,
+        'membershipDate': membershipDate,
+        'createdAt': Timestamp.fromDate(membershipDate),
       });
     } catch (e) {
       throw Exception('Failed to add member: $e');
