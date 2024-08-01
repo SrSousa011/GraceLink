@@ -222,12 +222,26 @@ class _BecomeMemberState extends State<BecomeMember> {
           reasonForMembership: _reasonForMembershipController.text,
           reference: _referenceController.text,
           civilStatus: selectedCivilStatus,
+          membershipDate: DateTime.now(), // Adiciona a data atual
         );
+
+        if (!mounted) return;
 
         setState(() {
           _isLoading = false;
         });
 
+        // Limpar os campos do formulário
+        _fullNameController.clear();
+        _addressController.clear();
+        _lastVisitedChurchController.clear();
+        _reasonForMembershipController.clear();
+        _referenceController.clear();
+        setState(() {
+          selectedCivilStatus = 'Single';
+        });
+
+        // Mostrar o diálogo de sucesso
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -239,8 +253,9 @@ class _BecomeMemberState extends State<BecomeMember> {
                 TextButton(
                   child: const Text('OK'),
                   onPressed: () {
-                    Navigator.of(context).pop();
-                    // Navegar para outra tela ou atualizar o estado
+                    Navigator.of(context).pop(); // Fechar o diálogo
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        '/home', (Route<dynamic> route) => false);
                   },
                 ),
               ],
@@ -248,6 +263,8 @@ class _BecomeMemberState extends State<BecomeMember> {
           },
         );
       } catch (e) {
+        if (!mounted) return; // Check if the widget is still mounted
+
         setState(() {
           _isLoading = false;
         });
