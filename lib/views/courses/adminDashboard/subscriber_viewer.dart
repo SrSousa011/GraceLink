@@ -65,7 +65,8 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    const primaryColor = Colors.blue;
+    final primaryColor =
+        theme.brightness == Brightness.dark ? Colors.blueGrey : Colors.blue;
 
     return Scaffold(
       appBar: AppBar(
@@ -74,7 +75,8 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ListView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Card(
               elevation: 4.0,
@@ -95,11 +97,6 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text(
-                      'User ID: ${widget.userId}',
-                      style: theme.textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8.0),
                     Text(
@@ -132,31 +129,49 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
                       ),
                     ),
                     const SizedBox(height: 16.0),
-                    ElevatedButton(
-                      onPressed: _loading ? null : _toggleStatus,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      ),
-                      child: _loading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : Text(
-                              _status! ? 'Mark as Not Paid' : 'Mark as Paid'),
-                    ),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-              ),
-              child: const Text('Back to List'),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12.0), // Reduced padding for smaller button
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: const Text('Back to List',
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+                const SizedBox(width: 16.0),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _loading ? null : _toggleStatus,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12.0), // Reduced padding for smaller button
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: _loading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text(_status! ? 'Mark as Not Paid' : 'Mark as Paid',
+                            style: const TextStyle(color: Colors.white)),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
