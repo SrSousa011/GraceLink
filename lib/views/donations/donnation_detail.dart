@@ -1,23 +1,25 @@
 import 'dart:async';
+import 'package:churchapp/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/views/donations/upload_photo.dart';
+import 'package:provider/provider.dart';
 
 class DonationDetails extends StatefulWidget {
   final String fullName;
-  final String isbn;
-  final String bankName;
+  final String? isbn;
+  final String? bankName;
   final String donationType;
   final String donationValue;
 
   const DonationDetails({
     super.key,
     required this.fullName,
-    required this.isbn,
-    required this.bankName,
     required this.donationType,
     required this.donationValue,
+    this.isbn,
+    this.bankName,
   });
 
   @override
@@ -86,6 +88,8 @@ class _DonationDetailsState extends State<DonationDetails> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Donation Details'),
@@ -128,8 +132,10 @@ class _DonationDetailsState extends State<DonationDetails> {
                 ElevatedButton(
                   onPressed: _navigateAndUploadPhoto,
                   style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        isDarkMode ? const Color(0xFF333333) : Colors.blue,
+                    shape: const StadiumBorder(),
                     foregroundColor: Colors.white,
-                    backgroundColor: const Color(0xFF5AAFf9),
                   ),
                   child: const Text('Upload Photo'),
                 ),
