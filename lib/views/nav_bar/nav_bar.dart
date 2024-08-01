@@ -26,7 +26,7 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
   UserData? userData;
-  bool _loading = true; // Adicionado para mostrar o estado de carregamento
+  bool _loading = true; // Loading state indicator
 
   @override
   void initState() {
@@ -39,8 +39,7 @@ class _NavBarState extends State<NavBar> {
 
     if (userId == null) {
       setState(() {
-        _loading =
-            false; // Atualizar estado para carregar apenas se userId não for nulo
+        _loading = false; // Update loading state if no user ID
       });
       return;
     }
@@ -50,6 +49,7 @@ class _NavBarState extends State<NavBar> {
           .collection('users')
           .doc(userId)
           .get();
+
       setState(() {
         userData = userDoc.exists
             ? UserData.fromDocument(userDoc)
@@ -60,14 +60,14 @@ class _NavBarState extends State<NavBar> {
                 imagePath: '',
                 role: 'user',
               );
-        _loading = false; // Atualizar estado após carregar dados
+        _loading = false; // Update loading state after data is fetched
       });
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching user data: $e');
       }
       setState(() {
-        _loading = false; // Atualizar estado em caso de erro
+        _loading = false; // Update loading state in case of error
       });
     }
   }
@@ -81,12 +81,10 @@ class _NavBarState extends State<NavBar> {
     Navigator.of(context).pop();
     Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (BuildContext context) {
-          return Welcome(
-            title: '',
-            onSignedIn: () {},
-          );
-        },
+        builder: (BuildContext context) => Welcome(
+          title: '',
+          onSignedIn: () {},
+        ),
       ),
       (route) => false,
     );
@@ -135,7 +133,14 @@ class _NavBarState extends State<NavBar> {
                   icon: Icons.school_outlined,
                   text: 'Courses',
                   color: iconColor,
-                  onTap: () => Navigator.pushNamed(context, '/courses'),
+                  onTap: () {
+                    if (userData?.role == 'admin') {
+                      Navigator.pushNamed(context, '/courses_dashboard',
+                          arguments: {'courseId': 1});
+                    } else {
+                      Navigator.pushNamed(context, '/courses');
+                    }
+                  },
                 ),
                 _buildListTile(
                   icon: Icons.group_add_outlined,

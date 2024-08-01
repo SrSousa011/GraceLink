@@ -37,6 +37,7 @@ class CoursesService {
         'userName': userName,
         'status': status,
         'registrationDate': DateTime.now(),
+        'createdAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
       if (kDebugMode) {

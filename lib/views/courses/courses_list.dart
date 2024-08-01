@@ -1,23 +1,43 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Course {
   final int id;
   final String title;
   final String instructor;
-  final String description;
-  final String descriptionDetails;
-  final double price;
-  String registrationDeadline;
   final String image;
+  final double price;
+  final String descriptionDetails;
+  final String description;
+  late final String registrationDeadline;
+  final DateTime? createdAt;
 
   Course({
     required this.id,
     required this.title,
     required this.instructor,
-    required this.description,
-    required this.descriptionDetails,
-    required this.price,
-    required this.registrationDeadline,
     required this.image,
+    required this.price,
+    required this.descriptionDetails,
+    required this.description,
+    required this.registrationDeadline,
+    this.createdAt,
   });
+
+  factory Course.fromJson(Map<String, dynamic> json) {
+    return Course(
+      id: json['id'],
+      title: json['title'],
+      instructor: json['instructor'],
+      image: json['image'],
+      price: json['price'],
+      descriptionDetails: json['descriptionDetails'],
+      description: json['description'],
+      registrationDeadline: json['registrationDeadline'],
+      createdAt: json.containsKey('createdAt')
+          ? (json['createdAt'] as Timestamp).toDate()
+          : null,
+    );
+  }
 }
 
 final List<Course> coursesList = [
