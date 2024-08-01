@@ -87,7 +87,9 @@ class _AdminPanelState extends State<AdminPanel> {
                               isDarkMode ? Colors.grey : Colors.red,
                             ),
                             foregroundColor: MaterialStateProperty.all<Color>(
-                              isDarkMode ? Colors.white : Colors.black,
+                              isDarkMode
+                                  ? Colors.white
+                                  : const Color.fromARGB(255, 255, 255, 255),
                             ),
                           ),
                           child: const Text('Demote'),
@@ -99,7 +101,9 @@ class _AdminPanelState extends State<AdminPanel> {
                               isDarkMode ? Colors.grey : Colors.blue,
                             ),
                             foregroundColor: MaterialStateProperty.all<Color>(
-                              isDarkMode ? Colors.white : Colors.black,
+                              isDarkMode
+                                  ? Colors.white
+                                  : const Color.fromARGB(255, 255, 255, 255),
                             ),
                           ),
                           child: const Text('Promote'),
