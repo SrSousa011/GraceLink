@@ -15,18 +15,16 @@ class UserData {
     this.role,
   });
 
-  // Convert to JSON format for Firestore storage
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'fullName': fullName,
       'address': address,
       'imagePath': imagePath,
-      'role': role, // Add role to JSON output
+      'role': role,
     };
   }
 
-  // Create a UserData instance from JSON data
   factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
       id: json['id'] ?? '',
