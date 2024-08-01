@@ -1,3 +1,4 @@
+import 'package:churchapp/views/events/events.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -83,7 +84,12 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
         await updateEvent(updatedEvent, widget.event.id);
 
         if (!context.mounted) return;
-        Navigator.pop(context, updatedEvent);
+
+        // Substituir a tela atual pela tela de eventos
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Events()),
+        );
       } catch (e) {
         _showErrorDialog(context, 'Erro ao atualizar evento',
             'Ocorreu um erro ao tentar atualizar o evento: ${e.toString()}');
