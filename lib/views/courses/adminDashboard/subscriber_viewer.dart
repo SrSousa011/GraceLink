@@ -5,14 +5,16 @@ class SubscriberViewer extends StatelessWidget {
   final String userName;
   final bool status;
   final DateTime registrationDate;
+  final String courseName; // Adicione esta variável
 
   const SubscriberViewer({
-    super.key,
+    Key? key,
     required this.userId,
     required this.userName,
     required this.status,
     required this.registrationDate,
-  });
+    required this.courseName, // Adicione esta variável
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +38,12 @@ class SubscriberViewer extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             Text(
-              'Status: ${status ? 'Not Payed' : 'Payed'}',
+              'Course Name: $courseName', // Exiba o nome do curso
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              'Status: ${status ? 'Payed' : 'Not Payed'}',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8.0),
