@@ -1,13 +1,14 @@
-import 'package:churchapp/views/admin/admin_painel.dart';
+import 'package:churchapp/views/member/become_member_list.dart';
+import 'package:churchapp/views/member/become_option.dart';
 import 'package:churchapp/views/user_Profile/manegement/about_us.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/member/become_member.dart';
 import 'package:churchapp/views/welcome.dart';
 import 'package:churchapp/views/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
 import 'package:churchapp/views/events/events.dart';
 import 'package:churchapp/views/home/home.dart';
-import 'package:churchapp/views/member/become_member.dart';
 import 'package:churchapp/views/notifications/notifications.dart';
 import 'package:churchapp/views/videos/videos.dart';
 
@@ -40,10 +41,12 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const Courses());
       case '/become_member':
         return MaterialPageRoute(builder: (_) => const BecomeMember());
+      case '/member_list':
+        return MaterialPageRoute(builder: (_) => const BecomeMemberList());
       case '/about_us':
         return MaterialPageRoute(builder: (_) => const AboutUs());
-      case '/admin_panel':
-        return MaterialPageRoute(builder: (_) => AdminPanel());
+      case '/admin_dashboard':
+        return MaterialPageRoute(builder: (_) => const AdminDashboard());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
