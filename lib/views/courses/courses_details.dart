@@ -1,9 +1,10 @@
+import 'package:churchapp/views/courses/courses_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:churchapp/services/auth_service.dart';
-import 'package:churchapp/views/courses/courses_list.dart';
 import 'package:churchapp/views/courses/courses_service.dart';
+import 'package:intl/intl.dart';
 
 class CoursesDetails extends StatefulWidget {
   final Course course;
@@ -29,11 +30,10 @@ class _CoursesDetailsState extends State<CoursesDetails> {
   @override
   void initState() {
     super.initState();
-    isClosed = widget.course.registrationDeadline == 'Encerrado';
     loadData();
   }
 
-  void loadData() async {
+  Future<void> loadData() async {
     try {
       fullName = await AuthenticationService().getCurrentUserName() ?? '';
       uid = await AuthenticationService().getCurrentUserId() ?? '';
@@ -42,6 +42,15 @@ class _CoursesDetailsState extends State<CoursesDetails> {
         courseId: widget.course.id,
         userId: uid,
       );
+
+      if (widget.course.registrationDeadline.isNotEmpty) {
+        DateTime deadline = _parseDate(widget.course.registrationDeadline);
+        if (DateTime.now().isAfter(deadline)) {
+          setState(() {
+            isClosed = true;
+          });
+        }
+      }
 
       if (mounted) {
         setState(() {
@@ -55,6 +64,18 @@ class _CoursesDetailsState extends State<CoursesDetails> {
       if (kDebugMode) {
         print('Error loading user data: $e');
       }
+    }
+  }
+
+  DateTime _parseDate(String dateStr) {
+    try {
+      final DateFormat format = DateFormat('dd/MM/yyyy');
+      return format.parse(dateStr);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error parsing date: $e');
+      }
+      return DateTime.now();
     }
   }
 
@@ -105,17 +126,16 @@ class _CoursesDetailsState extends State<CoursesDetails> {
                           userName: fullName,
                         );
 
-                        setState(() {
-                          widget.course.registrationDeadline = 'Encerrado';
-                          isClosed = true;
-                          isUserSubscribed = true;
-                        });
+                        if (mounted) {
+                          setState(() {
+                            isUserSubscribed = true;
+                          });
+                        }
 
                         SharedPreferences prefs =
                             await SharedPreferences.getInstance();
                         prefs.setBool(
                             'isUserSubscribed_${widget.course.id}_$uid', true);
-
                         const SnackBar(
                           content: Text('Inscrição realizada com sucesso!'),
                           duration: Duration(seconds: 3),
@@ -136,11 +156,17 @@ class _CoursesDetailsState extends State<CoursesDetails> {
                           : Colors.blue),
                 ),
                 foregroundColor: MaterialStateProperty.all<Color>(
-                  isDarkMode ? Colors.white : Colors.black,
+                  isDarkMode
+                      ? Colors.white
+                      : const Color.fromARGB(255, 255, 255, 255),
                 ),
               ),
               child: Text(
-                isClosed || isUserSubscribed ? 'Inscrito' : 'Inscrever-se',
+                isUserSubscribed
+                    ? 'Inscrito'
+                    : isClosed
+                        ? 'Inscrições encerradas'
+                        : 'Inscrever-se',
               ),
             ),
           ],
