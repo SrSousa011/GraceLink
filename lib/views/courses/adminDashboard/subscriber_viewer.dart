@@ -71,7 +71,6 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Subscriber Details'),
-        backgroundColor: primaryColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
