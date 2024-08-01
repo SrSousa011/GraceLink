@@ -104,16 +104,12 @@ class _LoginState extends State<Login> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
     final backgroundColor = isDarkMode ? Colors.black : Colors.white;
-    final textColor = isDarkMode ? Colors.white : Colors.black;
-    final buttonColor = isDarkMode ? const Color(0xFF333333) : Colors.blue;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Login',
-          style: TextStyle(color: textColor),
         ),
-        backgroundColor: buttonColor,
       ),
       backgroundColor: backgroundColor,
       body: Stack(
@@ -220,7 +216,7 @@ class _LoginState extends State<Login> {
         foregroundColor: Colors.white,
         backgroundColor: buttonColor,
         shape: const StadiumBorder(),
-        padding: const EdgeInsets.symmetric(vertical: 15.0),
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
       ),
       onPressed: _isLoading ? null : _validateAndSubmit,
       child:
