@@ -5,7 +5,7 @@ import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/event_service.dart';
 
 class UpdateEventForm extends StatefulWidget {
-  final Event event; // Recebe os detalhes do evento existente
+  final Event event;
 
   const UpdateEventForm({super.key, required this.event});
 
@@ -23,7 +23,6 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   @override
   void initState() {
     super.initState();
-    // Inicializa os controladores com os dados do evento existente
     _titleController = TextEditingController(text: widget.event.title);
     _descriptionController =
         TextEditingController(text: widget.event.description);
@@ -83,7 +82,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
       try {
         await updateEvent(updatedEvent, widget.event.id);
 
-        // Retorne para a tela anterior passando o evento atualizado
+        if (!context.mounted) return;
         Navigator.pop(context, updatedEvent);
       } catch (e) {
         _showErrorDialog(context, 'Erro ao atualizar evento',
@@ -96,7 +95,6 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   }
 
   void _showErrorDialog(BuildContext context, String title, String message) {
-    // Envolva a exibição do diálogo em um Future.microtask para evitar o erro
     Future.microtask(() {
       if (context.mounted) {
         showDialog(
