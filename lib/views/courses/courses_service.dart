@@ -46,4 +46,29 @@ class CoursesService {
       rethrow;
     }
   }
+
+  Future<void> updateUserStatus({
+    required String userId,
+    required int courseId,
+    required bool status,
+  }) async {
+    try {
+      final querySnapshot = await _registrationsCollection
+          .where('userId', isEqualTo: userId)
+          .where('courseId', isEqualTo: courseId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final docId = querySnapshot.docs.first.id;
+        await _registrationsCollection.doc(docId).update({
+          'status': status,
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error updating user status: $e');
+      }
+      rethrow;
+    }
+  }
 }
