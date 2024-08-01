@@ -50,6 +50,13 @@ class MemberDetailsScreen extends StatelessWidget {
                 ),
                 _buildDetailCard(
                   context,
+                  icon: Icons.phone,
+                  title: 'Phone Number',
+                  value: memberData['phoneNumber'] ?? 'N/A',
+                  iconColor: iconColor,
+                ),
+                _buildDetailCard(
+                  context,
                   icon: Icons.home,
                   title: 'Address',
                   value: memberData['address'] ?? 'N/A',
