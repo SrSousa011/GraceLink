@@ -1,4 +1,6 @@
+import 'package:churchapp/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DonateButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -12,20 +14,19 @@ class DonateButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final Color buttonColor = theme.brightness == Brightness.light
-        ? const Color(0xFF007BFF) // Azul claro
-        : Colors.grey; // Cinza no modo escuro
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
 
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        minimumSize: const Size.fromHeight(60),
-        padding: const EdgeInsets.all(20),
+        backgroundColor: isDarkMode ? const Color(0xFF333333) : Colors.blue,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
-        backgroundColor: buttonColor,
+        foregroundColor: Colors.white,
+        minimumSize: const Size.fromHeight(60),
+        padding: const EdgeInsets.all(20),
       ),
       child: Text(
         text,
