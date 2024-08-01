@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,10 +30,10 @@ class _NavBarState extends State<NavBar> {
   @override
   void initState() {
     super.initState();
-    getUserData();
+    _fetchUserData();
   }
 
-  Future<void> getUserData() async {
+  Future<void> _fetchUserData() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
 
     if (userId != null) {
@@ -41,22 +42,21 @@ class _NavBarState extends State<NavBar> {
             .collection('users')
             .doc(userId)
             .get();
-        if (userDoc.exists) {
-          setState(() {
-            userData = UserData.fromDocument(userDoc);
-          });
-        } else {
-          setState(() {
-            userData = UserData(
-              id: userId,
-              fullName: 'Unknown',
-              address: '',
-              imagePath: '',
-            );
-          });
-        }
+        setState(() {
+          userData = userDoc.exists
+              ? UserData.fromDocument(userDoc)
+              : UserData(
+                  id: userId,
+                  fullName: 'Unknown',
+                  address: '',
+                  imagePath: '',
+                  role: 'user',
+                );
+        });
       } catch (e) {
-        print('Error fetching user data: $e');
+        if (kDebugMode) {
+          print('Error fetching user data: $e');
+        }
       }
     }
   }
@@ -64,10 +64,10 @@ class _NavBarState extends State<NavBar> {
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('is_logged_in');
-
     await FirebaseAuth.instance.signOut();
 
-    if (!context.mounted) return;
+    if (!mounted) return;
+    Navigator.of(context).pop();
     Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (BuildContext context) {
@@ -87,87 +87,95 @@ class _NavBarState extends State<NavBar> {
     final bool isDarkMode = theme.brightness == Brightness.dark;
     final Color iconColor = isDarkMode ? Colors.white : Colors.black;
     final Color tileColor = isDarkMode ? Colors.black : Colors.white;
-    final Color textColor = isDarkMode ? Colors.white : Colors.black;
 
     return Drawer(
       backgroundColor: tileColor,
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          DrawerHeaderWidget(
-            userData: userData,
+          DrawerHeaderWidget(userData: userData),
+          _buildListTile(
+            icon: Icons.home_outlined,
+            text: 'Home',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/home'),
           ),
-          ListTile(
-            leading: Icon(Icons.home_outlined, color: iconColor),
-            title: Text('Home', style: TextStyle(color: textColor)),
+          _buildListTile(
+            icon: Icons.event,
+            text: 'Events',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/event_page'),
+          ),
+          _buildListTile(
+            icon: Icons.volunteer_activism_outlined,
+            text: 'Donations',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/donations'),
+          ),
+          _buildListTile(
+            icon: Icons.school_outlined,
+            text: 'Courses',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/courses'),
+          ),
+          _buildListTile(
+            icon: Icons.group_add_outlined,
+            text: 'Become Member',
+            color: iconColor,
             onTap: () {
-              Navigator.pushNamed(context, '/home');
+              if (userData?.role == 'admin') {
+                Navigator.pushNamed(context, '/admin_dashboard');
+              } else {
+                Navigator.pushNamed(context, '/become_member');
+              }
             },
           ),
-          ListTile(
-            leading: Icon(Icons.event, color: iconColor),
-            title: Text('Events', style: TextStyle(color: textColor)),
-            onTap: () {
-              Navigator.pushNamed(context, '/event_page');
-            },
+          _buildListTile(
+            icon: Icons.notifications_outlined,
+            text: 'Notifications',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/notifications'),
           ),
-          ListTile(
-            leading: Icon(Icons.volunteer_activism_outlined, color: iconColor),
-            title: Text('Donations', style: TextStyle(color: textColor)),
-            onTap: () {
-              Navigator.pushNamed(context, '/donations');
-            },
+          _buildListTile(
+            icon: Icons.video_library_outlined,
+            text: 'Videos',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/videos'),
           ),
-          ListTile(
-            leading: Icon(Icons.school_outlined, color: iconColor),
-            title: Text('Courses', style: TextStyle(color: textColor)),
-            onTap: () {
-              Navigator.pushNamed(context, '/courses');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.group_add_outlined, color: iconColor),
-            title: Text('Become member', style: TextStyle(color: textColor)),
-            onTap: () {
-              Navigator.pushNamed(context, '/become_member');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.notifications_outlined, color: iconColor),
-            title: Text('Notifications', style: TextStyle(color: textColor)),
-            onTap: () {
-              Navigator.pushNamed(context, '/notifications');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.video_library_outlined, color: iconColor),
-            title: Text('Videos', style: TextStyle(color: textColor)),
-            onTap: () {
-              Navigator.pushNamed(context, '/videos');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.info_outlined, color: iconColor),
-            title: Text('About Us', style: TextStyle(color: textColor)),
-            onTap: () {
-              Navigator.pushNamed(context, '/about_us');
-            },
+          _buildListTile(
+            icon: Icons.info_outlined,
+            text: 'About Us',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/about_us'),
           ),
           if (userData?.role == 'admin')
-            ListTile(
-              leading: Icon(Icons.admin_panel_settings, color: iconColor),
-              title: Text('Admin Panel', style: TextStyle(color: textColor)),
-              onTap: () {
-                Navigator.pushNamed(context, '/admin_panel');
-              },
+            _buildListTile(
+              icon: Icons.admin_panel_settings,
+              text: 'Admin Panel',
+              color: iconColor,
+              onTap: () => Navigator.pushNamed(context, '/admin_panel'),
             ),
-          ListTile(
-            leading: const Icon(Icons.logout),
-            title: const Text('Logout'),
+          _buildListTile(
+            icon: Icons.logout,
+            text: 'Logout',
+            color: Colors.red,
             onTap: _logout,
           ),
         ],
       ),
+    );
+  }
+
+  ListTile _buildListTile({
+    required IconData icon,
+    required String text,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: color),
+      title: Text(text, style: TextStyle(color: color)),
+      onTap: onTap,
     );
   }
 }
