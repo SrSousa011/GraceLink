@@ -1,38 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Member {
-  final String id;
-  final String fullName;
-  final String address;
-  final String phoneNumber;
-  final String lastVisitedChurch;
-  final String reasonForMembership;
-  final String reference;
-
-  Member({
-    required this.id,
-    required this.phoneNumber,
-    required this.address,
-    required this.lastVisitedChurch,
-    required this.reasonForMembership,
-    required this.reference,
-    required this.fullName,
-  });
-}
-
-class BecomeMmemberService {
+class BecomeMemberService {
   final CollectionReference _memberCollection =
       FirebaseFirestore.instance.collection('becomeMember');
 
-  Future<void> addMember(Member member) async {
+  Future<void> addMember({
+    required String fullName,
+    required String address,
+    required String lastVisitedChurch,
+    required String reasonForMembership,
+    required String reference,
+    required String civilStatus,
+  }) async {
     try {
       await _memberCollection.add({
-        'fullName': member.fullName,
-        'address': member.address,
-        'phoneNumber': member.phoneNumber,
-        'lastVisitedChurch': member.lastVisitedChurch,
-        'reasonForMembership': member.reasonForMembership,
-        'reference': member.reference,
+        'fullName': fullName,
+        'address': address,
+        'lastVisitedChurch': lastVisitedChurch,
+        'reasonForMembership': reasonForMembership,
+        'reference': reference,
+        'civilStatus': civilStatus,
       });
     } catch (e) {
       throw Exception('Failed to add member: $e');
