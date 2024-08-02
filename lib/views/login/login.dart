@@ -104,17 +104,17 @@ class _LoginState extends State<Login> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
     final backgroundColor = isDarkMode ? Colors.black : Colors.white;
+    final textColor = isDarkMode ? Colors.grey[300] : Colors.grey[700];
+    final borderColor = isDarkMode ? Colors.grey[700] : Colors.grey[400];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Login',
-        ),
+        title: const Text('Login'),
       ),
       backgroundColor: backgroundColor,
       body: Stack(
         children: [
-          _buildLoginForm(),
+          _buildLoginForm(textColor!, borderColor!),
           if (_isLoading)
             Container(
               color: Colors.black.withOpacity(0.5),
@@ -127,7 +127,7 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Widget _buildLoginForm() {
+  Widget _buildLoginForm(Color textColor, Color borderColor) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Form(
@@ -139,9 +139,9 @@ class _LoginState extends State<Login> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildEmailField(),
+                _buildEmailField(textColor, borderColor),
                 const SizedBox(height: 20),
-                _buildPasswordField(),
+                _buildPasswordField(textColor, borderColor),
                 const SizedBox(height: 20),
                 _buildLoginButton(),
               ],
@@ -152,21 +152,17 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Widget _buildEmailField() {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
-    final borderColor = isDarkMode ? Colors.grey[700] : Colors.grey[400];
-
+  Widget _buildEmailField(Color textColor, Color borderColor) {
     return TextFormField(
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         labelText: 'Email',
-        labelStyle: TextStyle(color: borderColor),
+        labelStyle: TextStyle(color: textColor),
         enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: borderColor!),
+          borderSide: BorderSide(color: borderColor),
         ),
-        focusedBorder: const UnderlineInputBorder(
+        focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.blue),
         ),
       ),
@@ -174,29 +170,25 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Widget _buildPasswordField() {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
-    final iconColor = isDarkMode ? Colors.grey[700] : Colors.grey[700];
-
+  Widget _buildPasswordField(Color textColor, Color borderColor) {
     return TextFormField(
       controller: _passwordController,
       decoration: InputDecoration(
         labelText: 'Password',
-        labelStyle: TextStyle(color: iconColor),
+        labelStyle: TextStyle(color: textColor),
         suffixIcon: IconButton(
           icon: Icon(
             _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            color: iconColor,
+            color: textColor,
           ),
           onPressed: () => setState(() {
             _isPasswordVisible = !_isPasswordVisible;
           }),
         ),
         enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey[400]!),
+          borderSide: BorderSide(color: borderColor),
         ),
-        focusedBorder: const UnderlineInputBorder(
+        focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.blue),
         ),
       ),
@@ -219,8 +211,7 @@ class _LoginState extends State<Login> {
         padding: const EdgeInsets.symmetric(vertical: 10.0),
       ),
       onPressed: _isLoading ? null : _validateAndSubmit,
-      child:
-          _isLoading ? const CircularProgressIndicator() : const Text('Login'),
+      child: const Text('Login'),
     );
   }
 }
