@@ -40,7 +40,7 @@ class _CoursesDetailsState extends State<CoursesDetails> {
       uid = await authService.getCurrentUserId() ?? '';
 
       bool subscribed = await widget.coursesService.isUserAlreadySubscribed(
-        courseId: widget.course.id,
+        courseId: widget.course.courseId,
         userId: uid,
       );
 
@@ -57,7 +57,8 @@ class _CoursesDetailsState extends State<CoursesDetails> {
       }
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setBool('isUserSubscribed_${widget.course.id}_$uid', subscribed);
+      prefs.setBool(
+          'isUserSubscribed_${widget.course.courseId}_$uid', subscribed);
     } catch (e) {
       if (kDebugMode) {
         print('Error loading user data: $e');
@@ -113,7 +114,7 @@ class _CoursesDetailsState extends State<CoursesDetails> {
                   : () async {
                       try {
                         await widget.coursesService.registerUserForCourse(
-                          courseId: widget.course.id,
+                          courseId: widget.course.courseId,
                           userId: uid,
                           status: false,
                           userName: fullName,
@@ -128,7 +129,8 @@ class _CoursesDetailsState extends State<CoursesDetails> {
                         SharedPreferences prefs =
                             await SharedPreferences.getInstance();
                         prefs.setBool(
-                            'isUserSubscribed_${widget.course.id}_$uid', true);
+                            'isUserSubscribed_${widget.course.courseId}_$uid',
+                            true);
 
                         const SnackBar(
                           content: Text('Inscrição realizada com sucesso!'),
