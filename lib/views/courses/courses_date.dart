@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Course {
-  final String id;
+  final String courseId;
   final String title;
   final String instructor;
   final String imageURL;
@@ -11,7 +11,7 @@ class Course {
   final String descriptionDetails;
 
   Course({
-    required this.id,
+    required this.courseId,
     required this.title,
     required this.instructor,
     required this.imageURL,
@@ -28,7 +28,7 @@ class Course {
     final registrationDeadline = timestamp?.toDate() ?? DateTime.now();
 
     return Course(
-      id: doc.id,
+      courseId: doc.id,
       title: data['title'] ?? '',
       instructor: data['instructor'] ?? '',
       imageURL: data['imageURL'] ?? '',
