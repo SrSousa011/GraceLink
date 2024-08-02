@@ -1,9 +1,10 @@
 import 'package:churchapp/views/courses/courses_date.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/courses/courses_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CoursesDetails extends StatefulWidget {
   final Course course;
@@ -42,10 +43,6 @@ class _CoursesDetailsState extends State<CoursesDetails> {
         courseId: widget.course.id,
         userId: uid,
       );
-
-      // Debugging line to print the registration deadline
-      print(
-          'Registration Deadline Type: ${widget.course.registrationDeadline.runtimeType}');
 
       if (DateTime.now().isAfter(widget.course.registrationDeadline)) {
         setState(() {
@@ -107,7 +104,7 @@ class _CoursesDetailsState extends State<CoursesDetails> {
             Text(
               isClosed
                   ? 'Inscrições encerradas'
-                  : 'Inscrições disponíveis até: ${widget.course.registrationDeadline}',
+                  : 'Inscrições disponíveis até: ${DateFormat('dd/MM/yyyy').format(widget.course.registrationDeadline)}',
             ),
             const SizedBox(height: 32.0),
             ElevatedButton(
