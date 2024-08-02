@@ -1,79 +1,159 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:churchapp/views/courses/courses_date.dart';
+import 'package:churchapp/views/courses/courses_service.dart';
+import 'package:churchapp/views/courses/courses_details.dart';
 
-class Course {
-  final int id;
-  final String title;
-  final String instructor;
-  final String image;
-  final double price;
-  final String descriptionDetails;
-  final String description;
-  late final String registrationDeadline;
-  final DateTime? createdAt;
+class CoursesList extends StatefulWidget {
+  const CoursesList({super.key});
 
-  Course({
-    required this.id,
-    required this.title,
-    required this.instructor,
-    required this.image,
-    required this.price,
-    required this.descriptionDetails,
-    required this.description,
-    required this.registrationDeadline,
-    this.createdAt,
-  });
+  @override
+  State<CoursesList> createState() => _CoursesListState();
+}
 
-  factory Course.fromJson(Map<String, dynamic> json) {
-    return Course(
-      id: json['id'],
-      title: json['title'],
-      instructor: json['instructor'],
-      image: json['image'],
-      price: json['price'],
-      descriptionDetails: json['descriptionDetails'],
-      description: json['description'],
-      registrationDeadline: json['registrationDeadline'],
-      createdAt: json.containsKey('createdAt')
-          ? (json['createdAt'] as Timestamp).toDate()
-          : null,
+class _CoursesListState extends State<CoursesList> {
+  final CoursesService _coursesService = CoursesService();
+  late Future<List<Course>> _coursesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _coursesFuture = _coursesService.getCourses();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Courses'),
+        centerTitle: true,
+      ),
+      body: FutureBuilder<List<Course>>(
+        future: _coursesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No courses available.'));
+          }
+
+          final coursesList = snapshot.data!;
+
+          return ListView.builder(
+            itemCount: coursesList.length,
+            itemBuilder: (context, index) {
+              final course = coursesList[index];
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CoursesDetails(
+                          course: course,
+                          coursesService: _coursesService,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(16.0),
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 4.0, horizontal: 10.0),
+                    decoration: BoxDecoration(
+                      gradient: isDarkMode
+                          ? const LinearGradient(
+                              colors: [Color(0xFF3C3C3C), Color(0xFF5A5A5A)],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            )
+                          : const LinearGradient(
+                              colors: [Color(0xFFFFD59C), Color(0xFF62CFF7)],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 150.0,
+                          height: 230.0,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(course.imageURL),
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        const SizedBox(width: 16.0),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                course.title,
+                                style: TextStyle(
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 8.0),
+                              Text(
+                                course.instructor,
+                                style: TextStyle(
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.normal,
+                                  color: isDarkMode
+                                      ? Colors.white70
+                                      : Colors.black54,
+                                ),
+                              ),
+                              const SizedBox(height: 8.0),
+                              Text(
+                                course.description,
+                                style: TextStyle(
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.normal,
+                                  color: isDarkMode
+                                      ? Colors.white70
+                                      : Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 8.0),
+                              Text(
+                                '${course.price} €',
+                                style: TextStyle(
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.normal,
+                                  color: isDarkMode
+                                      ? Colors.white70
+                                      : Colors.black54,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
-
-final List<Course> coursesList = [
-  Course(
-    id: 1,
-    title: 'Mulher Única',
-    instructor: 'Para Mulheres | ministrado por pessoa fulana',
-    description: 'Elevando sua autoestima e maximizando a adição das mulheres.',
-    descriptionDetails:
-        'Este curso visa elevar a autoestima e maximizar a adição das mulheres. Ao longo do programa, os participantes serão guiados através de uma jornada de autoexploração e desenvolvimento pessoal, onde aprenderão a reconhecer e abraçar sua singularidade, cultivar uma mentalidade positiva, fortalecer suas habilidades de comunicação e liderança, e estabelecer metas claras para alcançar o sucesso em suas vidas pessoais e profissionais. O curso é ministrado por instrutores experientes e oferece uma combinação de palestras, exercícios práticos, discussões em grupo e suporte individualizado para garantir uma experiência de aprendizado enriquecedora e transformadora para todas as participantes.',
-    price: 100,
-    registrationDeadline: '31/12/2024',
-    image: 'assets/imagens/mulher-unica.jpg',
-  ),
-  Course(
-    id: 2,
-    title: 'Homem ao Máximo',
-    instructor: 'Para Homens | ministrado por pessoa fulana',
-    description:
-        'Elevando o nível máximo de sua hombridade e potencializando o sucesso familiar.',
-    descriptionDetails:
-        'O curso Homem ao Máximo é uma jornada de autodescoberta e desenvolvimento pessoal projetada para elevar o nível máximo de hombridade e potencializar o sucesso familiar. Durante este curso, os participantes explorarão diversos aspectos da masculinidade, incluindo habilidades de liderança, comunicação eficaz, construção de relacionamentos saudáveis e gestão de conflitos. Ao longo do programa, os participantes serão capacitados a identificar seus pontos fortes, superar desafios pessoais e alcançar seu pleno potencial como homens, contribuindo assim para o crescimento e prosperidade de suas famílias.',
-    price: 100,
-    registrationDeadline: '31/12/2024',
-    image: 'assets/imagens/homen-ao-maximo.jpg',
-  ),
-  Course(
-    id: 3,
-    title: 'Casados para sempre',
-    instructor: 'Para casados | ministrado por pessoa fulana',
-    description:
-        'Um manual de instruções bíblicas para a saúde do seu casamento promovendo a alegria familiar.',
-    descriptionDetails:
-        'Casados para Sempre é um curso baseado em princípios bíblicos projetado para fortalecer a saúde do casamento e promover a alegria familiar. Os participantes aprendem a aplicar ensinamentos da Bíblia para resolver conflitos, melhorar a comunicação e construir um casamento duradouro e feliz. Ministrado por instrutores experientes, o curso oferece uma jornada de aprendizado enriquecedora e transformadora para casais comprometidos.',
-    price: 100,
-    registrationDeadline: '31/12/2024',
-    image: 'assets/imagens/casados-para-sempre.jpg',
-  ),
-];
