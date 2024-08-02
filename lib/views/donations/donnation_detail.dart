@@ -8,8 +8,6 @@ import 'package:provider/provider.dart';
 
 class DonationDetails extends StatefulWidget {
   final String fullName;
-  final String? isbn;
-  final String? bankName;
   final String donationType;
   final String donationValue;
 
@@ -18,8 +16,6 @@ class DonationDetails extends StatefulWidget {
     required this.fullName,
     required this.donationType,
     required this.donationValue,
-    this.isbn,
-    this.bankName,
   });
 
   @override
@@ -106,14 +102,14 @@ class _DonationDetailsState extends State<DonationDetails> {
                 style: const TextStyle(fontSize: 18.0),
               ),
               const SizedBox(height: 10.0),
-              SelectableText(
-                'ISBN: ${widget.isbn}',
-                style: const TextStyle(fontSize: 18.0),
+              const SelectableText(
+                'ISBN: 978-3-16-148410-0',
+                style: TextStyle(fontSize: 18.0),
               ),
               const SizedBox(height: 10.0),
-              Text(
-                'Bank Name: ${widget.bankName}',
-                style: const TextStyle(fontSize: 18.0),
+              const Text(
+                'Bank Name: Banque et Caisse d\'Épargne de l\'État',
+                style: TextStyle(fontSize: 18.0),
               ),
               const SizedBox(height: 10.0),
               Text(
