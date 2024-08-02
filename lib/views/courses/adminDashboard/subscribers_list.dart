@@ -57,7 +57,7 @@ class _SubscribersListState extends State<SubscribersList> {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Course Registrations'),
+        title: const Text('Subscribers List'),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
