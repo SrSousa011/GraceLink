@@ -1,11 +1,11 @@
-import 'package:churchapp/views/member/become_member.dart';
-import 'package:flutter/material.dart';
 import 'package:churchapp/views/admin/admin_painel.dart';
+import 'package:flutter/material.dart';
 import 'package:churchapp/views/courses/adminDashboard/courses_dashboard.dart';
-import 'package:churchapp/views/courses/adminDashboard/subscriber_viewer.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscribers_list.dart';
+import 'package:churchapp/views/courses/adminDashboard/subscriber_viewer.dart';
 import 'package:churchapp/views/donations/dashboard/donnation_dashboard.dart';
 import 'package:churchapp/views/donations/dashboard/donnations_list.dart';
+import 'package:churchapp/views/member/become_member.dart';
 import 'package:churchapp/views/member/become_member_list.dart';
 import 'package:churchapp/views/member/become_dashboard.dart';
 import 'package:churchapp/views/user_Profile/manegement/about_us.dart';
@@ -50,31 +50,28 @@ class AppRoutes {
       case '/courses':
         return MaterialPageRoute(builder: (_) => const Courses());
       case '/courses_dashboard':
-        final args = settings.arguments as Map<String, dynamic>;
-        final courseId = args['courseId'] as int;
-        return MaterialPageRoute(
-          builder: (_) => CoursesDashboard(courseId: courseId),
-        );
+        return MaterialPageRoute(builder: (_) => const CoursesDashboard());
       case '/subscribers_list':
-        final args = settings.arguments as Map<String, dynamic>;
-        final courseId = args['courseId'] as int;
         return MaterialPageRoute(
-          builder: (_) => SubscribersList(courseId: courseId),
+          builder: (_) => const SubscribersList(),
         );
       case '/subscriber_viewer':
-        final args = settings.arguments as Map<String, dynamic>;
-        final userId = args['userId'] as String;
-        final userName = args['userName'] as String;
-        final status = args['status'] as bool;
-        final registrationDate = args['registrationDate'] as DateTime;
-        final courseName = args['courseName'] as String;
+        final args = settings.arguments as Map<String, dynamic>?;
+        if (args == null ||
+            !args.containsKey('userId') ||
+            !args.containsKey('userName') ||
+            !args.containsKey('status') ||
+            !args.containsKey('registrationDate') ||
+            !args.containsKey('courseName')) {
+          return _errorRoute('Missing one or more arguments');
+        }
         return MaterialPageRoute(
           builder: (_) => SubscriberViewer(
-            userId: userId,
-            userName: userName,
-            status: status,
-            registrationDate: registrationDate,
-            courseName: courseName,
+            userId: args['userId'] as String,
+            userName: args['userName'] as String,
+            status: args['status'] as bool,
+            registrationDate: args['registrationDate'] as DateTime,
+            courseName: args['courseName'] as String,
           ),
         );
       case '/member_list':
@@ -96,6 +93,16 @@ class AppRoutes {
           ),
         );
     }
+  }
+
+  static Route<dynamic> _errorRoute(String message) {
+    return MaterialPageRoute(
+      builder: (_) => Scaffold(
+        body: Center(
+          child: Text(message),
+        ),
+      ),
+    );
   }
 
   static GlobalKey<NavigatorState>? navigatorKey = GlobalKey<NavigatorState>();
