@@ -24,22 +24,32 @@ class _SubscribersListState extends State<SubscribersList> {
   Future<void> _fetchRegistrations() async {
     try {
       // Fetch all course registrations
-      QuerySnapshot snapshot =
+      QuerySnapshot registrationsSnapshot =
           await _firestore.collection('courseregistration').get();
+      List<Map<String, dynamic>> registrations = [];
+
+      // Fetch course details for each registration
+      for (var doc in registrationsSnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final courseId = data['courseId'] ?? '';
+
+        // Fetch course title
+        String courseName = 'Unknown'; // Default value
+        if (courseId.isNotEmpty) {
+          courseName = await _fetchCourseName(courseId);
+        }
+
+        registrations.add({
+          'userId': data['userId'] ?? 'Unknown',
+          'userName': data['userName'] ?? 'Unknown',
+          'registrationDate': (data['registrationDate'] as Timestamp).toDate(),
+          'courseName': courseName,
+          'status': data['status'] ?? false,
+        });
+      }
 
       setState(() {
-        _registrations = snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          return {
-            'userId': data['userId'] ?? 'Unknown',
-            'userName': data['userName'] ?? 'Unknown',
-            'registrationDate':
-                (data['registrationDate'] as Timestamp).toDate(),
-            'courseName': data['courseName'] ??
-                'Unknown', // Adjust field name if necessary
-            'status': data['status'] ?? false, // Adjust field name if necessary
-          };
-        }).toList();
+        _registrations = registrations;
         _loading = false;
       });
     } catch (e) {
@@ -49,6 +59,20 @@ class _SubscribersListState extends State<SubscribersList> {
       setState(() {
         _loading = false;
       });
+    }
+  }
+
+  Future<String> _fetchCourseName(String courseId) async {
+    try {
+      final courseDoc =
+          await _firestore.collection('courses').doc(courseId).get();
+      final courseData = courseDoc.data();
+      return courseData?['title'] ?? 'Unknown';
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching course name: $e');
+      }
+      return 'Unknown';
     }
   }
 
@@ -68,7 +92,7 @@ class _SubscribersListState extends State<SubscribersList> {
                 return ListTile(
                   title: Text(registration['userName']),
                   subtitle: Text(
-                      'Registered on: ${registration['registrationDate'].toLocal().toString().split(' ')[0]}'),
+                      'Course: ${registration['courseName']} \nRegistered on: ${registration['registrationDate'].toLocal().toString().split(' ')[0]}'),
                   trailing: ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(

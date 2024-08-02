@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:churchapp/views/courses/courses_service.dart'; // Ensure the path is correct
+import 'package:churchapp/views/courses/courses_service.dart';
 
 class SubscriberViewer extends StatefulWidget {
   final String userId;
