@@ -55,7 +55,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         const SnackBar(content: Text('Profile updated successfully')),
       );
 
-      // Navigate to the UserProfileScreen
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => ProfileScreen(
