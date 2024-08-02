@@ -1,3 +1,4 @@
+import 'package:churchapp/views/courses/courses_date.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
@@ -6,7 +7,7 @@ class CoursesService {
       FirebaseFirestore.instance.collection('courseregistration');
 
   Future<bool> isUserAlreadySubscribed({
-    required int courseId,
+    required String courseId,
     required String userId,
   }) async {
     try {
@@ -24,8 +25,21 @@ class CoursesService {
     }
   }
 
+  Future<List<Course>> getCourses() async {
+    try {
+      final querySnapshot =
+          await FirebaseFirestore.instance.collection('courses').get();
+      return querySnapshot.docs.map((doc) {
+        return Course.fromDocument(doc);
+      }).toList();
+    } catch (e) {
+      print('Error fetching courses: $e');
+      throw e;
+    }
+  }
+
   Future<void> registerUserForCourse({
-    required int courseId,
+    required String courseId,
     required String userId,
     required String userName,
     required bool status,
@@ -49,7 +63,7 @@ class CoursesService {
 
   Future<void> updateUserStatus({
     required String userId,
-    required int courseId,
+    required String courseId,
     required bool status,
   }) async {
     try {
