@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -26,7 +25,6 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
   UserData? userData;
-  bool _loading = true;
 
   @override
   void initState() {
@@ -38,9 +36,7 @@ class _NavBarState extends State<NavBar> {
     final userId = FirebaseAuth.instance.currentUser?.uid;
 
     if (userId == null) {
-      setState(() {
-        _loading = false;
-      });
+      setState(() {});
       return;
     }
 
@@ -60,15 +56,9 @@ class _NavBarState extends State<NavBar> {
                 imagePath: '',
                 role: 'user',
               );
-        _loading = false;
       });
     } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching user data: $e');
-      }
-      setState(() {
-        _loading = false;
-      });
+      setState(() {});
     }
   }
 
@@ -99,94 +89,92 @@ class _NavBarState extends State<NavBar> {
 
     return Drawer(
       backgroundColor: tileColor,
-      child: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: EdgeInsets.zero,
-              children: <Widget>[
-                DrawerHeaderWidget(userData: userData),
-                _buildListTile(
-                  icon: Icons.home_outlined,
-                  text: 'Home',
-                  color: iconColor,
-                  onTap: () => Navigator.pushNamed(context, '/home'),
-                ),
-                _buildListTile(
-                  icon: Icons.event,
-                  text: 'Events',
-                  color: iconColor,
-                  onTap: () => Navigator.pushNamed(context, '/event_page'),
-                ),
-                _buildListTile(
-                  icon: Icons.volunteer_activism_outlined,
-                  text: 'Donations',
-                  color: iconColor,
-                  onTap: () {
-                    if (userData?.role == 'admin') {
-                      Navigator.pushNamed(context, '/donations_dashboard');
-                    } else {
-                      Navigator.pushNamed(context, '/donations');
-                    }
-                  },
-                ),
-                _buildListTile(
-                  icon: Icons.school_outlined,
-                  text: 'Courses',
-                  color: iconColor,
-                  onTap: () {
-                    if (userData?.role == 'admin') {
-                      Navigator.pushNamed(context, '/courses_dashboard',
-                          arguments: {'courseId': 1});
-                    } else {
-                      Navigator.pushNamed(context, '/courses');
-                    }
-                  },
-                ),
-                _buildListTile(
-                  icon: Icons.group_add_outlined,
-                  text: 'Become Member',
-                  color: iconColor,
-                  onTap: () {
-                    if (userData?.role == 'admin') {
-                      Navigator.pushNamed(context, '/members_dashboard');
-                    } else {
-                      Navigator.pushNamed(context, '/become_member');
-                    }
-                  },
-                ),
-                _buildListTile(
-                  icon: Icons.notifications_outlined,
-                  text: 'Notifications',
-                  color: iconColor,
-                  onTap: () => Navigator.pushNamed(context, '/notifications'),
-                ),
-                _buildListTile(
-                  icon: Icons.video_library_outlined,
-                  text: 'Videos',
-                  color: iconColor,
-                  onTap: () => Navigator.pushNamed(context, '/videos'),
-                ),
-                _buildListTile(
-                  icon: Icons.info_outlined,
-                  text: 'About Us',
-                  color: iconColor,
-                  onTap: () => Navigator.pushNamed(context, '/about_us'),
-                ),
-                if (userData?.role == 'admin')
-                  _buildListTile(
-                    icon: Icons.admin_panel_settings,
-                    text: 'Admin Panel',
-                    color: iconColor,
-                    onTap: () => Navigator.pushNamed(context, '/admin_panel'),
-                  ),
-                _buildListTile(
-                  icon: Icons.logout,
-                  text: 'Logout',
-                  color: Colors.red,
-                  onTap: _logout,
-                ),
-              ],
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          DrawerHeaderWidget(userData: userData),
+          _buildListTile(
+            icon: Icons.home_outlined,
+            text: 'Home',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/home'),
+          ),
+          _buildListTile(
+            icon: Icons.event,
+            text: 'Events',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/event_page'),
+          ),
+          _buildListTile(
+            icon: Icons.volunteer_activism_outlined,
+            text: 'Donations',
+            color: iconColor,
+            onTap: () {
+              if (userData?.role == 'admin') {
+                Navigator.pushNamed(context, '/donations_dashboard');
+              } else {
+                Navigator.pushNamed(context, '/donations');
+              }
+            },
+          ),
+          _buildListTile(
+            icon: Icons.school_outlined,
+            text: 'Courses',
+            color: iconColor,
+            onTap: () {
+              if (userData?.role == 'admin') {
+                Navigator.pushNamed(context, '/courses_dashboard',
+                    arguments: {'courseId': 1});
+              } else {
+                Navigator.pushNamed(context, '/courses');
+              }
+            },
+          ),
+          _buildListTile(
+            icon: Icons.group_add_outlined,
+            text: 'Become Member',
+            color: iconColor,
+            onTap: () {
+              if (userData?.role == 'admin') {
+                Navigator.pushNamed(context, '/members_dashboard');
+              } else {
+                Navigator.pushNamed(context, '/become_member');
+              }
+            },
+          ),
+          _buildListTile(
+            icon: Icons.notifications_outlined,
+            text: 'Notifications',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/notifications'),
+          ),
+          _buildListTile(
+            icon: Icons.video_library_outlined,
+            text: 'Videos',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/videos'),
+          ),
+          _buildListTile(
+            icon: Icons.info_outlined,
+            text: 'About Us',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/about_us'),
+          ),
+          if (userData?.role == 'admin')
+            _buildListTile(
+              icon: Icons.admin_panel_settings,
+              text: 'Admin Panel',
+              color: iconColor,
+              onTap: () => Navigator.pushNamed(context, '/admin_panel'),
             ),
+          _buildListTile(
+            icon: Icons.logout,
+            text: 'Logout',
+            color: Colors.red,
+            onTap: _logout,
+          ),
+        ],
+      ),
     );
   }
 
