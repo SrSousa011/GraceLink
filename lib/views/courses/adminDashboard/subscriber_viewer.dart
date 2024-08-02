@@ -1,5 +1,5 @@
-import 'package:churchapp/views/courses/courses_service.dart';
 import 'package:flutter/material.dart';
+import 'package:churchapp/views/courses/courses_service.dart'; // Ensure the path is correct
 
 class SubscriberViewer extends StatefulWidget {
   final String userId;
@@ -40,7 +40,7 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
     try {
       await _coursesService.updateUserStatus(
         userId: widget.userId,
-        courseId: widget.courseName,
+        courseId: widget.courseName, // Adjust field if necessary
         status: !_status!,
       );
 
@@ -48,12 +48,16 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
         _status = !_status!;
       });
 
-      SnackBar(
-        content: Text(_status! ? 'Marked as Paid' : 'Marked as Not Paid'),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_status! ? 'Marked as Paid' : 'Marked as Not Paid'),
+        ),
       );
     } catch (e) {
-      const SnackBar(
-        content: Text('Error updating status'),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error updating status'),
+        ),
       );
     } finally {
       setState(() {
