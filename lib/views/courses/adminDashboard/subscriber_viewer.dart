@@ -40,7 +40,7 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
     try {
       await _coursesService.updateUserStatus(
         userId: widget.userId,
-        courseId: widget.registrationDate.hashCode,
+        courseId: widget.courseName,
         status: !_status!,
       );
 
@@ -142,8 +142,7 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12.0), // Reduced padding for smaller button
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
@@ -158,8 +157,7 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
                     onPressed: _loading ? null : _toggleStatus,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12.0), // Reduced padding for smaller button
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
