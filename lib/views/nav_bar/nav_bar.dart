@@ -123,8 +123,7 @@ class _NavBarState extends State<NavBar> {
             color: iconColor,
             onTap: () {
               if (userData?.role == 'admin') {
-                Navigator.pushNamed(context, '/courses_dashboard',
-                    arguments: {'courseId': 1});
+                Navigator.pushNamed(context, '/courses_dashboard');
               } else {
                 Navigator.pushNamed(context, '/courses');
               }
