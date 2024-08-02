@@ -26,7 +26,7 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
   UserData? userData;
-  bool _loading = true; // Loading state indicator
+  bool _loading = true;
 
   @override
   void initState() {
@@ -39,7 +39,7 @@ class _NavBarState extends State<NavBar> {
 
     if (userId == null) {
       setState(() {
-        _loading = false; // Update loading state if no user ID
+        _loading = false;
       });
       return;
     }
@@ -60,14 +60,14 @@ class _NavBarState extends State<NavBar> {
                 imagePath: '',
                 role: 'user',
               );
-        _loading = false; // Update loading state after data is fetched
+        _loading = false;
       });
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching user data: $e');
       }
       setState(() {
-        _loading = false; // Update loading state in case of error
+        _loading = false;
       });
     }
   }
