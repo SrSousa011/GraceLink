@@ -36,13 +36,14 @@ class UserData {
   }
 
   factory UserData.fromDocument(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>? ?? {};
+    final data = doc.data() as Map<String, dynamic>?;
+
     return UserData(
       id: doc.id,
-      fullName: data['fullName'] ?? '',
-      address: data['address'] ?? '',
-      imagePath: data['imagePath'] ?? '',
-      role: data['role'] as String?,
+      fullName: data?['fullName'] ?? '',
+      address: data?['address'] ?? '',
+      imagePath: data?['imagePath'] ?? '',
+      role: data?['role'] as String?,
     );
   }
 }
