@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 class PhoneTextField extends StatelessWidget {
   final int maxLength;
   final TextEditingController controller;
-  final String? Function(String value) validator;
 
   const PhoneTextField({
     super.key,
     required this.maxLength,
     required this.controller,
-    required this.validator,
   });
 
   @override

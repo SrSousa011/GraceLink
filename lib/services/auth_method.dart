@@ -54,17 +54,11 @@ class AuthMethods {
     String? lastNameError = validateLastName(lastName);
     if (lastNameError != null) return lastNameError;
 
-    String? phoneNumberError = validatePhoneNumber(phoneNumber);
-    if (phoneNumberError != null) return phoneNumberError;
-
     String? cityError = validateCity(city);
     if (cityError != null) return cityError;
 
     String? countryError = validateCountry(country);
     if (countryError != null) return countryError;
-
-    String? genderError = validateGender(gender);
-    if (genderError != null) return genderError;
 
     try {
       UserCredential userCredential =
@@ -168,13 +162,6 @@ class AuthMethods {
     return null;
   }
 
-  String? validatePhoneNumber(String value) {
-    if (_isEmpty(value)) {
-      return 'Phone number cannot be empty';
-    }
-    return null;
-  }
-
   String? validateCity(String? value) {
     if (_isEmpty(value)) {
       return 'City cannot be empty';
@@ -185,13 +172,6 @@ class AuthMethods {
   String? validateCountry(String? value) {
     if (_isEmpty(value)) {
       return 'Country cannot be empty';
-    }
-    return null;
-  }
-
-  String? validateGender(String value) {
-    if (_isEmpty(value)) {
-      return 'Gender cannot be empty';
     }
     return null;
   }

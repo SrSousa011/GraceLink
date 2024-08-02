@@ -140,11 +140,13 @@ class _SignUpPageState extends State<SignUpPage> {
         _buildTextField(
           labelText: 'City',
           controller: _cityController,
+          validator: _authMethods.validateCity,
         ),
         const SizedBox(height: 20.0),
         _buildTextField(
           labelText: 'Country',
           controller: _countryController,
+          validator: _authMethods.validateCountry,
         ),
       ],
     );
@@ -179,7 +181,6 @@ class _SignUpPageState extends State<SignUpPage> {
           child: PhoneTextField(
             maxLength: numberOfPhoneDigits,
             controller: _phoneNumberController,
-            validator: _authMethods.validatePhoneNumber,
           ),
         ),
       ],
@@ -337,13 +338,30 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Future<void> _validateAndSubmit() async {
     final form = _formKey.currentState;
-    if (form != null && form.validate()) {
+    if (form!.validate()) {
       setState(() {
         _isLoading = true;
       });
 
       String email = _emailController.text.trim();
       String password = _passwordController.text;
+
+      String? firstName = _firstNameController.text.trim();
+      String? lastName = _lastNameController.text.trim();
+      String? phoneNumber = _phoneNumberController.text.trim();
+      String? city = _cityController.text.trim();
+      String? country = _countryController.text.trim();
+
+      DateTime? dateOfBirth;
+      if (selectedYear != null &&
+          selectedMonth != null &&
+          selectedDay != null) {
+        dateOfBirth = DateTime(
+          selectedYear!,
+          selectedMonth!,
+          selectedDay!,
+        );
+      }
 
       try {
         UserCredential userCredential =
@@ -356,17 +374,11 @@ class _SignUpPageState extends State<SignUpPage> {
             .collection('users')
             .doc(userCredential.user!.uid)
             .set({
-          'fullName':
-              '${_firstNameController.text} ${_lastNameController.text.trim()}',
+          'fullName': '$firstName $lastName',
           'email': email,
-          'phoneNumber': selectedDDD + _phoneNumberController.text.trim(),
-          'address':
-              '${_cityController.text} ${_countryController.text.trim()}',
-          'dateOfBirth': DateTime(
-            selectedYear!,
-            selectedMonth!,
-            selectedDay!,
-          ),
+          'phoneNumber': selectedDDD + (phoneNumber),
+          'address': '$city $country',
+          'dateOfBirth': dateOfBirth,
         });
 
         setState(() {
@@ -409,7 +421,33 @@ class _SignUpPageState extends State<SignUpPage> {
             );
           },
         );
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
+  }
+
+  void showError(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Validation Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
