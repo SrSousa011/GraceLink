@@ -1,7 +1,6 @@
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/events/event_delete.dart';
 import 'package:churchapp/views/events/update_event.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -21,12 +20,15 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   late Event _event;
   String _creatorName = '';
   final AuthenticationService _authService = AuthenticationService();
+  bool _isAdmin = false;
+  bool _isCreator = false;
 
   @override
   void initState() {
     super.initState();
     _event = widget.event;
     _fetchCreatorName();
+    _checkUserPrivileges();
   }
 
   Future<void> _fetchCreatorName() async {
@@ -38,10 +40,14 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         });
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao buscar nome do criador: $e');
-      }
+      print('Erro ao buscar nome do criador: $e');
     }
+  }
+
+  Future<void> _checkUserPrivileges() async {
+    final currentUserId = await _authService.getCurrentUserId();
+    _isCreator = _event.createdBy == currentUserId;
+    _isAdmin = await _authService.isAdmin(currentUserId);
   }
 
   @override
@@ -53,38 +59,39 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       appBar: AppBar(
         title: Text(_event.title),
         actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'edit') {
-                _navigateToUpdateEventScreen(context, _event);
-              } else if (value == 'delete') {
-                EventDelete.confirmDeleteEvent(
-                    context, _event.id, _event.title);
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              PopupMenuItem<String>(
-                value: 'edit',
-                child: ListTile(
-                  leading: Icon(Icons.edit,
-                      color: isDarkMode ? Colors.white : Colors.blue),
-                  title: Text('Editar',
-                      style: TextStyle(
-                          color: isDarkMode ? Colors.white : Colors.black)),
+          if (_isCreator || _isAdmin)
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == 'edit') {
+                  _navigateToUpdateEventScreen(context, _event);
+                } else if (value == 'delete') {
+                  EventDelete.confirmDeleteEvent(
+                      context, _event.id, _event.title);
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                  value: 'edit',
+                  child: ListTile(
+                    leading: Icon(Icons.edit,
+                        color: isDarkMode ? Colors.white : Colors.blue),
+                    title: Text('Editar',
+                        style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black)),
+                  ),
                 ),
-              ),
-              PopupMenuItem<String>(
-                value: 'delete',
-                child: ListTile(
-                  leading: Icon(Icons.delete,
-                      color: isDarkMode ? Colors.grey[300] : Colors.red),
-                  title: Text('Excluir',
-                      style: TextStyle(
-                          color: isDarkMode ? Colors.white : Colors.red)),
+                PopupMenuItem<String>(
+                  value: 'delete',
+                  child: ListTile(
+                    leading: Icon(Icons.delete,
+                        color: isDarkMode ? Colors.grey[300] : Colors.red),
+                    title: Text('Excluir',
+                        style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.red)),
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
         ],
       ),
       body: Stack(
@@ -120,14 +127,14 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             child: Row(
               children: [
                 Text(
-                  'Criado por',
+                  'Creato da',
                   style: TextStyle(
                     fontSize: 12,
                     fontStyle: FontStyle.italic,
                     color: isDarkMode ? Colors.grey : Colors.black54,
                   ),
                 ),
-                const SizedBox(width: 8.0),
+                SizedBox(width: 8.0),
                 Text(
                   _creatorName,
                   style: TextStyle(
