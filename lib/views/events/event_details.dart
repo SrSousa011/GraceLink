@@ -111,29 +111,32 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     'Hora: ${_event.time.format(context)}', isDarkMode),
                 _buildDetailsText(
                     'Localização: ${_event.location}', isDarkMode),
-                Text(
-                  'Criado por: $_creatorName',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                ),
               ],
             ),
           ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                'Direita em Italiano',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontStyle: FontStyle.italic,
-                  color: isDarkMode ? Colors.grey : Colors.black54,
+          Positioned(
+            bottom: 16.0,
+            right: 16.0,
+            child: Row(
+              children: [
+                Text(
+                  'Criado por',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontStyle: FontStyle.italic,
+                    color: isDarkMode ? Colors.grey : Colors.black54,
+                  ),
                 ),
-              ),
+                const SizedBox(width: 8.0),
+                Text(
+                  _creatorName,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.grey : Colors.black,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
