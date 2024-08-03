@@ -8,7 +8,7 @@ class UserProfileService {
     try {
       await _firestore.collection('users').doc(userId).update({
         'fullName': fullName,
-        'address': address, // Atualizado para salvar o endereço
+        'address': address,
       });
     } catch (e) {
       throw Exception('Failed to update profile: $e');

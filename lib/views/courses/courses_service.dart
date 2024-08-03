@@ -6,6 +6,7 @@ class CoursesService {
   final CollectionReference _registrationsCollection =
       FirebaseFirestore.instance.collection('courseregistration');
 
+  // Check if a user is already subscribed to a specific course
   Future<bool> isUserAlreadySubscribed({
     required String courseId,
     required String userId,
@@ -25,6 +26,7 @@ class CoursesService {
     }
   }
 
+  // Fetch a list of courses from Firestore
   Future<List<Course>> getCourses() async {
     try {
       final querySnapshot =
@@ -38,6 +40,7 @@ class CoursesService {
     }
   }
 
+  // Register a user for a course
   Future<void> registerUserForCourse({
     required String courseId,
     required String userId,
@@ -61,6 +64,7 @@ class CoursesService {
     }
   }
 
+  // Update the status of a user for a specific course
   Future<void> updateUserStatus({
     required String userId,
     required String courseId,
@@ -77,6 +81,11 @@ class CoursesService {
         await _registrationsCollection.doc(docId).update({
           'status': status,
         });
+      } else {
+        if (kDebugMode) {
+          print(
+              'No registration found for userId: $userId and courseId: $courseId');
+        }
       }
     } catch (e) {
       if (kDebugMode) {

@@ -8,7 +8,7 @@ const String tEditProfile = 'Edit Profile';
 const double tDefaultSize = 16.0;
 const double tFormHeight = 20.0;
 const String tFullName = 'Full Name';
-const String tAddress = 'Address'; // Updated from 'Bio' to 'Address'
+const String tAddress = 'Address';
 const String tJoined = 'Joined ';
 const String tJoinedAt = '25 Jan 2022';
 const String tDelete = 'Delete';
@@ -44,10 +44,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     String fullName = _fullNameController.text;
     String address = _addressController.text;
 
-    // Instantiate the service class
     UserProfileService userProfileService = UserProfileService();
 
-    // Call the method to update user profile
     userProfileService
         .updateUserProfile(widget.userData.id, fullName, address)
         .then((_) {
@@ -85,12 +83,12 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final Color buttonColor = theme.brightness == Brightness.light
-        ? Colors.blue // Azul no modo claro
-        : Colors.grey; // Cinza no modo escuro
+        ? Colors.blue
+        : Colors.grey;
 
     final Color buttonTextColor = theme.brightness == Brightness.light
-        ? Colors.white // Branco no modo claro
-        : Colors.black; // Preto no modo escuro
+        ? Colors.white
+        : Colors.black;
 
     return Scaffold(
       appBar: AppBar(
@@ -162,15 +160,15 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: _clearFields, // Clear the fields
+                        onPressed: _clearFields,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: theme.brightness == Brightness.light
                               ? Colors.redAccent.withOpacity(0.1)
-                              : Colors.grey, // Cinza para o modo escuro
+                              : Colors.grey,
                           elevation: 0,
                           foregroundColor: theme.brightness == Brightness.light
                               ? Colors.red
-                              : Colors.black, // Preto para o modo escuro
+                              : Colors.black,
                           shape: const StadiumBorder(),
                         ),
                         child: const Text(tDelete),

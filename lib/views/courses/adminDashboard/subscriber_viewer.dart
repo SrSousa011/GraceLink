@@ -40,10 +40,11 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
     try {
       await _coursesService.updateUserStatus(
         userId: widget.userId,
-        courseId: widget.courseName, // Adjust field if necessary
+        courseId: widget.courseName,
         status: !_status!,
       );
 
+      // Atualiza o estado do widget
       setState(() {
         _status = !_status!;
       });
@@ -55,8 +56,8 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error updating status'),
+        SnackBar(
+          content: Text('Error updating status: $e'),
         ),
       );
     } finally {
@@ -168,8 +169,10 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
                     ),
                     child: _loading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : Text(_status! ? 'Mark as Not Paid' : 'Mark as Paid',
-                            style: const TextStyle(color: Colors.white)),
+                        : Text(
+                            _status! ? 'Mark as Not Paid' : 'Mark as Paid',
+                            style: const TextStyle(color: Colors.white),
+                          ),
                   ),
                 ),
               ],

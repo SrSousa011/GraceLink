@@ -14,13 +14,13 @@ class EventDelete {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Fechar o diálogo
+                Navigator.of(context).pop();
               },
               child: const Text('Cancelar'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Fechar o diálogo
+                Navigator.of(context).pop();
                 _deleteEventAndNotify(context, eventId);
               },
               child: const Text('Excluir'),
@@ -50,7 +50,7 @@ class EventDelete {
     try {
       await deleteEvent(eventId);
       if (!context.mounted) return;
-      Navigator.pop(context, true); // Return true to indicate success
+      Navigator.pop(context, true);
     } catch (e) {
       showDialog(
         context: context,
