@@ -1,3 +1,4 @@
+import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/event_service.dart';
 import 'package:churchapp/views/notifications/notification_service.dart';
@@ -20,6 +21,7 @@ class _AddEventFormState extends State<AddEventForm> {
   TimeOfDay? _selectedTime;
   String _location = '';
   final NotificationService _notificationService = NotificationService();
+  late AuthenticationService _authenticationService;
 
   @override
   void initState() {
@@ -31,6 +33,7 @@ class _AddEventFormState extends State<AddEventForm> {
     _selectedTime = TimeOfDay.now();
     _notificationService.initialize();
     _notificationService.requestNotificationPermission();
+    _authenticationService = AuthenticationService();
   }
 
   @override
@@ -72,6 +75,13 @@ class _AddEventFormState extends State<AddEventForm> {
         _descriptionController.text.isNotEmpty &&
         _selectedDate != null &&
         _selectedTime != null) {
+      // Obtém o ID do usuário atual
+      final userId = await _authenticationService.getCurrentUserId();
+      if (userId == null) {
+        _showErrorDialog(context, 'Erro ao salvar evento',
+            'Não foi possível obter o ID do usuário.');
+        return;
+      }
 
       final eventId = DateTime.now().millisecondsSinceEpoch.toString();
 
@@ -82,6 +92,7 @@ class _AddEventFormState extends State<AddEventForm> {
         date: _selectedDate!,
         time: _selectedTime!,
         location: _location,
+        createdBy: userId, // Usa o ID do usuário
       );
 
       try {

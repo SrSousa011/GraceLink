@@ -9,6 +9,7 @@ class Event {
   final DateTime date;
   final TimeOfDay time;
   final String location;
+  final String createdBy;
 
   Event({
     required this.id,
@@ -17,6 +18,7 @@ class Event {
     required this.date,
     required this.time,
     required this.location,
+    required this.createdBy,
   });
 
   factory Event.fromFirestore(String id, Map<String, dynamic> data) {
@@ -30,6 +32,7 @@ class Event {
         minute: int.parse(data['time'].split(':')[1]),
       ),
       location: data['location'] ?? '',
+      createdBy: data['createdBy'] ?? '',
     );
   }
 
@@ -40,6 +43,7 @@ class Event {
       'date': date,
       'time': '${time.hour}:${time.minute}',
       'location': location,
+      'createdBy': createdBy,
     };
   }
 }
@@ -54,6 +58,7 @@ Future<void> addEvent(Event event) async {
       'date': Timestamp.fromDate(event.date),
       'time': '${event.time.hour}:${event.time.minute}',
       'location': event.location,
+      'createdBy': event.createdBy,
     });
   } catch (e) {
     if (kDebugMode) {
@@ -73,6 +78,7 @@ Future<void> updateEvent(Event event, String eventId) async {
       'date': Timestamp.fromDate(event.date),
       'time': '${event.time.hour}:${event.time.minute}',
       'location': event.location,
+      'createdBy': event.createdBy,
     });
   } catch (e) {
     if (kDebugMode) {
