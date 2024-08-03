@@ -73,9 +73,7 @@ class AuthenticationService implements BaseAuth {
   Future<void> signUpWithPersonalInfo({
     required String firstName,
     required String lastName,
-  }) async {
-    // Implement sign-up with personal info
-  }
+  }) async {}
 
   @override
   Future<void> signUpWithDateOfBirthAndGender({
@@ -433,6 +431,23 @@ class AuthenticationService implements BaseAuth {
       if (kDebugMode) {
         print('Error setting user role: $e');
       }
+    }
+  }
+
+  Future<String> getUserNameById(String userId) async {
+    try {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (userSnapshot.exists) {
+        return userSnapshot.get('fullName') ?? 'Usuário Desconhecido';
+      } else {
+        return 'Usuário Desconhecido';
+      }
+    } catch (e) {
+      return 'Erro ao buscar usuário';
     }
   }
 }
