@@ -84,9 +84,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
       );
 
       try {
-        // Chama a função updateEvent com o objeto Event e o ID do evento
-        await updateEvent(
-            updatedEvent, widget.event.id); // Corrigido: pass the ID
+        await updateEvent(updatedEvent, widget.event.id);
 
         if (_notificationService.notificationsEnabled) {
           await _notificationService.sendNotification(
@@ -95,15 +93,32 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
           );
         }
 
-        if (!context.mounted) return;
-        Navigator.pop(context, true);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (context.mounted) {
+            Navigator.pop(context, updatedEvent); // Retorne o evento atualizado
+          }
+        });
       } catch (e) {
-        _showErrorDialog(context, 'Erro ao atualizar evento',
-            'Ocorreu um erro ao tentar atualizar o evento: ${e.toString()}');
+        if (context.mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _showErrorDialog(
+              context,
+              'Erro ao atualizar evento',
+              'Ocorreu um erro ao tentar atualizar o evento: ${e.toString()}',
+            );
+          });
+        }
       }
     } else {
-      _showErrorDialog(context, 'Erro ao atualizar evento',
-          'Por favor, preencha todos os campos.');
+      if (context.mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _showErrorDialog(
+            context,
+            'Erro ao atualizar evento',
+            'Por favor, preencha todos os campos.',
+          );
+        });
+      }
     }
   }
 
