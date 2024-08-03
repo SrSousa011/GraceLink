@@ -450,4 +450,25 @@ class AuthenticationService implements BaseAuth {
       return 'Erro ao buscar usuário';
     }
   }
+
+  Future<bool> isAdmin(String? currentUserId) async {
+    try {
+      User? user = _firebaseAuth.currentUser;
+      if (user != null) {
+        DocumentSnapshot userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
+          String? role = data['role'];
+          return role == 'admin';
+        }
+      }
+      return false;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error checking if user is admin: $e');
+      }
+      return false;
+    }
+  }
 }
