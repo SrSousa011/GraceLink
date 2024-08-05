@@ -1,12 +1,14 @@
+import 'dart:io';
 import 'package:churchapp/views/events/event_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/update_event.dart';
 import 'package:churchapp/views/events/event_delete.dart';
+import 'package:churchapp/views/events/image_picker.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final Event event;
@@ -82,6 +84,24 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     return _isAdmin || _currentUserId == _event.createdBy;
   }
 
+  Future<void> _updateImage() async {
+    if (_shouldShowPopupMenu()) {
+      final newImageUrl = await Navigator.push<String>(
+        context,
+        MaterialPageRoute(builder: (context) => ImagePickerScreen()),
+      );
+
+      if (newImageUrl != null) {
+        setState(() {
+          _event = _event.copyWith(imageUrl: newImageUrl);
+        });
+
+        // Atualize o evento no Firestore com a nova URL da imagem
+        await updateEvent(_event, _event.id);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -136,6 +156,29 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                GestureDetector(
+                  onTap: _updateImage,
+                  child: _event.imageUrl != null
+                      ? Image.file(
+                          File(_event
+                              .imageUrl!), // Use FileImage for local files
+                          height: 200,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          height: 200,
+                          width: double.infinity,
+                          color:
+                              isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                          child: Center(
+                            child: Icon(Icons.add_a_photo,
+                                color:
+                                    isDarkMode ? Colors.white : Colors.black54),
+                          ),
+                        ),
+                ),
+                const SizedBox(height: 16.0),
                 Text(
                   'Título: ${_event.title}',
                   style: TextStyle(
