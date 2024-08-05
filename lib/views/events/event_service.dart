@@ -10,6 +10,7 @@ class Event {
   final TimeOfDay time;
   final String location;
   final String createdBy;
+  final String? imageUrl; // Adicione este campo
 
   Event({
     required this.id,
@@ -19,6 +20,7 @@ class Event {
     required this.time,
     required this.location,
     required this.createdBy,
+    this.imageUrl,
   });
 
   factory Event.fromFirestore(String id, Map<String, dynamic> data) {
@@ -33,6 +35,7 @@ class Event {
       ),
       location: data['location'] ?? '',
       createdBy: data['createdBy'] ?? '',
+      imageUrl: data['imageUrl'], // Adicione esta linha
     );
   }
 
@@ -44,7 +47,30 @@ class Event {
       'time': '${time.hour}:${time.minute}',
       'location': location,
       'createdBy': createdBy,
+      'imageUrl': imageUrl,
     };
+  }
+
+  Event copyWith({
+    String? id,
+    String? title,
+    String? description,
+    DateTime? date,
+    TimeOfDay? time,
+    String? location,
+    String? createdBy,
+    String? imageUrl,
+  }) {
+    return Event(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      date: date ?? this.date,
+      time: time ?? this.time,
+      location: location ?? this.location,
+      createdBy: createdBy ?? this.createdBy,
+      imageUrl: imageUrl ?? this.imageUrl,
+    );
   }
 }
 
@@ -59,6 +85,7 @@ Future<void> addEvent(Event event) async {
       'time': '${event.time.hour}:${event.time.minute}',
       'location': event.location,
       'createdBy': event.createdBy,
+      'imageUrl': event.imageUrl, // Adicione esta linha
     });
   } catch (e) {
     if (kDebugMode) {
@@ -79,6 +106,7 @@ Future<void> updateEvent(Event event, String eventId) async {
       'time': '${event.time.hour}:${event.time.minute}',
       'location': event.location,
       'createdBy': event.createdBy,
+      'imageUrl': event.imageUrl,
     });
   } catch (e) {
     if (kDebugMode) {
