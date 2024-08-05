@@ -1,10 +1,13 @@
+import 'dart:io';
+import 'package:churchapp/views/events/event_details.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/event_service.dart';
 import 'package:churchapp/views/notifications/notification_service.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 class AddEventForm extends StatefulWidget {
   const AddEventForm({super.key});
@@ -20,8 +23,10 @@ class _AddEventFormState extends State<AddEventForm> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   String _location = '';
+  File? _image;
   final NotificationService _notificationService = NotificationService();
   late AuthenticationService _authenticationService;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -70,12 +75,29 @@ class _AddEventFormState extends State<AddEventForm> {
     }
   }
 
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _takePhoto() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
   Future<void> _saveEvent(BuildContext context) async {
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty &&
         _selectedDate != null &&
         _selectedTime != null) {
-      // Obtém o ID do usuário atual
       final userId = await _authenticationService.getCurrentUserId();
       if (userId == null) {
         _showErrorDialog(context, 'Erro ao salvar evento',
@@ -92,7 +114,8 @@ class _AddEventFormState extends State<AddEventForm> {
         date: _selectedDate!,
         time: _selectedTime!,
         location: _location,
-        createdBy: userId, // Usa o ID do usuário
+        createdBy: userId,
+        imageUrl: _image?.path,
       );
 
       try {
@@ -105,7 +128,12 @@ class _AddEventFormState extends State<AddEventForm> {
         }
 
         if (!context.mounted) return;
-        Navigator.pop(context, true);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => EventDetailsScreen(event: newEvent),
+          ),
+        );
       } catch (e) {
         _showErrorDialog(context, 'Erro ao salvar evento',
             'Ocorreu um erro ao tentar salvar o evento: ${e.toString()}');
@@ -162,6 +190,8 @@ class _AddEventFormState extends State<AddEventForm> {
             _buildTimeField(isDarkMode: isDarkMode),
             const SizedBox(height: 20.0),
             _buildLocationField(isDarkMode: isDarkMode),
+            const SizedBox(height: 20.0),
+            _buildImagePicker(isDarkMode: isDarkMode),
             const SizedBox(height: 20.0),
             _buildSaveButton(isDarkMode: isDarkMode),
           ],
@@ -222,6 +252,33 @@ class _AddEventFormState extends State<AddEventForm> {
         icon: Icon(Icons.location_on,
             color: isDarkMode ? Colors.white : Colors.blue),
       ),
+    );
+  }
+
+  Widget _buildImagePicker({required bool isDarkMode}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 10.0),
+        Row(
+          children: [
+            _image != null
+                ? Image.file(
+                    _image!,
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  )
+                : const SizedBox(width: 10.0),
+            ElevatedButton.icon(
+              onPressed: _pickImage,
+              icon: Icon(Icons.image,
+                  color: isDarkMode ? Colors.white : Colors.blue),
+              label: const Text('Selecionar da Galeria'),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
