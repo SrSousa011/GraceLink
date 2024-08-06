@@ -264,20 +264,24 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> _launchFacebook() async {
-    const facebookUrl =
-        "https://www.facebook.com/igrejaevangelicaresplandecendoasnacoes/?locale=pt_BR";
+    const nativeUrl = "fb://profile/100088490063123";
+    const webUrl = "https://www.facebook.com/profile.php?id=100088490063123";
 
     try {
-      await launchUrlString(facebookUrl, mode: LaunchMode.externalApplication);
+      await launchUrlString(nativeUrl, mode: LaunchMode.externalApplication);
     } catch (e) {
       if (kDebugMode) {
-        print(e);
+        print(
+            "Não foi possível abrir o aplicativo do Facebook, abrindo no navegador: $e");
       }
+      await launchUrlString(webUrl, mode: LaunchMode.platformDefault);
     }
   }
+//https://resplandecendonacoes.org/
 
   Future<void> _launchDonationPage() async {
-    const donationUrl = "https://resplandecendonacoes.org/";
+    const donationUrl =
+        "https://linktr.ee/igrejaresplandecendoasnacoes?utm_source=linktree_profile_share";
     try {
       await launchUrlString(donationUrl, mode: LaunchMode.externalApplication);
     } catch (e) {
