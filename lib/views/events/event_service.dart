@@ -85,7 +85,7 @@ Future<void> addEvent(Event event) async {
       'time': '${event.time.hour}:${event.time.minute}',
       'location': event.location,
       'createdBy': event.createdBy,
-      'imageUrl': event.imageUrl, // Adicione esta linha
+      'imageUrl': event.imageUrl,
     });
   } catch (e) {
     if (kDebugMode) {

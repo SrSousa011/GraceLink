@@ -1,9 +1,10 @@
-import 'package:churchapp/theme/theme_provider.dart';
-import 'package:churchapp/views/events/event_service.dart';
-import 'package:churchapp/views/notifications/notification_service.dart';
+import 'package:churchapp/views/events/events.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:churchapp/theme/theme_provider.dart';
+import 'package:churchapp/views/events/event_service.dart';
+import 'package:churchapp/views/notifications/notification_service.dart';
 
 class UpdateEventForm extends StatefulWidget {
   final Event event;
@@ -20,7 +21,6 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   late TextEditingController _locationController;
   late DateTime _selectedDate;
   late TimeOfDay _selectedTime;
-  String _location = '';
   final NotificationService _notificationService = NotificationService();
 
   @override
@@ -72,21 +72,20 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
 
   Future<void> _updateEvent(BuildContext context) async {
     if (_titleController.text.isNotEmpty &&
-        _descriptionController.text.isNotEmpty) {
+        _descriptionController.text.isNotEmpty &&
+        _locationController.text.isNotEmpty) {
       final updatedEvent = Event(
         id: widget.event.id,
         title: _titleController.text,
         description: _descriptionController.text,
         date: _selectedDate,
         time: _selectedTime,
-        location: _location,
+        location: _locationController.text,
         createdBy: widget.event.createdBy,
       );
 
       try {
-        // Chama a função updateEvent com o objeto Event e o ID do evento
-        await updateEvent(
-            updatedEvent, widget.event.id); // Corrigido: pass the ID
+        await updateEvent(updatedEvent, widget.event.id);
 
         if (_notificationService.notificationsEnabled) {
           await _notificationService.sendNotification(
@@ -95,15 +94,25 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
           );
         }
 
-        if (!context.mounted) return;
-        Navigator.pop(context, true);
+        if (context.mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const Events(),
+            ),
+          );
+        }
       } catch (e) {
-        _showErrorDialog(context, 'Erro ao atualizar evento',
-            'Ocorreu um erro ao tentar atualizar o evento: ${e.toString()}');
+        if (context.mounted) {
+          _showErrorDialog(context, 'Erro ao atualizar evento',
+              'Ocorreu um erro ao tentar atualizar o evento: ${e.toString()}');
+        }
       }
     } else {
-      _showErrorDialog(context, 'Erro ao atualizar evento',
-          'Por favor, preencha todos os campos.');
+      if (context.mounted) {
+        _showErrorDialog(context, 'Erro ao atualizar evento',
+            'Por favor, preencha todos os campos.');
+      }
     }
   }
 
@@ -200,11 +209,6 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   Widget _buildLocationField({required bool isDarkMode}) {
     return TextField(
       controller: _locationController,
-      onChanged: (value) {
-        setState(() {
-          _location = value;
-        });
-      },
       decoration: InputDecoration(
         labelText: 'Localização do Evento',
         icon: Icon(Icons.location_on,

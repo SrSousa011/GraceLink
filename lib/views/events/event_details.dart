@@ -88,7 +88,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     if (_shouldShowPopupMenu()) {
       final newImageUrl = await Navigator.push<String>(
         context,
-        MaterialPageRoute(builder: (context) => ImagePickerScreen()),
+        MaterialPageRoute(builder: (context) => const ImagePickerScreen()),
       );
 
       if (newImageUrl != null) {
@@ -96,7 +96,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
           _event = _event.copyWith(imageUrl: newImageUrl);
         });
 
-        // Atualize o evento no Firestore com a nova URL da imagem
         await updateEvent(_event, _event.id);
       }
     }
@@ -160,8 +159,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                   onTap: _updateImage,
                   child: _event.imageUrl != null
                       ? Image.file(
-                          File(_event
-                              .imageUrl!), // Use FileImage for local files
+                          File(_event.imageUrl!),
                           height: 200,
                           width: double.infinity,
                           fit: BoxFit.cover,
