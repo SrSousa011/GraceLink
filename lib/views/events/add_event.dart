@@ -1,12 +1,15 @@
 import 'dart:io';
-import 'package:churchapp/views/events/event_details.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as path;
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/views/events/events.dart';
+import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
-import 'package:churchapp/views/events/event_service.dart';
 import 'package:churchapp/views/notifications/notification_service.dart';
 
 class AddEventForm extends StatefulWidget {
@@ -24,9 +27,12 @@ class _AddEventFormState extends State<AddEventForm> {
   TimeOfDay? _selectedTime;
   String _location = '';
   File? _image;
+  String? _imageUrl; // Adicionado para armazenar a URL da imagem
+  final ImagePicker _picker = ImagePicker();
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NotificationService _notificationService = NotificationService();
   late AuthenticationService _authenticationService;
-  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -47,6 +53,41 @@ class _AddEventFormState extends State<AddEventForm> {
     _descriptionController.dispose();
     _locationController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile != null) {
+        setState(() {
+          _image = File(pickedFile.path);
+        });
+
+        String fileName = path.basename(_image!.path);
+        String uniqueFileName =
+            '${DateTime.now().millisecondsSinceEpoch}_$fileName';
+
+        final uploadTask = _storage
+            .ref()
+            .child('eventImages/$uniqueFileName')
+            .putFile(_image!);
+        final taskSnapshot = await uploadTask;
+
+        final downloadUrl = await taskSnapshot.ref.getDownloadURL();
+        if (kDebugMode) {
+          print('Imagem carregada com sucesso: $downloadUrl');
+        }
+
+        setState(() {
+          _imageUrl = downloadUrl;
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Erro ao selecionar ou carregar imagem: $e");
+      }
+    }
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -75,24 +116,6 @@ class _AddEventFormState extends State<AddEventForm> {
     }
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<void> _takePhoto() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
-    }
-  }
-
   Future<void> _saveEvent(BuildContext context) async {
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty &&
@@ -100,26 +123,29 @@ class _AddEventFormState extends State<AddEventForm> {
         _selectedTime != null) {
       final userId = await _authenticationService.getCurrentUserId();
       if (userId == null) {
+        if (!context.mounted) return;
         _showErrorDialog(context, 'Erro ao salvar evento',
             'Não foi possível obter o ID do usuário.');
         return;
       }
 
       final eventId = DateTime.now().millisecondsSinceEpoch.toString();
+      String? imageUrl = _imageUrl;
 
-      final newEvent = Event(
-        id: eventId,
-        title: _titleController.text,
-        description: _descriptionController.text,
-        date: _selectedDate!,
-        time: _selectedTime!,
-        location: _location,
-        createdBy: userId,
-        imageUrl: _image?.path,
-      );
+      final newEvent = {
+        'id': eventId,
+        'title': _titleController.text,
+        'description': _descriptionController.text,
+        'date': _selectedDate!,
+        'time': _selectedTime!.format(context),
+        'location': _location,
+        'createdBy': userId,
+        'imageUrl': imageUrl,
+      };
 
       try {
-        await addEvent(newEvent);
+        await _firestore.collection('events').doc(eventId).set(newEvent);
+
         if (_notificationService.notificationsEnabled) {
           await _notificationService.sendNotification(
             _titleController.text,
@@ -128,19 +154,35 @@ class _AddEventFormState extends State<AddEventForm> {
         }
 
         if (!context.mounted) return;
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => EventDetailsScreen(event: newEvent),
+            builder: (context) => const Events(),
           ),
         );
       } catch (e) {
+        if (!context.mounted) return;
         _showErrorDialog(context, 'Erro ao salvar evento',
             'Ocorreu um erro ao tentar salvar o evento: ${e.toString()}');
       }
     } else {
       _showErrorDialog(context, 'Erro ao salvar evento',
           'Por favor, preencha todos os campos.');
+    }
+  }
+
+  Future<String?> _uploadImage(File file, String eventId) async {
+    try {
+      final uploadTask =
+          _storage.ref().child('eventImages/$eventId.jpg').putFile(file);
+
+      final taskSnapshot = await uploadTask;
+      return await taskSnapshot.ref.getDownloadURL();
+    } catch (e) {
+      if (kDebugMode) {
+        print("Erro ao carregar imagem: $e");
+      }
+      return null;
     }
   }
 
@@ -248,7 +290,7 @@ class _AddEventFormState extends State<AddEventForm> {
         });
       },
       decoration: InputDecoration(
-        labelText: 'Localização do Evento',
+        labelText: 'Localização',
         icon: Icon(Icons.location_on,
             color: isDarkMode ? Colors.white : Colors.blue),
       ),
@@ -259,25 +301,20 @@ class _AddEventFormState extends State<AddEventForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 10.0),
-        Row(
-          children: [
-            _image != null
-                ? Image.file(
-                    _image!,
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.cover,
-                  )
-                : const SizedBox(width: 10.0),
-            ElevatedButton.icon(
-              onPressed: _pickImage,
-              icon: Icon(Icons.image,
-                  color: isDarkMode ? Colors.white : Colors.blue),
-              label: const Text('Selecionar da Galeria'),
-            ),
-          ],
+        ElevatedButton(
+          onPressed: _pickImage,
+          child: const Text('Selecionar Imagem'),
         ),
+        if (_image != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Image.file(
+              _image!,
+              width: 100,
+              height: 100,
+              fit: BoxFit.cover,
+            ),
+          ),
       ],
     );
   }
@@ -285,13 +322,6 @@ class _AddEventFormState extends State<AddEventForm> {
   Widget _buildSaveButton({required bool isDarkMode}) {
     return ElevatedButton(
       onPressed: () => _saveEvent(context),
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-      ),
       child: const Text('Salvar Evento'),
     );
   }
