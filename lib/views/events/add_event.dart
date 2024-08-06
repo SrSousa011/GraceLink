@@ -27,7 +27,7 @@ class _AddEventFormState extends State<AddEventForm> {
   TimeOfDay? _selectedTime;
   String _location = '';
   File? _image;
-  String? _imageUrl; // Adicionado para armazenar a URL da imagem
+  String? _imageUrl;
   final ImagePicker _picker = ImagePicker();
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
