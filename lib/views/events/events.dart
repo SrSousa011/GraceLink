@@ -64,78 +64,88 @@ class _EventsState extends State<Events> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: _isSearching
-            ? TextField(
-                controller: _searchController,
-                autofocus: true,
-                onChanged: _updateSearchQuery,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: 'Pesquisar eventos...',
-                ),
-              )
-            : const Text('Eventos'),
-        actions: [
-          _isSearching
-              ? IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    setState(() {
-                      _isSearching = false;
-                      _searchController.clear();
-                      _updateSearchQuery('');
-                    });
-                  },
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) {
+          return;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: _isSearching
+              ? TextField(
+                  controller: _searchController,
+                  autofocus: true,
+                  onChanged: _updateSearchQuery,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Pesquisar eventos...',
+                  ),
                 )
-              : IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    setState(() {
-                      _isSearching = true;
-                    });
-                  },
-                ),
-        ],
-      ),
-      drawer: NavBar(
-        auth: AuthenticationService(),
-        authService: AuthenticationService(),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: FutureBuilder<List<Event>>(
-              future: _eventsFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return const Center(child: Text('Erro ao carregar eventos'));
-                }
-                if (!snapshot.hasData || _filteredEvents.isEmpty) {
-                  return const Center(child: Text('Nenhum evento encontrado'));
-                }
-                return ListView.builder(
-                  itemCount: _filteredEvents.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        _navigateToEventDetailsScreen(
-                            context, _filteredEvents[index]);
-                      },
-                      child: EventListItem(event: _filteredEvents[index]),
-                    );
-                  },
-                );
-              },
+              : const Text('Eventos'),
+          actions: [
+            _isSearching
+                ? IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: () {
+                      setState(() {
+                        _isSearching = false;
+                        _searchController.clear();
+                        _updateSearchQuery('');
+                      });
+                    },
+                  )
+                : IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: () {
+                      setState(() {
+                        _isSearching = true;
+                      });
+                    },
+                  ),
+          ],
+        ),
+        drawer: NavBar(
+          auth: AuthenticationService(),
+          authService: AuthenticationService(),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: FutureBuilder<List<Event>>(
+                future: _eventsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return const Center(
+                        child: Text('Erro ao carregar eventos'));
+                  }
+                  if (!snapshot.hasData || _filteredEvents.isEmpty) {
+                    return const Center(
+                        child: Text('Nenhum evento encontrado'));
+                  }
+                  return ListView.builder(
+                    itemCount: _filteredEvents.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          _navigateToEventDetailsScreen(
+                              context, _filteredEvents[index]);
+                        },
+                        child: EventListItem(event: _filteredEvents[index]),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
+        floatingActionButton: _buildAddEventButton(),
       ),
-      floatingActionButton: _buildAddEventButton(),
     );
   }
 
