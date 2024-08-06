@@ -5,8 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:path/path.dart' as path;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:path/path.dart' as path;
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/update_event.dart';
@@ -97,13 +97,16 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
         if (pickedFile != null) {
           File file = File(pickedFile.path);
+          final imageBytes = await file.readAsBytes();
 
           String fileName = path.basename(file.path);
           String uniqueFileName =
               '${DateTime.now().millisecondsSinceEpoch}_$fileName';
 
-          final uploadTask =
-              _storage.ref().child('eventImages/$uniqueFileName').putFile(file);
+          final uploadTask = _storage
+              .ref()
+              .child('eventImages/$uniqueFileName')
+              .putData(imageBytes);
           final taskSnapshot = await uploadTask;
 
           final downloadUrl = await taskSnapshot.ref.getDownloadURL();
