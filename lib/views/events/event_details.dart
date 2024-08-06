@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:churchapp/views/events/events.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
@@ -7,11 +6,13 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as path;
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/update_event.dart';
 import 'package:churchapp/views/events/event_delete.dart';
 import 'package:churchapp/views/events/event_service.dart';
+import 'package:churchapp/views/events/events.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final Event event;
@@ -186,11 +187,15 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 GestureDetector(
                   onTap: _updateImage,
                   child: _event.imageUrl != null
-                      ? Image.network(
-                          _event.imageUrl!,
+                      ? CachedNetworkImage(
+                          imageUrl: _event.imageUrl!,
                           height: 200,
                           width: double.infinity,
                           fit: BoxFit.cover,
+                          placeholder: (context, url) =>
+                              const Center(child: CircularProgressIndicator()),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
                         )
                       : Container(
                           height: 200,
