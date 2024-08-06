@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:churchapp/views/events/events.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
@@ -130,6 +131,11 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back,
+              color: isDarkMode ? Colors.white : Colors.black),
+          onPressed: _navigateToEventScreen,
+        ),
         title: Text(_event.title),
         actions: _shouldShowPopupMenu()
             ? [
@@ -271,6 +277,30 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     if (updatedEvent != null && context.mounted) {
       setState(() {
         _event = updatedEvent;
+      });
+    }
+  }
+
+  void _navigateToEventScreen() async {
+    final result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const Events(),
+      ),
+    );
+
+    if (result != null && context.mounted) {
+      setState(() {
+        _event = Event(
+          id: result['id'],
+          title: result['title'],
+          description: result['description'],
+          date: result['date'],
+          time: result['time'],
+          location: result['location'],
+          imageUrl: result['imageUrl'],
+          createdBy: _event.createdBy,
+        );
       });
     }
   }
