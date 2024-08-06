@@ -1,4 +1,3 @@
-import 'package:churchapp/views/events/events.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -82,6 +81,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
         time: _selectedTime,
         location: _locationController.text,
         createdBy: widget.event.createdBy,
+        imageUrl: widget.event.imageUrl,
       );
 
       try {
@@ -95,12 +95,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
         }
 
         if (context.mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const Events(),
-            ),
-          );
+          Navigator.pop(context, updatedEvent);
         }
       } catch (e) {
         if (context.mounted) {
