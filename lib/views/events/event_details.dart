@@ -1,14 +1,16 @@
 import 'dart:io';
-import 'package:churchapp/views/events/event_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as path;
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/update_event.dart';
 import 'package:churchapp/views/events/event_delete.dart';
-import 'package:churchapp/views/events/image_picker.dart';
+import 'package:churchapp/views/events/event_service.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final Event event;
@@ -25,6 +27,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   bool _isAdmin = false;
   String? _currentUserId;
   final AuthenticationService _authService = AuthenticationService();
+  final ImagePicker _picker = ImagePicker();
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   @override
   void initState() {
@@ -52,7 +56,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Erro ao buscar nome do criador: $e');
+        print('Error fetching creator name: $e');
       }
     }
   }
@@ -65,7 +69,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       });
     } catch (e) {
       if (kDebugMode) {
-        print('Erro ao verificar se o usuário é admin: $e');
+        print('Error checking admin role: $e');
       }
     }
   }
@@ -75,7 +79,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       _currentUserId = await _authService.getCurrentUserId();
     } catch (e) {
       if (kDebugMode) {
-        print('Erro ao buscar o ID do usuário atual: $e');
+        print('Error fetching current user ID: $e');
       }
     }
   }
@@ -86,17 +90,35 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
   Future<void> _updateImage() async {
     if (_shouldShowPopupMenu()) {
-      final newImageUrl = await Navigator.push<String>(
-        context,
-        MaterialPageRoute(builder: (context) => const ImagePickerScreen()),
-      );
+      try {
+        final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
-      if (newImageUrl != null) {
-        setState(() {
-          _event = _event.copyWith(imageUrl: newImageUrl);
-        });
+        if (pickedFile != null) {
+          File file = File(pickedFile.path);
 
-        await updateEvent(_event, _event.id);
+          String fileName = path.basename(file.path);
+          String uniqueFileName =
+              '${DateTime.now().millisecondsSinceEpoch}_$fileName';
+
+          final uploadTask =
+              _storage.ref().child('eventImages/$uniqueFileName').putFile(file);
+          final taskSnapshot = await uploadTask;
+
+          final downloadUrl = await taskSnapshot.ref.getDownloadURL();
+          if (kDebugMode) {
+            print('Image uploaded successfully: $downloadUrl');
+          }
+
+          setState(() {
+            _event = _event.copyWith(imageUrl: downloadUrl);
+          });
+
+          await updateEvent(_event, _event.id);
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print("Error picking or uploading image: $e");
+        }
       }
     }
   }
@@ -127,7 +149,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       child: ListTile(
                         leading: Icon(Icons.edit,
                             color: isDarkMode ? Colors.white : Colors.blue),
-                        title: Text('Editar',
+                        title: Text('Edit',
                             style: TextStyle(
                                 color:
                                     isDarkMode ? Colors.white : Colors.black)),
@@ -138,7 +160,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       child: ListTile(
                         leading: Icon(Icons.delete,
                             color: isDarkMode ? Colors.grey[300] : Colors.red),
-                        title: Text('Excluir',
+                        title: Text('Delete',
                             style: TextStyle(
                                 color: isDarkMode ? Colors.white : Colors.red)),
                       ),
@@ -158,8 +180,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 GestureDetector(
                   onTap: _updateImage,
                   child: _event.imageUrl != null
-                      ? Image.file(
-                          File(_event.imageUrl!),
+                      ? Image.network(
+                          _event.imageUrl!,
                           height: 200,
                           width: double.infinity,
                           fit: BoxFit.cover,
@@ -178,7 +200,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 ),
                 const SizedBox(height: 16.0),
                 Text(
-                  'Título: ${_event.title}',
+                  'Title: ${_event.title}',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -186,14 +208,13 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                   ),
                 ),
                 _buildDetailsText(
-                    'Descrição: ${_event.description}', isDarkMode),
+                    'Description: ${_event.description}', isDarkMode),
                 _buildDetailsText(
-                    'Data: ${DateFormat('dd/MM/yyyy').format(_event.date)}',
+                    'Date: ${DateFormat('dd/MM/yyyy').format(_event.date)}',
                     isDarkMode),
                 _buildDetailsText(
-                    'Hora: ${_event.time.format(context)}', isDarkMode),
-                _buildDetailsText(
-                    'Localização: ${_event.location}', isDarkMode),
+                    'Time: ${_event.time.format(context)}', isDarkMode),
+                _buildDetailsText('Location: ${_event.location}', isDarkMode),
               ],
             ),
           ),
@@ -204,7 +225,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Criado por',
+                  'Created by',
                   style: TextStyle(
                     fontSize: 14,
                     fontStyle: FontStyle.italic,
