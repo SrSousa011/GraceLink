@@ -171,21 +171,6 @@ class _AddEventFormState extends State<AddEventForm> {
     }
   }
 
-  Future<String?> _uploadImage(File file, String eventId) async {
-    try {
-      final uploadTask =
-          _storage.ref().child('eventImages/$eventId.jpg').putFile(file);
-
-      final taskSnapshot = await uploadTask;
-      return await taskSnapshot.ref.getDownloadURL();
-    } catch (e) {
-      if (kDebugMode) {
-        print("Erro ao carregar imagem: $e");
-      }
-      return null;
-    }
-  }
-
   void _showErrorDialog(BuildContext context, String title, String message) {
     showDialog(
       context: context,

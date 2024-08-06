@@ -10,7 +10,7 @@ class Event {
   final TimeOfDay time;
   final String location;
   final String createdBy;
-  final String? imageUrl; // Adicione este campo
+  final String? imageUrl;
 
   Event({
     required this.id,
