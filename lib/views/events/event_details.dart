@@ -60,7 +60,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching creator name: $e');
+        print('Erro ao buscar o nome do criador: $e');
       }
     }
   }
@@ -73,7 +73,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       });
     } catch (e) {
       if (kDebugMode) {
-        print('Error checking admin role: $e');
+        print('Erro ao verificar o papel de administrador: $e');
       }
     }
   }
@@ -83,7 +83,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       _currentUserId = await _authService.getCurrentUserId();
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching current user ID: $e');
+        print('Erro ao buscar o ID do usuário atual: $e');
       }
     }
   }
@@ -126,7 +126,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error downloading or saving image: $e');
+        print('Erro ao baixar ou salvar a imagem: $e');
       }
     }
   }
@@ -161,7 +161,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
           final downloadUrl = await taskSnapshot.ref.getDownloadURL();
           if (kDebugMode) {
-            print('Image uploaded successfully: $downloadUrl');
+            print('Imagem carregada com sucesso: $downloadUrl');
           }
 
           setState(() {
@@ -175,7 +175,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         }
       } catch (e) {
         if (kDebugMode) {
-          print("Error picking or uploading image: $e");
+          print("Erro ao selecionar ou carregar a imagem: $e");
         }
       }
     }
@@ -233,86 +233,97 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               ]
             : null,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (_localImagePath != null) ...[
-              Image.file(
-                File(_localImagePath!),
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ] else if (widget.event.imageUrl != null &&
-                widget.event.imageUrl!.isNotEmpty) ...[
-              CachedNetworkImage(
-                imageUrl: widget.event.imageUrl!,
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorWidget: (context, error, stackTrace) {
-                  return const Center(child: Text('Error loading image'));
-                },
-                placeholder: (context, url) {
-                  return Container(
-                    color: Colors.grey[300],
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (_localImagePath != null) ...[
+                  Image.file(
+                    File(_localImagePath!),
                     height: 200,
                     width: double.infinity,
-                    child: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                },
-              ),
-            ],
-            if (_localImagePath == null &&
-                (widget.event.imageUrl == null ||
-                    widget.event.imageUrl!.isEmpty)) ...[
-              const SizedBox.shrink(),
-            ],
-            const SizedBox(height: 16.0),
-            Text(
-              'Title: ${_event.title}',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black,
-              ),
-            ),
-            _buildDetailsText('Description: ${_event.description}', isDarkMode),
-            _buildDetailsText(
-                'Date: ${DateFormat('dd/MM/yyyy').format(_event.date)}',
-                isDarkMode),
-            _buildDetailsText(
-                'Time: ${_event.time.format(context)}', isDarkMode),
-            _buildDetailsText('Location: ${_event.location}', isDarkMode),
-            const SizedBox(height: 16.0),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Created by',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontStyle: FontStyle.italic,
-                    color: isDarkMode ? Colors.grey : Colors.black54,
+                    fit: BoxFit.cover,
                   ),
-                ),
-                const SizedBox(width: 4.0),
+                ] else if (widget.event.imageUrl != null &&
+                    widget.event.imageUrl!.isNotEmpty) ...[
+                  CachedNetworkImage(
+                    imageUrl: widget.event.imageUrl!,
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorWidget: (context, error, stackTrace) {
+                      return const Center(child: Text('Error loading image'));
+                    },
+                    placeholder: (context, url) {
+                      return Container(
+                        color: Colors.grey[300],
+                        height: 200,
+                        width: double.infinity,
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+                if (_localImagePath == null &&
+                    (widget.event.imageUrl == null ||
+                        widget.event.imageUrl!.isEmpty)) ...[
+                  const SizedBox.shrink(),
+                ],
+                const SizedBox(height: 16.0),
                 Text(
-                  _creatorName,
+                  'Title: ${_event.title}',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.grey : Colors.black,
+                    color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
+                _buildDetailsText(
+                    'Description: ${_event.description}', isDarkMode),
+                _buildDetailsText(
+                    'Date: ${DateFormat('dd/MM/yyyy').format(_event.date)}',
+                    isDarkMode),
+                _buildDetailsText(
+                    'Time: ${_event.time.format(context)}', isDarkMode),
+                _buildDetailsText('Location: ${_event.location}', isDarkMode),
+                const SizedBox(height: 16.0),
               ],
             ),
-          ],
-        ),
+          ),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Created by',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontStyle: FontStyle.italic,
+                      color: isDarkMode ? Colors.grey : Colors.black54,
+                    ),
+                  ),
+                  const SizedBox(width: 4.0),
+                  Text(
+                    _creatorName,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.grey : Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: _shouldShowPopupMenu()
           ? FloatingActionButton(
