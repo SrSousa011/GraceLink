@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:churchapp/views/events/event_delete.dart';
 import 'package:churchapp/views/events/event_detail/event_details.dart';
 import 'package:churchapp/views/events/event_detail/event_image.dart';
-import 'package:flutter/foundation.dart';
+import 'package:churchapp/views/events/events.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -13,8 +15,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/update_event.dart';
-import 'package:churchapp/views/events/event_delete.dart';
-import 'package:churchapp/views/events/events.dart';
 import 'package:churchapp/views/events/event_service.dart';
 import 'package:path/path.dart' as path;
 
@@ -30,6 +30,7 @@ class EventDetailsScreen extends StatefulWidget {
 class _EventDetailsScreenState extends State<EventDetailsScreen> {
   late Event _event;
   String _creatorName = '';
+  String _creatorImageUrl = '';
   bool _isAdmin = false;
   String? _currentUserId;
   final AuthenticationService _authService = AuthenticationService();
@@ -45,23 +46,28 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   }
 
   Future<void> _initialize() async {
-    await _fetchCreatorName();
-    await _checkIfAdmin();
-    await _fetchCurrentUserId();
-    await _checkLocalImage();
+    await Future.wait([
+      _fetchCreatorDetails(),
+      _checkIfAdmin(),
+      _fetchCurrentUserId(),
+      _checkLocalImage(),
+    ]);
   }
 
-  Future<void> _fetchCreatorName() async {
+  Future<void> _fetchCreatorDetails() async {
     try {
       final name = await _authService.getUserNameById(_event.createdBy);
+      final imageUrl = await _authService.getUserImageById(_event.createdBy);
+
       if (mounted) {
         setState(() {
           _creatorName = name;
+          _creatorImageUrl = imageUrl ?? '';
         });
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching creator name: $e');
+        print('Error fetching creator details: $e');
       }
     }
   }
@@ -115,15 +121,21 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       }
 
       final response = await http.get(Uri.parse(_event.imageUrl!));
-      final imageBytes = response.bodyBytes;
+      if (response.statusCode == 200) {
+        final imageBytes = response.bodyBytes;
 
-      final file = File(filePath);
-      await file.writeAsBytes(imageBytes);
+        final file = File(filePath);
+        await file.writeAsBytes(imageBytes);
 
-      if (mounted) {
-        setState(() {
-          _localImagePath = filePath;
-        });
+        if (mounted) {
+          setState(() {
+            _localImagePath = filePath;
+          });
+        }
+      } else {
+        if (kDebugMode) {
+          print('Failed to download image: ${response.statusCode}');
+        }
       }
     } catch (e) {
       if (kDebugMode) {
@@ -194,45 +206,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               color: isDarkMode ? Colors.white : Colors.black),
           onPressed: _navigateToEventScreen,
         ),
-        title: Text(_event.title),
-        actions: _shouldShowPopupMenu()
-            ? [
-                PopupMenuButton<String>(
-                  onSelected: (value) {
-                    if (value == 'edit') {
-                      _navigateToUpdateEventScreen(context, _event);
-                    } else if (value == 'delete') {
-                      EventDelete.confirmDeleteEvent(
-                          context, _event.id, _event.title);
-                    }
-                  },
-                  itemBuilder: (BuildContext context) =>
-                      <PopupMenuEntry<String>>[
-                    PopupMenuItem<String>(
-                      value: 'edit',
-                      child: ListTile(
-                        leading: Icon(Icons.edit,
-                            color: isDarkMode ? Colors.white : Colors.blue),
-                        title: Text('Edit',
-                            style: TextStyle(
-                                color:
-                                    isDarkMode ? Colors.white : Colors.black)),
-                      ),
-                    ),
-                    PopupMenuItem<String>(
-                      value: 'delete',
-                      child: ListTile(
-                        leading: Icon(Icons.delete,
-                            color: isDarkMode ? Colors.grey[300] : Colors.red),
-                        title: Text('Delete',
-                            style: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.red)),
-                      ),
-                    ),
-                  ],
-                ),
-              ]
-            : null,
+        title: const Text('Evento'),
       ),
       body: Stack(
         children: [
@@ -241,10 +215,85 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: _creatorImageUrl.isNotEmpty
+                            ? NetworkImage(_creatorImageUrl)
+                            : null,
+                        radius: 20,
+                        child: _creatorImageUrl.isEmpty
+                            ? Icon(Icons.person, color: Colors.grey[600])
+                            : null,
+                      ),
+                      const SizedBox(width: 8.0),
+                      Expanded(
+                        child: Text(
+                          _creatorName,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.grey : Colors.black,
+                          ),
+                        ),
+                      ),
+                      if (_shouldShowPopupMenu())
+                        PopupMenuButton<String>(
+                          onSelected: (value) {
+                            if (value == 'edit') {
+                              _navigateToUpdateEventScreen(context, _event);
+                            } else if (value == 'delete') {
+                              EventDelete.confirmDeleteEvent(
+                                context,
+                                _event.id,
+                                _event.title,
+                              );
+                            }
+                          },
+                          itemBuilder: (BuildContext context) =>
+                              <PopupMenuEntry<String>>[
+                            PopupMenuItem<String>(
+                              value: 'edit',
+                              child: ListTile(
+                                leading: Icon(Icons.edit,
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.blue),
+                                title: Text('Edit',
+                                    style: TextStyle(
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black)),
+                              ),
+                            ),
+                            PopupMenuItem<String>(
+                              value: 'delete',
+                              child: ListTile(
+                                leading: Icon(Icons.delete,
+                                    color: isDarkMode
+                                        ? Colors.grey[300]
+                                        : Colors.red),
+                                title: Text('Delete',
+                                    style: TextStyle(
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.red)),
+                              ),
+                            ),
+                          ],
+                          icon: Icon(Icons.more_vert,
+                              color: isDarkMode ? Colors.white : Colors.black),
+                        ),
+                    ],
+                  ),
+                ),
                 EventImage(
                   imageUrl: _event.imageUrl,
                   localImagePath: _localImagePath,
                 ),
+                const SizedBox(height: 16.0),
                 EventDetails(
                   title: _event.title,
                   description: _event.description,
@@ -256,40 +305,14 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               ],
             ),
           ),
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Criado por',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                      color: isDarkMode ? Colors.grey : Colors.black54,
-                    ),
-                  ),
-                  const SizedBox(width: 4.0),
-                  Text(
-                    _creatorName,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.grey : Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ],
       ),
       floatingActionButton: _shouldShowPopupMenu()
           ? FloatingActionButton(
               onPressed: _updateImage,
-              child: const Icon(Icons.add_a_photo),
+              backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
+              child: Icon(Icons.add_a_photo,
+                  color: isDarkMode ? Colors.white : Colors.black),
             )
           : null,
     );
