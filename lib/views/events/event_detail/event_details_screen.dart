@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:churchapp/views/events/event_detail/event_details.dart';
+import 'package:churchapp/views/events/event_detail/event_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -60,7 +61,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Erro ao buscar o nome do criador: $e');
+        print('Error fetching creator name: $e');
       }
     }
   }
@@ -73,7 +74,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       });
     } catch (e) {
       if (kDebugMode) {
-        print('Erro ao verificar o papel de administrador: $e');
+        print('Error checking admin role: $e');
       }
     }
   }
@@ -83,7 +84,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       _currentUserId = await _authService.getCurrentUserId();
     } catch (e) {
       if (kDebugMode) {
-        print('Erro ao buscar o ID do usuário atual: $e');
+        print('Error fetching current user ID: $e');
       }
     }
   }
@@ -126,7 +127,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Erro ao baixar ou salvar a imagem: $e');
+        print('Error downloading or saving image: $e');
       }
     }
   }
@@ -161,7 +162,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
           final downloadUrl = await taskSnapshot.ref.getDownloadURL();
           if (kDebugMode) {
-            print('Imagem carregada com sucesso: $downloadUrl');
+            print('Image uploaded successfully: $downloadUrl');
           }
 
           setState(() {
@@ -175,7 +176,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         }
       } catch (e) {
         if (kDebugMode) {
-          print("Erro ao selecionar ou carregar a imagem: $e");
+          print("Error selecting or uploading image: $e");
         }
       }
     }
@@ -240,58 +241,18 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (_localImagePath != null) ...[
-                  Image.file(
-                    File(_localImagePath!),
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ] else if (widget.event.imageUrl != null &&
-                    widget.event.imageUrl!.isNotEmpty) ...[
-                  CachedNetworkImage(
-                    imageUrl: widget.event.imageUrl!,
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorWidget: (context, error, stackTrace) {
-                      return const Center(child: Text('Error loading image'));
-                    },
-                    placeholder: (context, url) {
-                      return Container(
-                        color: Colors.grey[300],
-                        height: 200,
-                        width: double.infinity,
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-                if (_localImagePath == null &&
-                    (widget.event.imageUrl == null ||
-                        widget.event.imageUrl!.isEmpty)) ...[
-                  const SizedBox.shrink(),
-                ],
-                const SizedBox(height: 16.0),
-                Text(
-                  'Title: ${_event.title}',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
+                EventImage(
+                  imageUrl: _event.imageUrl,
+                  localImagePath: _localImagePath,
                 ),
-                _buildDetailsText(
-                    'Description: ${_event.description}', isDarkMode),
-                _buildDetailsText(
-                    'Date: ${DateFormat('dd/MM/yyyy').format(_event.date)}',
-                    isDarkMode),
-                _buildDetailsText(
-                    'Time: ${_event.time.format(context)}', isDarkMode),
-                _buildDetailsText('Location: ${_event.location}', isDarkMode),
-                const SizedBox(height: 16.0),
+                EventDetails(
+                  title: _event.title,
+                  description: _event.description,
+                  date: DateFormat('dd/MM/yyyy').format(_event.date),
+                  time: _event.time.format(context),
+                  location: _event.location,
+                  isDarkMode: isDarkMode,
+                ),
               ],
             ),
           ),
@@ -303,7 +264,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Created by',
+                    'Criado por',
                     style: TextStyle(
                       fontSize: 14,
                       fontStyle: FontStyle.italic,
@@ -331,19 +292,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               child: const Icon(Icons.add_a_photo),
             )
           : null,
-    );
-  }
-
-  Widget _buildDetailsText(String text, bool isDarkMode) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 16,
-          color: isDarkMode ? Colors.white : Colors.black,
-        ),
-      ),
     );
   }
 

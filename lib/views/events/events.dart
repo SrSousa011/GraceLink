@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/views/events/add_event.dart';
-import 'package:churchapp/views/events/event_details.dart';
+import 'package:churchapp/views/events/event_detail/event_details_screen.dart';
 import 'package:churchapp/views/events/event_list_item.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/services/auth_service.dart';
