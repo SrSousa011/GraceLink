@@ -211,12 +211,11 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       body: Stack(
         children: [
           SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Row(
                     children: [
                       CircleAvatar(
@@ -235,9 +234,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: isDarkMode
-                                ? const Color.fromARGB(255, 255, 255, 255)
-                                : Colors.black,
+                            color: isDarkMode ? Colors.white : Colors.black,
                           ),
                         ),
                       ),
@@ -291,18 +288,24 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     ],
                   ),
                 ),
-                EventImage(
-                  imageUrl: _event.imageUrl,
-                  localImagePath: _localImagePath,
+                Padding(
+                  padding: const EdgeInsets.all(0.0),
+                  child: EventImage(
+                    imageUrl: _event.imageUrl,
+                    localImagePath: _localImagePath,
+                  ),
                 ),
                 const SizedBox(height: 16.0),
-                EventDetails(
-                  title: _event.title,
-                  description: _event.description,
-                  date: DateFormat('dd/MM/yyyy').format(_event.date),
-                  time: _event.time.format(context),
-                  location: _event.location,
-                  isDarkMode: isDarkMode,
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: EventDetails(
+                    title: _event.title,
+                    description: _event.description,
+                    date: DateFormat('dd/MM/yyyy').format(_event.date),
+                    time: _event.time.format(context),
+                    location: _event.location,
+                    isDarkMode: isDarkMode,
+                  ),
                 ),
               ],
             ),
