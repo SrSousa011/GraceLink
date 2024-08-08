@@ -235,7 +235,9 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: isDarkMode ? Colors.grey : Colors.black,
+                            color: isDarkMode
+                                ? const Color.fromARGB(255, 255, 255, 255)
+                                : Colors.black,
                           ),
                         ),
                       ),
