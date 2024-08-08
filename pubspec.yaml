@@ -55,6 +55,7 @@ dependencies:
   get: ^4.6.6
   path_provider: ^2.1.3
   font_awesome_flutter: ^10.7.0
+  http: ^1.2.2
 
 dev_dependencies:
   flutter_test:
