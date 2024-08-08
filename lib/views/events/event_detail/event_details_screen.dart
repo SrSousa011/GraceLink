@@ -215,7 +215,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.only(
+                      left: 16.0, right: 16.0, top: 0.0, bottom: 0.0),
                   child: Row(
                     children: [
                       CircleAvatar(
@@ -288,6 +289,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 16.0),
                 Padding(
                   padding: const EdgeInsets.all(0.0),
                   child: EventImage(

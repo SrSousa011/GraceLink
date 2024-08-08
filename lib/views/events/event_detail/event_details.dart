@@ -24,17 +24,17 @@ class EventDetails extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Title: $title',
+          title,
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: isDarkMode ? Colors.white : Colors.black,
           ),
         ),
-        _buildDetailsText('Description: $description'),
-        _buildDetailsText('Date: $date'),
-        _buildDetailsText('Time: $time'),
-        _buildDetailsText('Location: $location'),
+        _buildDetailsText(description),
+        _buildDetailsText(' $date'),
+        _buildDetailsText(' $time'),
+        _buildDetailsText(' $location'),
         const SizedBox(height: 16.0),
       ],
     );
