@@ -1,18 +1,21 @@
+import 'dart:async';
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:path/path.dart' as path;
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/update_event.dart';
 import 'package:churchapp/views/events/event_delete.dart';
-import 'package:churchapp/views/events/event_service.dart';
 import 'package:churchapp/views/events/events.dart';
+import 'package:churchapp/views/events/event_service.dart';
+import 'package:path/path.dart' as path;
 
 class EventDetailsScreen extends StatefulWidget {
   final Event event;
@@ -31,6 +34,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   final AuthenticationService _authService = AuthenticationService();
   final ImagePicker _picker = ImagePicker();
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  String? _localImagePath;
 
   @override
   void initState() {
@@ -43,9 +47,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     await _fetchCreatorName();
     await _checkIfAdmin();
     await _fetchCurrentUserId();
-    if (mounted) {
-      setState(() {});
-    }
+    await _checkLocalImage();
   }
 
   Future<void> _fetchCreatorName() async {
@@ -86,6 +88,54 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     }
   }
 
+  Future<void> _checkLocalImage() async {
+    if (_event.imageUrl != null && _event.imageUrl!.isNotEmpty) {
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName = _getFileNameFromUrl(_event.imageUrl!);
+      final filePath = '${directory.path}/$fileName';
+
+      final file = File(filePath);
+      if (await file.exists()) {
+        setState(() {
+          _localImagePath = filePath;
+        });
+      } else {
+        await _downloadAndSaveImage(filePath);
+      }
+    }
+  }
+
+  Future<void> _downloadAndSaveImage(String filePath) async {
+    try {
+      final directory = path.dirname(filePath);
+      final dir = Directory(directory);
+      if (!await dir.exists()) {
+        await dir.create(recursive: true);
+      }
+
+      final response = await http.get(Uri.parse(_event.imageUrl!));
+      final imageBytes = response.bodyBytes;
+
+      final file = File(filePath);
+      await file.writeAsBytes(imageBytes);
+
+      if (mounted) {
+        setState(() {
+          _localImagePath = filePath;
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error downloading or saving image: $e');
+      }
+    }
+  }
+
+  String _getFileNameFromUrl(String url) {
+    final Uri uri = Uri.parse(url);
+    return uri.pathSegments.last;
+  }
+
   bool _shouldShowPopupMenu() {
     return _isAdmin || _currentUserId == _event.createdBy;
   }
@@ -116,9 +166,12 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
           setState(() {
             _event = _event.copyWith(imageUrl: downloadUrl);
+            _localImagePath = null;
           });
 
           await updateEvent(_event, _event.id);
+
+          await _checkLocalImage();
         }
       } catch (e) {
         if (kDebugMode) {
@@ -180,62 +233,63 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               ]
             : null,
       ),
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: _updateImage,
-                  child: _event.imageUrl != null
-                      ? CachedNetworkImage(
-                          imageUrl: _event.imageUrl!,
-                          height: 200,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) =>
-                              const Center(child: CircularProgressIndicator()),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
-                        )
-                      : Container(
-                          height: 200,
-                          width: double.infinity,
-                          color:
-                              isDarkMode ? Colors.grey[800] : Colors.grey[200],
-                          child: Center(
-                            child: Icon(Icons.add_a_photo,
-                                color:
-                                    isDarkMode ? Colors.white : Colors.black54),
-                          ),
-                        ),
-                ),
-                const SizedBox(height: 16.0),
-                Text(
-                  'Title: ${_event.title}',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                ),
-                _buildDetailsText(
-                    'Description: ${_event.description}', isDarkMode),
-                _buildDetailsText(
-                    'Date: ${DateFormat('dd/MM/yyyy').format(_event.date)}',
-                    isDarkMode),
-                _buildDetailsText(
-                    'Time: ${_event.time.format(context)}', isDarkMode),
-                _buildDetailsText('Location: ${_event.location}', isDarkMode),
-              ],
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_localImagePath != null) ...[
+              Image.file(
+                File(_localImagePath!),
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ] else if (widget.event.imageUrl != null &&
+                widget.event.imageUrl!.isNotEmpty) ...[
+              CachedNetworkImage(
+                imageUrl: widget.event.imageUrl!,
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorWidget: (context, error, stackTrace) {
+                  return const Center(child: Text('Error loading image'));
+                },
+                placeholder: (context, url) {
+                  return Container(
+                    color: Colors.grey[300],
+                    height: 200,
+                    width: double.infinity,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                },
+              ),
+            ],
+            if (_localImagePath == null &&
+                (widget.event.imageUrl == null ||
+                    widget.event.imageUrl!.isEmpty)) ...[
+              const SizedBox.shrink(),
+            ],
+            const SizedBox(height: 16.0),
+            Text(
+              'Title: ${_event.title}',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
             ),
-          ),
-          Positioned(
-            bottom: 16.0,
-            right: 16.0,
-            child: Row(
+            _buildDetailsText('Description: ${_event.description}', isDarkMode),
+            _buildDetailsText(
+                'Date: ${DateFormat('dd/MM/yyyy').format(_event.date)}',
+                isDarkMode),
+            _buildDetailsText(
+                'Time: ${_event.time.format(context)}', isDarkMode),
+            _buildDetailsText('Location: ${_event.location}', isDarkMode),
+            const SizedBox(height: 16.0),
+            Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
@@ -257,9 +311,15 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 ),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+      floatingActionButton: _shouldShowPopupMenu()
+          ? FloatingActionButton(
+              onPressed: _updateImage,
+              child: const Icon(Icons.add_a_photo),
+            )
+          : null,
     );
   }
 
