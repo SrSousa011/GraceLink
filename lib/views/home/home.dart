@@ -15,6 +15,7 @@ const String tLogo = 'assets/icons/logo.png';
 const String trLogo = 'assets/icons/rlogo.png';
 const String tInsta = 'assets/icons/insta.png';
 const String tFace = 'assets/icons/face.png';
+const String tYoutube = 'assets/icons/youtube.png';
 
 class Home extends StatefulWidget {
   final BaseAuth auth;
@@ -45,49 +46,93 @@ class _HomeState extends State<Home> {
         .toList();
   }
 
+  Future<void> _launchInstagram() async {
+    const nativeUrl = "instagram://user?username=igrejaresplandecendoathus";
+    const webUrl = "https://www.instagram.com/igrejaresplandecendoathus/";
+
+    try {
+      await launchUrlString(nativeUrl, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      await launchUrlString(webUrl, mode: LaunchMode.platformDefault);
+    }
+  }
+
+  Future<void> _launchFacebook() async {
+    const nativeUrl = "fb://profile/100088490063123";
+    const webUrl = "https://www.facebook.com/profile.php?id=100088490063123";
+
+    try {
+      await launchUrlString(nativeUrl, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (kDebugMode) {
+        print(
+            "Não foi possível abrir o aplicativo do Facebook, abrindo no navegador: $e");
+      }
+      await launchUrlString(webUrl, mode: LaunchMode.platformDefault);
+    }
+  }
+
+  Future<void> _launchDonationPage() async {
+    const donationUrl =
+        "https://linktr.ee/igrejaresplandecendoasnacoes?utm_source=linktree_profile_share";
+    try {
+      await launchUrlString(donationUrl, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+  }
+
+  Future<void> _launchYouTube() async {
+    const youtubeUrl = "https://www.youtube.com/@igrejaresplandecendo";
+    try {
+      await launchUrlString(youtubeUrl, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (kDebugMode) {
+        print("Não foi possível abrir o aplicativo do YouTube: $e");
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Home'),
-          actions: [
-            IconButton(
-              icon: Icon(
-                isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                color: isDarkMode ? Colors.white : Colors.black,
-              ),
-              onPressed: () {
-                themeProvider.toggleTheme();
-              },
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
-          ],
-        ),
-        drawer: NavBar(
-          auth: widget.auth,
-          authService: AuthenticationService(),
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              const SizedBox(height: 20),
-              _buildUpcomingEventsSection(isDarkMode),
-              const SizedBox(height: 20),
-              _buildImportantInfoSection(),
-            ],
+            onPressed: () {
+              themeProvider.toggleTheme();
+            },
           ),
+        ],
+      ),
+      drawer: NavBar(
+        auth: widget.auth,
+        authService: AuthenticationService(),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            const SizedBox(height: 20),
+            _buildUpcomingEventsSection(isDarkMode),
+            const SizedBox(height: 20),
+            _buildImportantInfoSection(),
+          ],
         ),
       ),
     );
@@ -235,6 +280,15 @@ class _HomeState extends State<Home> {
                 height: 50,
               ),
             ),
+            const SizedBox(width: 10),
+            GestureDetector(
+              onTap: _launchYouTube,
+              child: Image.asset(
+                tYoutube,
+                width: 50,
+                height: 50,
+              ),
+            ),
           ],
         ),
       ],
@@ -247,47 +301,5 @@ class _HomeState extends State<Home> {
       context,
       MaterialPageRoute(builder: (context) => EventDetailsScreen(event: event)),
     );
-  }
-
-  Future<void> _launchInstagram() async {
-    const nativeUrl = "instagram://user?username=igrejaresplandecendoathus";
-    const webUrl = "https://www.instagram.com/igrejaresplandecendoathus/";
-
-    try {
-      await launchUrlString(nativeUrl, mode: LaunchMode.externalApplication);
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-      await launchUrlString(webUrl, mode: LaunchMode.platformDefault);
-    }
-  }
-
-  Future<void> _launchFacebook() async {
-    const nativeUrl = "fb://profile/100088490063123";
-    const webUrl = "https://www.facebook.com/profile.php?id=100088490063123";
-
-    try {
-      await launchUrlString(nativeUrl, mode: LaunchMode.externalApplication);
-    } catch (e) {
-      if (kDebugMode) {
-        print(
-            "Não foi possível abrir o aplicativo do Facebook, abrindo no navegador: $e");
-      }
-      await launchUrlString(webUrl, mode: LaunchMode.platformDefault);
-    }
-  }
-//https://resplandecendonacoes.org/
-
-  Future<void> _launchDonationPage() async {
-    const donationUrl =
-        "https://linktr.ee/igrejaresplandecendoasnacoes?utm_source=linktree_profile_share";
-    try {
-      await launchUrlString(donationUrl, mode: LaunchMode.externalApplication);
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-    }
   }
 }
