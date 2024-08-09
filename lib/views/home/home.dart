@@ -38,8 +38,19 @@ class _HomeState extends State<Home> {
   Future<List<Event>> _fetchEvents() async {
     CollectionReference events =
         FirebaseFirestore.instance.collection('events');
-    var snapshot =
-        await events.orderBy('date', descending: true).limit(5).get();
+
+    DateTime now = DateTime.now();
+    DateTime endDate = now.add(const Duration(days: 30));
+
+    Timestamp startTimestamp = Timestamp.fromDate(now);
+    Timestamp endTimestamp = Timestamp.fromDate(endDate);
+
+    var snapshot = await events
+        .where('date', isGreaterThanOrEqualTo: startTimestamp)
+        .where('date', isLessThanOrEqualTo: endTimestamp)
+        .orderBy('date', descending: true)
+        .get();
+
     return snapshot.docs
         .map((doc) =>
             Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
