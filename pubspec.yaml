@@ -89,7 +89,9 @@ flutter:
       - assets/icons/rlogo.png
       - assets/icons/logo.png
       - assets/icons/insta.png
-      - 'assets/icons/face.png'
+      - assets/icons/face.png
+      - assets/icons/youtube.png
+
       - assets/imagens/bacground-image-center.jpg
       - assets/imagens/dizimo.jpg
       - assets/imagens/oferta.jpg
