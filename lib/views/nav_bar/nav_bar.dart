@@ -1,9 +1,9 @@
+import 'package:churchapp/data/model/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/welcome.dart';
-import 'package:churchapp/models/user_data.dart';
 import 'package:churchapp/views/nav_bar/drawer_header_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

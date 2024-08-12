@@ -1,7 +1,7 @@
+import 'package:churchapp/data/model/user_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:churchapp/models/user_data.dart';
 
 class AdminPanel extends StatefulWidget {
   const AdminPanel({super.key});

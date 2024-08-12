@@ -1,4 +1,4 @@
-import 'package:churchapp/models/user_data.dart';
+import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/views/user_Profile/editProfile/user_profile_service.dart';
 import 'package:churchapp/views/user_profile/user_profile.dart';
 import 'package:flutter/material.dart';
@@ -82,13 +82,11 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final Color buttonColor = theme.brightness == Brightness.light
-        ? Colors.blue
-        : Colors.grey;
+    final Color buttonColor =
+        theme.brightness == Brightness.light ? Colors.blue : Colors.grey;
 
-    final Color buttonTextColor = theme.brightness == Brightness.light
-        ? Colors.white
-        : Colors.black;
+    final Color buttonTextColor =
+        theme.brightness == Brightness.light ? Colors.white : Colors.black;
 
     return Scaffold(
       appBar: AppBar(

@@ -1,4 +1,4 @@
-import 'package:churchapp/models/user_data.dart';
+import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/views/user_profile/user_profile.dart';
 import 'package:flutter/material.dart';
 

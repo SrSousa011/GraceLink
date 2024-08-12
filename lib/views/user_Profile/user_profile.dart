@@ -1,5 +1,7 @@
 import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/services/auth_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/user_Profile/editProfile/update_profile.dart';
@@ -10,7 +12,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:churchapp/models/user_data.dart';
 import 'package:churchapp/views/user_Profile/profile_menu.dart';
 import 'package:churchapp/views/user_Profile/settings/settings.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';

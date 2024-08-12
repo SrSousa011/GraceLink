@@ -1,4 +1,4 @@
-import 'package:churchapp/data/firebase_service/model/user_data.dart';
+import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/exceptions/firebase_exception_wrapper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
