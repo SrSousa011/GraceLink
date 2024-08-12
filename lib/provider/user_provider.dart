@@ -1,7 +1,7 @@
+import 'package:churchapp/data/firebase_service/model/user_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:churchapp/models/user_data.dart';
 import 'package:churchapp/views/events/event_service.dart';
 
 class UserProvider with ChangeNotifier {
