@@ -5,7 +5,7 @@ import 'package:churchapp/views/events/events.dart';
 import 'package:churchapp/views/events/event_detail/event_details_screen.dart';
 import 'package:churchapp/views/events/event_list_item.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
-import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/events/event_service.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';

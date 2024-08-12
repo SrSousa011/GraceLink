@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:churchapp/data/model/user_data.dart';
-import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/user_Profile/editProfile/update_profile.dart';
 import 'package:churchapp/views/user_Profile/manegement/user_management_screen.dart';

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:churchapp/services/auth_method.dart';
-import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/auth/auth_method.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/home/home.dart';
 import 'package:churchapp/views/signUp/date_birth.dart';
 import 'package:churchapp/views/signUp/gender.dart';

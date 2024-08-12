@@ -7,7 +7,7 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart' as YT;
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'videos_service.dart';
-import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 
 class Videos extends StatefulWidget {

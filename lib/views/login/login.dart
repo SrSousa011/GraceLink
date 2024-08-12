@@ -1,9 +1,9 @@
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/login/local_settings.dart';
 import 'package:flutter/material.dart';
-import 'package:churchapp/services/auth_method.dart';
+import 'package:churchapp/auth/auth_method.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/home/home.dart';
 import 'package:provider/provider.dart';
 

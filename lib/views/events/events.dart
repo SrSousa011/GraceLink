@@ -4,7 +4,7 @@ import 'package:churchapp/views/events/add_event.dart';
 import 'package:churchapp/views/events/event_detail/event_details_screen.dart';
 import 'package:churchapp/views/events/event_list_item.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
-import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/events/event_service.dart';
 
 class Events extends StatefulWidget {

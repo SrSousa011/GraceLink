@@ -1,4 +1,4 @@
-import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class LoginButton extends StatelessWidget {

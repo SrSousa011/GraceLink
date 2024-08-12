@@ -9,7 +9,7 @@ import 'package:churchapp/views/member/become_member.dart';
 import 'package:churchapp/views/member/become_member_list.dart';
 import 'package:churchapp/views/member/become_dashboard.dart';
 import 'package:churchapp/views/user_Profile/manegement/about_us.dart';
-import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/welcome.dart';
 import 'package:churchapp/views/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';

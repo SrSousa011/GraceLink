@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:churchapp/views/user_Profile/settings/change_email.dart';
 import 'package:churchapp/views/user_Profile/settings/change_password.dart';
-import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/auth/auth_service.dart';
 
 const Color tPrimaryColor = Colors.blue; // Example primary color
 const Color tDarkColor = Colors.black; // Example dark color

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/login/login.dart';
 import 'package:churchapp/views/signUp/sign_up_page.dart';
 

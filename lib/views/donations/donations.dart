@@ -1,4 +1,4 @@
-import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/donations/donation_type.dart';
 import 'package:churchapp/views/donations/donation_value.dart';
 import 'package:churchapp/views/donations/donnation_detail.dart';

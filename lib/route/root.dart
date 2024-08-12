@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/provider/user_provider.dart';
-import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/home/home.dart';
 import 'package:churchapp/views/login/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';

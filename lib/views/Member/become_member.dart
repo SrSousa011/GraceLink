@@ -1,7 +1,7 @@
 import 'package:churchapp/views/member/become_member_service.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 
 class BecomeMember extends StatefulWidget {

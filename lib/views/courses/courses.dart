@@ -1,4 +1,4 @@
-import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/courses/courses_details.dart';
 import 'package:churchapp/views/courses/courses_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';

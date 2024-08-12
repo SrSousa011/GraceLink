@@ -1,6 +1,6 @@
 import 'package:churchapp/views/user_Profile/editProfile/update_profile.dart';
 import 'package:flutter/material.dart';
-import 'package:churchapp/services/auth_service.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 const Color tPrimaryColor = Colors.blue;
