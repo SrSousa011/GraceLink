@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-
 import 'package:flutter/foundation.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -23,30 +22,55 @@ class ImagePickerr {
   Future<void> updateProfilePicture(
       VoidCallback onSuccess, Function(String)? onError) async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      File file = File(pickedFile.path);
-      try {
-        UploadTask uploadTask = _storage
-            .ref()
-            .child('userProfilePictures/$userId/profilePicture.jpg')
-            .putFile(file);
 
-        TaskSnapshot taskSnapshot = await uploadTask;
-        String downloadURL = await taskSnapshot.ref.getDownloadURL();
+    if (pickedFile == null) {
+      if (onError != null) {
+        onError("No image selected.");
+      }
+      return;
+    }
 
-        await _firestore
-            .collection('users')
-            .doc(userId)
-            .update({'imagePath': downloadURL});
+    File file = File(pickedFile.path);
 
-        onSuccess();
-      } catch (e) {
-        if (kDebugMode) {
-          print("Error uploading image: $e");
-        }
-        if (onError != null) {
-          onError(e.toString());
-        }
+    if (!await file.exists()) {
+      if (onError != null) {
+        onError("Selected file does not exist.");
+      }
+      return;
+    }
+
+    try {
+      UploadTask uploadTask = _storage
+          .ref()
+          .child('userProfilePictures/$userId/profilePicture.jpg')
+          .putFile(file);
+
+      TaskSnapshot taskSnapshot = await uploadTask;
+
+      String downloadURL = await taskSnapshot.ref.getDownloadURL();
+
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .update({'imagePath': downloadURL});
+
+      onSuccess();
+    } catch (e) {
+      String errorMessage;
+      if (e is FirebaseException) {
+        errorMessage = "Firebase error: ${e.message}";
+      } else if (e is IOException) {
+        errorMessage = "I/O error: ${e.toString()}";
+      } else {
+        errorMessage = "Unexpected error: ${e.toString()}";
+      }
+
+      if (kDebugMode) {
+        print("Error uploading image: $errorMessage");
+      }
+
+      if (onError != null) {
+        onError(errorMessage);
       }
     }
   }
