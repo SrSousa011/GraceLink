@@ -1,8 +1,7 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/auth/auth_service.dart';
+import 'package:churchapp/util/imagepicker.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/user_Profile/editProfile/update_profile.dart';
 import 'package:churchapp/views/user_Profile/manegement/user_management_screen.dart';
@@ -31,11 +30,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
-  final ImagePicker _picker = ImagePicker();
-
+  late ImagePickerr _imagePicker;
   late User _user;
   late UserData _userData;
   String? _imageUrl;
@@ -43,37 +38,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _user = _auth.currentUser!;
+    _user = FirebaseAuth.instance.currentUser!;
     _userData = widget.userData;
     _imageUrl = _userData.imagePath;
+
+    _imagePicker = ImagePickerr(
+      storage: FirebaseStorage.instance,
+      firestore: FirebaseFirestore.instance,
+      picker: ImagePicker(),
+      userId: _user.uid,
+    );
   }
 
-  Future<void> _updateProfilePicture() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      File file = File(pickedFile.path);
-      try {
-        UploadTask uploadTask = _storage
-            .ref()
-            .child('userProfilePictures/${_user.uid}/profilePicture.jpg')
-            .putFile(file);
-
-        TaskSnapshot taskSnapshot = await uploadTask;
-        String downloadURL = await taskSnapshot.ref.getDownloadURL();
-
-        await _firestore
-            .collection('users')
-            .doc(_user.uid)
-            .update({'imagePath': downloadURL});
+  void _updateProfilePicture() {
+    _imagePicker.updateProfilePicture(
+      () {
         setState(() {
-          _imageUrl = downloadURL;
+          _imageUrl = _userData.imagePath;
         });
-      } catch (e) {
+      },
+      (error) {
         if (kDebugMode) {
-          print("Error uploading image: $e");
+          print('Error: $error');
         }
-      }
-    }
+      },
+    );
   }
 
   @override
