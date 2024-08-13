@@ -49,7 +49,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _updateProfilePicture() async {
     await _imagePicker.updateProfilePicture(
       () {
-        // Atualize o estado após o upload da imagem
         setState(() {});
       },
       (error) {
