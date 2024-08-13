@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:churchapp/views/events/event_delete.dart';
 import 'package:churchapp/views/events/event_detail/event_details.dart';
 import 'package:churchapp/views/events/event_detail/event_image.dart';
+import 'package:churchapp/views/events/event_detail/event_image_add.dart';
 import 'package:churchapp/views/events/events.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
@@ -35,6 +37,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   String? _currentUserId;
   final AuthenticationService _authService = AuthenticationService();
   final ImagePicker _picker = ImagePicker();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
   String? _localImagePath;
 
@@ -153,44 +156,18 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     return _isAdmin || _currentUserId == _event.createdBy;
   }
 
-  Future<void> _updateImage() async {
-    if (_shouldShowPopupMenu()) {
-      try {
-        final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+  Future<void> _pickImage() async {
+    final imageAdd = ImageAdd(
+      storage: _storage,
+      picker: _picker,
+      firestore: _firestore,
+      eventId: _event.id,
+    );
 
-        if (pickedFile != null) {
-          File file = File(pickedFile.path);
-          final imageBytes = await file.readAsBytes();
+    final downloadUrl = await imageAdd.updateImage();
 
-          String fileName = path.basename(file.path);
-          String uniqueFileName =
-              '${DateTime.now().millisecondsSinceEpoch}_$fileName';
-
-          final uploadTask = _storage
-              .ref()
-              .child('eventImages/$uniqueFileName')
-              .putData(imageBytes);
-          final taskSnapshot = await uploadTask;
-
-          final downloadUrl = await taskSnapshot.ref.getDownloadURL();
-          if (kDebugMode) {
-            print('Image uploaded successfully: $downloadUrl');
-          }
-
-          setState(() {
-            _event = _event.copyWith(imageUrl: downloadUrl);
-            _localImagePath = null;
-          });
-
-          await updateEvent(_event, _event.id);
-
-          await _checkLocalImage();
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          print("Error selecting or uploading image: $e");
-        }
-      }
+    if (downloadUrl != null) {
+      setState(() {});
     }
   }
 
@@ -316,7 +293,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       ),
       floatingActionButton: _shouldShowPopupMenu()
           ? FloatingActionButton(
-              onPressed: _updateImage,
+              onPressed: _pickImage,
               backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
               child: Icon(Icons.add_a_photo,
                   color: isDarkMode ? Colors.white : Colors.black),

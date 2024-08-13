@@ -1,9 +1,8 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
+import 'package:churchapp/views/events/event_detail/event_image_add.dart';
+import 'package:churchapp/views/events/event_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:path/path.dart' as path;
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/auth/auth_service.dart';
@@ -26,11 +25,11 @@ class _AddEventFormState extends State<AddEventForm> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   String _location = '';
-  File? _image;
   String? _imageUrl;
   final ImagePicker _picker = ImagePicker();
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  late Event _event;
   final NotificationService _notificationService = NotificationService();
   late AuthenticationService _authenticationService;
 
@@ -56,37 +55,19 @@ class _AddEventFormState extends State<AddEventForm> {
   }
 
   Future<void> _pickImage() async {
-    try {
-      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final imageAdd = ImageAdd(
+      storage: _storage,
+      picker: _picker,
+      firestore: _firestore,
+      eventId: _event.id,
+    );
 
-      if (pickedFile != null) {
-        setState(() {
-          _image = File(pickedFile.path);
-        });
+    final downloadUrl = await imageAdd.updateImage();
 
-        String fileName = path.basename(_image!.path);
-        String uniqueFileName =
-            '${DateTime.now().millisecondsSinceEpoch}_$fileName';
-
-        final uploadTask = _storage
-            .ref()
-            .child('eventImages/$uniqueFileName')
-            .putFile(_image!);
-        final taskSnapshot = await uploadTask;
-
-        final downloadUrl = await taskSnapshot.ref.getDownloadURL();
-        if (kDebugMode) {
-          print('Imagem carregada com sucesso: $downloadUrl');
-        }
-
-        setState(() {
-          _imageUrl = downloadUrl;
-        });
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print("Erro ao selecionar ou carregar imagem: $e");
-      }
+    if (downloadUrl != null) {
+      setState(() {
+        _imageUrl = downloadUrl;
+      });
     }
   }
 
@@ -290,11 +271,11 @@ class _AddEventFormState extends State<AddEventForm> {
           onPressed: _pickImage,
           child: const Text('Selecionar Imagem'),
         ),
-        if (_image != null)
+        if (_imageUrl != null)
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
-            child: Image.file(
-              _image!,
+            child: Image.network(
+              _imageUrl!,
               width: 100,
               height: 100,
               fit: BoxFit.cover,
