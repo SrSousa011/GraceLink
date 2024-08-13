@@ -5,50 +5,52 @@ import 'package:cached_network_image/cached_network_image.dart';
 class EventImage extends StatelessWidget {
   final String? imageUrl;
   final String? localImagePath;
-  final double imageHeight; // Altura ajustável
+  final double imageHeight;
 
   const EventImage({
     super.key,
     this.imageUrl,
     this.localImagePath,
-    this.imageHeight = 400.0, // Altura padrão
+    this.imageHeight = 400.0,
   });
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size; // Obtém a largura da tela
+    final screenSize = MediaQuery.of(context).size;
 
     return Container(
-      width: screenSize.width, // Largura total da tela
-      height: imageHeight, // Altura ajustável
-      padding: EdgeInsets.zero, // Remove o padding
-      margin: EdgeInsets.zero, // Remove a margem
+      width: screenSize.width,
+      height: imageHeight,
+      padding: EdgeInsets.zero,
+      margin: EdgeInsets.zero,
       child: localImagePath != null
           ? ClipRRect(
-              borderRadius: BorderRadius.zero, // Sem bordas arredondadas
+              borderRadius: BorderRadius.zero,
               child: Image.file(
                 File(localImagePath!),
-                fit: BoxFit.cover, // Preenche a área disponível
+                fit: BoxFit.cover,
               ),
             )
           : imageUrl != null && imageUrl!.isNotEmpty
-              ? ClipRRect(
-                  borderRadius: BorderRadius.zero, // Sem bordas arredondadas
-                  child: CachedNetworkImage(
-                    imageUrl: imageUrl!,
-                    fit: BoxFit.cover, // Preenche a área disponível
-                    errorWidget: (context, error, stackTrace) {
-                      return const Center(child: Text('Error loading image'));
-                    },
-                    placeholder: (context, url) {
-                      return Container(
-                        color: Colors.grey[300],
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    },
-                  ),
+              ? CachedNetworkImage(
+                  imageUrl: imageUrl!,
+                  fit: BoxFit.cover,
+                  errorWidget: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[300],
+                      child: const Center(
+                        child: Icon(Icons.error, color: Colors.red),
+                      ),
+                    );
+                  },
+                  placeholder: (context, url) {
+                    return Container(
+                      color: Colors.grey[200],
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  },
                 )
               : const SizedBox.shrink(),
     );
