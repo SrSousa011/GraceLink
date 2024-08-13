@@ -129,10 +129,7 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-      drawer: NavBar(
-        auth: widget.auth,
-        authService: AuthenticationService(),
-      ),
+      drawer: const NavBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(

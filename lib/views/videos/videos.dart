@@ -5,9 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as YT;
 import 'package:cached_network_image/cached_network_image.dart';
-
 import 'videos_service.dart';
-import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 
 class Videos extends StatefulWidget {
@@ -220,10 +218,7 @@ class _VideosState extends State<Videos> {
             ),
           ],
         ),
-        drawer: NavBar(
-          auth: AuthenticationService(),
-          authService: AuthenticationService(),
-        ),
+        drawer: const NavBar(),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

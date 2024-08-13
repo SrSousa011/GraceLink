@@ -1,4 +1,3 @@
-import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/courses/courses_details.dart';
 import 'package:churchapp/views/courses/courses_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
@@ -32,10 +31,7 @@ class _CoursesState extends State<Courses> {
         title: const Text('Cursos'),
         centerTitle: true,
       ),
-      drawer: NavBar(
-        auth: AuthenticationService(),
-        authService: AuthenticationService(),
-      ),
+      drawer: const NavBar(),
       body: FutureBuilder<List<Course>>(
         future: _coursesFuture,
         builder: (context, snapshot) {

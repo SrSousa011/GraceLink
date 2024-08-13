@@ -137,10 +137,7 @@ class _DonationsState extends State<Donations> {
         appBar: AppBar(
           title: const Text('Donations'),
         ),
-        drawer: NavBar(
-          auth: AuthenticationService(),
-          authService: AuthenticationService(),
-        ),
+        drawer: const NavBar(),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),

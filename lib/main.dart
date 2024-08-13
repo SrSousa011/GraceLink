@@ -40,10 +40,7 @@ class MyApp extends StatelessWidget {
       themeMode: themeProvider.themeMode,
       home: SplashScreen(
         root: Root(auth: AuthenticationService()),
-        drawer: NavBar(
-          auth: AuthenticationService(),
-          authService: AuthenticationService(),
-        ),
+        drawer: const NavBar(),
       ),
       onGenerateRoute: AppRoutes.generateRoute,
     );

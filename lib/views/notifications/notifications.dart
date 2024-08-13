@@ -1,4 +1,3 @@
-import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/notifications/chat_arguments.dart';
 import 'package:churchapp/views/notifications/notification_service.dart';
@@ -61,10 +60,7 @@ class _Application extends State<Notifications> {
         appBar: AppBar(
           title: const Text('Notificações'),
         ),
-        drawer: NavBar(
-          auth: AuthenticationService(),
-          authService: AuthenticationService(),
-        ),
+        drawer: const NavBar(),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: FutureBuilder(
