@@ -1,5 +1,3 @@
-import 'package:churchapp/views/events/event_detail/event_image_add.dart';
-import 'package:churchapp/views/events/event_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -29,7 +27,6 @@ class _AddEventFormState extends State<AddEventForm> {
   final ImagePicker _picker = ImagePicker();
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  late Event _event;
   final NotificationService _notificationService = NotificationService();
   late AuthenticationService _authenticationService;
 
@@ -52,23 +49,6 @@ class _AddEventFormState extends State<AddEventForm> {
     _descriptionController.dispose();
     _locationController.dispose();
     super.dispose();
-  }
-
-  Future<void> _pickImage() async {
-    final imageAdd = ImageAdd(
-      storage: _storage,
-      picker: _picker,
-      firestore: _firestore,
-      eventId: _event.id,
-    );
-
-    final downloadUrl = await imageAdd.updateImage();
-
-    if (downloadUrl != null) {
-      setState(() {
-        _imageUrl = downloadUrl;
-      });
-    }
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -97,6 +77,28 @@ class _AddEventFormState extends State<AddEventForm> {
     }
   }
 
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      try {
+        final file = await pickedFile.readAsBytes();
+        final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+        final storageRef = _storage.ref().child('event_images/$fileName');
+        final uploadTask = storageRef.putData(file);
+
+        final snapshot = await uploadTask.whenComplete(() {});
+        final downloadUrl = await snapshot.ref.getDownloadURL();
+
+        setState(() {
+          _imageUrl = downloadUrl;
+        });
+      } catch (e) {
+        _showErrorDialog(context, 'Erro ao selecionar imagem',
+            'Ocorreu um erro ao tentar selecionar a imagem: ${e.toString()}');
+      }
+    }
+  }
+
   Future<void> _saveEvent(BuildContext context) async {
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty &&
@@ -111,8 +113,6 @@ class _AddEventFormState extends State<AddEventForm> {
       }
 
       final eventId = DateTime.now().millisecondsSinceEpoch.toString();
-      String? imageUrl = _imageUrl;
-
       final newEvent = {
         'id': eventId,
         'title': _titleController.text,
@@ -121,7 +121,7 @@ class _AddEventFormState extends State<AddEventForm> {
         'time': _selectedTime!.format(context),
         'location': _location,
         'createdBy': userId,
-        'imageUrl': imageUrl,
+        'imageUrl': _imageUrl,
       };
 
       try {
@@ -181,29 +181,59 @@ class _AddEventFormState extends State<AddEventForm> {
       appBar: AppBar(
         title: const Text('Novo Evento'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTextField('Título do Evento', _titleController, Icons.title,
-                isDarkMode: isDarkMode),
-            const SizedBox(height: 20.0),
-            _buildTextField('Descrição do Evento', _descriptionController,
-                Icons.description,
-                isDarkMode: isDarkMode),
-            const SizedBox(height: 20.0),
-            _buildDateField(isDarkMode: isDarkMode),
-            const SizedBox(height: 20.0),
-            _buildTimeField(isDarkMode: isDarkMode),
-            const SizedBox(height: 20.0),
-            _buildLocationField(isDarkMode: isDarkMode),
-            const SizedBox(height: 20.0),
-            _buildImagePicker(isDarkMode: isDarkMode),
-            const SizedBox(height: 20.0),
-            _buildSaveButton(isDarkMode: isDarkMode),
-          ],
-        ),
+      resizeToAvoidBottomInset:
+          false, // Não redimensiona a tela quando o teclado aparece
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTextField(
+                    'Título do Evento', _titleController, Icons.title,
+                    isDarkMode: isDarkMode),
+                const SizedBox(height: 20.0),
+                _buildTextField('Descrição do Evento', _descriptionController,
+                    Icons.description,
+                    isDarkMode: isDarkMode),
+                const SizedBox(height: 20.0),
+                _buildDateField(isDarkMode: isDarkMode),
+                const SizedBox(height: 20.0),
+                _buildTimeField(isDarkMode: isDarkMode),
+                const SizedBox(height: 20.0),
+                _buildLocationField(isDarkMode: isDarkMode),
+                const SizedBox(height: 20.0),
+                if (_imageUrl != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Image.network(
+                      _imageUrl!,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                const SizedBox(height: 100.0), // Espaço suficiente para o botão
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 16.0,
+            right: 16.0,
+            child: FloatingActionButton(
+              onPressed: _pickImage,
+              backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
+              child: Icon(Icons.add_a_photo,
+                  color: isDarkMode ? Colors.black : Colors.white),
+            ),
+          ),
+          Positioned(
+            bottom: 16.0,
+            left: 16.0,
+            child: _buildSaveButton(isDarkMode: isDarkMode), // Botão fixo
+          ),
+        ],
       ),
     );
   }
@@ -255,40 +285,32 @@ class _AddEventFormState extends State<AddEventForm> {
           _location = value;
         });
       },
+      controller: _locationController,
       decoration: InputDecoration(
-        labelText: 'Localização',
+        labelText: 'Localização do Evento',
         icon: Icon(Icons.location_on,
             color: isDarkMode ? Colors.white : Colors.blue),
       ),
     );
   }
 
-  Widget _buildImagePicker({required bool isDarkMode}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ElevatedButton(
-          onPressed: _pickImage,
-          child: const Text('Selecionar Imagem'),
-        ),
-        if (_imageUrl != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Image.network(
-              _imageUrl!,
-              width: 100,
-              height: 100,
-              fit: BoxFit.cover,
-            ),
-          ),
-      ],
-    );
-  }
-
   Widget _buildSaveButton({required bool isDarkMode}) {
     return ElevatedButton(
       onPressed: () => _saveEvent(context),
-      child: const Text('Salvar Evento'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
+        minimumSize: const Size(100, 40),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+      ),
+      child: Text(
+        'Salvar',
+        style: TextStyle(
+          color: isDarkMode ? Colors.black : Colors.white,
+          fontSize: 14,
+        ),
+      ),
     );
   }
 }
