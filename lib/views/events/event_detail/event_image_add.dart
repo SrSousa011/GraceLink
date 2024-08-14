@@ -68,4 +68,56 @@ class ImageAdd {
       return null;
     }
   }
+
+  Future<void> uploadAndSaveImage({
+    required VoidCallback onSuccess,
+    Function(String)? onError,
+  }) async {
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile == null) {
+        onError?.call("No image selected.");
+        return;
+      }
+
+      File file = File(pickedFile.path);
+      if (!await file.exists()) {
+        onError?.call("Selected file does not exist.");
+        return;
+      }
+
+      String fileName = path.basename(file.path);
+      String uniqueFileName =
+          '${DateTime.now().millisecondsSinceEpoch}_$fileName';
+
+      final uploadTask =
+          _storage.ref().child('eventImages/$uniqueFileName').putFile(file);
+      final taskSnapshot = await uploadTask;
+
+      final downloadURL = await taskSnapshot.ref.getDownloadURL();
+
+      await _firestore
+          .collection('events')
+          .doc(eventId)
+          .update({'imageUrl': downloadURL});
+
+      onSuccess();
+    } catch (e) {
+      String errorMessage;
+      if (e is FirebaseException) {
+        errorMessage = "Firebase error: ${e.message}";
+      } else if (e is IOException) {
+        errorMessage = "I/O error: ${e.toString()}";
+      } else {
+        errorMessage = "Unexpected error: ${e.toString()}";
+      }
+
+      if (kDebugMode) {
+        print("Error uploading image: $errorMessage");
+      }
+
+      onError?.call(errorMessage);
+    }
+  }
 }
