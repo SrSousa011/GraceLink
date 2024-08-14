@@ -1,5 +1,6 @@
 import 'package:churchapp/views/member/member.dart';
 import 'package:churchapp/views/member/members_detail.dart';
+import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -48,6 +49,7 @@ class _BecomeMemberListState extends State<BecomeMemberList> {
       appBar: AppBar(
         title: const Text('Membership Applications'),
       ),
+      drawer: const NavBar(),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(

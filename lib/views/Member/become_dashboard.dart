@@ -1,4 +1,5 @@
 import 'package:churchapp/theme/theme_provider.dart';
+import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -57,6 +58,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
       appBar: AppBar(
         title: const Text('Members Dashboard'),
       ),
+      drawer: const NavBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
