@@ -140,25 +140,21 @@ class _EventsState extends State<Events> {
             ),
           ],
         ),
-        floatingActionButton: _buildAddEventButton(),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            _navigateToAddEventScreen(context);
+          },
+          tooltip: 'Novo Evento',
+          child: const Icon(Icons.add),
+        ),
       ),
-    );
-  }
-
-  Widget _buildAddEventButton() {
-    return FloatingActionButton(
-      onPressed: () {
-        _navigateToAddEventScreen(context);
-      },
-      tooltip: 'Novo Evento',
-      child: const Icon(Icons.add),
     );
   }
 
   void _navigateToAddEventScreen(BuildContext context) async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const AddEventForm()),
+      _createPageRoute(const AddEventForm()),
     );
 
     if (result != null && context.mounted) {
@@ -174,7 +170,7 @@ class _EventsState extends State<Events> {
   void _navigateToEventDetailsScreen(BuildContext context, Event event) async {
     final updatedEvent = await Navigator.push<Event>(
       context,
-      MaterialPageRoute(builder: (context) => EventDetailsScreen(event: event)),
+      _createPageRoute(EventDetailsScreen(event: event)) as Route<Event>,
     );
 
     if (updatedEvent != null && context.mounted) {
@@ -185,5 +181,22 @@ class _EventsState extends State<Events> {
         const SnackBar(content: Text('Evento atualizado')),
       );
     }
+  }
+
+  PageRouteBuilder _createPageRoute(Widget page) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0); // Start from right
+        const end = Offset.zero; // End at the center
+        const curve = Curves.easeInOut;
+
+        var tween = Tween(begin: begin, end: end);
+        var offsetAnimation =
+            animation.drive(tween.chain(CurveTween(curve: curve)));
+
+        return SlideTransition(position: offsetAnimation, child: child);
+      },
+    );
   }
 }
