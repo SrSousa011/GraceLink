@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:churchapp/views/events/event_delete.dart';
 import 'package:churchapp/views/events/event_detail/event_details.dart';
 import 'package:churchapp/views/events/event_detail/event_image.dart';
@@ -8,8 +7,6 @@ import 'package:churchapp/views/events/events.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,7 +15,6 @@ import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/update_event.dart';
 import 'package:churchapp/views/events/event_service.dart';
-import 'package:path/path.dart' as path;
 
 class EventDetailsScreen extends StatefulWidget {
   final Event event;
@@ -53,7 +49,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       _fetchCreatorDetails(),
       _checkIfAdmin(),
       _fetchCurrentUserId(),
-      _checkLocalImage(),
     ]);
   }
 
@@ -96,60 +91,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         print('Error fetching current user ID: $e');
       }
     }
-  }
-
-  Future<void> _checkLocalImage() async {
-    if (_event.imageUrl != null && _event.imageUrl!.isNotEmpty) {
-      final directory = await getApplicationDocumentsDirectory();
-      final fileName = _getFileNameFromUrl(_event.imageUrl!);
-      final filePath = '${directory.path}/$fileName';
-
-      final file = File(filePath);
-      if (await file.exists()) {
-        setState(() {
-          _localImagePath = filePath;
-        });
-      } else {
-        await _downloadAndSaveImage(filePath);
-      }
-    }
-  }
-
-  Future<void> _downloadAndSaveImage(String filePath) async {
-    try {
-      final directory = path.dirname(filePath);
-      final dir = Directory(directory);
-      if (!await dir.exists()) {
-        await dir.create(recursive: true);
-      }
-
-      final response = await http.get(Uri.parse(_event.imageUrl!));
-      if (response.statusCode == 200) {
-        final imageBytes = response.bodyBytes;
-
-        final file = File(filePath);
-        await file.writeAsBytes(imageBytes);
-
-        if (mounted) {
-          setState(() {
-            _localImagePath = filePath;
-          });
-        }
-      } else {
-        if (kDebugMode) {
-          print('Failed to download image: ${response.statusCode}');
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error downloading or saving image: $e');
-      }
-    }
-  }
-
-  String _getFileNameFromUrl(String url) {
-    final Uri uri = Uri.parse(url);
-    return uri.pathSegments.last;
   }
 
   bool _shouldShowPopupMenu() {
