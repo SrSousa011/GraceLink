@@ -27,8 +27,6 @@ class EventDetailsScreen extends StatefulWidget {
 
 class _EventDetailsScreenState extends State<EventDetailsScreen> {
   late Event _event;
-  String _creatorName = '';
-  String _creatorImageUrl = '';
   bool _isAdmin = false;
   String? _currentUserId;
   final AuthenticationService _authService = AuthenticationService();
@@ -46,28 +44,9 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
   Future<void> _initialize() async {
     await Future.wait([
-      _fetchCreatorDetails(),
       _checkIfAdmin(),
       _fetchCurrentUserId(),
     ]);
-  }
-
-  Future<void> _fetchCreatorDetails() async {
-    try {
-      final name = await _authService.getUserNameById(_event.createdBy);
-      final imageUrl = await _authService.getUserImageById(_event.createdBy);
-
-      if (mounted) {
-        setState(() {
-          _creatorName = name;
-          _creatorImageUrl = imageUrl ?? '';
-        });
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching creator details: $e');
-      }
-    }
   }
 
   Future<void> _checkIfAdmin() async {
@@ -100,16 +79,21 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   Future<void> _pickImage() async {
     final imageAdd = ImageAdd(
       storage: _storage,
-      picker: _picker,
       firestore: _firestore,
+      picker: _picker,
       eventId: _event.id,
     );
 
-    final downloadUrl = await imageAdd.updateImage();
-
-    if (downloadUrl != null) {
-      setState(() {});
-    }
+    imageAdd.uploadAndSaveImage(
+      onSuccess: () {
+        setState(() {});
+      },
+      onError: (errorMessage) {
+        if (kDebugMode) {
+          print('Error uploading image: $errorMessage');
+        }
+      },
+    );
   }
 
   @override
@@ -132,80 +116,26 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 16.0, right: 16.0, top: 0.0, bottom: 0.0),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundImage: _creatorImageUrl.isNotEmpty
-                            ? NetworkImage(_creatorImageUrl)
-                            : null,
-                        radius: 20,
-                        child: _creatorImageUrl.isEmpty
-                            ? Icon(Icons.person, color: Colors.grey[600])
-                            : null,
-                      ),
-                      const SizedBox(width: 8.0),
-                      Expanded(
-                        child: Text(
-                          _creatorName,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isDarkMode ? Colors.white : Colors.black,
-                          ),
-                        ),
-                      ),
-                      if (_shouldShowPopupMenu())
-                        PopupMenuButton<String>(
-                          onSelected: (value) {
-                            if (value == 'edit') {
-                              _navigateToUpdateEventScreen(context, _event);
-                            } else if (value == 'delete') {
-                              EventDelete.confirmDeleteEvent(
-                                context,
-                                _event.id,
-                                _event.title,
-                              );
-                            }
-                          },
-                          itemBuilder: (BuildContext context) =>
-                              <PopupMenuEntry<String>>[
-                            PopupMenuItem<String>(
-                              value: 'edit',
-                              child: ListTile(
-                                leading: Icon(Icons.edit,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.blue),
-                                title: Text('Edit',
-                                    style: TextStyle(
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black)),
-                              ),
-                            ),
-                            PopupMenuItem<String>(
-                              value: 'delete',
-                              child: ListTile(
-                                leading: Icon(Icons.delete,
-                                    color: isDarkMode
-                                        ? Colors.grey[300]
-                                        : Colors.red),
-                                title: Text('Delete',
-                                    style: TextStyle(
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.red)),
-                              ),
-                            ),
-                          ],
-                          icon: Icon(Icons.more_vert,
-                              color: isDarkMode ? Colors.white : Colors.black),
-                        ),
-                    ],
-                  ),
+                StreamBuilder<DocumentSnapshot>(
+                  stream: _firestore
+                      .collection('users')
+                      .doc(_event.createdBy)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (!snapshot.hasData || !snapshot.data!.exists) {
+                      return _buildCreatorInfo('', '');
+                    }
+
+                    final userData = snapshot.data!;
+                    final creatorName = userData['fullName'] ?? '';
+                    final creatorImageUrl = userData['imagePath'] ?? '';
+
+                    return _buildCreatorInfo(creatorName, creatorImageUrl);
+                  },
                 ),
                 const SizedBox(height: 16.0),
                 Padding(
@@ -240,6 +170,77 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                   color: isDarkMode ? Colors.white : Colors.black),
             )
           : null,
+    );
+  }
+
+  Widget _buildCreatorInfo(String name, String imageUrl) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+
+    return Padding(
+      padding:
+          const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 0.0),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundImage:
+                imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
+            radius: 20,
+            child: imageUrl.isEmpty
+                ? Icon(Icons.person, color: Colors.grey[600])
+                : null,
+          ),
+          const SizedBox(width: 8.0),
+          Expanded(
+            child: Text(
+              name,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+          ),
+          if (_shouldShowPopupMenu())
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == 'edit') {
+                  _navigateToUpdateEventScreen(context, _event);
+                } else if (value == 'delete') {
+                  EventDelete.confirmDeleteEvent(
+                    context,
+                    _event.id,
+                    _event.title,
+                  );
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                  value: 'edit',
+                  child: ListTile(
+                    leading: Icon(Icons.edit,
+                        color: isDarkMode ? Colors.white : Colors.blue),
+                    title: Text('Edit',
+                        style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black)),
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'delete',
+                  child: ListTile(
+                    leading: Icon(Icons.delete,
+                        color: isDarkMode ? Colors.grey[300] : Colors.red),
+                    title: Text('Delete',
+                        style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.red)),
+                  ),
+                ),
+              ],
+              icon: Icon(Icons.more_vert,
+                  color: isDarkMode ? Colors.white : Colors.black),
+            ),
+        ],
+      ),
     );
   }
 
