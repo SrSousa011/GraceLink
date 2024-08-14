@@ -32,9 +32,9 @@ class EventDetails extends StatelessWidget {
           ),
         ),
         _buildDetailsText(description),
-        _buildDetailsText(' $date'),
-        _buildDetailsText(' $time'),
-        _buildDetailsText(' $location'),
+        _buildDetailsText(date),
+        _buildDetailsText(time),
+        _buildDetailsText(location),
         const SizedBox(height: 16.0),
       ],
     );
