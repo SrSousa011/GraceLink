@@ -1,10 +1,10 @@
-import 'package:churchapp/data/model/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:churchapp/views/welcome.dart';
 import 'package:churchapp/views/nav_bar/drawer_header_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:churchapp/data/model/user_data.dart';
 
 class NavBar extends StatefulWidget {
   final VoidCallback? onNotLoggedIn;
@@ -140,6 +140,14 @@ class _NavBarState extends State<NavBar> {
               Navigator.pushNamed(context, route);
             },
           ),
+          if (userData?.role == 'admin')
+            _buildListTile(
+              icon: Icons.upload_file_outlined,
+              text: 'Manage Course Materials',
+              color: iconColor,
+              onTap: () =>
+                  Navigator.pushNamed(context, '/manage_course_materials'),
+            ),
           _buildListTile(
             icon: Icons.group_add_outlined,
             text: 'Become Member',

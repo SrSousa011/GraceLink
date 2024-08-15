@@ -1,4 +1,5 @@
 import 'package:churchapp/views/admin/admin_painel.dart';
+import 'package:churchapp/views/materials/materials_courses.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/courses/adminDashboard/courses_dashboard.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscribers_list.dart';
@@ -78,6 +79,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const BecomeMemberList());
       case '/become_member':
         return MaterialPageRoute(builder: (_) => const BecomeMember());
+      case '/manage_course_materials':
+        return MaterialPageRoute(builder: (_) => const CourseMaterialsPage());
       case '/about_us':
         return MaterialPageRoute(builder: (_) => const AboutUs());
       case '/members_dashboard':
