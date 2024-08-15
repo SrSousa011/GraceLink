@@ -16,16 +16,29 @@ class UploadButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
-    final iconColor = isDarkMode ? Colors.white : Colors.blue;
 
     return ElevatedButton.icon(
-      icon: Icon(
-        isDarkMode ? Icons.dark_mode : Icons.light_mode,
-        color: iconColor,
+      icon: isUploading
+          ? const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            )
+          : const Icon(
+              Icons.upload,
+              color: Colors.white,
+            ),
+      label: Text(
+        isUploading ? 'Uploading...' : 'Upload File',
+        style: const TextStyle(color: Colors.white),
       ),
-      label: isUploading
-          ? const CircularProgressIndicator()
-          : const Text('Upload File'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isDarkMode ? const Color(0xFF333333) : Colors.blue,
+        shape: const StadiumBorder(),
+        foregroundColor: Colors.white,
+      ),
       onPressed: isUploading ? null : onPressed,
     );
   }
