@@ -298,7 +298,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                               ),
                             if (_selectedInstructorName != null)
                               Text(
-                                'Instructor: $_selectedInstructorName',
+                                '$_selectedInstructorName',
                                 style: Theme.of(context).textTheme.bodyLarge,
                               ),
                           ],
