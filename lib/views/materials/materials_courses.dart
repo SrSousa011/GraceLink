@@ -24,8 +24,8 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   String? _selectedCourseId;
   String? _userRole;
   String? _errorMessage;
-  List<String> _courses = [];
-  String? _selectedCourseTitle; // Store the title of the selected course
+  List<Map<String, String>> _courses = []; // Changed to store ID and title
+  String? _selectedCourseTitle;
 
   @override
   void initState() {
@@ -54,7 +54,13 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     try {
       final snapshot = await _firestore.collection('courses').get();
       setState(() {
-        _courses = snapshot.docs.map((doc) => doc.id).toList();
+        _courses = snapshot.docs.map((doc) {
+          final data = doc.data();
+          return {
+            'id': doc.id,
+            'title': data['title'] as String? ?? 'No Title',
+          };
+        }).toList();
       });
     } catch (e) {
       setState(() {
@@ -109,7 +115,25 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
       return;
     }
 
-    final FilePickerResult? result = await FilePicker.platform.pickFiles();
+    // Allow selection of specific file types
+    final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: [
+        'png',
+        'jpg',
+        'jpeg',
+        'mp4',
+        'mkv',
+        'pdf',
+        'doc',
+        'docx',
+        'xls',
+        'xlsx',
+        'ppt',
+        'pptx'
+      ],
+    );
+
     if (result != null) {
       final File file = File(result.files.single.path!);
       setState(() {
@@ -142,7 +166,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
       }
     } else {
       setState(() {
-        _errorMessage = 'File selection canceled.';
+        _errorMessage = 'File selection canceled or invalid file type.';
       });
     }
   }
@@ -153,7 +177,6 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
       _errorMessage = null;
     });
 
-    // Fetch the course title
     final title = await getTitleById(courseId);
     setState(() {
       _selectedCourseTitle = title;
@@ -178,10 +201,10 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
               DropdownButton<String>(
                 hint: const Text('Select a Course'),
                 value: _selectedCourseId,
-                items: _courses.map((courseId) {
+                items: _courses.map((course) {
                   return DropdownMenuItem<String>(
-                    value: courseId,
-                    child: Text(courseId),
+                    value: course['id'],
+                    child: Text(course['title']!),
                   );
                 }).toList(),
                 onChanged: (value) {
