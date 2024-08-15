@@ -17,8 +17,8 @@ class FileListView extends StatelessWidget {
       itemCount: fileDocs.length,
       itemBuilder: (context, index) {
         final file = fileDocs[index];
-        final url = file['url'] as String;
-        final name = file['title'] as String;
+        final url = file['url'] as String? ?? '';
+        final name = file['name'] as String? ?? 'Unknown File';
 
         return ListTile(
           title: Text(
@@ -31,20 +31,27 @@ class FileListView extends StatelessWidget {
           trailing: IconButton(
             icon: const Icon(Icons.download),
             onPressed: () async {
-              try {
-                final Uri uri = Uri.parse(url);
-                if (await canLaunchUrl(uri)) {
-                  await launchUrl(uri);
-                } else {
+              if (url.isNotEmpty) {
+                try {
+                  final Uri uri = Uri.parse(url);
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri);
+                  } else {
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Could not launch URL')),
+                    );
+                  }
+                } catch (e) {
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Could not launch URL')),
+                    SnackBar(content: Text('Error opening URL: $e')),
                   );
                 }
-              } catch (e) {
+              } else {
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error opening URL: $e')),
+                  const SnackBar(content: Text('Invalid URL')),
                 );
               }
             },
