@@ -167,7 +167,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               onPressed: _pickImage,
               backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
               child: Icon(Icons.add_a_photo,
-                  color: isDarkMode ? Colors.white : Colors.black),
+                  color: isDarkMode ? Colors.black : Colors.white),
             )
           : null,
     );
