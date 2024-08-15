@@ -1,12 +1,12 @@
-import 'package:churchapp/views/materials/error_message.dart';
-import 'package:churchapp/views/materials/file_list.dart';
-import 'package:churchapp/views/materials/upload_button.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:churchapp/views/materials/error_message.dart';
+import 'package:churchapp/views/materials/file_list.dart';
+import 'package:churchapp/views/materials/upload_button.dart';
 
 class CourseMaterialsPage extends StatefulWidget {
   const CourseMaterialsPage({super.key});
@@ -24,7 +24,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   String? _selectedCourseId;
   String? _userRole;
   String? _errorMessage;
-  List<Map<String, String>> _courses = []; // Changed to store ID and title
+  List<Map<String, String>> _courses = [];
   String? _selectedCourseTitle;
 
   @override
@@ -115,7 +115,6 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
       return;
     }
 
-    // Allow selection of specific file types
     final FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: [
@@ -134,7 +133,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
       ],
     );
 
-    if (result != null) {
+    if (result != null && result.files.single.path != null) {
       final File file = File(result.files.single.path!);
       setState(() {
         _isUploading = true;
@@ -179,7 +178,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
 
     final title = await getTitleById(courseId);
     setState(() {
-      _selectedCourseTitle = title;
+      _selectedCourseTitle = title ?? 'No Title';
     });
 
     await _loadFiles(courseId);
@@ -204,7 +203,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                 items: _courses.map((course) {
                   return DropdownMenuItem<String>(
                     value: course['id'],
-                    child: Text(course['title']!),
+                    child: Text(course['title'] ?? 'No Title'),
                   );
                 }).toList(),
                 onChanged: (value) {
