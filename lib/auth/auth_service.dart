@@ -434,6 +434,23 @@ class AuthenticationService implements BaseAuth {
     }
   }
 
+  Future<String> getTitleById(String userId) async {
+    try {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('courses')
+          .doc(userId)
+          .get();
+
+      if (userSnapshot.exists) {
+        return userSnapshot.get('title') ?? 'Usuário Desconhecido';
+      } else {
+        return 'Usuário Desconhecido';
+      }
+    } catch (e) {
+      return 'Erro ao buscar usuário';
+    }
+  }
+
   Future<bool> isAdmin(String? currentUserId) async {
     try {
       User? user = _firebaseAuth.currentUser;
