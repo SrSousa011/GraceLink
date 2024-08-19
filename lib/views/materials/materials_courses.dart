@@ -1,3 +1,4 @@
+import 'package:churchapp/views/materials/file_list.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,7 +7,6 @@ import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
-import 'package:churchapp/views/materials/file_list.dart';
 import 'package:churchapp/views/materials/upload_button.dart';
 import 'package:churchapp/views/materials/error_message.dart';
 
@@ -104,6 +104,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
             'url': data['url'] as String?,
             'name': data['name'] as String?,
             'courseId': courseId,
+            'visibility': data['visibility'] as String? ?? 'public',
           };
         }).toList();
         _errorMessage = null;
@@ -290,6 +291,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                 child: FileListView(
                   fileDocs: _fileDocs,
                   isDarkMode: isDarkMode,
+                  userRole: _userRole ?? 'user',
                 ),
               ),
             ],
