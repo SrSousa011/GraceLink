@@ -1,14 +1,14 @@
-import 'package:churchapp/views/materials/file_list.dart';
-import 'package:churchapp/views/materials/upload_button.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:churchapp/views/materials/error_message.dart';
-import 'package:churchapp/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:churchapp/theme/theme_provider.dart';
+import 'package:churchapp/views/materials/file_list.dart';
+import 'package:churchapp/views/materials/upload_button.dart';
+import 'package:churchapp/views/materials/error_message.dart';
 
 class CourseMaterialsPage extends StatefulWidget {
   const CourseMaterialsPage({super.key});
@@ -26,7 +26,6 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   String? _selectedCourseId;
   String? _userRole;
   String? _errorMessage;
-  List<Map<String, dynamic>> _courses = [];
   String? _selectedCourseTitle;
   String? _selectedCourseImageUrl;
   String? _selectedInstructorName;
@@ -34,43 +33,38 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   @override
   void initState() {
     super.initState();
-    _fetchUserRole();
-    _fetchCourses();
+    _fetchUserRoleAndCourse();
   }
 
-  Future<void> _fetchUserRole() async {
+  Future<void> _fetchUserRoleAndCourse() async {
     final userId = _auth.currentUser?.uid;
-    if (userId != null) {
-      try {
-        final userDoc = await _firestore.collection('users').doc(userId).get();
+    if (userId == null) {
+      setState(() {
+        _errorMessage = 'User not logged in.';
+      });
+      return;
+    }
+
+    try {
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      _userRole = userDoc.data()?['role'] as String? ?? 'user';
+
+      final registrationSnapshot = await _firestore
+          .collection('courseregistration')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      if (registrationSnapshot.docs.isNotEmpty) {
+        final courseId = registrationSnapshot.docs.first['courseId'];
+        await _handleCourseSelection(courseId);
+      } else {
         setState(() {
-          _userRole = userDoc.data()?['role'] as String? ?? 'user';
-        });
-      } catch (e) {
-        setState(() {
-          _errorMessage = 'Error fetching user role: $e';
+          _errorMessage = 'User not registered in any course.';
         });
       }
-    }
-  }
-
-  Future<void> _fetchCourses() async {
-    try {
-      final snapshot = await _firestore.collection('courses').get();
-      setState(() {
-        _courses = snapshot.docs.map((doc) {
-          final data = doc.data();
-          return {
-            'id': doc.id,
-            'title': data['title'] as String? ?? 'No Title',
-            'imageURL': data['imageURL'] as String?,
-            'instructor': data['instructor'] as String?,
-          };
-        }).toList();
-      });
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error fetching courses: $e';
+        _errorMessage = 'Error fetching data: $e';
       });
     }
   }
@@ -196,10 +190,10 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     });
 
     final courseData =
-        _courses.firstWhere((course) => course['id'] == courseId);
+        await _firestore.collection('courses').doc(courseId).get();
     setState(() {
-      _selectedCourseImageUrl = courseData['imageURL'];
-      _selectedInstructorName = courseData['instructor'];
+      _selectedCourseImageUrl = courseData.data()?['imageURL'];
+      _selectedInstructorName = courseData.data()?['instructor'];
     });
 
     await _loadFiles(courseId);
@@ -225,22 +219,6 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                 Center(
                   child: Column(
                     children: [
-                      DropdownButton<String>(
-                        hint: const Text('Select a Course'),
-                        value: _selectedCourseId,
-                        items: _courses.map((course) {
-                          return DropdownMenuItem<String>(
-                            value: course['id'],
-                            child: Text(course['title'] ?? 'No Title'),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          if (value != null) {
-                            _handleCourseSelection(value);
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 16.0),
                       UploadButton(
                         isUploading: _isUploading,
                         onPressed: _uploadFile,
