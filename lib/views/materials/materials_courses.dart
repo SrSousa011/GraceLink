@@ -29,18 +29,21 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   String? _selectedCourseTitle;
   String? _selectedCourseImageUrl;
   String? _selectedInstructorName;
+  List<Map<String, String>> _courses = [];
+  bool _isFetchingCourses = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchUserRoleAndCourse();
+    _fetchUserRoleAndCourses();
   }
 
-  Future<void> _fetchUserRoleAndCourse() async {
+  Future<void> _fetchUserRoleAndCourses() async {
     final userId = _auth.currentUser?.uid;
     if (userId == null) {
       setState(() {
         _errorMessage = 'User not logged in.';
+        _isFetchingCourses = false;
       });
       return;
     }
@@ -55,8 +58,27 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
           .get();
 
       if (registrationSnapshot.docs.isNotEmpty) {
-        final courseId = registrationSnapshot.docs.first['courseId'];
-        await _handleCourseSelection(courseId);
+        _courses = await Future.wait(
+          registrationSnapshot.docs.map((doc) async {
+            final courseId = doc['courseId'];
+            final courseDoc =
+                await _firestore.collection('courses').doc(courseId).get();
+            return {
+              'id': courseId,
+              'title':
+                  courseDoc.data()?['title'] as String? ?? 'Unknown Course',
+            };
+          }),
+        );
+        if (_courses.isNotEmpty) {
+          // Automatically select the first course
+          _selectedCourseId = _courses.first['id'];
+          await _handleCourseSelection(_selectedCourseId!);
+        } else {
+          setState(() {
+            _errorMessage = 'User not registered in any course.';
+          });
+        }
       } else {
         setState(() {
           _errorMessage = 'User not registered in any course.';
@@ -65,6 +87,10 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     } catch (e) {
       setState(() {
         _errorMessage = 'Error fetching data: $e';
+      });
+    } finally {
+      setState(() {
+        _isFetchingCourses = false;
       });
     }
   }
@@ -216,7 +242,25 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (_userRole == 'admin')
+              if (_isFetchingCourses)
+                const Center(child: CircularProgressIndicator()),
+              if (!_isFetchingCourses && _courses.isNotEmpty)
+                DropdownButton<String>(
+                  value: _selectedCourseId,
+                  hint: const Text('Select a course'),
+                  items: _courses.map((course) {
+                    return DropdownMenuItem<String>(
+                      value: course['id'],
+                      child: Text(course['title'] ?? 'Unknown Course'),
+                    );
+                  }).toList(),
+                  onChanged: (value) async {
+                    if (value != null) {
+                      await _handleCourseSelection(value);
+                    }
+                  },
+                ),
+              if (_userRole == 'admin' && !_isFetchingCourses)
                 Center(
                   child: Column(
                     children: [
