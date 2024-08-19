@@ -5,11 +5,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FileListView extends StatelessWidget {
   final List<Map<String, dynamic>> fileDocs;
   final bool isDarkMode;
+  final String userRole;
 
   const FileListView({
     super.key,
     required this.fileDocs,
     required this.isDarkMode,
+    required this.userRole,
   });
 
   Future<void> _deleteFile(
@@ -33,48 +35,6 @@ class FileListView extends StatelessWidget {
     }
   }
 
-  Future<void> _freezeFile(
-      BuildContext context, String courseId, String fileId) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('courses/$courseId/materials')
-          .doc(fileId)
-          .update({'visibility': 'frozen'});
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('File frozen successfully')),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error freezing file: $e')),
-        );
-      }
-    }
-  }
-
-  Future<void> _unfreezeFile(
-      BuildContext context, String courseId, String fileId) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('courses/$courseId/materials')
-          .doc(fileId)
-          .update({'visibility': 'public'});
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('File unfrozen successfully')),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error unfrozen file: $e')),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -84,9 +44,7 @@ class FileListView extends StatelessWidget {
         final url = file['url'] as String? ?? '';
         final name = file['name'] as String? ?? 'Unknown File';
         final fileId = file['id'] as String? ?? '';
-        final visibility = file['visibility'] as String? ?? 'public';
-
-        final isFrozen = visibility == 'frozen';
+        final courseId = file['courseId'] as String? ?? '';
 
         return ListTile(
           title: Text(
@@ -101,60 +59,47 @@ class FileListView extends StatelessWidget {
             children: [
               IconButton(
                 icon: const Icon(Icons.download),
-                onPressed: isFrozen
-                    ? null // Disable if file is frozen
-                    : () async {
-                        if (url.isNotEmpty) {
-                          try {
-                            final Uri uri = Uri.parse(url);
-                            if (await canLaunchUrl(uri)) {
-                              await launchUrl(uri);
-                            } else {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('Could not launch URL')),
-                                );
-                              }
-                            }
-                          } catch (e) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content: Text('Error opening URL: $e')),
-                              );
-                            }
-                          }
-                        } else {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Invalid URL')),
-                            );
-                          }
+                onPressed: () async {
+                  if (url.isNotEmpty) {
+                    try {
+                      final Uri uri = Uri.parse(url);
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri);
+                      } else {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Could not launch URL'),
+                            ),
+                          );
                         }
-                      },
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
-                onPressed: isFrozen
-                    ? null // Disable if file is frozen
-                    : () {
-                        _deleteFile(context, file['courseId'], fileId);
-                      },
-              ),
-              IconButton(
-                icon: Icon(
-                  isFrozen ? Icons.lock_open : Icons.lock,
-                  color: isFrozen ? Colors.green : Colors.orange,
-                ),
-                onPressed: () {
-                  if (isFrozen) {
-                    _unfreezeFile(context, file['courseId'], fileId);
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Error opening URL: $e'),
+                          ),
+                        );
+                      }
+                    }
                   } else {
-                    _freezeFile(context, file['courseId'], fileId);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Invalid URL')),
+                      );
+                    }
                   }
                 },
               ),
+              if (userRole == 'admin') ...[
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () {
+                    _deleteFile(context, courseId, fileId);
+                  },
+                ),
+              ],
             ],
           ),
         );
