@@ -4,11 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/materials/upload_button.dart';
 import 'package:churchapp/views/materials/error_message.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:dio/dio.dart';
 
 class CourseMaterialsPage extends StatefulWidget {
   const CourseMaterialsPage({super.key});
@@ -71,7 +74,6 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
           }),
         );
         if (_courses.isNotEmpty) {
-          // Automatically select the first course
           _selectedCourseId = _courses.first['id'];
           await _handleCourseSelection(_selectedCourseId!);
         } else {
@@ -226,6 +228,28 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     await _loadFiles(courseId);
   }
 
+  Future<void> _handleDownload(String fileUrl, String fileName) async {
+    try {
+      final dio = Dio();
+      final directory = await getExternalStorageDirectory();
+      final downloadDirectory = Directory(
+          '${directory?.path}/Download'); // Caminho do diretório de downloads
+      if (!await downloadDirectory.exists()) {
+        await downloadDirectory.create(recursive: true);
+      }
+      final filePath = '${downloadDirectory.path}/$fileName';
+      await dio.download(fileUrl, filePath);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('File downloaded to $filePath')),
+      );
+    } catch (e) {
+      print('Error downloading file: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error downloading file: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -336,6 +360,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                   fileDocs: _fileDocs,
                   isDarkMode: isDarkMode,
                   userRole: _userRole ?? 'user',
+                  onDownload: _handleDownload,
                 ),
               ),
             ],
