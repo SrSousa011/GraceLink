@@ -250,7 +250,14 @@ class _FinancialScreenState extends State<FinancialScreen> {
                                 ),
                               ),
                               onTap: () {
-                                // Ação ao tocar na transação, como mostrar detalhes
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TransactionDetails(
+                                      transaction: transaction,
+                                    ),
+                                  ),
+                                );
                               },
                             );
                           },
