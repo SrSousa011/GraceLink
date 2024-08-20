@@ -2,7 +2,7 @@ import 'package:churchapp/views/financial/transaction_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:churchapp/views/financial/transaction_page.dart'; // Importando TransactionsPage
+import 'package:churchapp/views/financial/transaction_page.dart';
 
 class FinancialScreen extends StatefulWidget {
   const FinancialScreen({super.key});
@@ -51,7 +51,7 @@ class _FinancialScreenState extends State<FinancialScreen> {
           return Column(
             children: [
               Container(
-                height: MediaQuery.of(context).size.height * 0.4,
+                height: MediaQuery.of(context).size.height * 0.3,
                 decoration: const BoxDecoration(
                   color: Colors.blue,
                   borderRadius: BorderRadius.vertical(
@@ -88,92 +88,99 @@ class _FinancialScreenState extends State<FinancialScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 16.0, horizontal: 16.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(30),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    _buildFinancialCard(
-                      icon: Icons.account_balance_wallet,
-                      title: 'Saldo Total',
-                      value: '€ ${totalBalance.toStringAsFixed(2)}',
-                      valueStyle: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black,
-                      ),
-                      withShadow: false,
-                      backgroundColor: Colors.transparent,
-                      titleStyle: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildFinancialCard(
-                            icon: Icons.trending_up,
-                            title: 'Receitas',
-                            value: '€ ${income.toStringAsFixed(2)}',
-                            valueStyle: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.black,
-                            ),
-                            withShadow: false,
-                            backgroundColor: const Color.fromARGB(
-                              0,
-                              98,
-                              162,
-                              241,
-                            ),
-                            titleStyle: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                            ),
-                          ),
+                transform: Matrix4.translationValues(0.0, -60.0, 0.0),
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Center(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 16.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(30),
+                          bottom: Radius.circular(30),
                         ),
-                        Expanded(
-                          child: _buildFinancialCard(
-                            icon: Icons.trending_down,
-                            title: 'Despesas',
-                            value: '€ ${expenses.toStringAsFixed(2)}',
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          _buildFinancialCard(
+                            icon: Icons.account_balance_wallet,
+                            title: 'Saldo Total',
+                            value: '€ ${totalBalance.toStringAsFixed(2)}',
                             valueStyle: const TextStyle(
-                              fontSize: 12,
+                              fontSize: 18,
                               color: Colors.black,
                             ),
                             withShadow: false,
                             backgroundColor: Colors.transparent,
                             titleStyle: const TextStyle(
-                              fontSize: 14,
+                              fontSize: 18,
                               color: Colors.black,
                             ),
-                            iconColor: Colors.red,
                           ),
-                        ),
-                      ],
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildFinancialCard(
+                                  icon: Icons.trending_up,
+                                  title: 'Receitas',
+                                  value: '€ ${income.toStringAsFixed(2)}',
+                                  valueStyle: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                  ),
+                                  withShadow: false,
+                                  backgroundColor: const Color.fromARGB(
+                                    0,
+                                    98,
+                                    162,
+                                    241,
+                                  ),
+                                  titleStyle: const TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: _buildFinancialCard(
+                                  icon: Icons.trending_down,
+                                  title: 'Despesas',
+                                  value: '€ ${expenses.toStringAsFixed(2)}',
+                                  valueStyle: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                  ),
+                                  withShadow: false,
+                                  backgroundColor: Colors.transparent,
+                                  titleStyle: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                  ),
+                                  iconColor: Colors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 16),
-                  ],
+                  ),
                 ),
               ),
-              // Histórico de Transações
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final transactionItemHeight =
-                        70.0; // Adjust this height based on your item design
+                    const transactionItemHeight = 70.0;
                     final availableHeight = constraints.maxHeight;
                     final itemCount =
                         (availableHeight / transactionItemHeight).floor();
@@ -184,7 +191,7 @@ class _FinancialScreenState extends State<FinancialScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
                             decoration: BoxDecoration(
                               color: Colors.blue[50],
                               borderRadius: const BorderRadius.vertical(
@@ -232,6 +239,8 @@ class _FinancialScreenState extends State<FinancialScreen> {
                               itemBuilder: (context, index) {
                                 final transaction = transactionData[index];
                                 return ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 4.0, horizontal: 0.0),
                                   leading: Icon(
                                     transaction.isPositive
                                         ? Icons.arrow_upward
@@ -294,7 +303,7 @@ class _FinancialScreenState extends State<FinancialScreen> {
     Color iconColor = Colors.teal,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
@@ -313,9 +322,9 @@ class _FinancialScreenState extends State<FinancialScreen> {
           Icon(
             icon,
             color: iconColor,
-            size: 24,
+            size: 20,
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
