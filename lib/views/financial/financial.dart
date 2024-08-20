@@ -50,7 +50,6 @@ class _FinancialScreenState extends State<FinancialScreen> {
 
           return Column(
             children: [
-              // Fundo azul que termina no meio
               Container(
                 height: MediaQuery.of(context).size.height * 0.4,
                 decoration: const BoxDecoration(
@@ -88,7 +87,6 @@ class _FinancialScreenState extends State<FinancialScreen> {
                   ),
                 ),
               ),
-              // Container branco com informações financeiras
               Container(
                 padding: const EdgeInsets.symmetric(
                     vertical: 16.0, horizontal: 16.0),
@@ -96,7 +94,6 @@ class _FinancialScreenState extends State<FinancialScreen> {
                   color: Colors.white,
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(30),
-                    bottom: Radius.circular(0),
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -173,98 +170,110 @@ class _FinancialScreenState extends State<FinancialScreen> {
               ),
               // Histórico de Transações
               Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12.0),
-                        decoration: BoxDecoration(
-                          color: Colors.blue[50],
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(30),
-                            bottom: Radius.circular(0),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.account_balance,
-                                size: 30, color: Colors.blue),
-                            const SizedBox(width: 8),
-                            const Text(
-                              'Histórico de Transação',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final transactionItemHeight =
+                        70.0; // Adjust this height based on your item design
+                    final availableHeight = constraints.maxHeight;
+                    final itemCount =
+                        (availableHeight / transactionItemHeight).floor();
+
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            decoration: BoxDecoration(
+                              color: Colors.blue[50],
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(30),
+                                bottom: Radius.circular(0),
                               ),
                             ),
-                            const Spacer(),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TransactionsPage(
-                                      transactions: transactionData,
-                                    ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.account_balance,
+                                    size: 30, color: Colors.blue),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Histórico de Transação',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue,
                                   ),
-                                );
-                              },
-                              child: const Text(
-                                'Ver Todos',
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: transactionData.length,
-                          itemBuilder: (context, index) {
-                            final transaction = transactionData[index];
-                            return ListTile(
-                              leading: Icon(
-                                transaction.isPositive
-                                    ? Icons.arrow_upward
-                                    : Icons.arrow_downward,
-                                color: transaction.isPositive
-                                    ? Colors.green
-                                    : Colors.red,
-                              ),
-                              title: Text(transaction.title),
-                              subtitle: Text(
-                                transaction.isPositive
-                                    ? 'Recebido de: ${transaction.from}'
-                                    : 'Pago para: ${transaction.from}',
-                              ),
-                              trailing: Text(
-                                '${transaction.isPositive ? '+' : '-'} ${transaction.amount.toStringAsFixed(2)} €',
-                                style: TextStyle(
-                                  color: transaction.isPositive
-                                      ? Colors.green
-                                      : Colors.red,
-                                  fontWeight: FontWeight.bold,
                                 ),
-                              ),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TransactionDetails(
-                                      transaction: transaction,
+                                const Spacer(),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => TransactionsPage(
+                                          transactions: transactionData,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text(
+                                    'Ver Todos',
+                                    style: TextStyle(color: Colors.blue),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount:
+                                  itemCount.clamp(0, transactionData.length),
+                              itemBuilder: (context, index) {
+                                final transaction = transactionData[index];
+                                return ListTile(
+                                  leading: Icon(
+                                    transaction.isPositive
+                                        ? Icons.arrow_upward
+                                        : Icons.arrow_downward,
+                                    color: transaction.isPositive
+                                        ? Colors.green
+                                        : Colors.red,
+                                  ),
+                                  title: Text(transaction.title),
+                                  subtitle: Text(
+                                    transaction.isPositive
+                                        ? 'Recebido de: ${transaction.from}'
+                                        : 'Pago para: ${transaction.from}',
+                                  ),
+                                  trailing: Text(
+                                    '${transaction.isPositive ? '+' : '-'} ${transaction.amount.toStringAsFixed(2)} €',
+                                    style: TextStyle(
+                                      color: transaction.isPositive
+                                          ? Colors.green
+                                          : Colors.red,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            TransactionDetails(
+                                          transaction: transaction,
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 );
                               },
-                            );
-                          },
-                        ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
               ),
             ],
