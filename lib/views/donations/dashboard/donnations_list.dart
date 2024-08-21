@@ -41,54 +41,153 @@ class _DonationsListState extends State<DonationsList> {
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final Color primaryTextColor = isDarkMode ? Colors.white : Colors.black;
+    final Color secondaryTextColor =
+        isDarkMode ? Colors.grey[300]! : Colors.grey;
+    final Color donationValueColor =
+        isDarkMode ? Colors.greenAccent : Colors.green;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Donations List'),
+        title: const Text('Lista de Doações'),
+        backgroundColor: isDarkMode ? Colors.grey[900] : Colors.blue,
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    isDarkMode ? Colors.white : Colors.black),
+              ),
+            )
           : ListView.builder(
               itemCount: _donations.length,
               itemBuilder: (context, index) {
                 final donation =
                     _donations[index].data() as Map<String, dynamic>;
-
                 final fullName = donation['fullName'] ?? 'Unknown';
+                final donationValue = donation['donationValue'] ?? '0.00';
                 final donationType = donation['donationType'] ?? 'No type';
-                final donationValue = donation['donationValue'] ?? '0';
-                final photoURL = donation['photoURL'] ?? '';
+                final userId = donation['userId'];
+                final paymentProofURL = donation['photoURL'] ?? '';
 
-                return ListTile(
-                  title: Text(fullName),
-                  subtitle: Text(
-                      'Donation Type: $donationType\nValue: $donationValue'),
-                  trailing: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        isDarkMode ? Colors.grey : Colors.blue,
-                      ),
-                      foregroundColor: MaterialStateProperty.all<Color>(
-                        isDarkMode
-                            ? Colors.white
-                            : const Color.fromARGB(255, 255, 255, 255),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DonationViewer(
-                            fullName: fullName,
-                            donationType: donationType,
-                            donationValue: donationValue,
-                            photoURL: photoURL,
+                return StreamBuilder<DocumentSnapshot>(
+                  stream:
+                      _firestore.collection('users').doc(userId).snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return ListTile(
+                        leading: CircleAvatar(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                isDarkMode ? Colors.white : Colors.black),
                           ),
                         ),
+                        title: Text(
+                          'Carregando...',
+                          style: TextStyle(color: primaryTextColor),
+                        ),
                       );
-                    },
-                    child: const Text('View Details'),
-                  ),
+                    }
+
+                    if (!snapshot.hasData || !snapshot.data!.exists) {
+                      return ListTile(
+                        leading: const CircleAvatar(
+                          child: Icon(Icons.person),
+                        ),
+                        title: Text(
+                          donationType,
+                          style: TextStyle(color: primaryTextColor),
+                        ),
+                        subtitle: Text(
+                          fullName,
+                          style: TextStyle(color: secondaryTextColor),
+                        ),
+                        trailing: Text(
+                          '+ $donationValue',
+                          style: TextStyle(
+                            color: donationValueColor,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DonationViewer(
+                                title: 'Donation Details',
+                                from: fullName,
+                                amount: donationValue,
+                                time: 'Unknown',
+                                date: 'Unknown',
+                                total: donationValue,
+                                paymentProofURL: paymentProofURL,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    }
+
+                    final userData = snapshot.data!;
+                    final creatorName = userData['fullName'] ?? fullName;
+                    final creatorImageUrl = userData['imagePath'] ?? '';
+
+                    return ListTile(
+                      leading: creatorImageUrl.isNotEmpty
+                          ? CircleAvatar(
+                              backgroundImage: NetworkImage(creatorImageUrl),
+                            )
+                          : const CircleAvatar(
+                              child: Icon(Icons.person),
+                            ),
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            donationType,
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                              color: primaryTextColor,
+                            ),
+                          ),
+                          const SizedBox(height: 2.0),
+                          Text(
+                            creatorName,
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      trailing: Text(
+                        '+ $donationValue',
+                        style: TextStyle(
+                          color: donationValueColor,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DonationViewer(
+                              title: 'Donation Details',
+                              from: creatorName,
+                              amount: donationValue,
+                              time: 'Unknown',
+                              date: 'Unknown',
+                              total: donationValue,
+                              paymentProofURL: paymentProofURL,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
                 );
               },
             ),
