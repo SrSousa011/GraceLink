@@ -12,7 +12,7 @@ class DonationsDashboard extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Donations Dashboard'),
+        title: const Text('Doações Dashboard'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -35,7 +35,7 @@ class DonationsDashboard extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    'Donations Overview',
+                    'Doações Overview',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 10),
@@ -53,7 +53,7 @@ class DonationsDashboard extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(context).pushNamed('/donations');
                         },
-                        child: const Text('Donations'),
+                        child: const Text('Doações'),
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -66,7 +66,7 @@ class DonationsDashboard extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(context).pushNamed('/donations_list');
                         },
-                        child: const Text('Donations List'),
+                        child: const Text('Lista Doações'),
                       ),
                     ],
                   ),

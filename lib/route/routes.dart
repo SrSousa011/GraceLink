@@ -1,5 +1,5 @@
 import 'package:churchapp/views/admin/admin_painel.dart';
-import 'package:churchapp/views/financial/financial.dart';
+import 'package:churchapp/views/donations/financial/financial.dart';
 import 'package:churchapp/views/materials/materials_courses.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/courses/adminDashboard/courses_dashboard.dart';
