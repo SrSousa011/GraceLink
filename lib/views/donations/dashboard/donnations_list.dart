@@ -2,6 +2,7 @@ import 'package:churchapp/views/donations/dashboard/donnatio_viewer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart'; // Importa o pacote intl para formatação de datas
 
 class DonationsList extends StatefulWidget {
   const DonationsList({super.key});
@@ -70,6 +71,15 @@ class _DonationsListState extends State<DonationsList> {
                 final userId = donation['userId'];
                 final paymentProofURL = donation['photoURL'] ?? '';
 
+                // Formatação da data e hora
+                final timestamp = donation['timestamp'] as Timestamp?;
+                final date = timestamp != null
+                    ? DateFormat('dd/MM/yyyy').format(timestamp.toDate())
+                    : 'Unknown';
+                final time = timestamp != null
+                    ? DateFormat('HH:mm').format(timestamp.toDate())
+                    : 'Unknown';
+
                 return StreamBuilder<DocumentSnapshot>(
                   stream:
                       _firestore.collection('users').doc(userId).snapshots(),
@@ -118,8 +128,8 @@ class _DonationsListState extends State<DonationsList> {
                                 title: 'Donation Details',
                                 from: fullName,
                                 amount: donationValue,
-                                time: 'Unknown',
-                                date: 'Unknown',
+                                time: time,
+                                date: date,
                                 total: donationValue,
                                 paymentProofURL: paymentProofURL,
                               ),
@@ -178,8 +188,8 @@ class _DonationsListState extends State<DonationsList> {
                               title: 'Donation Details',
                               from: creatorName,
                               amount: donationValue,
-                              time: 'Unknown',
-                              date: 'Unknown',
+                              time: time,
+                              date: date,
                               total: donationValue,
                               paymentProofURL: paymentProofURL,
                             ),
