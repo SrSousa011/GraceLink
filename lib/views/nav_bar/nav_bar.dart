@@ -96,13 +96,13 @@ class _NavBarState extends State<NavBar> {
                   ),
                   _buildListTile(
                     icon: Icons.event,
-                    text: 'Events',
+                    text: 'Eventos',
                     color: iconColor,
                     onTap: () => Navigator.pushNamed(context, '/event_page'),
                   ),
                   _buildListTile(
                     icon: Icons.volunteer_activism_outlined,
-                    text: 'Donations',
+                    text: 'Doações',
                     color: iconColor,
                     onTap: () {
                       final route = userData.role == 'admin'
@@ -113,7 +113,7 @@ class _NavBarState extends State<NavBar> {
                   ),
                   _buildListTile(
                     icon: Icons.school_outlined,
-                    text: 'Courses',
+                    text: 'Cursos',
                     color: iconColor,
                     onTap: () {
                       final route = userData.role == 'admin'
@@ -125,14 +125,14 @@ class _NavBarState extends State<NavBar> {
                   if (userData.role == 'admin' || isEnrolledInCourse)
                     _buildListTile(
                       icon: Icons.upload_file_outlined,
-                      text: 'Manage Course Materials',
+                      text: 'Materiais de cursos',
                       color: iconColor,
                       onTap: () => Navigator.pushNamed(
                           context, '/manage_course_materials'),
                     ),
                   _buildListTile(
                     icon: Icons.group_add_outlined,
-                    text: 'Become Member',
+                    text: 'Torne-se Membro',
                     color: iconColor,
                     onTap: () {
                       final route = userData.role == 'admin'
@@ -143,26 +143,26 @@ class _NavBarState extends State<NavBar> {
                   ),
                   _buildListTile(
                     icon: Icons.notifications_outlined,
-                    text: 'Notifications',
+                    text: 'Notificações',
                     color: iconColor,
                     onTap: () => Navigator.pushNamed(context, '/notifications'),
                   ),
                   _buildListTile(
                     icon: Icons.video_library_outlined,
-                    text: 'Videos',
+                    text: 'Vídeos',
                     color: iconColor,
                     onTap: () => Navigator.pushNamed(context, '/videos'),
                   ),
                   _buildListTile(
                     icon: Icons.info_outlined,
-                    text: 'About Us',
+                    text: 'Sobre nós',
                     color: iconColor,
                     onTap: () => Navigator.pushNamed(context, '/about_us'),
                   ),
                   if (userData.role == 'admin')
                     _buildListTile(
                       icon: Icons.admin_panel_settings,
-                      text: 'Admin Panel',
+                      text: 'Admin Painel',
                       color: iconColor,
                       onTap: () => Navigator.pushNamed(context, '/admin_panel'),
                     ),
