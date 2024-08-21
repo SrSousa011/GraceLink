@@ -64,9 +64,9 @@ class DonationsDashboard extends StatelessWidget {
                           foregroundColor: Colors.white,
                         ),
                         onPressed: () {
-                          Navigator.of(context).pushNamed('/donations_list');
+                          Navigator.of(context).pushNamed('/donation_report');
                         },
-                        child: const Text('Lista Doações'),
+                        child: const Text('Relatório de doações'),
                       ),
                     ],
                   ),
