@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 
 class DonationViewer extends StatelessWidget {
-  final String fullName;
-  final String donationType;
-  final String donationValue;
-  final String photoURL;
+  final String title;
+  final String from;
+  final String amount;
+  final String time;
+  final String date;
+  final String total;
+  final String paymentProofURL;
 
   const DonationViewer({
     super.key,
-    required this.fullName,
-    required this.donationType,
-    required this.donationValue,
-    required this.photoURL,
+    required this.title,
+    required this.from,
+    required this.amount,
+    required this.time,
+    required this.date,
+    required this.total,
+    required this.paymentProofURL,
   });
 
   @override
@@ -27,28 +33,59 @@ class DonationViewer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Full Name: $fullName',
-                style: const TextStyle(fontSize: 18.0),
+                'Title: $title',
+                style: const TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 10.0),
               Text(
-                'Donation Type: $donationType',
-                style: const TextStyle(fontSize: 18.0),
+                'From: $from',
+                style: const TextStyle(
+                  fontSize: 18.0,
+                  color: Colors.grey,
+                ),
               ),
               const SizedBox(height: 10.0),
               Text(
-                'Donation Value: $donationValue',
-                style: const TextStyle(fontSize: 18.0),
+                'Amount: + $amount',
+                style: const TextStyle(
+                  fontSize: 18.0,
+                  color: Colors.green,
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              Text(
+                'Time: $time',
+                style: const TextStyle(
+                  fontSize: 18.0,
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              Text(
+                'Date: $date',
+                style: const TextStyle(
+                  fontSize: 18.0,
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              Text(
+                'Total:  $total',
+                style: const TextStyle(
+                  fontSize: 18.0,
+                ),
               ),
               const SizedBox(height: 20.0),
-              if (photoURL.isNotEmpty)
+              if (paymentProofURL.isNotEmpty)
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            FullScreenImage(imageUrl: photoURL),
+                        builder: (context) => FullScreenImage(
+                          imageUrl: paymentProofURL,
+                        ),
                       ),
                     );
                   },
@@ -58,7 +95,7 @@ class DonationViewer extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12.0),
                       image: DecorationImage(
-                        image: NetworkImage(photoURL),
+                        image: NetworkImage(paymentProofURL),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -75,7 +112,7 @@ class DonationViewer extends StatelessWidget {
                     ),
                   ),
                 ),
-              if (photoURL.isEmpty) const Text('No image available.'),
+              if (paymentProofURL.isEmpty) const Text('No image available.'),
             ],
           ),
         ),
