@@ -1,6 +1,8 @@
+import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DonationsDashboard extends StatelessWidget {
   const DonationsDashboard({super.key});
@@ -39,7 +41,7 @@ class DonationsDashboard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Bem vindo de volta!',
+                    'Bem-vindo de volta!',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -78,47 +80,79 @@ class DonationsDashboard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 40.0),
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-                borderRadius: BorderRadius.circular(12.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: isDarkMode ? Colors.black54 : Colors.grey[400]!,
-                    blurRadius: 8.0,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Resumo',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: isDarkMode ? Colors.white : Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const SizedBox(height: 16.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildSummaryCard(
-                        context,
-                        title: 'Doações totais',
-                        value: '€ 1,250.00',
-                      ),
-                      _buildSummaryCard(
-                        context,
-                        title: 'Pendentes',
-                        value: '3',
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('donations')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text('Erro: ${snapshot.error}'));
+                }
+
+                final donations = snapshot.data?.docs ?? [];
+                final donationStats = DonationStats.fromDonations(donations);
+
+                final monthlyIncome = donationStats.monthlyIncome;
+
+                final now = DateTime.now();
+                final startOfMonth = DateTime(now.year, now.month, 1);
+                final endOfMonth = DateTime(now.year, now.month + 1, 0);
+
+                final monthlyDonations = donations.where((doc) {
+                  final timestamp = (doc['timestamp'] as Timestamp).toDate();
+                  return timestamp.isAfter(startOfMonth) &&
+                      timestamp.isBefore(endOfMonth);
+                }).toList();
+
+                final numberOfDonationsThisMonth = monthlyDonations.length;
+
+                return Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDarkMode ? Colors.black54 : Colors.grey[400]!,
+                        blurRadius: 8.0,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                ],
-              ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Resumo',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              color: isDarkMode ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      const SizedBox(height: 16.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildSummaryCard(
+                            context,
+                            title: 'Doações do mês',
+                            value: '€ ${monthlyIncome.toStringAsFixed(2)}',
+                          ),
+                          _buildSummaryCard(
+                            context,
+                            title: 'Doadores mês',
+                            value: numberOfDonationsThisMonth.toString(),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ],
         ),
