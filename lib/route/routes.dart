@@ -1,5 +1,5 @@
 import 'package:churchapp/views/admin/admin_painel.dart';
-import 'package:churchapp/views/donations/financial/financial.dart';
+import 'package:churchapp/views/donations/financial/donation_report.dart';
 import 'package:churchapp/views/materials/materials_courses.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/courses/adminDashboard/courses_dashboard.dart';
@@ -88,8 +88,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const MembersDashboard());
       case '/admin_panel':
         return MaterialPageRoute(builder: (_) => const AdminPanel());
-      case '/financial':
-        return MaterialPageRoute(builder: (_) => const FinancialScreen());
+      case '/donation_report':
+        return MaterialPageRoute(builder: (_) => const DonationReportScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

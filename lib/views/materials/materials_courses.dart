@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/materials/upload_button.dart';
 import 'package:churchapp/views/materials/error_message.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:dio/dio.dart';
 
 class CourseMaterialsPage extends StatefulWidget {

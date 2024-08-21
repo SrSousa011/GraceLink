@@ -35,7 +35,7 @@ class Event {
       ),
       location: data['location'] ?? '',
       createdBy: data['createdBy'] ?? '',
-      imageUrl: data['imageUrl'], // Adicione esta linha
+      imageUrl: data['imageUrl'],
     );
   }
 

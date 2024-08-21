@@ -169,9 +169,10 @@ class _NavBarState extends State<NavBar> {
                   if (userData.role == 'admin')
                     _buildListTile(
                       icon: Icons.account_balance_outlined,
-                      text: 'Financial Overview',
+                      text: 'Donation Report',
                       color: iconColor,
-                      onTap: () => Navigator.pushNamed(context, '/financial'),
+                      onTap: () =>
+                          Navigator.pushNamed(context, '/donation_report'),
                     ),
                   _buildListTile(
                     icon: Icons.logout,
