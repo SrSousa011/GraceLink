@@ -96,7 +96,7 @@ class DonationsList extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          donationType,
+                          creatorName,
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.bold,
@@ -105,7 +105,7 @@ class DonationsList extends StatelessWidget {
                         ),
                         const SizedBox(height: 2.0),
                         Text(
-                          creatorName,
+                          donationType,
                           style: TextStyle(
                             fontSize: 14.0,
                             color: secondaryTextColor,
