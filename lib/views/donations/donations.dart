@@ -44,7 +44,7 @@ class _DonationsState extends State<Donations> {
           return AlertDialog(
             title: const Text('Error'),
             content:
-                const Text('Please select a donation type and enter a value.'),
+                const Text('Selecione um tipo de doação e insira um valor.'),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
@@ -85,7 +85,7 @@ class _DonationsState extends State<Donations> {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: const Text('Close'),
+                    child: const Text('Fechar'),
                   ),
                 ],
               );

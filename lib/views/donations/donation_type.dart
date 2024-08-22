@@ -23,12 +23,21 @@ class _DonationTypeState extends State<DonationType> {
   String? selectedFoodType = '';
 
   void showWarningDialog(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final attentionIconColor = isDarkMode ? Colors.grey : Colors.orange;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Warning'),
-          content: const Text('You can only select one type of donation.'),
+          title: Row(
+            children: <Widget>[
+              Icon(Icons.warning, color: attentionIconColor),
+              const SizedBox(width: 8.0),
+              const Text('Atenção'),
+            ],
+          ),
+          content: const Text('Você só pode selecionar um tipo de doação.'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -59,9 +68,7 @@ class _DonationTypeState extends State<DonationType> {
               ),
             ),
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -107,9 +114,7 @@ class _DonationTypeState extends State<DonationType> {
                   ),
                 ),
               ),
-              const SizedBox(
-                width: 20,
-              ),
+              const SizedBox(width: 20),
               SizedBox(
                 width: 150,
                 height: 150,
