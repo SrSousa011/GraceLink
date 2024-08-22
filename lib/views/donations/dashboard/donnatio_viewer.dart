@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 
-class DonationViewer extends StatelessWidget {
+class DonationDetails extends StatelessWidget {
   final String title;
   final String from;
-  final String amount;
   final String time;
   final String date;
   final String total;
   final String paymentProofURL;
 
-  const DonationViewer({
+  const DonationDetails({
     super.key,
     required this.title,
     required this.from,
-    required this.amount,
     required this.time,
     required this.date,
     required this.total,
@@ -24,7 +22,7 @@ class DonationViewer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Donation Info'),
+        title: const Text('Doação'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -33,26 +31,10 @@ class DonationViewer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Title: $title',
-                style: const TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10.0),
-              Text(
                 'From: $from',
                 style: const TextStyle(
                   fontSize: 18.0,
                   color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 10.0),
-              Text(
-                'Amount: + $amount',
-                style: const TextStyle(
-                  fontSize: 18.0,
-                  color: Colors.green,
                 ),
               ),
               const SizedBox(height: 10.0),

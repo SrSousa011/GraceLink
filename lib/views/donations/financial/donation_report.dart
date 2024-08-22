@@ -236,7 +236,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const DonationsList(),
+                                    builder: (context) => DonationsList(),
                                   ),
                                 );
                               },
@@ -331,10 +331,9 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
-                                                  DonationViewer(
+                                                  DonationDetails(
                                                 title: 'Detalhes da Doação',
                                                 from: fullName,
-                                                amount: donationValue,
                                                 time: 'timestamp',
                                                 date: 'timestamp',
                                                 total: donationValue,
@@ -397,10 +396,9 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                DonationViewer(
+                                                DonationDetails(
                                               title: 'Detalhes da Doação',
                                               from: creatorName,
-                                              amount: donationValue,
                                               time: 'timestamp',
                                               date: 'timestamp',
                                               total: donationValue,

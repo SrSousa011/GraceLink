@@ -46,7 +46,7 @@ class AppRoutes {
       case '/donations':
         return MaterialPageRoute(builder: (_) => const Donations());
       case '/donations_list':
-        return MaterialPageRoute(builder: (_) => const DonationsList());
+        return MaterialPageRoute(builder: (_) => DonationsList());
       case '/donations_dashboard':
         return MaterialPageRoute(builder: (_) => const DonationsDashboard());
       case '/courses':
