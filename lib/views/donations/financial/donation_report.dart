@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import '../dashboard/donnation_receipt.dart';
 
 class DonationReportScreen extends StatefulWidget {
@@ -276,6 +277,16 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                 final userId = donation['userId'] ?? '';
                                 final paymentProofURL =
                                     donation['photoURL'] ?? '';
+                                final timestamp =
+                                    donation['timestamp'] as Timestamp?;
+                                final date = timestamp != null
+                                    ? DateFormat('dd/MM/yyyy')
+                                        .format(timestamp.toDate())
+                                    : 'Unknown';
+                                final time = timestamp != null
+                                    ? DateFormat('HH:mm')
+                                        .format(timestamp.toDate())
+                                    : 'Unknown';
 
                                 return StreamBuilder<DocumentSnapshot>(
                                   stream: _firestore
@@ -335,8 +346,8 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                                   DonationReceipt(
                                                 title: 'Detalhes da Doação',
                                                 from: fullName,
-                                                time: 'timestamp',
-                                                date: 'timestamp',
+                                                time: time,
+                                                date: date,
                                                 total: donationValue,
                                                 paymentProofURL:
                                                     paymentProofURL,
@@ -400,8 +411,8 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                                 DonationReceipt(
                                               title: 'Detalhes da Doação',
                                               from: creatorName,
-                                              time: 'timestamp',
-                                              date: 'timestamp',
+                                              time: time,
+                                              date: date,
                                               total: donationValue,
                                               paymentProofURL: paymentProofURL,
                                             ),
