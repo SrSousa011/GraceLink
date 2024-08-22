@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class DonationDetails extends StatelessWidget {
+class DonationReceipt extends StatelessWidget {
   final String title;
   final String from;
   final String time;
@@ -8,7 +8,7 @@ class DonationDetails extends StatelessWidget {
   final String total;
   final String paymentProofURL;
 
-  const DonationDetails({
+  const DonationReceipt({
     super.key,
     required this.title,
     required this.from,

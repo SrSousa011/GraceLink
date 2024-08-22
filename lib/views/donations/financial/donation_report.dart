@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../dashboard/donnation_details.dart';
+import '../dashboard/donnation_receipt.dart';
 
 class DonationReportScreen extends StatefulWidget {
   const DonationReportScreen({super.key});
@@ -331,7 +331,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
-                                                  DonationDetails(
+                                                  DonationReceipt(
                                                 title: 'Detalhes da Doação',
                                                 from: fullName,
                                                 time: 'timestamp',
@@ -396,7 +396,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                DonationDetails(
+                                                DonationReceipt(
                                               title: 'Detalhes da Doação',
                                               from: creatorName,
                                               time: 'timestamp',

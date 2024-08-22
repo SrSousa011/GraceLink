@@ -1,4 +1,4 @@
-import 'package:churchapp/views/donations/dashboard/donnation_details.dart';
+import 'package:churchapp/views/donations/dashboard/donnation_receipt.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -126,7 +126,7 @@ class DonationsList extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DonationDetails(
+                          builder: (context) => DonationReceipt(
                             title: 'Detalhes da Doação',
                             from: creatorName,
                             time: time,

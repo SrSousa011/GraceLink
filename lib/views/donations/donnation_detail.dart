@@ -64,7 +64,7 @@ class _DonationDetailsState extends State<DonationDetails> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Donation successfully completed'),
+            content: Text('Doação realizada com sucesso'),
           ),
         );
       }
@@ -75,7 +75,7 @@ class _DonationDetailsState extends State<DonationDetails> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to complete donation: $e'),
+            content: Text('Falha ao tentar realizar a doação: $e'),
           ),
         );
       }
@@ -88,7 +88,7 @@ class _DonationDetailsState extends State<DonationDetails> {
     final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Donation Details'),
+        title: const Text('Detalhes da doação'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -98,7 +98,7 @@ class _DonationDetailsState extends State<DonationDetails> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Full Name: ${widget.fullName}',
+                'Nome: ${widget.fullName}',
                 style: const TextStyle(fontSize: 18.0),
               ),
               const SizedBox(height: 10.0),
@@ -108,21 +108,20 @@ class _DonationDetailsState extends State<DonationDetails> {
               ),
               const SizedBox(height: 10.0),
               const Text(
-                'Bank Name: Banque et Caisse d\'Épargne de l\'État',
+                'Nome do banco: Banque et Caisse d\'Épargne de l\'État',
                 style: TextStyle(fontSize: 18.0),
               ),
               const SizedBox(height: 10.0),
               Text(
-                'Donation Type: ${widget.donationType}',
+                'Doação para: ${widget.donationType}',
                 style: const TextStyle(fontSize: 18.0),
               ),
               const SizedBox(height: 10.0),
               Text(
-                'Donation Value: ${widget.donationValue}',
+                'Valor: ${widget.donationValue}',
                 style: const TextStyle(fontSize: 18.0),
               ),
-              const Text(
-                  'Copy the ISBN number and pay outside of the application.'),
+              const Text('Copie o número ISBN e pague fora do aplicativo.'),
               const SizedBox(height: 30.0),
               if (uploadStatus == null) ...[
                 ElevatedButton(
@@ -133,7 +132,7 @@ class _DonationDetailsState extends State<DonationDetails> {
                     shape: const StadiumBorder(),
                     foregroundColor: Colors.white,
                   ),
-                  child: const Text('Upload Photo'),
+                  child: const Text('Comprovante'),
                 ),
               ] else if (uploadStatus == 'success') ...[
                 const Text(

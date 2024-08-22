@@ -135,7 +135,7 @@ class _DonationsState extends State<Donations> {
       canPop: false,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Donations'),
+          title: const Text('Doações'),
         ),
         drawer: const NavBar(),
         body: SingleChildScrollView(
@@ -166,7 +166,7 @@ class _DonationsState extends State<Donations> {
                       foregroundColor: Colors.white,
                       backgroundColor: buttonColor,
                     ),
-                    child: const Text('Next'),
+                    child: const Text('Próximo'),
                   ),
                 ),
               ],

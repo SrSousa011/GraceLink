@@ -72,7 +72,7 @@ class _StoragePageState extends State<StoragePage> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Donation successfully completed')),
+            const SnackBar(content: Text('Doação concluída com sucesso')),
           );
         }
 
@@ -86,7 +86,7 @@ class _StoragePageState extends State<StoragePage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to complete donation: $e'),
+              content: Text('Falha ao concluir a doação: $e'),
             ),
           );
         }
@@ -94,7 +94,7 @@ class _StoragePageState extends State<StoragePage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please upload an image before confirming.'),
+          content: Text('Por favor, carregue uma imagem antes de confirmar.'),
         ),
       );
     }
@@ -104,7 +104,7 @@ class _StoragePageState extends State<StoragePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Donation Details'),
+        title: const Text('Detalhes da doação'),
         elevation: 0,
         actions: [
           IconButton(
@@ -150,7 +150,7 @@ class _StoragePageState extends State<StoragePage> {
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                             ),
-                            child: const Text('Confirm'),
+                            child: const Text('Confirmar'),
                           ),
                           ElevatedButton(
                             onPressed: _removeImage,
@@ -161,7 +161,7 @@ class _StoragePageState extends State<StoragePage> {
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                             ),
-                            child: const Text('Remove'),
+                            child: const Text('Cancelar'),
                           ),
                         ],
                       ),
@@ -172,7 +172,7 @@ class _StoragePageState extends State<StoragePage> {
             if (_uploadedImageUrl == null)
               const Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Text('Please upload an image.'),
+                child: Text('Por favor, carregue uma imagem.'),
               ),
           ],
         ),
