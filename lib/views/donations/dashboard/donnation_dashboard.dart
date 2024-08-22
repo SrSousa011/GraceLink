@@ -14,7 +14,7 @@ class DonationsDashboard extends StatelessWidget {
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.only(top: 60.0, left: 16.0),
+        padding: const EdgeInsets.only(top: 60.0, left: 16.0, right: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -113,7 +113,13 @@ class DonationsDashboard extends StatelessWidget {
                 return Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                    color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                    gradient: LinearGradient(
+                      colors: isDarkMode
+                          ? [Colors.grey[850]!, Colors.grey[800]!]
+                          : [Colors.blueAccent, Colors.blue],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(12.0),
                     boxShadow: [
                       BoxShadow(
@@ -128,8 +134,11 @@ class DonationsDashboard extends StatelessWidget {
                     children: [
                       Text(
                         'Resumo',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: isDarkMode ? Colors.white : Colors.black,
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium
+                            ?.copyWith(
+                              color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
                       ),
@@ -191,7 +200,13 @@ class DonationsDashboard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[700] : Colors.white,
+          gradient: LinearGradient(
+            colors: isDarkMode
+                ? [Colors.grey[850]!, Colors.grey[800]!]
+                : [Colors.blueAccent, Colors.blue],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(12.0),
           boxShadow: [
             BoxShadow(

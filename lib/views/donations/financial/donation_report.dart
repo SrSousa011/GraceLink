@@ -45,6 +45,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
 
     final backgroundColor = isDarkMode ? Colors.black : Colors.white;
     final primaryTextColor = isDarkMode ? Colors.white : Colors.black;
+    final layoutTextColor = isDarkMode ? Colors.white : Colors.white;
     final cardBackgroundColor = isDarkMode ? Colors.grey[800]! : Colors.white;
     final cardTextColor = isDarkMode ? Colors.white : Colors.black;
     final cardShadowColor = isDarkMode
@@ -124,7 +125,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: primaryTextColor,
+                                color: layoutTextColor,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -133,7 +134,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
-                                color: primaryTextColor,
+                                color: layoutTextColor,
                               ),
                             ),
                           ],
