@@ -1,11 +1,11 @@
+import 'package:churchapp/views/donations/dashboard/donation_analytics.dart';
+import 'package:churchapp/views/donations/dashboard/donnation_receipt.dart';
 import 'package:churchapp/views/donations/dashboard/donnations_list.dart';
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import '../dashboard/donnation_receipt.dart';
 
 class DonationReportScreen extends StatefulWidget {
   const DonationReportScreen({super.key});
@@ -27,9 +27,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
     try {
       setState(() {});
     } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao buscar doações: $e');
-      }
+      print('Error fetching donations: $e');
       setState(() {});
     }
   }
@@ -39,7 +37,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      return const Center(child: Text('Usuário não está autenticado.'));
+      return const Center(child: Text('User not authenticated.'));
     }
 
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -67,17 +65,15 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Erro: ${snapshot.error}'));
+            return Center(child: Text('Error: ${snapshot.error}'));
           }
 
           if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(
-                child: Text('Dados do usuário não encontrados'));
+            return const Center(child: Text('User data not found.'));
           }
 
           final data = snapshot.data!.data() as Map<String, dynamic>;
-
-          final userName = data['fullName'] ?? 'Usuário';
+          final userName = data['fullName'] ?? 'User';
 
           return StreamBuilder<QuerySnapshot>(
             stream: _firestore.collection('donations').snapshots(),
@@ -90,18 +86,13 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
               if (donationsSnapshot.hasError) {
                 return Center(
                     child: Text(
-                        'Erro ao buscar doações: ${donationsSnapshot.error}'));
+                        'Error fetching donations: ${donationsSnapshot.error}'));
               }
 
               final donations = donationsSnapshot.data?.docs ?? [];
               final donationStats = DonationStats.fromDonations(donations);
               final totalBalance = donationStats.totalBalance;
               final monthlyIncome = donationStats.monthlyIncome;
-
-              if (kDebugMode) {
-                print('Total Balance: € ${totalBalance.toStringAsFixed(2)}');
-                print('Monthly Income: € ${monthlyIncome.toStringAsFixed(2)}');
-              }
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,7 +113,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Bom Dia',
+                              'Good Morning',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -145,62 +136,76 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                   ),
                   Transform.translate(
                     offset: const Offset(0.0, -100.0),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Center(
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 8.0, horizontal: 16.0),
-                            decoration: BoxDecoration(
-                              color: cardBackgroundColor,
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(30),
-                                bottom: Radius.circular(30),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: cardShadowColor,
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DonationAnalyticsPage(
+                              totalBalance: totalBalance,
+                              monthlyIncome: monthlyIncome,
                             ),
-                            child: Column(
-                              children: [
-                                _buildFinancialCard(
-                                  icon: Icons.account_balance_wallet,
-                                  title: 'Saldo Total',
-                                  value: '€ ${totalBalance.toStringAsFixed(2)}',
-                                  valueStyle: TextStyle(
-                                    fontSize: 18,
-                                    color: cardTextColor,
-                                  ),
-                                  withShadow: false,
-                                  backgroundColor: cardBackgroundColor,
-                                  titleStyle: TextStyle(
-                                    fontSize: 18,
-                                    color: cardTextColor,
-                                  ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Center(
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 16.0),
+                              decoration: BoxDecoration(
+                                color: cardBackgroundColor,
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(30),
+                                  bottom: Radius.circular(30),
                                 ),
-                                _buildFinancialCard(
-                                  icon: Icons.trending_up,
-                                  title: 'Renda do Mês',
-                                  value:
-                                      '€ ${monthlyIncome.toStringAsFixed(2)}',
-                                  valueStyle: TextStyle(
-                                    fontSize: 14,
-                                    color: incomeColor,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: cardShadowColor,
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
                                   ),
-                                  withShadow: false,
-                                  backgroundColor: Colors.transparent,
-                                  titleStyle: TextStyle(
-                                    fontSize: 15,
-                                    color: cardTextColor,
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  _buildFinancialCard(
+                                    icon: Icons.account_balance_wallet,
+                                    title: 'Total Balance',
+                                    value:
+                                        '€ ${totalBalance.toStringAsFixed(2)}',
+                                    valueStyle: TextStyle(
+                                      fontSize: 18,
+                                      color: cardTextColor,
+                                    ),
+                                    withShadow: false,
+                                    backgroundColor: cardBackgroundColor,
+                                    titleStyle: TextStyle(
+                                      fontSize: 18,
+                                      color: cardTextColor,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  _buildFinancialCard(
+                                    icon: Icons.trending_up,
+                                    title: 'Monthly Income',
+                                    value:
+                                        '€ ${monthlyIncome.toStringAsFixed(2)}',
+                                    valueStyle: TextStyle(
+                                      fontSize: 14,
+                                      color: incomeColor,
+                                    ),
+                                    withShadow: false,
+                                    backgroundColor: Colors.transparent,
+                                    titleStyle: TextStyle(
+                                      fontSize: 15,
+                                      color: cardTextColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -378,7 +383,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            donationType,
+                                            creatorName,
                                             style: TextStyle(
                                               fontSize: 16.0,
                                               fontWeight: FontWeight.bold,
@@ -387,7 +392,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                           ),
                                           const SizedBox(height: 2.0),
                                           Text(
-                                            creatorName,
+                                            donationType,
                                             style: TextStyle(
                                               fontSize: 14.0,
                                               color: secondaryTextColor,
