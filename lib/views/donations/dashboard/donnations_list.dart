@@ -20,7 +20,6 @@ class DonationsList extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lista de Doações'),
-        backgroundColor: isDarkMode ? Colors.grey[900] : Colors.blue,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore.collection('donations').snapshots(),
