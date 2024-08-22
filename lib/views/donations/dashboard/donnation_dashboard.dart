@@ -222,7 +222,7 @@ class DonationsDashboard extends StatelessWidget {
             Text(
               title,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
             ),
@@ -230,7 +230,7 @@ class DonationsDashboard extends StatelessWidget {
             Text(
               value,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
             ),
