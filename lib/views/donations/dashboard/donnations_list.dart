@@ -1,4 +1,4 @@
-import 'package:churchapp/views/donations/dashboard/donnatio_viewer.dart';
+import 'package:churchapp/views/donations/dashboard/donnation_details.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
