@@ -76,39 +76,31 @@ class _BecomeMemberState extends State<BecomeMember> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Tornar-se Membro'),
-        ),
-        body: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildFullNameSection(),
-                    const SizedBox(height: 20.0),
-                    _buildLastVisitedChurchSection(),
-                    const SizedBox(height: 20.0),
-                    _buildCivilStatusSection(),
-                    const SizedBox(height: 20.0),
-                    _buildReasonForMembershipSection(),
-                    const SizedBox(height: 20.0),
-                    _buildReferenceSection(),
-                    const SizedBox(height: 20.0),
-                    _buildSignUpButton(),
-                  ],
-                ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Tornar-se Membro'),
+      ),
+      body: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildFullNameSection(),
+                  const SizedBox(height: 20.0),
+                  _buildLastVisitedChurchSection(),
+                  const SizedBox(height: 20.0),
+                  _buildCivilStatusSection(),
+                  const SizedBox(height: 20.0),
+                  _buildReasonForMembershipSection(),
+                  const SizedBox(height: 20.0),
+                  _buildReferenceSection(),
+                  const SizedBox(height: 20.0),
+                  _buildSignUpButton(),
+                ],
               ),
             ),
           ),
