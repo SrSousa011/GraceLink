@@ -1,7 +1,7 @@
-import 'package:churchapp/views/member/become_member_service.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:churchapp/auth/auth_service.dart';
+import 'package:churchapp/views/member/become_member_service.dart';
 
 class BecomeMember extends StatefulWidget {
   const BecomeMember({super.key});
@@ -23,6 +23,7 @@ class _BecomeMemberState extends State<BecomeMember> {
   bool _isLoading = false;
   String selectedCivilStatus = 'Solteiro(a)';
   String selectedGender = 'Masculino';
+  DateTime _birthDate = DateTime.now(); // Default birth date
 
   @override
   void initState() {
@@ -73,6 +74,7 @@ class _BecomeMemberState extends State<BecomeMember> {
               _referenceController.text = userData['reference'] ?? '';
               selectedCivilStatus = userData['civilStatus'] ?? 'Solteiro(a)';
               selectedGender = userData['gender'] ?? 'Masculino';
+              _birthDate = (userData['birthDate'] as Timestamp).toDate();
             });
           }
         } else {
@@ -158,6 +160,7 @@ class _BecomeMemberState extends State<BecomeMember> {
           phoneNumber: _phoneNumberController.text.isEmpty
               ? null
               : _phoneNumberController.text,
+          birthDate: _birthDate, // Pass DateTime directly
           lastVisitedChurch: _lastVisitedChurchController.text.isEmpty
               ? null
               : _lastVisitedChurchController.text,
@@ -184,6 +187,7 @@ class _BecomeMemberState extends State<BecomeMember> {
           _referenceController.clear();
           selectedCivilStatus = 'Solteiro(a)';
           selectedGender = 'Masculino';
+          _birthDate = DateTime.now();
 
           showDialog(
             context: context,
@@ -243,6 +247,21 @@ class _BecomeMemberState extends State<BecomeMember> {
     _reasonForMembershipController.dispose();
     _referenceController.dispose();
     super.dispose();
+  }
+
+  Future<void> _selectBirthDate(BuildContext context) async {
+    final DateTime? selectedDate = await showDatePicker(
+      context: context,
+      initialDate: _birthDate,
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+
+    if (selectedDate != null && selectedDate != _birthDate) {
+      setState(() {
+        _birthDate = selectedDate;
+      });
+    }
   }
 
   @override
@@ -379,6 +398,7 @@ class _BecomeMemberState extends State<BecomeMember> {
       items: const [
         DropdownMenuItem(value: 'Masculino', child: Text('Masculino')),
         DropdownMenuItem(value: 'Feminino', child: Text('Feminino')),
+        DropdownMenuItem(value: 'Outro', child: Text('Outro')),
       ],
       decoration: const InputDecoration(
         labelText: 'Gênero',
