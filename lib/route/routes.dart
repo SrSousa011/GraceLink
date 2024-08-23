@@ -2,7 +2,7 @@ import 'package:churchapp/views/admin/admin_painel.dart';
 import 'package:churchapp/views/donations/dashboard/donnations_list.dart';
 import 'package:churchapp/views/donations/financial/donation_report.dart';
 import 'package:churchapp/views/materials/materials_courses.dart';
-import 'package:churchapp/views/member/become_option.dart';
+import 'package:churchapp/views/member/become_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/courses/adminDashboard/courses_dashboard.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscribers_list.dart';

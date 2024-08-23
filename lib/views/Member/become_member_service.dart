@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BecomeMemberService {
   final CollectionReference _memberCollection =
-      FirebaseFirestore.instance.collection('members');
+      FirebaseFirestore.instance.collection('becomeMember');
 
   Future<void> addMember({
     required String fullName,

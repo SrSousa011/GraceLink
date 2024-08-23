@@ -18,7 +18,8 @@ class _MembersDashboardState extends State<MembersDashboard> {
   int _totalMen = 0;
   int _totalWomen = 0;
   int _totalChildren = 0;
-  int _newSignUps = 0; // Este valor deve ser calculado conforme necessário
+  final int _newSignUps =
+      0; // Este valor deve ser calculado conforme necessário
 
   @override
   void initState() {
@@ -28,7 +29,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
 
   Future<void> fetchMemberCounts() async {
     try {
-      final querySnapshot = await _firestore.collection('members').get();
+      final querySnapshot = await _firestore.collection('becomeMember').get();
       final members = querySnapshot.docs;
 
       // Verificar se os dados estão sendo retornados
