@@ -96,13 +96,7 @@ class _BecomeMemberState extends State<BecomeMember> {
         }
       }
     } catch (e) {
-      if (mounted) {
-        _showErrorDialog(
-          context,
-          'Erro ao buscar dados',
-          'Falha ao buscar os dados do usuário: $e',
-        );
-      }
+      if (mounted) {}
     }
   }
 
