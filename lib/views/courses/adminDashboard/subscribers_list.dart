@@ -127,6 +127,7 @@ class _SubscribersListState extends State<SubscribersList> {
                           status: registration['status'],
                           registrationDate: registration['registrationDate'],
                           courseName: registration['courseName'],
+                          imagePath: registration['imagePath'],
                         ),
                       ),
                     );
