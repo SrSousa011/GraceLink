@@ -31,13 +31,8 @@ class _MembersDashboardState extends State<MembersDashboard> {
       final querySnapshot = await _firestore.collection('members').get();
       final members = querySnapshot.docs;
 
-      // Log dos dados dos membros para depuração
-      members.forEach((doc) {
-        final gender = doc['gender'];
-        final birthDate = (doc['birthDate'] as Timestamp).toDate();
-        final age = DateTime.now().year - birthDate.year;
-        print('Gender: $gender, BirthDate: $birthDate, Age: $age');
-      });
+      // Verificar se os dados estão sendo retornados
+      print('Fetched ${members.length} members from Firestore.');
 
       setState(() {
         _totalMembers = members.length;
