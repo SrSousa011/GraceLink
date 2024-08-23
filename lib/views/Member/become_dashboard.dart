@@ -36,32 +36,45 @@ class _MembersDashboardState extends State<MembersDashboard> {
 
   Future<void> fetchMemberCounts() async {
     try {
-      final querySnapshot = await _firestore.collection('becomeMember').get();
-      final members = querySnapshot.docs;
-
       final now = DateTime.now();
       final startOfMonth = DateTime(now.year, now.month, 1);
       final endOfMonth = DateTime(now.year, now.month + 1, 0);
 
+      final querySnapshot = await _firestore
+          .collection('becomeMember')
+          .where('createdAt',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
+          .where('createdAt',
+              isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
+          .get();
+
+      final members = querySnapshot.docs;
+
       setState(() {
         _totalMembers = members.length;
-        _totalMen = members.where((doc) => doc['gender'] == 'Masculino').length;
-        _totalWomen =
-            members.where((doc) => doc['gender'] == 'Feminino').length;
+        _totalMen = members
+            .where((doc) => (doc.data()['gender'] as String?) == 'Masculino')
+            .length;
+        _totalWomen = members
+            .where((doc) => (doc.data()['gender'] as String?) == 'Feminino')
+            .length;
+
+        // Atualização para lidar com campos opcionais
         _totalChildren = members.where((doc) {
-          final birthDate = (doc['dateOfBirth'] as Timestamp).toDate();
-          final age = DateTime.now().year - birthDate.year;
+          final birthDateTimestamp = doc.data()['birthDate'] as Timestamp?;
+          if (birthDateTimestamp == null) return false;
+
+          final birthDate = birthDateTimestamp.toDate();
+          final age = now.year - birthDate.year;
           return age <= 12;
         }).length;
 
-        _newSignUps = members.where((doc) {
-          final createdAt = (doc['createdAt'] as Timestamp).toDate();
-          return createdAt.isAfter(startOfMonth) &&
-              createdAt.isBefore(endOfMonth);
-        }).length;
+        _newSignUps = members
+            .length; // Se todos os documentos no intervalo são novas inscrições
       });
     } catch (e) {
-      if (mounted) {}
+      // Adicione um log para depuração
+      print('Failed to fetch member counts: $e');
     }
   }
 
@@ -70,9 +83,6 @@ class _MembersDashboardState extends State<MembersDashboard> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    _appBarColor = isDarkMode
-        ? Colors.blueGrey[900]!
-        : const Color.fromARGB(255, 255, 255, 255);
     _appBarColor = isDarkMode
         ? Colors.blueGrey[900]!
         : const Color.fromARGB(255, 255, 255, 255);
@@ -283,11 +293,10 @@ class _MembersDashboardState extends State<MembersDashboard> {
               shape: const StadiumBorder(),
               foregroundColor: Colors.white,
             ),
-            icon: const Icon(Icons.list),
-            label: const Text('Lista de Membros'),
+            icon: const Icon(Icons.search),
+            label: const Text('Ver Lista de Membros'),
             onPressed: () {
-              Navigator.of(context)
-                  .pushNamed('/member_list', arguments: {'filter': 'all'});
+              Navigator.of(context).pushNamed('/member_list');
             },
           ),
         ),
