@@ -22,43 +22,43 @@ class _SubscribersListState extends State<SubscribersList> {
   }
 
   Future<void> _fetchRegistrations() async {
+    setState(() => _loading = true);
+
     try {
-      // Fetch all course registrations
-      QuerySnapshot registrationsSnapshot =
+      final registrationsSnapshot =
           await _firestore.collection('courseregistration').get();
-      List<Map<String, dynamic>> registrations = [];
+      final registrations = await Future.wait(
+        registrationsSnapshot.docs.map((doc) async {
+          final data = doc.data();
+          final courseId = data['courseId'] ?? '';
+          final courseName = courseId.isNotEmpty
+              ? await _fetchCourseName(courseId)
+              : 'Unknown';
 
-      // Fetch course details for each registration
-      for (var doc in registrationsSnapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
-        final courseId = data['courseId'] ?? '';
+          final userId = data['userId'] ?? 'Unknown';
+          final userData = await _fetchUserData(userId);
 
-        // Fetch course title
-        String courseName = 'Unknown'; // Default value
-        if (courseId.isNotEmpty) {
-          courseName = await _fetchCourseName(courseId);
-        }
-
-        registrations.add({
-          'userId': data['userId'] ?? 'Unknown',
-          'userName': data['userName'] ?? 'Unknown',
-          'registrationDate': (data['registrationDate'] as Timestamp).toDate(),
-          'courseName': courseName,
-          'status': data['status'] ?? false,
-        });
-      }
+          return {
+            'userId': userId,
+            'userName': data['userName'] ?? 'Unknown',
+            'registrationDate':
+                (data['registrationDate'] as Timestamp).toDate(),
+            'courseName': courseName,
+            'status': data['status'] ?? false,
+            'imagePath': userData['imagePath'] ?? '',
+          };
+        }),
+      );
 
       setState(() {
         _registrations = registrations;
-        _loading = false;
       });
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching registrations: $e');
       }
-      setState(() {
-        _loading = false;
-      });
+    } finally {
+      setState(() => _loading = false);
     }
   }
 
@@ -76,12 +76,25 @@ class _SubscribersListState extends State<SubscribersList> {
     }
   }
 
+  Future<Map<String, dynamic>> _fetchUserData(String userId) async {
+    try {
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      return userDoc.data() ?? {};
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching user data: $e');
+      }
+      return {};
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Subscribers List'),
+        title: const Text('Lista de incritos'),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -90,36 +103,34 @@ class _SubscribersListState extends State<SubscribersList> {
               itemBuilder: (context, index) {
                 final registration = _registrations[index];
                 return ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage:
+                        NetworkImage(registration['imagePath'] ?? ''),
+                    backgroundColor:
+                        isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                    child: registration['imagePath'] == ''
+                        ? const Icon(Icons.person)
+                        : null,
+                  ),
                   title: Text(registration['userName']),
                   subtitle: Text(
-                      'Course: ${registration['courseName']} \nRegistered on: ${registration['registrationDate'].toLocal().toString().split(' ')[0]}'),
-                  trailing: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        isDarkMode ? Colors.grey : Colors.blue,
-                      ),
-                      foregroundColor: MaterialStateProperty.all<Color>(
-                        isDarkMode
-                            ? Colors.white
-                            : const Color.fromARGB(255, 255, 255, 255),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SubscriberViewer(
-                            userId: registration['userId'],
-                            userName: registration['userName'],
-                            status: registration['status'],
-                            registrationDate: registration['registrationDate'],
-                            courseName: registration['courseName'],
-                          ),
-                        ),
-                      );
-                    },
-                    child: const Text('View Details'),
+                    'Course: ${registration['courseName']} \nRegistered on: ${registration['registrationDate'].toLocal().toString().split(' ')[0]}',
                   ),
+                  tileColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SubscriberViewer(
+                          userId: registration['userId'],
+                          userName: registration['userName'],
+                          status: registration['status'],
+                          registrationDate: registration['registrationDate'],
+                          courseName: registration['courseName'],
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),
