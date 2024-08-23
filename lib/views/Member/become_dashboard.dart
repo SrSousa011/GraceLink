@@ -1,8 +1,8 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class MembersDashboard extends StatefulWidget {
   const MembersDashboard({super.key});
@@ -20,7 +20,6 @@ class _MembersDashboardState extends State<MembersDashboard> {
   int _totalChildren = 0;
   int _newSignUps = 0;
 
-  // Define colors for both light and dark modes
   late Color _appBarColor;
   late Color _summaryCardColorStart;
   late Color _summaryCardColorEnd;
@@ -77,7 +76,6 @@ class _MembersDashboardState extends State<MembersDashboard> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    // Set colors based on the theme mode
     _appBarColor = isDarkMode ? Colors.blueGrey[900]! : Colors.blue;
     _summaryCardColorStart =
         isDarkMode ? Colors.blueGrey[800]! : Colors.blueAccent;
@@ -154,6 +152,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
                 context,
                 'Total de Membros',
                 _totalMembers.toString(),
+                filter: 'all',
               ),
             ),
             const SizedBox(width: 16.0),
@@ -162,6 +161,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
                 context,
                 'Novas Inscrições',
                 _newSignUps.toString(),
+                filter: 'new',
               ),
             ),
           ],
@@ -175,6 +175,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
                 context,
                 'Total de Homens',
                 _totalMen.toString(),
+                filter: 'male',
               ),
             ),
             const SizedBox(width: 16.0),
@@ -183,14 +184,16 @@ class _MembersDashboardState extends State<MembersDashboard> {
                 context,
                 'Total de Mulheres',
                 _totalWomen.toString(),
+                filter: 'female',
               ),
             ),
             const SizedBox(width: 16.0),
             Expanded(
               child: _buildStatCard(
                 context,
-                'Total de Crianças (<12)',
+                'Total de Crianças',
                 _totalChildren.toString(),
+                filter: 'children',
               ),
             ),
           ],
@@ -202,45 +205,53 @@ class _MembersDashboardState extends State<MembersDashboard> {
   Widget _buildStatCard(
     BuildContext context,
     String title,
-    String value,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [_statCardColorStart, _statCardColorEnd],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+    String value, {
+    required String filter,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context)
+            .pushNamed('/member_list', arguments: {'filter': filter});
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [_statCardColorStart, _statCardColorEnd],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(12.0),
+          boxShadow: [
+            BoxShadow(
+              color: _textColor == Colors.white
+                  ? Colors.black54
+                  : Colors.grey[400]!,
+              blurRadius: 6.0,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        borderRadius: BorderRadius.circular(12.0),
-        boxShadow: [
-          BoxShadow(
-            color:
-                _textColor == Colors.white ? Colors.black54 : Colors.grey[400]!,
-            blurRadius: 6.0,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: _textColor,
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-          const SizedBox(height: 8.0),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: _textColor,
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-        ],
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: _textColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              value,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: _textColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -275,7 +286,8 @@ class _MembersDashboardState extends State<MembersDashboard> {
             icon: const Icon(Icons.list),
             label: const Text('Lista de Membros'),
             onPressed: () {
-              Navigator.of(context).pushNamed('/member_list');
+              Navigator.of(context)
+                  .pushNamed('/member_list', arguments: {'filter': 'all'});
             },
           ),
         ),

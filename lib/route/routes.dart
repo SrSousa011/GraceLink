@@ -1,15 +1,15 @@
+import 'package:flutter/material.dart';
+import 'package:churchapp/views/member/become_member_list.dart';
+import 'package:churchapp/views/member/become_member.dart';
 import 'package:churchapp/views/admin/admin_painel.dart';
 import 'package:churchapp/views/donations/dashboard/donnations_list.dart';
 import 'package:churchapp/views/donations/financial/donation_report.dart';
 import 'package:churchapp/views/materials/materials_courses.dart';
 import 'package:churchapp/views/member/become_dashboard.dart';
-import 'package:flutter/material.dart';
 import 'package:churchapp/views/courses/adminDashboard/courses_dashboard.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscribers_list.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscriber_viewer.dart';
 import 'package:churchapp/views/donations/dashboard/donnation_dashboard.dart';
-import 'package:churchapp/views/member/become_member.dart';
-import 'package:churchapp/views/member/become_member_list.dart';
 import 'package:churchapp/views/user_Profile/manegement/about_us.dart';
 import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/welcome.dart';
@@ -76,8 +76,6 @@ class AppRoutes {
             courseName: args['courseName'] as String,
           ),
         );
-      case '/member_list':
-        return MaterialPageRoute(builder: (_) => BecomeMemberList());
       case '/become_member':
         return MaterialPageRoute(builder: (_) => const BecomeMember());
       case '/manage_course_materials':
@@ -86,6 +84,10 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const AboutUs());
       case '/members_dashboard':
         return MaterialPageRoute(builder: (_) => const MembersDashboard());
+      case '/member_list':
+        final args = settings.arguments as Map<String, String>;
+        return MaterialPageRoute(
+            builder: (_) => BecomeMemberList(filter: args['filter'] ?? 'all'));
       case '/admin_panel':
         return MaterialPageRoute(builder: (_) => const AdminPanel());
       case '/donation_report':

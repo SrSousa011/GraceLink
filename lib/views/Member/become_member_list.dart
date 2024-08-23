@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 
 class BecomeMemberList extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final String filter;
 
-  BecomeMemberList({super.key});
+  BecomeMemberList({super.key, required this.filter});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,7 @@ class BecomeMemberList extends StatelessWidget {
         title: const Text('Lista de Membros'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _firestore.collection('becomeMember').snapshots(),
+        stream: _getFilteredMembers(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
@@ -115,7 +116,7 @@ class BecomeMemberList extends StatelessWidget {
                       ),
                     ),
                     subtitle: Text(
-                      member['address'] as String? ?? 'Notfound',
+                      member['address'] as String? ?? 'Não encontrado',
                       style: TextStyle(
                         fontSize: 14.0,
                         color: secondaryTextColor,
@@ -139,5 +140,38 @@ class BecomeMemberList extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Stream<QuerySnapshot> _getFilteredMembers() {
+    final now = DateTime.now();
+    final startOfMonth = DateTime(now.year, now.month, 1);
+
+    switch (filter) {
+      case 'male':
+        return _firestore
+            .collection('becomeMember')
+            .where('gender', isEqualTo: 'Masculino')
+            .snapshots();
+      case 'female':
+        return _firestore
+            .collection('becomeMember')
+            .where('gender', isEqualTo: 'Feminino')
+            .snapshots();
+      case 'children':
+        return _firestore
+            .collection('becomeMember')
+            .where('birthDate',
+                isLessThanOrEqualTo:
+                    now.subtract(const Duration(days: 365 * 12)))
+            .snapshots();
+      case 'new':
+        return _firestore
+            .collection('becomeMember')
+            .where('createdAt', isGreaterThanOrEqualTo: startOfMonth)
+            .snapshots();
+      case 'all':
+      default:
+        return _firestore.collection('becomeMember').snapshots();
+    }
   }
 }
