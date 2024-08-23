@@ -59,17 +59,14 @@ class _CoursesDashboardState extends State<CoursesDashboard> {
         ? Colors.blueGrey[900]!
         : const Color.fromARGB(255, 255, 255, 255);
 
-    final Color containerBackgroundColor = isDarkMode
-        ? Colors.blueGrey[800]!
-        : Colors.blueAccent; // Original color for light mode
+    final Color containerBackgroundColor =
+        isDarkMode ? Colors.blueGrey[800]! : Colors.blueAccent;
 
-    final Color containerBoxShadowColor = isDarkMode
-        ? Colors.blueGrey[800]!
-        : Colors.grey[300]!; // Original shadow color for light mode
+    final Color containerBoxShadowColor =
+        isDarkMode ? Colors.blueGrey[800]! : Colors.grey[300]!;
 
-    final Color buttonBackgroundColor = isDarkMode
-        ? Colors.blueGrey[800]!
-        : Colors.blue; // Original button color for light mode
+    final Color buttonBackgroundColor =
+        isDarkMode ? Colors.blueGrey[800]! : Colors.blue;
 
     const Color summaryCardTextColor = Colors.white;
 
@@ -89,10 +86,7 @@ class _CoursesDashboardState extends State<CoursesDashboard> {
                 gradient: LinearGradient(
                   colors: isDarkMode
                       ? [containerBackgroundColor, Colors.grey[800]!]
-                      : [
-                          containerBackgroundColor,
-                          Colors.blueAccent
-                        ], // Original gradient for light mode
+                      : [containerBackgroundColor, Colors.blueAccent],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),

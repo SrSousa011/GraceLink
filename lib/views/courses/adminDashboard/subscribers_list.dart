@@ -2,6 +2,7 @@ import 'package:churchapp/views/courses/adminDashboard/subscriber_viewer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class SubscribersList extends StatefulWidget {
   const SubscribersList({super.key});
@@ -45,7 +46,7 @@ class _SubscribersListState extends State<SubscribersList> {
                 (data['registrationDate'] as Timestamp).toDate(),
             'courseName': courseName,
             'status': data['status'] ?? false,
-            'imagePath': userData['imagePath'] ?? '',
+            'imagePath': userData['profilePicture'] ?? '',
           };
         }),
       );
@@ -94,7 +95,7 @@ class _SubscribersListState extends State<SubscribersList> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de incritos'),
+        title: const Text('Lista de cadastrados'),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -102,19 +103,29 @@ class _SubscribersListState extends State<SubscribersList> {
               itemCount: _registrations.length,
               itemBuilder: (context, index) {
                 final registration = _registrations[index];
+                final registrationDate =
+                    registration['registrationDate'] as DateTime;
+                final formattedDate =
+                    DateFormat('d MMMM yyyy').format(registrationDate);
+
                 return ListTile(
                   leading: CircleAvatar(
-                    backgroundImage:
-                        NetworkImage(registration['imagePath'] ?? ''),
+                    backgroundImage: registration['imagePath'] != ''
+                        ? NetworkImage(registration['imagePath'])
+                        : null,
                     backgroundColor:
                         isDarkMode ? Colors.grey[800] : Colors.grey[300],
                     child: registration['imagePath'] == ''
                         ? const Icon(Icons.person)
                         : null,
                   ),
-                  title: Text(registration['userName']),
+                  title: Text(
+                    registration['userName'],
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   subtitle: Text(
-                    'Course: ${registration['courseName']} \nRegistered on: ${registration['registrationDate'].toLocal().toString().split(' ')[0]}',
+                    'Curso: ${registration['courseName']} \nData de inscrição: $formattedDate',
+                    style: const TextStyle(color: Colors.black54),
                   ),
                   tileColor: isDarkMode ? Colors.grey[800] : Colors.white,
                   onTap: () {

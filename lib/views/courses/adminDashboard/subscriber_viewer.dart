@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:churchapp/views/courses/courses_service.dart';
+import 'package:flutter/material.dart';
 
 class SubscriberViewer extends StatefulWidget {
   final String userId;
@@ -7,6 +7,7 @@ class SubscriberViewer extends StatefulWidget {
   final bool status;
   final DateTime registrationDate;
   final String courseName;
+  final String imagePath;
 
   const SubscriberViewer({
     super.key,
@@ -15,6 +16,7 @@ class SubscriberViewer extends StatefulWidget {
     required this.status,
     required this.registrationDate,
     required this.courseName,
+    required this.imagePath,
   });
 
   @override
@@ -44,7 +46,6 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
         status: !_status!,
       );
 
-      // Atualiza o estado do widget
       setState(() {
         _status = !_status!;
       });
@@ -73,6 +74,11 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
     final primaryColor =
         theme.brightness == Brightness.dark ? Colors.blueGrey : Colors.blue;
 
+    String formattedDate =
+        '${widget.registrationDate.day.toString().padLeft(2, '0')}/'
+        '${widget.registrationDate.month.toString().padLeft(2, '0')}/'
+        '${widget.registrationDate.year}';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Subscriber Details'),
@@ -91,7 +97,10 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.person, size: 40, color: primaryColor),
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(widget.imagePath),
+                          radius: 30,
+                        ),
                         const SizedBox(width: 16.0),
                         Expanded(
                           child: Text(
@@ -109,7 +118,7 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
                     ),
                     const SizedBox(height: 8.0),
                     Text(
-                      'Registration Date: ${widget.registrationDate.toLocal()}',
+                      'Data de inscrição: $formattedDate',
                       style: theme.textTheme.titleMedium,
                     ),
                     const SizedBox(height: 16.0),
@@ -127,7 +136,7 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: Text(
-                        _status! ? 'Paid' : 'Not Paid',
+                        _status! ? 'Pago' : 'Não Pago',
                         style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold),
                       ),
@@ -152,7 +161,7 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    child: const Text('Back to List',
+                    child: const Text('Voltar',
                         style: TextStyle(color: Colors.white)),
                   ),
                 ),
