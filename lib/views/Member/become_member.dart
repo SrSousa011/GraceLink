@@ -74,7 +74,7 @@ class _BecomeMemberState extends State<BecomeMember> {
               _referenceController.text = userData['reference'] ?? '';
               selectedCivilStatus = userData['civilStatus'] ?? 'Solteiro(a)';
               selectedGender = userData['gender'] ?? 'Masculino';
-              _birthDate = (userData['birthDate'] as Timestamp).toDate();
+              _birthDate = (userData['dateOfBirth'] as Timestamp).toDate();
             });
           }
         } else {
