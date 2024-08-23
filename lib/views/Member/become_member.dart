@@ -14,20 +14,24 @@ class BecomeMember extends StatefulWidget {
 class _BecomeMemberState extends State<BecomeMember> {
   late TextEditingController _fullNameController;
   late TextEditingController _addressController;
+  late TextEditingController _phoneNumberController;
   late TextEditingController _lastVisitedChurchController;
   late TextEditingController _reasonForMembershipController;
   late TextEditingController _referenceController;
+  String? _imagePath;
+  String? _dateOfBirth;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
-  String selectedCivilStatus = 'Single';
+  String selectedCivilStatus = 'Solteiro(a)';
 
   @override
   void initState() {
     super.initState();
     _fullNameController = TextEditingController();
     _addressController = TextEditingController();
+    _phoneNumberController = TextEditingController();
     _lastVisitedChurchController = TextEditingController();
     _reasonForMembershipController = TextEditingController();
     _referenceController = TextEditingController();
@@ -48,18 +52,16 @@ class _BecomeMemberState extends State<BecomeMember> {
           setState(() {
             _fullNameController.text = userData['fullName'] ?? '';
             _addressController.text = userData['address'] ?? '';
-            _lastVisitedChurchController.text =
-                userData['lastVisitedChurch'] ?? '';
-            _reasonForMembershipController.text =
-                userData['reasonForMembership'] ?? '';
-            _referenceController.text = userData['reference'] ?? '';
-            selectedCivilStatus = userData['civilStatus'] ?? 'Single';
+            _phoneNumberController.text = userData['phoneNumber'] ?? '';
+            _imagePath = userData['imagePath'];
+            _dateOfBirth = userData['dateOfBirth'];
+            selectedCivilStatus = userData['civilStatus'] ?? 'Solteiro(a)';
           });
         }
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching user data: $e');
+        print('Erro ao buscar dados do usuário: $e');
       }
     }
   }
@@ -68,7 +70,7 @@ class _BecomeMemberState extends State<BecomeMember> {
   void dispose() {
     _fullNameController.dispose();
     _addressController.dispose();
-    _lastVisitedChurchController.dispose();
+    _phoneNumberController.dispose();
     _reasonForMembershipController.dispose();
     _referenceController.dispose();
     super.dispose();
@@ -76,41 +78,35 @@ class _BecomeMemberState extends State<BecomeMember> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Become a Member'),
-        ),
-        body: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildFullNameSection(),
-                    const SizedBox(height: 20.0),
-                    _buildLastVisitedChurchSection(),
-                    const SizedBox(height: 20.0),
-                    _buildCivilStatusSection(),
-                    const SizedBox(height: 20.0),
-                    _buildAddressSection(),
-                    const SizedBox(height: 20.0),
-                    _buildReasonForMembershipSection(),
-                    const SizedBox(height: 20.0),
-                    _buildReferenceSection(),
-                    const SizedBox(height: 20.0),
-                    _buildSignUpButton(),
-                  ],
-                ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Tornar-se Membro'),
+      ),
+      body: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (_imagePath != null) _buildProfileImageSection(),
+                  const SizedBox(height: 20.0),
+                  _buildFullNameSection(),
+                  const SizedBox(height: 20.0),
+                  if (_dateOfBirth != null) _buildDateOfBirthSection(),
+                  const SizedBox(height: 20.0),
+                  _buildCivilStatusSection(),
+                  const SizedBox(height: 20.0),
+                  _buildLastVisitedChurchSection(),
+                  const SizedBox(height: 20.0),
+                  _buildReasonForMembershipSection(),
+                  const SizedBox(height: 20.0),
+                  _buildReferenceSection(),
+                  const SizedBox(height: 20.0),
+                  _buildSignUpButton(),
+                ],
               ),
             ),
           ),
@@ -119,27 +115,34 @@ class _BecomeMemberState extends State<BecomeMember> {
     );
   }
 
+  Widget _buildProfileImageSection() {
+    return Center(
+      child: CircleAvatar(
+        radius: 50,
+        backgroundImage: NetworkImage(_imagePath!),
+      ),
+    );
+  }
+
   Widget _buildFullNameSection() {
     return TextFormField(
       controller: _fullNameController,
       decoration: const InputDecoration(
-        labelText: 'Full Name',
+        labelText: 'Nome Completo',
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Full name cannot be empty';
+          return 'O nome completo não pode estar vazio';
         }
         return null;
       },
     );
   }
 
-  Widget _buildAddressSection() {
-    return TextFormField(
-      controller: _addressController,
-      decoration: const InputDecoration(
-        labelText: 'Address',
-      ),
+  Widget _buildDateOfBirthSection() {
+    return Text(
+      'Data de Nascimento: $_dateOfBirth',
+      style: const TextStyle(fontSize: 16),
     );
   }
 
@@ -147,7 +150,7 @@ class _BecomeMemberState extends State<BecomeMember> {
     return TextFormField(
       controller: _lastVisitedChurchController,
       decoration: const InputDecoration(
-        labelText: 'Last Visited Church',
+        labelText: 'Última igreja visitada',
       ),
     );
   }
@@ -156,11 +159,11 @@ class _BecomeMemberState extends State<BecomeMember> {
     return TextFormField(
       controller: _reasonForMembershipController,
       decoration: const InputDecoration(
-        labelText: 'Reason for Membership',
+        labelText: 'Razão para Tornar-se Membro',
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Reason for membership cannot be empty';
+          return 'A razão para tornar-se membro não pode estar vazia';
         }
         return null;
       },
@@ -171,7 +174,7 @@ class _BecomeMemberState extends State<BecomeMember> {
     return TextFormField(
       controller: _referenceController,
       decoration: const InputDecoration(
-        labelText: 'Reference from Current Member',
+        labelText: 'Referência de um Membro Atual',
       ),
     );
   }
@@ -185,13 +188,13 @@ class _BecomeMemberState extends State<BecomeMember> {
         });
       },
       items: const [
-        DropdownMenuItem(value: 'Single', child: Text('Single')),
-        DropdownMenuItem(value: 'Married', child: Text('Married')),
-        DropdownMenuItem(value: 'Divorced', child: Text('Divorced')),
-        DropdownMenuItem(value: 'Widowed', child: Text('Widowed')),
+        DropdownMenuItem(value: 'Solteiro(a)', child: Text('Solteiro(a)')),
+        DropdownMenuItem(value: 'Casado(a)', child: Text('Casado(a)')),
+        DropdownMenuItem(value: 'Divorciado(a)', child: Text('Divorciado(a)')),
+        DropdownMenuItem(value: 'Viúvo(a)', child: Text('Viúvo(a)')),
       ],
       decoration: const InputDecoration(
-        labelText: 'Civil Status',
+        labelText: 'Estado Civil',
       ),
     );
   }
@@ -207,7 +210,7 @@ class _BecomeMemberState extends State<BecomeMember> {
         ),
       ),
       child:
-          _isLoading ? const CircularProgressIndicator() : const Text('Submit'),
+          _isLoading ? const CircularProgressIndicator() : const Text('Enviar'),
     );
   }
 
@@ -223,12 +226,21 @@ class _BecomeMemberState extends State<BecomeMember> {
       try {
         await becomeMemberService.addMember(
           fullName: _fullNameController.text,
-          address: _addressController.text,
-          lastVisitedChurch: _lastVisitedChurchController.text,
+          address: _addressController.text.isNotEmpty
+              ? _addressController.text
+              : null,
+          phoneNumber: _phoneNumberController.text.isNotEmpty
+              ? _phoneNumberController.text
+              : null,
           reasonForMembership: _reasonForMembershipController.text,
-          reference: _referenceController.text,
+          reference: _referenceController.text.isNotEmpty
+              ? _referenceController.text
+              : null,
           civilStatus: selectedCivilStatus,
-          membershipDate: DateTime.now(), // Adiciona a data atual
+          membershipDate: DateTime.now(),
+          lastVisitedChurch: _lastVisitedChurchController.text,
+          dateOfBirth: _dateOfBirth,
+          imagePath: _imagePath,
         );
 
         if (!mounted) return;
@@ -237,29 +249,27 @@ class _BecomeMemberState extends State<BecomeMember> {
           _isLoading = false;
         });
 
-        // Limpar os campos do formulário
         _fullNameController.clear();
         _addressController.clear();
-        _lastVisitedChurchController.clear();
+        _phoneNumberController.clear();
         _reasonForMembershipController.clear();
         _referenceController.clear();
         setState(() {
-          selectedCivilStatus = 'Single';
+          selectedCivilStatus = 'Solteiro(a)';
         });
 
-        // Mostrar o diálogo de sucesso
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Success'),
-              content: const Text(
-                  'You have successfully submitted your information!'),
+              title: const Text('Sucesso'),
+              content:
+                  const Text('As suas informações foram enviadas com sucesso!'),
               actions: <Widget>[
                 TextButton(
                   child: const Text('OK'),
                   onPressed: () {
-                    Navigator.of(context).pop(); // Fechar o diálogo
+                    Navigator.of(context).pop();
                     Navigator.of(context).pushNamedAndRemoveUntil(
                         '/home', (Route<dynamic> route) => false);
                   },
@@ -269,7 +279,7 @@ class _BecomeMemberState extends State<BecomeMember> {
           },
         );
       } catch (e) {
-        if (!mounted) return; // Check if the widget is still mounted
+        if (!mounted) return;
 
         setState(() {
           _isLoading = false;
@@ -279,8 +289,8 @@ class _BecomeMemberState extends State<BecomeMember> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Error'),
-              content: Text('Failed to submit your information: $e'),
+              title: const Text('Erro'),
+              content: Text('Falha ao enviar as suas informações: $e'),
               actions: <Widget>[
                 TextButton(
                   child: const Text('OK'),
