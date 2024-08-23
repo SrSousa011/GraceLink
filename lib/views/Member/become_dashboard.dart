@@ -76,12 +76,18 @@ class _MembersDashboardState extends State<MembersDashboard> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    _appBarColor = isDarkMode ? Colors.blueGrey[900]! : Colors.blue;
+    _appBarColor = isDarkMode
+        ? Colors.blueGrey[900]!
+        : const Color.fromARGB(255, 255, 255, 255);
+    _appBarColor = isDarkMode
+        ? Colors.blueGrey[900]!
+        : const Color.fromARGB(255, 255, 255, 255);
     _summaryCardColorStart =
         isDarkMode ? Colors.blueGrey[800]! : Colors.blueAccent;
     _summaryCardColorEnd = isDarkMode ? Colors.blueGrey[600]! : Colors.blue;
     _buttonColor = isDarkMode ? Colors.blueGrey[700]! : Colors.blueAccent;
-    _textColor = isDarkMode ? Colors.white : Colors.black;
+    _textColor =
+        isDarkMode ? Colors.white : const Color.fromARGB(255, 255, 255, 255);
     _statCardColorStart =
         isDarkMode ? Colors.blueGrey[800]! : Colors.blueAccent;
     _statCardColorEnd = isDarkMode ? Colors.blueGrey[600]! : Colors.blue;
