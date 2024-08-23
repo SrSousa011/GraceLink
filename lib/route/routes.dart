@@ -74,6 +74,7 @@ class AppRoutes {
             status: args['status'] as bool,
             registrationDate: args['registrationDate'] as DateTime,
             courseName: args['courseName'] as String,
+            imagePath: args['imagePath'] as String,
           ),
         );
       case '/become_member':
