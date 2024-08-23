@@ -18,8 +18,16 @@ class _MembersDashboardState extends State<MembersDashboard> {
   int _totalMen = 0;
   int _totalWomen = 0;
   int _totalChildren = 0;
-  final int _newSignUps =
-      0; // Este valor deve ser calculado conforme necessário
+  int _newSignUps = 0;
+
+  // Define colors for both light and dark modes
+  late Color _appBarColor;
+  late Color _summaryCardColorStart;
+  late Color _summaryCardColorEnd;
+  late Color _buttonColor;
+  late Color _textColor;
+  late Color _statCardColorStart;
+  late Color _statCardColorEnd;
 
   @override
   void initState() {
@@ -32,27 +40,35 @@ class _MembersDashboardState extends State<MembersDashboard> {
       final querySnapshot = await _firestore.collection('becomeMember').get();
       final members = querySnapshot.docs;
 
-      // Verificar se os dados estão sendo retornados
-      print('Fetched ${members.length} members from Firestore.');
+      final now = DateTime.now();
+      final startOfMonth = DateTime(now.year, now.month, 1);
+      final endOfMonth = DateTime(now.year, now.month + 1, 0);
 
       setState(() {
         _totalMembers = members.length;
-        _totalMen = members.where((doc) => doc['gender'] == 'Male').length;
-        _totalWomen = members.where((doc) => doc['gender'] == 'Female').length;
+        _totalMen = members.where((doc) => doc['gender'] == 'Masculino').length;
+        _totalWomen =
+            members.where((doc) => doc['gender'] == 'Feminino').length;
         _totalChildren = members.where((doc) {
-          final birthDate = (doc['birthDate'] as Timestamp).toDate();
+          final birthDate = (doc['dateOfBirth'] as Timestamp).toDate();
           final age = DateTime.now().year - birthDate.year;
           return age <= 12;
         }).length;
 
-        // Print dos totais calculados para depuração
-        print('Total Members: $_totalMembers');
-        print('Total Men: $_totalMen');
-        print('Total Women: $_totalWomen');
-        print('Total Children (<12): $_totalChildren');
+        _newSignUps = members.where((doc) {
+          final createdAt = (doc['createdAt'] as Timestamp).toDate();
+          return createdAt.isAfter(startOfMonth) &&
+              createdAt.isBefore(endOfMonth);
+        }).length;
       });
     } catch (e) {
-      print('Failed to fetch member counts: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content:
+                  Text('Failed to load member data. Please try again later.')),
+        );
+      }
     }
   }
 
@@ -61,9 +77,21 @@ class _MembersDashboardState extends State<MembersDashboard> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
+    // Set colors based on the theme mode
+    _appBarColor = isDarkMode ? Colors.blueGrey[900]! : Colors.blue;
+    _summaryCardColorStart =
+        isDarkMode ? Colors.blueGrey[800]! : Colors.blueAccent;
+    _summaryCardColorEnd = isDarkMode ? Colors.blueGrey[600]! : Colors.blue;
+    _buttonColor = isDarkMode ? Colors.blueGrey[700]! : Colors.blueAccent;
+    _textColor = isDarkMode ? Colors.white : Colors.black;
+    _statCardColorStart =
+        isDarkMode ? Colors.blueGrey[800]! : Colors.blueAccent;
+    _statCardColorEnd = isDarkMode ? Colors.blueGrey[600]! : Colors.blue;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Painel de Membros'),
+        backgroundColor: _appBarColor,
       ),
       drawer: const NavBar(),
       body: Padding(
@@ -71,128 +99,126 @@ class _MembersDashboardState extends State<MembersDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-                borderRadius: BorderRadius.circular(12.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: isDarkMode
-                        ? Colors.black.withOpacity(0.5)
-                        : Colors.black.withOpacity(0.1),
-                    blurRadius: 8.0,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    'Visão Geral do Painel',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          context,
-                          'Total de Membros',
-                          _totalMembers.toString(),
-                        ),
-                      ),
-                      const SizedBox(width: 16.0),
-                      Expanded(
-                        child: _buildStatCard(
-                          context,
-                          'Novas Inscrições',
-                          _newSignUps.toString(),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          context,
-                          'Total de Homens',
-                          _totalMen.toString(),
-                        ),
-                      ),
-                      const SizedBox(width: 16.0),
-                      Expanded(
-                        child: _buildStatCard(
-                          context,
-                          'Total de Mulheres',
-                          _totalWomen.toString(),
-                        ),
-                      ),
-                      const SizedBox(width: 16.0),
-                      Expanded(
-                        child: _buildStatCard(
-                          context,
-                          'Total de Crianças (<12)',
-                          _totalChildren.toString(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            _buildSummaryCard(context),
             const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    isDarkMode ? const Color(0xFF333333) : Colors.blue,
-                shape: const StadiumBorder(),
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.of(context).pushNamed('/become_member');
-              },
-              child: const Text('Tornar-se um Membro'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    isDarkMode ? const Color(0xFF333333) : Colors.blue,
-                shape: const StadiumBorder(),
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.of(context).pushNamed('/member_list');
-              },
-              child: const Text('Lista de Membros'),
-            ),
+            _buildActionButtons(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStatCard(BuildContext context, String title, String value) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
-
+  Widget _buildSummaryCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[700] : Colors.white,
-        borderRadius: BorderRadius.circular(8.0),
+        gradient: LinearGradient(
+          colors: [_summaryCardColorStart, _summaryCardColorEnd],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16.0),
         boxShadow: [
           BoxShadow(
-            color: isDarkMode
-                ? Colors.black.withOpacity(0.5)
-                : Colors.black.withOpacity(0.1),
-            blurRadius: 4.0,
-            offset: const Offset(0, 2),
+            color:
+                _textColor == Colors.white ? Colors.black54 : Colors.grey[400]!,
+            blurRadius: 12.0,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            'Visão Geral do Painel',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: _textColor,
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const SizedBox(height: 10),
+          _buildStatsRows(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatsRows(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: _buildStatCard(
+                context,
+                'Total de Membros',
+                _totalMembers.toString(),
+              ),
+            ),
+            const SizedBox(width: 16.0),
+            Expanded(
+              child: _buildStatCard(
+                context,
+                'Novas Inscrições',
+                _newSignUps.toString(),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: _buildStatCard(
+                context,
+                'Total de Homens',
+                _totalMen.toString(),
+              ),
+            ),
+            const SizedBox(width: 16.0),
+            Expanded(
+              child: _buildStatCard(
+                context,
+                'Total de Mulheres',
+                _totalWomen.toString(),
+              ),
+            ),
+            const SizedBox(width: 16.0),
+            Expanded(
+              child: _buildStatCard(
+                context,
+                'Total de Crianças (<12)',
+                _totalChildren.toString(),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatCard(
+    BuildContext context,
+    String title,
+    String value,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [_statCardColorStart, _statCardColorEnd],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12.0),
+        boxShadow: [
+          BoxShadow(
+            color:
+                _textColor == Colors.white ? Colors.black54 : Colors.grey[400]!,
+            blurRadius: 6.0,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -202,19 +228,58 @@ class _MembersDashboardState extends State<MembersDashboard> {
           Text(
             title,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: isDarkMode ? Colors.white70 : Colors.black87,
+                  color: _textColor,
+                  fontWeight: FontWeight.bold,
                 ),
           ),
           const SizedBox(height: 8.0),
           Text(
             value,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: _textColor,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black87,
                 ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _buttonColor,
+              shape: const StadiumBorder(),
+              foregroundColor: Colors.white,
+            ),
+            icon: const Icon(Icons.person_add),
+            label: const Text('Tornar-se um Membro'),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/become_member');
+            },
+          ),
+        ),
+        const SizedBox(height: 20),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _buttonColor,
+              shape: const StadiumBorder(),
+              foregroundColor: Colors.white,
+            ),
+            icon: const Icon(Icons.list),
+            label: const Text('Lista de Membros'),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/member_list');
+            },
+          ),
+        ),
+      ],
     );
   }
 }
