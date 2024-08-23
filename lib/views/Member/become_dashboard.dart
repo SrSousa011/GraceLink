@@ -184,7 +184,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
                 filter: 'male',
               ),
             ),
-            const SizedBox(width: 16.0),
+            const SizedBox(width: 14.0),
             Expanded(
               child: _buildStatCard(
                 context,
@@ -193,7 +193,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
                 filter: 'female',
               ),
             ),
-            const SizedBox(width: 16.0),
+            const SizedBox(width: 14.0),
             Expanded(
               child: _buildStatCard(
                 context,
