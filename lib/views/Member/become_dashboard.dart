@@ -92,7 +92,6 @@ class _MembersDashboardState extends State<MembersDashboard> {
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 10),
-                  // Primeira Linha: Total de Membros e Novas Inscrições
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
