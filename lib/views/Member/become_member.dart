@@ -22,6 +22,7 @@ class _BecomeMemberState extends State<BecomeMember> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   String selectedCivilStatus = 'Solteiro(a)';
+  String selectedGender = 'Masculino';
 
   @override
   void initState() {
@@ -71,6 +72,7 @@ class _BecomeMemberState extends State<BecomeMember> {
                   userData['reasonForMembership'] ?? '';
               _referenceController.text = userData['reference'] ?? '';
               selectedCivilStatus = userData['civilStatus'] ?? 'Solteiro(a)';
+              selectedGender = userData['gender'] ?? 'Masculino';
             });
           }
         } else {
@@ -164,6 +166,7 @@ class _BecomeMemberState extends State<BecomeMember> {
               ? null
               : _referenceController.text,
           civilStatus: selectedCivilStatus,
+          gender: selectedGender,
           membershipDate: DateTime.now(),
           createdById: userId,
         );
@@ -180,6 +183,7 @@ class _BecomeMemberState extends State<BecomeMember> {
           _reasonForMembershipController.clear();
           _referenceController.clear();
           selectedCivilStatus = 'Solteiro(a)';
+          selectedGender = 'Masculino';
 
           showDialog(
             context: context,
@@ -234,6 +238,7 @@ class _BecomeMemberState extends State<BecomeMember> {
   void dispose() {
     _fullNameController.dispose();
     _addressController.dispose();
+    _phoneNumberController.dispose();
     _lastVisitedChurchController.dispose();
     _reasonForMembershipController.dispose();
     _referenceController.dispose();
@@ -259,11 +264,13 @@ class _BecomeMemberState extends State<BecomeMember> {
                   const SizedBox(height: 20.0),
                   _buildLastVisitedChurchSection(),
                   const SizedBox(height: 20.0),
-                  _buildCivilStatusSection(),
-                  const SizedBox(height: 20.0),
                   _buildReasonForMembershipSection(),
                   const SizedBox(height: 20.0),
                   _buildReferenceSection(),
+                  const SizedBox(height: 20.0),
+                  _buildCivilStatusSection(),
+                  const SizedBox(height: 20.0),
+                  _buildGenderSection(),
                   const SizedBox(height: 20.0),
                   _buildSignUpButton(),
                 ],
@@ -287,6 +294,24 @@ class _BecomeMemberState extends State<BecomeMember> {
         }
         return null;
       },
+    );
+  }
+
+  Widget _buildAddressSection() {
+    return TextFormField(
+      controller: _addressController,
+      decoration: const InputDecoration(
+        labelText: 'Endereço',
+      ),
+    );
+  }
+
+  Widget _buildPhoneNumberSection() {
+    return TextFormField(
+      controller: _phoneNumberController,
+      decoration: const InputDecoration(
+        labelText: 'Número de Telefone',
+      ),
     );
   }
 
@@ -339,6 +364,24 @@ class _BecomeMemberState extends State<BecomeMember> {
       ],
       decoration: const InputDecoration(
         labelText: 'Estado Civil',
+      ),
+    );
+  }
+
+  Widget _buildGenderSection() {
+    return DropdownButtonFormField<String>(
+      value: selectedGender,
+      onChanged: (value) {
+        setState(() {
+          selectedGender = value!;
+        });
+      },
+      items: const [
+        DropdownMenuItem(value: 'Masculino', child: Text('Masculino')),
+        DropdownMenuItem(value: 'Feminino', child: Text('Feminino')),
+      ],
+      decoration: const InputDecoration(
+        labelText: 'Gênero',
       ),
     );
   }

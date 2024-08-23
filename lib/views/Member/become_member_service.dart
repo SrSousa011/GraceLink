@@ -12,6 +12,7 @@ class BecomeMemberService {
     required String reasonForMembership,
     String? reference,
     String? civilStatus,
+    required String gender,
     required DateTime membershipDate,
     required String createdById,
   }) async {
@@ -24,6 +25,7 @@ class BecomeMemberService {
         'reasonForMembership': reasonForMembership,
         'reference': reference,
         'civilStatus': civilStatus,
+        'gender': gender,
         'membershipDate': membershipDate,
         'createdById': createdById,
         'createdAt': Timestamp.fromDate(membershipDate),
