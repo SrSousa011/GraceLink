@@ -7,6 +7,7 @@ class BecomeMemberService {
   Future<void> addMember({
     required String fullName,
     String? address,
+    String? phoneNumber,
     String? lastVisitedChurch,
     required String reasonForMembership,
     String? reference,
@@ -18,6 +19,7 @@ class BecomeMemberService {
       await _memberCollection.add({
         'fullName': fullName,
         'address': address,
+        'phoneNumber': phoneNumber,
         'lastVisitedChurch': lastVisitedChurch,
         'reasonForMembership': reasonForMembership,
         'reference': reference,

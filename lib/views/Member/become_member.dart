@@ -13,6 +13,7 @@ class BecomeMember extends StatefulWidget {
 class _BecomeMemberState extends State<BecomeMember> {
   late TextEditingController _fullNameController;
   late TextEditingController _addressController;
+  late TextEditingController _phoneNumberController;
   late TextEditingController _lastVisitedChurchController;
   late TextEditingController _reasonForMembershipController;
   late TextEditingController _referenceController;
@@ -27,6 +28,7 @@ class _BecomeMemberState extends State<BecomeMember> {
     super.initState();
     _fullNameController = TextEditingController();
     _addressController = TextEditingController();
+    _phoneNumberController = TextEditingController();
     _lastVisitedChurchController = TextEditingController();
     _reasonForMembershipController = TextEditingController();
     _referenceController = TextEditingController();
@@ -62,6 +64,7 @@ class _BecomeMemberState extends State<BecomeMember> {
             setState(() {
               _fullNameController.text = userData['fullName'] ?? '';
               _addressController.text = userData['address'] ?? '';
+              _phoneNumberController.text = userData['phoneNumber'] ?? '';
               _lastVisitedChurchController.text =
                   userData['lastVisitedChurch'] ?? '';
               _reasonForMembershipController.text =
@@ -150,6 +153,9 @@ class _BecomeMemberState extends State<BecomeMember> {
           fullName: _fullNameController.text,
           address:
               _addressController.text.isEmpty ? null : _addressController.text,
+          phoneNumber: _phoneNumberController.text.isEmpty
+              ? null
+              : _phoneNumberController.text,
           lastVisitedChurch: _lastVisitedChurchController.text.isEmpty
               ? null
               : _lastVisitedChurchController.text,
@@ -169,6 +175,7 @@ class _BecomeMemberState extends State<BecomeMember> {
 
           _fullNameController.clear();
           _addressController.clear();
+          _phoneNumberController.clear();
           _lastVisitedChurchController.clear();
           _reasonForMembershipController.clear();
           _referenceController.clear();
