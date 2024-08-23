@@ -77,7 +77,7 @@ class AppRoutes {
           ),
         );
       case '/member_list':
-        return MaterialPageRoute(builder: (_) => const BecomeMemberList());
+        return MaterialPageRoute(builder: (_) => BecomeMemberList());
       case '/become_member':
         return MaterialPageRoute(builder: (_) => const BecomeMember());
       case '/manage_course_materials':
