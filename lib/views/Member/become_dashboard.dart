@@ -1,7 +1,6 @@
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,38 +13,50 @@ class MembersDashboard extends StatefulWidget {
 
 class _MembersDashboardState extends State<MembersDashboard> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   int _totalMembers = 0;
-  int _newSignUps = 0;
+  int _totalMen = 0;
+  int _totalWomen = 0;
+  int _totalChildren = 0;
+  int _newSignUps = 0; // Este valor deve ser calculado conforme necessário
 
   @override
   void initState() {
     super.initState();
-    _fetchDashboardData();
+    fetchMemberCounts();
   }
 
-  Future<void> _fetchDashboardData() async {
+  Future<void> fetchMemberCounts() async {
     try {
-      final totalMembersSnapshot =
-          await _firestore.collection('becomeMember').get();
-      setState(() {
-        _totalMembers = totalMembersSnapshot.docs.length;
+      final querySnapshot = await _firestore.collection('members').get();
+      final members = querySnapshot.docs;
+
+      // Log dos dados dos membros para depuração
+      members.forEach((doc) {
+        final gender = doc['gender'];
+        final birthDate = (doc['birthDate'] as Timestamp).toDate();
+        final age = DateTime.now().year - birthDate.year;
+        print('Gender: $gender, BirthDate: $birthDate, Age: $age');
       });
 
-      final now = DateTime.now();
-      final startOfMonth = DateTime(now.year, now.month, 1);
-
-      final newSignUpsSnapshot = await _firestore
-          .collection('becomeMember')
-          .where('createdAt',
-              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
-          .get();
       setState(() {
-        _newSignUps = newSignUpsSnapshot.docs.length;
+        _totalMembers = members.length;
+        _totalMen = members.where((doc) => doc['gender'] == 'Male').length;
+        _totalWomen = members.where((doc) => doc['gender'] == 'Female').length;
+        _totalChildren = members.where((doc) {
+          final birthDate = (doc['birthDate'] as Timestamp).toDate();
+          final age = DateTime.now().year - birthDate.year;
+          return age <= 12;
+        }).length;
+
+        // Print dos totais calculados para depuração
+        print('Total Members: $_totalMembers');
+        print('Total Men: $_totalMen');
+        print('Total Women: $_totalWomen');
+        print('Total Children (<12): $_totalChildren');
       });
     } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching dashboard data: $e');
-      }
+      print('Failed to fetch member counts: $e');
     }
   }
 
@@ -56,7 +67,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Members Dashboard'),
+        title: const Text('Painel de Membros'),
       ),
       drawer: const NavBar(),
       body: Padding(
@@ -69,28 +80,71 @@ class _MembersDashboardState extends State<MembersDashboard> {
               decoration: BoxDecoration(
                 color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
                 borderRadius: BorderRadius.circular(12.0),
-                boxShadow: const [
+                boxShadow: [
                   BoxShadow(
-                    color: Colors.black26,
+                    color: isDarkMode
+                        ? Colors.black.withOpacity(0.5)
+                        : Colors.black.withOpacity(0.1),
                     blurRadius: 8.0,
-                    offset: Offset(0, 4),
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
               child: Column(
                 children: [
                   Text(
-                    'Dashboard Overview',
+                    'Visão Geral do Painel',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 10),
+                  // Primeira Linha: Total de Membros e Novas Inscrições
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildStatCard(
-                          context, 'Total Members', _totalMembers.toString()),
-                      _buildStatCard(
-                          context, 'New Sign-ups', _newSignUps.toString()),
+                      Expanded(
+                        child: _buildStatCard(
+                          context,
+                          'Total de Membros',
+                          _totalMembers.toString(),
+                        ),
+                      ),
+                      const SizedBox(width: 16.0),
+                      Expanded(
+                        child: _buildStatCard(
+                          context,
+                          'Novas Inscrições',
+                          _newSignUps.toString(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: _buildStatCard(
+                          context,
+                          'Total de Homens',
+                          _totalMen.toString(),
+                        ),
+                      ),
+                      const SizedBox(width: 16.0),
+                      Expanded(
+                        child: _buildStatCard(
+                          context,
+                          'Total de Mulheres',
+                          _totalWomen.toString(),
+                        ),
+                      ),
+                      const SizedBox(width: 16.0),
+                      Expanded(
+                        child: _buildStatCard(
+                          context,
+                          'Total de Crianças (<12)',
+                          _totalChildren.toString(),
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -107,7 +161,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
               onPressed: () {
                 Navigator.of(context).pushNamed('/become_member');
               },
-              child: const Text('Become a Member'),
+              child: const Text('Tornar-se um Membro'),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -120,7 +174,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
               onPressed: () {
                 Navigator.of(context).pushNamed('/member_list');
               },
-              child: const Text('List of Members'),
+              child: const Text('Lista de Membros'),
             ),
           ],
         ),
@@ -137,11 +191,13 @@ class _MembersDashboardState extends State<MembersDashboard> {
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.grey[700] : Colors.white,
         borderRadius: BorderRadius.circular(8.0),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Colors.black26,
+            color: isDarkMode
+                ? Colors.black.withOpacity(0.5)
+                : Colors.black.withOpacity(0.1),
             blurRadius: 4.0,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -150,13 +206,16 @@ class _MembersDashboardState extends State<MembersDashboard> {
         children: [
           Text(
             title,
-            style: Theme.of(context).textTheme.titleMedium,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: isDarkMode ? Colors.white70 : Colors.black87,
+                ),
           ),
           const SizedBox(height: 8.0),
           Text(
             value,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black87,
                 ),
           ),
         ],
