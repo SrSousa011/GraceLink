@@ -14,12 +14,9 @@ class BecomeMember extends StatefulWidget {
 class _BecomeMemberState extends State<BecomeMember> {
   late TextEditingController _fullNameController;
   late TextEditingController _addressController;
-  late TextEditingController _phoneNumberController;
   late TextEditingController _lastVisitedChurchController;
   late TextEditingController _reasonForMembershipController;
   late TextEditingController _referenceController;
-  String? _imagePath;
-  String? _dateOfBirth;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
@@ -31,7 +28,6 @@ class _BecomeMemberState extends State<BecomeMember> {
     super.initState();
     _fullNameController = TextEditingController();
     _addressController = TextEditingController();
-    _phoneNumberController = TextEditingController();
     _lastVisitedChurchController = TextEditingController();
     _reasonForMembershipController = TextEditingController();
     _referenceController = TextEditingController();
@@ -52,9 +48,11 @@ class _BecomeMemberState extends State<BecomeMember> {
           setState(() {
             _fullNameController.text = userData['fullName'] ?? '';
             _addressController.text = userData['address'] ?? '';
-            _phoneNumberController.text = userData['phoneNumber'] ?? '';
-            _imagePath = userData['imagePath'];
-            _dateOfBirth = userData['dateOfBirth'];
+            _lastVisitedChurchController.text =
+                userData['lastVisitedChurch'] ?? '';
+            _reasonForMembershipController.text =
+                userData['reasonForMembership'] ?? '';
+            _referenceController.text = userData['reference'] ?? '';
             selectedCivilStatus = userData['civilStatus'] ?? 'Solteiro(a)';
           });
         }
@@ -70,7 +68,7 @@ class _BecomeMemberState extends State<BecomeMember> {
   void dispose() {
     _fullNameController.dispose();
     _addressController.dispose();
-    _phoneNumberController.dispose();
+    _lastVisitedChurchController.dispose();
     _reasonForMembershipController.dispose();
     _referenceController.dispose();
     super.dispose();
@@ -78,48 +76,43 @@ class _BecomeMemberState extends State<BecomeMember> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tornar-se Membro'),
-      ),
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (_imagePath != null) _buildProfileImageSection(),
-                  const SizedBox(height: 20.0),
-                  _buildFullNameSection(),
-                  const SizedBox(height: 20.0),
-                  if (_dateOfBirth != null) _buildDateOfBirthSection(),
-                  const SizedBox(height: 20.0),
-                  _buildCivilStatusSection(),
-                  const SizedBox(height: 20.0),
-                  _buildLastVisitedChurchSection(),
-                  const SizedBox(height: 20.0),
-                  _buildReasonForMembershipSection(),
-                  const SizedBox(height: 20.0),
-                  _buildReferenceSection(),
-                  const SizedBox(height: 20.0),
-                  _buildSignUpButton(),
-                ],
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) {
+          return;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Tornar-se Membro'),
+        ),
+        body: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildFullNameSection(),
+                    const SizedBox(height: 20.0),
+                    _buildLastVisitedChurchSection(),
+                    const SizedBox(height: 20.0),
+                    _buildCivilStatusSection(),
+                    const SizedBox(height: 20.0),
+                    _buildReasonForMembershipSection(),
+                    const SizedBox(height: 20.0),
+                    _buildReferenceSection(),
+                    const SizedBox(height: 20.0),
+                    _buildSignUpButton(),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildProfileImageSection() {
-    return Center(
-      child: CircleAvatar(
-        radius: 50,
-        backgroundImage: NetworkImage(_imagePath!),
       ),
     );
   }
@@ -139,18 +132,11 @@ class _BecomeMemberState extends State<BecomeMember> {
     );
   }
 
-  Widget _buildDateOfBirthSection() {
-    return Text(
-      'Data de Nascimento: $_dateOfBirth',
-      style: const TextStyle(fontSize: 16),
-    );
-  }
-
   Widget _buildLastVisitedChurchSection() {
     return TextFormField(
       controller: _lastVisitedChurchController,
       decoration: const InputDecoration(
-        labelText: 'Última igreja visitada',
+        labelText: 'Última Igreja Visitada',
       ),
     );
   }
@@ -226,21 +212,12 @@ class _BecomeMemberState extends State<BecomeMember> {
       try {
         await becomeMemberService.addMember(
           fullName: _fullNameController.text,
-          address: _addressController.text.isNotEmpty
-              ? _addressController.text
-              : null,
-          phoneNumber: _phoneNumberController.text.isNotEmpty
-              ? _phoneNumberController.text
-              : null,
+          address: _addressController.text,
+          lastVisitedChurch: _lastVisitedChurchController.text,
           reasonForMembership: _reasonForMembershipController.text,
-          reference: _referenceController.text.isNotEmpty
-              ? _referenceController.text
-              : null,
+          reference: _referenceController.text,
           civilStatus: selectedCivilStatus,
           membershipDate: DateTime.now(),
-          lastVisitedChurch: _lastVisitedChurchController.text,
-          dateOfBirth: _dateOfBirth,
-          imagePath: _imagePath,
         );
 
         if (!mounted) return;
@@ -251,7 +228,7 @@ class _BecomeMemberState extends State<BecomeMember> {
 
         _fullNameController.clear();
         _addressController.clear();
-        _phoneNumberController.clear();
+        _lastVisitedChurchController.clear();
         _reasonForMembershipController.clear();
         _referenceController.clear();
         setState(() {
