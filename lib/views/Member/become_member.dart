@@ -23,7 +23,7 @@ class _BecomeMemberState extends State<BecomeMember> {
   bool _isLoading = false;
   String selectedCivilStatus = 'Solteiro(a)';
   String selectedGender = 'Masculino';
-  DateTime _birthDate = DateTime.now(); // Default birth date
+  DateTime _birthDate = DateTime.now();
 
   @override
   void initState() {
@@ -154,7 +154,7 @@ class _BecomeMemberState extends State<BecomeMember> {
           phoneNumber: _phoneNumberController.text.isEmpty
               ? null
               : _phoneNumberController.text,
-          birthDate: _birthDate, // Pass DateTime directly
+          birthDate: _birthDate,
           lastVisitedChurch: _lastVisitedChurchController.text.isEmpty
               ? null
               : _lastVisitedChurchController.text,
@@ -241,21 +241,6 @@ class _BecomeMemberState extends State<BecomeMember> {
     _reasonForMembershipController.dispose();
     _referenceController.dispose();
     super.dispose();
-  }
-
-  Future<void> _selectBirthDate(BuildContext context) async {
-    final DateTime? selectedDate = await showDatePicker(
-      context: context,
-      initialDate: _birthDate,
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-
-    if (selectedDate != null && selectedDate != _birthDate) {
-      setState(() {
-        _birthDate = selectedDate;
-      });
-    }
   }
 
   @override
