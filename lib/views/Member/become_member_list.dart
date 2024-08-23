@@ -1,90 +1,151 @@
-import 'package:churchapp/views/member/member.dart';
 import 'package:churchapp/views/member/members_detail.dart';
-import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class BecomeMemberList extends StatefulWidget {
-  const BecomeMemberList({super.key});
-
-  @override
-  State<BecomeMemberList> createState() => _BecomeMemberListState();
-}
-
-class _BecomeMemberListState extends State<BecomeMemberList> {
+class BecomeMemberList extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  List<Member> _members = [];
-  bool _loading = true;
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchMembers();
-  }
-
-  Future<void> _fetchMembers() async {
-    try {
-      QuerySnapshot snapshot =
-          await _firestore.collection('becomeMember').get();
-      setState(() {
-        _members =
-            snapshot.docs.map((doc) => Member.fromDocument(doc)).toList();
-        _loading = false;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching members: $e');
-      }
-      setState(() {
-        _loading = false;
-      });
-    }
-  }
+  BecomeMemberList({super.key});
 
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final Color primaryTextColor = isDarkMode ? Colors.white : Colors.black;
+    final Color secondaryTextColor =
+        isDarkMode ? Colors.grey[300]! : Colors.grey;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Membership Applications'),
+        title: const Text('Lista de Membros'),
       ),
-      drawer: const NavBar(),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: _members.length,
-              itemBuilder: (context, index) {
-                final member = _members[index];
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _firestore.collection('becomeMember').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    isDarkMode ? Colors.white : Colors.black),
+              ),
+            );
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(
+              child: Text(
+                'Nenhum membro encontrado',
+                style: TextStyle(color: primaryTextColor),
+              ),
+            );
+          }
+
+          final members = snapshot.data!.docs;
+
+          return ListView.builder(
+            itemCount: members.length,
+            itemBuilder: (context, index) {
+              final memberDoc = members[index];
+              final member = memberDoc.data() as Map<String, dynamic>;
+              final createdById = member['createdById'] as String?;
+              final memberId = memberDoc.id;
+
+              // Print details for debugging
+              print('Member ID: $memberId');
+              print('Created By ID: $createdById');
+
+              if (createdById == null) {
                 return ListTile(
-                  title: Text(member.fullName),
-                  subtitle: Text('Address: ${member.address}'),
-                  trailing: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        isDarkMode ? Colors.grey : Colors.blue,
+                  leading: const CircleAvatar(
+                    child: Icon(Icons.person),
+                  ),
+                  title: Text(
+                    'Usuário não encontrado',
+                    style: TextStyle(color: primaryTextColor),
+                  ),
+                );
+              }
+
+              return StreamBuilder<DocumentSnapshot>(
+                stream:
+                    _firestore.collection('users').doc(createdById).snapshots(),
+                builder: (context, userSnapshot) {
+                  if (userSnapshot.connectionState == ConnectionState.waiting) {
+                    return ListTile(
+                      leading: CircleAvatar(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              isDarkMode ? Colors.white : Colors.black),
+                        ),
                       ),
-                      foregroundColor: MaterialStateProperty.all<Color>(
-                        isDarkMode
-                            ? Colors.white
-                            : const Color.fromARGB(255, 255, 255, 255),
+                      title: Text(
+                        'Carregando...',
+                        style: TextStyle(color: primaryTextColor),
+                      ),
+                    );
+                  }
+
+                  if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
+                    return ListTile(
+                      leading: const CircleAvatar(
+                        child: Icon(Icons.person),
+                      ),
+                      title: Text(
+                        'Usuário não encontrado',
+                        style: TextStyle(color: primaryTextColor),
+                      ),
+                    );
+                  }
+
+                  final userData =
+                      userSnapshot.data!.data() as Map<String, dynamic>;
+                  final creatorName =
+                      userData['fullName'] as String? ?? 'Desconhecido';
+                  final creatorImageUrl = userData['imagePath'] as String?;
+
+                  // Print fullName for debugging
+                  print('Full Name: $creatorName');
+
+                  return ListTile(
+                    leading:
+                        creatorImageUrl != null && creatorImageUrl.isNotEmpty
+                            ? CircleAvatar(
+                                backgroundImage: NetworkImage(creatorImageUrl),
+                              )
+                            : const CircleAvatar(
+                                child: Icon(Icons.person),
+                              ),
+                    title: Text(
+                      creatorName,
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                        color: primaryTextColor,
                       ),
                     ),
-                    onPressed: () {
+                    subtitle: Text(
+                      member['address'] as String? ?? 'Notfound',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        color: secondaryTextColor,
+                      ),
+                    ),
+                    onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => MemberDetailsScreen(
-                            memberId: member.id,
+                            memberId: memberId,
                           ),
                         ),
                       );
                     },
-                    child: const Text('View Details'),
-                  ),
-                );
-              },
-            ),
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
