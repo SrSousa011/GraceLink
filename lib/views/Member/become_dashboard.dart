@@ -61,13 +61,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
         }).length;
       });
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content:
-                  Text('Failed to load member data. Please try again later.')),
-        );
-      }
+      if (mounted) {}
     }
   }
 
