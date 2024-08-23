@@ -48,11 +48,6 @@ class BecomeMemberList extends StatelessWidget {
               final member = memberDoc.data() as Map<String, dynamic>;
               final createdById = member['createdById'] as String?;
               final memberId = memberDoc.id;
-
-              // Print details for debugging
-              print('Member ID: $memberId');
-              print('Created By ID: $createdById');
-
               if (createdById == null) {
                 return ListTile(
                   leading: const CircleAvatar(
@@ -101,9 +96,6 @@ class BecomeMemberList extends StatelessWidget {
                   final creatorName =
                       userData['fullName'] as String? ?? 'Desconhecido';
                   final creatorImageUrl = userData['imagePath'] as String?;
-
-                  // Print fullName for debugging
-                  print('Full Name: $creatorName');
 
                   return ListTile(
                     leading:
