@@ -21,6 +21,7 @@ class MemberDetailsScreen extends StatelessWidget {
 
     const titleColorDark = Colors.grey;
     final infoTitleColorDark = Colors.grey[300]!;
+    final infoValueColorDark = Colors.grey[400]!;
     final containerColorDark = Colors.grey[800]!;
     final containerShadowColorDark = Colors.black.withOpacity(0.3);
 
@@ -81,44 +82,47 @@ class MemberDetailsScreen extends StatelessWidget {
                   ),
                 _buildSectionTitle('Informações Pessoais',
                     isDarkMode ? titleColorDark : titleColorLight),
-                _buildInfoContainer(
-                    'Nome Completo',
-                    memberData['fullName'],
-                    isDarkMode ? infoTitleColorDark : infoValueColorLight,
-                    isDarkMode ? containerColorDark : containerColorLight),
-                _buildInfoContainer(
-                    'Telefone',
-                    memberData['phoneNumber'],
-                    isDarkMode ? infoTitleColorDark : infoValueColorLight,
-                    isDarkMode ? containerColorDark : containerColorLight),
-                _buildInfoContainer(
-                    'Endereço',
-                    memberData['address'],
-                    isDarkMode ? infoTitleColorDark : infoValueColorLight,
-                    isDarkMode ? containerColorDark : containerColorLight),
-                const SizedBox(height: 16.0),
-                _buildSectionTitle('Informações da Igreja',
-                    isDarkMode ? titleColorDark : titleColorLight),
-                _buildInfoContainer(
-                    'Última Igreja Visitada',
-                    memberData['lastVisitedChurch'],
-                    isDarkMode ? infoTitleColorDark : infoValueColorLight,
-                    isDarkMode ? containerColorDark : containerColorLight),
-                _buildInfoContainer(
-                    'Razão para Adesão',
-                    memberData['reasonForMembership'],
-                    isDarkMode ? infoTitleColorDark : infoValueColorLight,
-                    isDarkMode ? containerColorDark : containerColorLight),
-                _buildInfoContainer(
-                    'Referência',
-                    memberData['reference'],
-                    isDarkMode ? infoTitleColorDark : infoValueColorLight,
-                    isDarkMode ? containerColorDark : containerColorLight),
-                _buildInfoContainer(
-                    'Estado Civil',
-                    memberData['civilStatus'],
-                    isDarkMode ? infoTitleColorDark : infoValueColorLight,
-                    isDarkMode ? containerColorDark : containerColorLight),
+                _buildGrid(
+                  [
+                    _buildInfoContainer(
+                        'Nome Completo',
+                        memberData['fullName'],
+                        isDarkMode ? infoValueColorDark : infoValueColorLight,
+                        isDarkMode ? containerColorDark : containerColorLight),
+                    _buildInfoContainer(
+                        'Telefone',
+                        memberData['phoneNumber'],
+                        isDarkMode ? infoValueColorDark : infoValueColorLight,
+                        isDarkMode ? containerColorDark : containerColorLight),
+                    _buildInfoContainer(
+                        'Endereço',
+                        memberData['address'],
+                        isDarkMode ? infoValueColorDark : infoValueColorLight,
+                        isDarkMode ? containerColorDark : containerColorLight),
+                    _buildInfoContainer(
+                        'Última Igreja Visitada',
+                        memberData['lastVisitedChurch'],
+                        isDarkMode ? infoValueColorDark : infoValueColorLight,
+                        isDarkMode ? containerColorDark : containerColorLight),
+                    _buildInfoContainer(
+                        'Razão para Adesão',
+                        memberData['reasonForMembership'],
+                        isDarkMode ? infoValueColorDark : infoValueColorLight,
+                        isDarkMode ? containerColorDark : containerColorLight),
+                    _buildInfoContainer(
+                        'Referência',
+                        memberData['reference'],
+                        isDarkMode ? infoValueColorDark : infoValueColorLight,
+                        isDarkMode ? containerColorDark : containerColorLight),
+                    _buildInfoContainer(
+                        'Estado Civil',
+                        memberData['civilStatus'],
+                        isDarkMode ? infoValueColorDark : infoValueColorLight,
+                        isDarkMode ? containerColorDark : containerColorLight),
+                  ],
+                  isDarkMode ? infoTitleColorDark : infoValueColorLight,
+                  isDarkMode ? containerColorDark : containerColorLight,
+                ),
                 const SizedBox(height: 16.0),
                 if (memberData.containsKey('membershipDate') &&
                     memberData['membershipDate'] != null)
@@ -126,7 +130,7 @@ class MemberDetailsScreen extends StatelessWidget {
                     'Data de Adesão',
                     _formatDate(
                         (memberData['membershipDate'] as Timestamp).toDate()),
-                    isDarkMode ? infoTitleColorDark : infoValueColorLight,
+                    isDarkMode ? infoValueColorDark : infoValueColorLight,
                     isDarkMode ? containerColorDark : containerColorLight,
                   ),
               ],
@@ -170,12 +174,14 @@ class MemberDetailsScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16.0,
-              color: textColor,
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16.0,
+                color: textColor,
+              ),
             ),
           ),
           Expanded(
@@ -190,6 +196,22 @@ class MemberDetailsScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildGrid(List<Widget> items, Color textColor, Color containerColor) {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16.0,
+        mainAxisSpacing: 16.0,
+      ),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        return items[index];
+      },
     );
   }
 
