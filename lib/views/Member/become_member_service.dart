@@ -6,15 +6,13 @@ class BecomeMemberService {
 
   Future<void> addMember({
     required String fullName,
-    required String reasonForMembership,
-    required String lastVisitedChurch,
-    required String civilStatus,
-    required DateTime membershipDate,
     String? address,
-    String? phoneNumber,
-    String? dateOfBirth,
-    String? imagePath,
+    String? lastVisitedChurch,
+    required String reasonForMembership,
     String? reference,
+    String? civilStatus,
+    required DateTime membershipDate,
+    required String createdById,
   }) async {
     try {
       await _memberCollection.add({
@@ -25,10 +23,8 @@ class BecomeMemberService {
         'reference': reference,
         'civilStatus': civilStatus,
         'membershipDate': membershipDate,
+        'createdById': createdById,
         'createdAt': Timestamp.fromDate(membershipDate),
-        'phoneNumber': phoneNumber,
-        'dateOfBirth': dateOfBirth,
-        'imagePath': imagePath,
       });
     } catch (e) {
       throw Exception('Failed to add member: $e');

@@ -1,5 +1,4 @@
 import 'package:churchapp/views/member/become_member_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/auth/auth_service.dart';
@@ -17,10 +16,10 @@ class _BecomeMemberState extends State<BecomeMember> {
   late TextEditingController _lastVisitedChurchController;
   late TextEditingController _reasonForMembershipController;
   late TextEditingController _referenceController;
+  late AuthenticationService _authenticationService;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-
   String selectedCivilStatus = 'Solteiro(a)';
 
   @override
@@ -31,35 +30,195 @@ class _BecomeMemberState extends State<BecomeMember> {
     _lastVisitedChurchController = TextEditingController();
     _reasonForMembershipController = TextEditingController();
     _referenceController = TextEditingController();
+    _authenticationService = AuthenticationService();
 
     _fetchUserData();
   }
 
   Future<void> _fetchUserData() async {
-    final userId = AuthenticationService().getCurrentUserId();
+    final userId = await _authenticationService.getCurrentUserId();
+
+    if (userId == null) {
+      if (mounted) {
+        _showErrorDialog(
+          context,
+          'Erro ao obter ID do usuário',
+          'Não foi possível obter o ID do usuário.',
+        );
+      }
+      return;
+    }
+
     try {
       final userDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(userId as String?)
+          .doc(userId)
           .get();
+
       if (userDoc.exists) {
         final userData = userDoc.data();
         if (userData != null) {
-          setState(() {
-            _fullNameController.text = userData['fullName'] ?? '';
-            _addressController.text = userData['address'] ?? '';
-            _lastVisitedChurchController.text =
-                userData['lastVisitedChurch'] ?? '';
-            _reasonForMembershipController.text =
-                userData['reasonForMembership'] ?? '';
-            _referenceController.text = userData['reference'] ?? '';
-            selectedCivilStatus = userData['civilStatus'] ?? 'Solteiro(a)';
-          });
+          if (mounted) {
+            setState(() {
+              _fullNameController.text = userData['fullName'] ?? '';
+              _addressController.text = userData['address'] ?? '';
+              _lastVisitedChurchController.text =
+                  userData['lastVisitedChurch'] ?? '';
+              _reasonForMembershipController.text =
+                  userData['reasonForMembership'] ?? '';
+              _referenceController.text = userData['reference'] ?? '';
+              selectedCivilStatus = userData['civilStatus'] ?? 'Solteiro(a)';
+            });
+          }
+        } else {
+          if (mounted) {
+            _showErrorDialog(
+              context,
+              'Dados não encontrados',
+              'Nenhum dado encontrado para o usuário.',
+            );
+          }
+        }
+      } else {
+        if (mounted) {
+          _showErrorDialog(
+            context,
+            'Documento não encontrado',
+            'O documento do usuário não foi encontrado.',
+          );
         }
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao buscar dados do usuário: $e');
+      if (mounted) {
+        _showErrorDialog(
+          context,
+          'Erro ao buscar dados',
+          'Falha ao buscar os dados do usuário: $e',
+        );
+      }
+    }
+  }
+
+  void _showErrorDialog(BuildContext context, String title, String message) {
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(message),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> _validateAndSubmit() async {
+    final form = _formKey.currentState;
+    if (form != null && form.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final becomeMemberService = BecomeMemberService();
+      final userId = await _authenticationService.getCurrentUserId();
+
+      if (userId == null) {
+        if (mounted) {
+          _showErrorDialog(
+            context,
+            'Erro ao salvar evento',
+            'Não foi possível obter o ID do usuário.',
+          );
+        }
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      try {
+        await becomeMemberService.addMember(
+          fullName: _fullNameController.text,
+          address:
+              _addressController.text.isEmpty ? null : _addressController.text,
+          lastVisitedChurch: _lastVisitedChurchController.text.isEmpty
+              ? null
+              : _lastVisitedChurchController.text,
+          reasonForMembership: _reasonForMembershipController.text,
+          reference: _referenceController.text.isEmpty
+              ? null
+              : _referenceController.text,
+          civilStatus: selectedCivilStatus,
+          membershipDate: DateTime.now(),
+          createdById: userId,
+        );
+
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+
+          _fullNameController.clear();
+          _addressController.clear();
+          _lastVisitedChurchController.clear();
+          _reasonForMembershipController.clear();
+          _referenceController.clear();
+          selectedCivilStatus = 'Solteiro(a)';
+
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Sucesso'),
+                content: const Text(
+                    'As suas informações foram enviadas com sucesso!'),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          '/home', (Route<dynamic> route) => false);
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Erro'),
+                content: Text('Falha ao enviar as suas informações: $e'),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
       }
     }
   }
@@ -190,88 +349,5 @@ class _BecomeMemberState extends State<BecomeMember> {
       child:
           _isLoading ? const CircularProgressIndicator() : const Text('Enviar'),
     );
-  }
-
-  Future<void> _validateAndSubmit() async {
-    final form = _formKey.currentState;
-    if (form != null && form.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      final becomeMemberService = BecomeMemberService();
-
-      try {
-        await becomeMemberService.addMember(
-          fullName: _fullNameController.text,
-          address: _addressController.text,
-          lastVisitedChurch: _lastVisitedChurchController.text,
-          reasonForMembership: _reasonForMembershipController.text,
-          reference: _referenceController.text,
-          civilStatus: selectedCivilStatus,
-          membershipDate: DateTime.now(),
-        );
-
-        if (!mounted) return;
-
-        setState(() {
-          _isLoading = false;
-        });
-
-        _fullNameController.clear();
-        _addressController.clear();
-        _lastVisitedChurchController.clear();
-        _reasonForMembershipController.clear();
-        _referenceController.clear();
-        setState(() {
-          selectedCivilStatus = 'Solteiro(a)';
-        });
-
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Sucesso'),
-              content:
-                  const Text('As suas informações foram enviadas com sucesso!'),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                        '/home', (Route<dynamic> route) => false);
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      } catch (e) {
-        if (!mounted) return;
-
-        setState(() {
-          _isLoading = false;
-        });
-
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Erro'),
-              content: Text('Falha ao enviar as suas informações: $e'),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      }
-    }
   }
 }
