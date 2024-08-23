@@ -18,8 +18,6 @@ class BecomeMemberService {
     required String gender,
   }) async {
     try {
-      final age = DateTime.now().year - birthDate!.year;
-
       await _memberCollection.add({
         'fullName': fullName,
         'address': address,
@@ -32,8 +30,7 @@ class BecomeMemberService {
         'createdById': createdById,
         'createdAt': Timestamp.fromDate(membershipDate),
         'gender': gender,
-        'birthDate': Timestamp.fromDate(birthDate),
-        'age': age,
+        'birthDate': birthDate != null ? Timestamp.fromDate(birthDate) : null,
       });
     } catch (e) {
       throw Exception('Failed to add member: $e');
