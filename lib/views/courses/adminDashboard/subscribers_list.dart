@@ -46,7 +46,7 @@ class _SubscribersListState extends State<SubscribersList> {
                 (data['registrationDate'] as Timestamp).toDate(),
             'courseName': courseName,
             'status': data['status'] ?? false,
-            'imagePath': userData['profilePicture'] ?? '',
+            'imagePath': userData['imagePath'] ?? '',
           };
         }),
       );
