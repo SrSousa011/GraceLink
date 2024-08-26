@@ -27,7 +27,7 @@ class _SubscribersListState extends State<SubscribersList> {
 
     try {
       final registrationsSnapshot =
-          await _firestore.collection('courseregistration').get();
+          await _firestore.collection('courseRegistration').get();
       final registrations = await Future.wait(
         registrationsSnapshot.docs.map((doc) async {
           final data = doc.data();
@@ -69,7 +69,7 @@ class _SubscribersListState extends State<SubscribersList> {
       final courseDoc =
           await _firestore.collection('courses').doc(courseId).get();
       final courseData = courseDoc.data();
-      return courseData?['title'] ?? 'Unknown';
+      return courseData?['courseName'] ?? 'Unknown';
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching course name: $e');
@@ -147,7 +147,6 @@ class _SubscribersListState extends State<SubscribersList> {
                         builder: (context) => SubscriberInfo(
                           userId: registration['userId'],
                           userName: registration['userName'],
-                          status: registration['status'],
                           registrationDate: registration['registrationDate'],
                           courseName: registration['courseName'],
                           imagePath: registration['imagePath'],
