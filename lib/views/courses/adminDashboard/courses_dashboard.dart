@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
@@ -7,10 +8,19 @@ import 'package:churchapp/views/courses/adminDashboard/subscribers_list.dart';
 class CoursesDashboard extends StatelessWidget {
   const CoursesDashboard({super.key});
 
-  Future<List<QueryDocumentSnapshot>> _fetchCourseRegistrations() async {
-    final snapshot =
-        await FirebaseFirestore.instance.collection('courseRegistration').get();
-    return snapshot.docs;
+  Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>>
+      _fetchCourseRegistrations() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('courseRegistration')
+          .get();
+      return snapshot.docs;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching course registrations: $e');
+      }
+      return [];
+    }
   }
 
   @override
@@ -40,7 +50,7 @@ class CoursesDashboard extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<List<QueryDocumentSnapshot>>(
+        child: FutureBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
           future: _fetchCourseRegistrations(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -59,8 +69,9 @@ class CoursesDashboard extends StatelessWidget {
             final endOfMonth = DateTime(now.year, now.month + 1, 0);
 
             final newEnrolled = documents.where((doc) {
-              final registrationDate = (doc.data()
-                  as Map<String, dynamic>)['registrationDate'] as Timestamp;
+              final data = doc.data();
+              final registrationDate = data['registrationDate'] as Timestamp?;
+              if (registrationDate == null) return false;
               final date = registrationDate.toDate();
               return date.isAfter(startOfMonth) && date.isBefore(endOfMonth);
             }).length;
