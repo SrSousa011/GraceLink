@@ -1,4 +1,4 @@
-import 'package:churchapp/views/courses/courses_date.dart';
+import 'package:churchapp/views/courses/service/courses_date.dart';
 import 'package:flutter/material.dart';
 
 class CourseSelectionDropdown extends StatelessWidget {
