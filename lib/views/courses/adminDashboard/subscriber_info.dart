@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class SubscriberInfo extends StatelessWidget {
+class SubscriberInfo extends StatefulWidget {
   final String userId;
   final String userName;
-  final bool status;
   final DateTime registrationDate;
   final String courseName;
   final String imagePath;
@@ -12,11 +12,69 @@ class SubscriberInfo extends StatelessWidget {
     super.key,
     required this.userId,
     required this.userName,
-    required this.status,
     required this.registrationDate,
     required this.courseName,
     required this.imagePath,
   });
+
+  @override
+  _SubscriberInfoState createState() => _SubscriberInfoState();
+}
+
+class _SubscriberInfoState extends State<SubscriberInfo> {
+  bool? _status;
+  late DocumentReference _docRef;
+  late Stream<DocumentSnapshot> _statusStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _docRef = FirebaseFirestore.instance
+        .collection('courseRegistration')
+        .doc(widget.userId);
+
+    _statusStream = _docRef.snapshots();
+
+    _statusStream.listen((docSnapshot) {
+      if (docSnapshot.exists) {
+        setState(() {
+          _status = docSnapshot['status'] as bool;
+        });
+      } else {
+        setState(() {
+          _status = false;
+        });
+      }
+    });
+  }
+
+  Future<void> _toggleStatus() async {
+    if (_status == null) return;
+
+    try {
+      setState(() {
+        _status = !_status!;
+      });
+
+      await _docRef.update({'status': _status});
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Status atualizado com sucesso!')),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _status = !_status!;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao atualizar status: $e')),
+        );
+      }
+    }
+  }
 
   Color _getBackgroundColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
@@ -48,11 +106,9 @@ class SubscriberInfo extends StatelessWidget {
         : Colors.grey[600]!;
   }
 
-  Color _getStatusColor(BuildContext context) {
-    final primaryColor = Theme.of(context).brightness == Brightness.dark
-        ? Colors.blueGrey
-        : Colors.blue;
-    return status ? Colors.green[700]! : primaryColor;
+  Color _getStatusColor() {
+    if (_status == null) return Colors.grey;
+    return _status! ? Colors.green[700]! : Colors.red[700]!;
   }
 
   @override
@@ -61,13 +117,14 @@ class SubscriberInfo extends StatelessWidget {
     final primaryColor =
         theme.brightness == Brightness.dark ? Colors.blueGrey : Colors.blue;
 
-    String formattedDate = '${registrationDate.day.toString().padLeft(2, '0')}/'
-        '${registrationDate.month.toString().padLeft(2, '0')}/'
-        '${registrationDate.year}';
+    String formattedDate =
+        '${widget.registrationDate.day.toString().padLeft(2, '0')}/'
+        '${widget.registrationDate.month.toString().padLeft(2, '0')}/'
+        '${widget.registrationDate.year}';
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Subscriber Details'),
+        title: const Text('Detalhes do Assinante'),
         backgroundColor: _getAppBarColor(context),
       ),
       backgroundColor: _getBackgroundColor(context),
@@ -87,11 +144,11 @@ class SubscriberInfo extends StatelessWidget {
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundImage: imagePath.isNotEmpty
-                              ? NetworkImage(imagePath)
+                          backgroundImage: widget.imagePath.isNotEmpty
+                              ? NetworkImage(widget.imagePath)
                               : null,
                           radius: 30,
-                          child: imagePath.isEmpty
+                          child: widget.imagePath.isEmpty
                               ? Icon(Icons.person,
                                   color: _getTextColor(context))
                               : null,
@@ -99,7 +156,7 @@ class SubscriberInfo extends StatelessWidget {
                         const SizedBox(width: 16.0),
                         Expanded(
                           child: Text(
-                            userName,
+                            widget.userName,
                             style: theme.textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: _getTextColor(context)),
@@ -109,13 +166,13 @@ class SubscriberInfo extends StatelessWidget {
                     ),
                     const SizedBox(height: 8.0),
                     Text(
-                      'Course: $courseName',
+                      'Curso: ${widget.courseName}',
                       style: theme.textTheme.titleMedium
                           ?.copyWith(color: _getSubtitleColor(context)),
                     ),
                     const SizedBox(height: 8.0),
                     Text(
-                      'Registration Date: $formattedDate',
+                      'Data de Inscrição: $formattedDate',
                       style: theme.textTheme.titleMedium
                           ?.copyWith(color: _getSubtitleColor(context)),
                     ),
@@ -131,11 +188,13 @@ class SubscriberInfo extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           vertical: 8.0, horizontal: 16.0),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(context),
-                        borderRadius: BorderRadius.circular(8.0),
+                        color: _getStatusColor(),
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
                       child: Text(
-                        status ? 'Paid' : 'Not Paid',
+                        _status == null
+                            ? 'Carregando...'
+                            : (_status! ? 'Pago' : 'Não Pago'),
                         style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold),
                       ),
@@ -147,8 +206,10 @@ class SubscriberInfo extends StatelessWidget {
             ),
             const SizedBox(height: 16.0),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(
+                SizedBox(
+                  width: 150.0,
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
@@ -157,11 +218,31 @@ class SubscriberInfo extends StatelessWidget {
                       backgroundColor: primaryColor,
                       padding: const EdgeInsets.symmetric(vertical: 12.0),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
                     ),
-                    child: const Text('Back',
+                    child: const Text('Voltar',
                         style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+                const SizedBox(width: 16.0),
+                SizedBox(
+                  width: 150.0,
+                  child: ElevatedButton(
+                    onPressed: _toggleStatus,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                    ),
+                    child: Text(
+                      _status == null
+                          ? 'Carregando...'
+                          : (_status! ? 'Não Pago' : 'Pago'),
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
               ],

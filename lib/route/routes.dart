@@ -71,7 +71,6 @@ class AppRoutes {
           builder: (_) => SubscriberInfo(
             userId: args['userId'] as String,
             userName: args['userName'] as String,
-            status: args['status'] as bool,
             registrationDate: args['registrationDate'] as DateTime,
             courseName: args['courseName'] as String,
             imagePath: args['imagePath'] as String,
