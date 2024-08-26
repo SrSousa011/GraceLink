@@ -14,8 +14,8 @@ class CoursesDashboard extends StatefulWidget {
 
 class _CoursesDashboardState extends State<CoursesDashboard> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  int _novasMatriculas = 0;
-  int _novosCadastrados = 0;
+  int _enrolled = 0;
+  int _newEnrolled = 0;
 
   @override
   void initState() {
@@ -29,33 +29,29 @@ class _CoursesDashboardState extends State<CoursesDashboard> {
       final startOfMonth = DateTime(now.year, now.month, 1);
       final endOfMonth = DateTime(now.year, now.month + 1, 0);
 
-      // Fetching new course registrations for the current month
-      final novasMatriculasSnapshot = await _firestore
+      final newEnrolledsSnapshot = await _firestore
           .collection('courseRegistration')
           .where('registrationDate',
               isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth),
               isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
           .get();
       setState(() {
-        _novasMatriculas = novasMatriculasSnapshot.docs.length;
+        _enrolled = newEnrolledsSnapshot.docs.length;
       });
 
-      // Fetching new signups for the current month
       final novosCadastradosSnapshot = await _firestore
-          .collection(
-              'courseRegistration') // Using the same collection as for novasMatriculas
+          .collection('courseRegistration')
           .where('registrationDate',
               isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth),
               isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
           .get();
       setState(() {
-        _novosCadastrados = novosCadastradosSnapshot.docs.length;
+        _newEnrolled = novosCadastradosSnapshot.docs.length;
       });
 
-      // Debug print statements
       if (kDebugMode) {
-        print('Novas Matrículas: $_novasMatriculas');
-        print('Novos Cadastrados: $_novosCadastrados');
+        print('Matrículados: $_enrolled');
+        print('Novos Cadastrados: $_newEnrolled');
       }
     } catch (e) {
       if (kDebugMode) {
@@ -138,7 +134,7 @@ class _CoursesDashboardState extends State<CoursesDashboard> {
                       _buildSummaryCard(
                         context,
                         title: 'Novas Matrículas',
-                        value: _novasMatriculas.toString(),
+                        value: _enrolled.toString(),
                         onTap: () {
                           Navigator.of(context).pushNamed('/subscribers_list');
                         },
@@ -146,7 +142,7 @@ class _CoursesDashboardState extends State<CoursesDashboard> {
                       _buildSummaryCard(
                         context,
                         title: 'Novos Cadastrados',
-                        value: _novosCadastrados.toString(),
+                        value: _newEnrolled.toString(),
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => const SubscribersList(),
