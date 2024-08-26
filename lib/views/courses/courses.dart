@@ -2,6 +2,7 @@ import 'package:churchapp/views/courses/courses_details.dart';
 import 'package:churchapp/views/courses/service/courses_date.dart';
 import 'package:churchapp/views/courses/service/courses_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Courses extends StatefulWidget {
@@ -50,6 +51,7 @@ class _CoursesState extends State<Courses> {
           return ListView.builder(
             itemCount: coursesList.length,
             itemBuilder: (context, index) {
+              final course = coursesList[index];
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: GestureDetector(
@@ -58,7 +60,7 @@ class _CoursesState extends State<Courses> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => CoursesDetails(
-                          course: coursesList[index],
+                          course: course,
                           coursesService: _coursesService,
                         ),
                       ),
@@ -90,7 +92,7 @@ class _CoursesState extends State<Courses> {
                           height: 230.0,
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: NetworkImage(coursesList[index].imageURL),
+                              image: NetworkImage(course.imageURL),
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.circular(8.0),
@@ -102,7 +104,7 @@ class _CoursesState extends State<Courses> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                coursesList[index].courseName,
+                                course.courseName,
                                 style: TextStyle(
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold,
@@ -112,7 +114,7 @@ class _CoursesState extends State<Courses> {
                               ),
                               const SizedBox(height: 8.0),
                               Text(
-                                coursesList[index].instructor,
+                                course.instructor,
                                 style: TextStyle(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.normal,
@@ -123,7 +125,7 @@ class _CoursesState extends State<Courses> {
                               ),
                               const SizedBox(height: 8.0),
                               Text(
-                                coursesList[index].description,
+                                course.description,
                                 style: TextStyle(
                                   fontSize: 15.0,
                                   fontWeight: FontWeight.normal,
@@ -134,7 +136,7 @@ class _CoursesState extends State<Courses> {
                               ),
                               const SizedBox(height: 8.0),
                               Text(
-                                '${coursesList[index].price} €',
+                                '${course.price} €',
                                 style: TextStyle(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.normal,
