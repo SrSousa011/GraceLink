@@ -25,24 +25,38 @@ class _CoursesDashboardState extends State<CoursesDashboard> {
 
   Future<void> _fetchDashboardData() async {
     try {
-      final trintaDiasAtras = DateTime.now().subtract(const Duration(days: 30));
+      final now = DateTime.now();
+      final startOfMonth = DateTime(now.year, now.month, 1);
+      final endOfMonth = DateTime(now.year, now.month + 1, 0);
+
+      // Fetching new course registrations for the current month
       final novasMatriculasSnapshot = await _firestore
           .collection('courseRegistration')
           .where('registrationDate',
-              isGreaterThanOrEqualTo: Timestamp.fromDate(trintaDiasAtras))
+              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth),
+              isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
           .get();
       setState(() {
         _novasMatriculas = novasMatriculasSnapshot.docs.length;
       });
 
+      // Fetching new signups for the current month
       final novosCadastradosSnapshot = await _firestore
-          .collection('signups')
-          .where('signUpDate',
-              isGreaterThanOrEqualTo: Timestamp.fromDate(trintaDiasAtras))
+          .collection(
+              'courseRegistration') // Using the same collection as for novasMatriculas
+          .where('registrationDate',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth),
+              isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
           .get();
       setState(() {
         _novosCadastrados = novosCadastradosSnapshot.docs.length;
       });
+
+      // Debug print statements
+      if (kDebugMode) {
+        print('Novas Matrículas: $_novasMatriculas');
+        print('Novos Cadastrados: $_novosCadastrados');
+      }
     } catch (e) {
       if (kDebugMode) {
         print('Erro ao buscar dados do dashboard: $e');
