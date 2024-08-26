@@ -1,63 +1,16 @@
-import 'package:churchapp/theme/theme_provider.dart';
-import 'package:churchapp/views/courses/adminDashboard/subscribers_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:churchapp/theme/theme_provider.dart';
+import 'package:churchapp/views/courses/adminDashboard/subscribers_list.dart';
 
-class CoursesDashboard extends StatefulWidget {
+class CoursesDashboard extends StatelessWidget {
   const CoursesDashboard({super.key});
 
-  @override
-  State<CoursesDashboard> createState() => _CoursesDashboardState();
-}
-
-class _CoursesDashboardState extends State<CoursesDashboard> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  int _enrolled = 0;
-  int _newEnrolled = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchDashboardData();
-  }
-
-  Future<void> _fetchDashboardData() async {
-    try {
-      final now = DateTime.now();
-      final startOfMonth = DateTime(now.year, now.month, 1);
-      final endOfMonth = DateTime(now.year, now.month + 1, 0);
-
-      final newEnrolledsSnapshot = await _firestore
-          .collection('courseRegistration')
-          .where('registrationDate',
-              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth),
-              isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
-          .get();
-      setState(() {
-        _enrolled = newEnrolledsSnapshot.docs.length;
-      });
-
-      final novosCadastradosSnapshot = await _firestore
-          .collection('courseRegistration')
-          .where('registrationDate',
-              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth),
-              isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
-          .get();
-      setState(() {
-        _newEnrolled = novosCadastradosSnapshot.docs.length;
-      });
-
-      if (kDebugMode) {
-        print('Matrículados: $_enrolled');
-        print('Novos Cadastrados: $_newEnrolled');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao buscar dados do dashboard: $e');
-      }
-    }
+  Future<List<QueryDocumentSnapshot>> _fetchCourseRegistrations() async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection('courseRegistration').get();
+    return snapshot.docs;
   }
 
   @override
@@ -87,100 +40,132 @@ class _CoursesDashboardState extends State<CoursesDashboard> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isDarkMode
-                      ? [containerBackgroundColor, Colors.grey[800]!]
-                      : [containerBackgroundColor, Colors.blueAccent],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(16.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: containerBoxShadowColor,
-                    blurRadius: 12.0,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Visão Geral dos Cursos',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          color: summaryCardTextColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const SizedBox(height: 8.0),
-                  Text(
-                    'Aqui está uma visão geral das novas matrículas e dos novos cadastrados',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.white70,
-                        ),
-                  ),
-                  const SizedBox(height: 24.0),
-                  Wrap(
-                    spacing: 16.0,
-                    runSpacing: 16.0,
-                    children: [
-                      _buildSummaryCard(
-                        context,
-                        title: 'Novas Matrículas',
-                        value: _enrolled.toString(),
-                        onTap: () {
-                          Navigator.of(context).pushNamed('/subscribers_list');
-                        },
-                      ),
-                      _buildSummaryCard(
-                        context,
-                        title: 'Novos Cadastrados',
-                        value: _newEnrolled.toString(),
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const SubscribersList(),
-                          ));
-                        },
+        child: FutureBuilder<List<QueryDocumentSnapshot>>(
+          future: _fetchCourseRegistrations(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              return Center(
+                  child: Text('Erro ao carregar dados: ${snapshot.error}'));
+            }
+
+            final documents = snapshot.data ?? [];
+
+            final now = DateTime.now();
+            final startOfMonth = DateTime(now.year, now.month, 1);
+            final endOfMonth = DateTime(now.year, now.month + 1, 0);
+
+            final newEnrolled = documents.where((doc) {
+              final registrationDate = (doc.data()
+                  as Map<String, dynamic>)['registrationDate'] as Timestamp;
+              final date = registrationDate.toDate();
+              return date.isAfter(startOfMonth) && date.isBefore(endOfMonth);
+            }).length;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: isDarkMode
+                          ? [containerBackgroundColor, Colors.grey[800]!]
+                          : [containerBackgroundColor, Colors.blueAccent],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: containerBoxShadowColor,
+                        blurRadius: 12.0,
+                        offset: const Offset(0, 6),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 40.0),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: buttonBackgroundColor,
-                shape: const StadiumBorder(),
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.of(context).pushNamed('/courses');
-              },
-              child: const Text('Lista de Cursos'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: buttonBackgroundColor,
-                shape: const StadiumBorder(),
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const SubscribersList(),
-                ));
-              },
-              child: const Text('Lista de Cadastrados'),
-            ),
-          ],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Visão Geral dos Cursos',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium
+                            ?.copyWith(
+                              color: summaryCardTextColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Text(
+                        'Aqui está uma visão geral das novas matrículas e dos novos cadastrados',
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Colors.white70,
+                                ),
+                      ),
+                      const SizedBox(height: 24.0),
+                      Wrap(
+                        spacing: 16.0,
+                        runSpacing: 16.0,
+                        children: [
+                          _buildSummaryCard(
+                            context,
+                            title: 'Total Matrículas',
+                            value: documents.length.toString(),
+                            onTap: () {
+                              Navigator.of(context)
+                                  .pushNamed('/subscribers_list');
+                            },
+                          ),
+                          _buildSummaryCard(
+                            context,
+                            title: 'Novos Matrículados',
+                            value: newEnrolled.toString(),
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => const SubscribersList(),
+                              ));
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 40.0),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: buttonBackgroundColor,
+                    shape: const StadiumBorder(),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/courses');
+                  },
+                  child: const Text('Lista de Cursos'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: buttonBackgroundColor,
+                    shape: const StadiumBorder(),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const SubscribersList(),
+                    ));
+                  },
+                  child: const Text('Lista de Cadastrados'),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
