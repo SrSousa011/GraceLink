@@ -1,9 +1,9 @@
-import 'package:churchapp/views/courses/courses_date.dart';
+import 'package:churchapp/views/courses/service/courses_date.dart';
+import 'package:churchapp/views/courses/service/courses_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:churchapp/auth/auth_service.dart';
-import 'package:churchapp/views/courses/courses_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CoursesDetails extends StatefulWidget {

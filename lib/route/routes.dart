@@ -68,8 +68,9 @@ class AppRoutes {
           return _errorRoute('Missing one or more arguments');
         }
         return MaterialPageRoute(
-          builder: (_) => SubscriberViewer(
+          builder: (_) => SubscriberInfo(
             userId: args['userId'] as String,
+            courseId: args['courseId'] as String,
             userName: args['userName'] as String,
             status: args['status'] as bool,
             registrationDate: args['registrationDate'] as DateTime,
