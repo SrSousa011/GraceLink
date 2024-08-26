@@ -48,6 +48,13 @@ class SubscriberInfo extends StatelessWidget {
         : Colors.grey[600]!;
   }
 
+  Color _getStatusColor(BuildContext context) {
+    final primaryColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.blueGrey
+        : Colors.blue;
+    return status ? Colors.green[700]! : primaryColor;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -124,7 +131,7 @@ class SubscriberInfo extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           vertical: 8.0, horizontal: 16.0),
                       decoration: BoxDecoration(
-                        color: status ? Colors.green : Colors.red,
+                        color: _getStatusColor(context),
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: Text(
