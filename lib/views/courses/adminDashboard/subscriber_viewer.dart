@@ -1,7 +1,6 @@
-import 'package:churchapp/views/courses/courses_service.dart';
 import 'package:flutter/material.dart';
 
-class SubscriberViewer extends StatefulWidget {
+class SubscriberInfo extends StatelessWidget {
   final String userId;
   final String userName;
   final bool status;
@@ -9,7 +8,7 @@ class SubscriberViewer extends StatefulWidget {
   final String courseName;
   final String imagePath;
 
-  const SubscriberViewer({
+  const SubscriberInfo({
     super.key,
     required this.userId,
     required this.userName,
@@ -19,53 +18,34 @@ class SubscriberViewer extends StatefulWidget {
     required this.imagePath,
   });
 
-  @override
-  State<SubscriberViewer> createState() => _SubscriberViewerState();
-}
-
-class _SubscriberViewerState extends State<SubscriberViewer> {
-  final CoursesService _coursesService = CoursesService();
-  bool? _status;
-  bool _loading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _status = widget.status;
+  Color _getBackgroundColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey[900]!
+        : Colors.white;
   }
 
-  Future<void> _toggleStatus() async {
-    setState(() {
-      _loading = true;
-    });
+  Color _getAppBarColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey[850]!
+        : Colors.blue;
+  }
 
-    try {
-      await _coursesService.updateUserStatus(
-        userId: widget.userId,
-        courseId: widget.courseName,
-        status: !_status!,
-      );
+  Color _getCardColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey[800]!
+        : Colors.grey[100]!;
+  }
 
-      setState(() {
-        _status = !_status!;
-      });
+  Color _getTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+  }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(_status! ? 'Marked as Paid' : 'Marked as Not Paid'),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error updating status: $e'),
-        ),
-      );
-    } finally {
-      setState(() {
-        _loading = false;
-      });
-    }
+  Color _getSubtitleColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey[300]!
+        : Colors.grey[600]!;
   }
 
   @override
@@ -74,21 +54,23 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
     final primaryColor =
         theme.brightness == Brightness.dark ? Colors.blueGrey : Colors.blue;
 
-    String formattedDate =
-        '${widget.registrationDate.day.toString().padLeft(2, '0')}/'
-        '${widget.registrationDate.month.toString().padLeft(2, '0')}/'
-        '${widget.registrationDate.year}';
+    String formattedDate = '${registrationDate.day.toString().padLeft(2, '0')}/'
+        '${registrationDate.month.toString().padLeft(2, '0')}/'
+        '${registrationDate.year}';
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Subscriber Details'),
+        backgroundColor: _getAppBarColor(context),
       ),
+      backgroundColor: _getBackgroundColor(context),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Card(
+              color: _getCardColor(context),
               elevation: 4.0,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -98,45 +80,55 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundImage: NetworkImage(widget.imagePath),
+                          backgroundImage: imagePath.isNotEmpty
+                              ? NetworkImage(imagePath)
+                              : null,
                           radius: 30,
+                          child: imagePath.isEmpty
+                              ? Icon(Icons.person,
+                                  color: _getTextColor(context))
+                              : null,
                         ),
                         const SizedBox(width: 16.0),
                         Expanded(
                           child: Text(
-                            widget.userName,
-                            style: theme.textTheme.titleLarge
-                                ?.copyWith(fontWeight: FontWeight.bold),
+                            userName,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: _getTextColor(context)),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8.0),
                     Text(
-                      'Course: ${widget.courseName}',
-                      style: theme.textTheme.titleMedium,
+                      'Course: $courseName',
+                      style: theme.textTheme.titleMedium
+                          ?.copyWith(color: _getSubtitleColor(context)),
                     ),
                     const SizedBox(height: 8.0),
                     Text(
-                      'Data de inscrição: $formattedDate',
-                      style: theme.textTheme.titleMedium,
+                      'Registration Date: $formattedDate',
+                      style: theme.textTheme.titleMedium
+                          ?.copyWith(color: _getSubtitleColor(context)),
                     ),
                     const SizedBox(height: 16.0),
                     Text(
                       'Status:',
-                      style: theme.textTheme.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: _getTextColor(context)),
                     ),
                     const SizedBox(height: 8.0),
                     Container(
                       padding: const EdgeInsets.symmetric(
                           vertical: 8.0, horizontal: 16.0),
                       decoration: BoxDecoration(
-                        color: _status! ? Colors.green : Colors.red,
+                        color: status ? Colors.green : Colors.red,
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: Text(
-                        _status! ? 'Pago' : 'Não Pago',
+                        status ? 'Paid' : 'Not Paid',
                         style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold),
                       ),
@@ -161,27 +153,8 @@ class _SubscriberViewerState extends State<SubscriberViewer> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    child: const Text('Voltar',
+                    child: const Text('Back',
                         style: TextStyle(color: Colors.white)),
-                  ),
-                ),
-                const SizedBox(width: 16.0),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _loading ? null : _toggleStatus,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                    child: _loading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : Text(
-                            _status! ? 'Mark as Not Paid' : 'Mark as Paid',
-                            style: const TextStyle(color: Colors.white),
-                          ),
                   ),
                 ),
               ],

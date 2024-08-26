@@ -43,7 +43,8 @@ class _SubscribersListState extends State<SubscribersList> {
             'userId': userId,
             'userName': data['userName'] ?? 'Unknown',
             'registrationDate':
-                (data['registrationDate'] as Timestamp).toDate(),
+                (data['registrationDate'] as Timestamp?)?.toDate() ??
+                    DateTime.now(),
             'courseName': courseName,
             'status': data['status'] ?? false,
             'imagePath': userData['imagePath'] ?? '',
@@ -95,7 +96,8 @@ class _SubscribersListState extends State<SubscribersList> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de cadastrados'),
+        title: const Text('Lista de Cadastrados'),
+        backgroundColor: isDarkMode ? Colors.grey[850] : Colors.blue,
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -114,25 +116,33 @@ class _SubscribersListState extends State<SubscribersList> {
                         ? NetworkImage(registration['imagePath'])
                         : null,
                     backgroundColor:
-                        isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                        isDarkMode ? Colors.grey[700] : Colors.grey[300],
                     child: registration['imagePath'] == ''
-                        ? const Icon(Icons.person)
+                        ? Icon(
+                            Icons.person,
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          )
                         : null,
                   ),
                   title: Text(
                     registration['userName'],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
                   ),
                   subtitle: Text(
                     'Curso: ${registration['courseName']} \nData de inscrição: $formattedDate',
-                    style: const TextStyle(color: Colors.black54),
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.grey[300] : Colors.black54,
+                    ),
                   ),
                   tileColor: isDarkMode ? Colors.grey[800] : Colors.white,
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SubscriberViewer(
+                        builder: (context) => SubscriberInfo(
                           userId: registration['userId'],
                           userName: registration['userName'],
                           status: registration['status'],
