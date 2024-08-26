@@ -27,7 +27,7 @@ class SubscriberInfo extends StatelessWidget {
   Color _getAppBarColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
         ? Colors.grey[850]!
-        : Colors.blue;
+        : const Color.fromARGB(255, 255, 255, 255);
   }
 
   Color _getCardColor(BuildContext context) {

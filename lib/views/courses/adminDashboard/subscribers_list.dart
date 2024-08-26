@@ -1,4 +1,4 @@
-import 'package:churchapp/views/courses/adminDashboard/subscriber_viewer.dart';
+import 'package:churchapp/views/courses/adminDashboard/subscriber_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -97,7 +97,9 @@ class _SubscribersListState extends State<SubscribersList> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lista de Cadastrados'),
-        backgroundColor: isDarkMode ? Colors.grey[850] : Colors.blue,
+        backgroundColor: isDarkMode
+            ? Colors.grey[850]
+            : const Color.fromARGB(255, 255, 255, 255),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())

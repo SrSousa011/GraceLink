@@ -1,3 +1,4 @@
+import 'package:churchapp/views/courses/adminDashboard/subscriber_info.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/member/become_member_list.dart';
 import 'package:churchapp/views/member/become_member.dart';
@@ -8,7 +9,6 @@ import 'package:churchapp/views/materials/materials_courses.dart';
 import 'package:churchapp/views/member/become_dashboard.dart';
 import 'package:churchapp/views/courses/adminDashboard/courses_dashboard.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscribers_list.dart';
-import 'package:churchapp/views/courses/adminDashboard/subscriber_viewer.dart';
 import 'package:churchapp/views/donations/dashboard/donnation_dashboard.dart';
 import 'package:churchapp/views/user_Profile/manegement/about_us.dart';
 import 'package:churchapp/auth/auth_service.dart';
@@ -57,7 +57,7 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (_) => const SubscribersList(),
         );
-      case '/subscriber_viewer':
+      case '/subscriber_info':
         final args = settings.arguments as Map<String, dynamic>?;
         if (args == null ||
             !args.containsKey('userId') ||
