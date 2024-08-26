@@ -18,7 +18,7 @@ class CourseSelectionDropdown extends StatelessWidget {
       items: courses.map((course) {
         return DropdownMenuItem<Course>(
           value: course,
-          child: Text(course.title),
+          child: Text(course.courseName),
         );
       }).toList(),
       onChanged: onChanged,
