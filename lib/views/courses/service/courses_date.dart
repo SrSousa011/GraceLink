@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Course {
   final String courseId;
-  final String title;
+  final String courseName;
   final String instructor;
   final String imageURL;
   final String description;
@@ -12,7 +12,7 @@ class Course {
 
   Course({
     required this.courseId,
-    required this.title,
+    required this.courseName,
     required this.instructor,
     required this.imageURL,
     required this.description,
@@ -29,7 +29,7 @@ class Course {
 
     return Course(
       courseId: doc.id,
-      title: data['title'] ?? '',
+      courseName: data['courseName'] ?? '',
       instructor: data['instructor'] ?? '',
       imageURL: data['imageURL'] ?? '',
       description: data['description'] ?? '',
@@ -41,7 +41,7 @@ class Course {
 
   Map<String, dynamic> toMap() {
     return {
-      'title': title,
+      'courseName': courseName,
       'instructor': instructor,
       'imageURL': imageURL,
       'description': description,

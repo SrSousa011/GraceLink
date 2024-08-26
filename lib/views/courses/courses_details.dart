@@ -72,7 +72,7 @@ class _CoursesDetailsState extends State<CoursesDetails> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.course.title),
+        title: Text(widget.course.courseName),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -118,6 +118,7 @@ class _CoursesDetailsState extends State<CoursesDetails> {
                           userId: uid,
                           status: false,
                           userName: fullName,
+                          courseName: widget.course.courseName,
                         );
 
                         if (mounted) {

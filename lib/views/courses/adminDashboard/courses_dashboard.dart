@@ -27,7 +27,7 @@ class _CoursesDashboardState extends State<CoursesDashboard> {
     try {
       final trintaDiasAtras = DateTime.now().subtract(const Duration(days: 30));
       final novasMatriculasSnapshot = await _firestore
-          .collection('courseregistration')
+          .collection('courseRegistration')
           .where('registrationDate',
               isGreaterThanOrEqualTo: Timestamp.fromDate(trintaDiasAtras))
           .get();

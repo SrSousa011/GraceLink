@@ -102,7 +102,7 @@ class _CoursesState extends State<Courses> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                coursesList[index].title,
+                                coursesList[index].courseName,
                                 style: TextStyle(
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold,

@@ -4,14 +4,13 @@ import 'package:flutter/foundation.dart';
 
 class CoursesService {
   final CollectionReference _registrationsCollection =
-      FirebaseFirestore.instance.collection('courseregistration');
+      FirebaseFirestore.instance.collection('courseRegistration');
 
   Future<bool> isUserAlreadySubscribed({
     required String courseId,
     required String userId,
   }) async {
     try {
-      // Adicione um print para depuração
       if (kDebugMode) {
         print('Checking subscription for userId: $userId, courseId: $courseId');
       }
@@ -47,6 +46,7 @@ class CoursesService {
 
   Future<void> registerUserForCourse({
     required String courseId,
+    required String courseName,
     required String userId,
     required String userName,
     required bool status,
@@ -58,6 +58,7 @@ class CoursesService {
 
       await _registrationsCollection.add({
         'courseId': courseId,
+        'courseName': courseName,
         'userId': userId,
         'userName': userName,
         'status': status,
