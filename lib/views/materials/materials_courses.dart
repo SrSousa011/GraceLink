@@ -55,7 +55,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
       _userRole = userDoc.data()?['role'] as String? ?? 'user';
 
       final registrationSnapshot = await _firestore
-          .collection('courseregistration')
+          .collection('courseRegistration')
           .where('userId', isEqualTo: userId)
           .get();
 
@@ -67,8 +67,8 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                 await _firestore.collection('courses').doc(courseId).get();
             return {
               'id': courseId,
-              'title':
-                  courseDoc.data()?['title'] as String? ?? 'Unknown Course',
+              'courseName': courseDoc.data()?['courseName'] as String? ??
+                  'Unknown Course',
             };
           }),
         );
@@ -99,10 +99,10 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   Future<String?> getTitleById(String courseId) async {
     try {
       final doc = await _firestore.collection('courses').doc(courseId).get();
-      return doc.data()?['title'] as String?;
+      return doc.data()?['courseName'] as String?;
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error fetching course title: $e';
+        _errorMessage = 'Error fetching course course name: $e';
       });
       return null;
     }
@@ -231,8 +231,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     try {
       final dio = Dio();
       final directory = await getExternalStorageDirectory();
-      final downloadDirectory = Directory(
-          '${directory?.path}/Download'); // Caminho do diretório de downloads
+      final downloadDirectory = Directory('${directory?.path}/Download');
       if (!await downloadDirectory.exists()) {
         await downloadDirectory.create(recursive: true);
       }
@@ -274,7 +273,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                   items: _courses.map((course) {
                     return DropdownMenuItem<String>(
                       value: course['id'],
-                      child: Text(course['title'] ?? 'Unknown Course'),
+                      child: Text(course['courseName'] ?? 'Unknown Course'),
                     );
                   }).toList(),
                   onChanged: (value) async {
@@ -359,7 +358,6 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                   fileDocs: _fileDocs,
                   isDarkMode: isDarkMode,
                   userRole: _userRole ?? 'user',
-                  onDownload: _handleDownload,
                 ),
               ),
             ],
