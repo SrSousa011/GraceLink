@@ -21,16 +21,14 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  List<Map<String, dynamic>> _fileDocs = [];
-  bool _isUploading = false;
+  List<Map<String, dynamic>> _courses = [];
+  bool _isFetchingCourses = true;
   String? _selectedCourseId;
   String? _userRole;
   String? _errorMessage;
   String? _selectedCourseTitle;
   String? _selectedCourseImageUrl;
   String? _selectedInstructorName;
-  List<Map<String, String>> _courses = [];
-  bool _isFetchingCourses = true;
 
   @override
   void initState() {
@@ -117,41 +115,6 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     }
   }
 
-  Future<void> _loadFiles(String courseId) async {
-    if (courseId.isEmpty) {
-      setState(() {
-        _errorMessage = 'Course ID cannot be empty.';
-      });
-      return;
-    }
-
-    final query = _userRole == 'admin'
-        ? _firestore.collection('courses/$courseId/materials')
-        : _firestore
-            .collection('courses/$courseId/materials')
-            .where('visibility', isEqualTo: 'public');
-    try {
-      final snapshot = await query.get();
-      setState(() {
-        _fileDocs = snapshot.docs.map((doc) {
-          final data = doc.data();
-          return {
-            'id': doc.id,
-            'url': data['url'] as String?,
-            'name': data['name'] as String?,
-            'courseId': courseId,
-            'visibility': data['visibility'] as String? ?? 'public',
-          };
-        }).toList();
-        _errorMessage = null;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Error loading files: $e';
-      });
-    }
-  }
-
   Future<void> _uploadFile() async {
     if (_selectedCourseId == null) {
       setState(() {
@@ -181,7 +144,6 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     if (result != null && result.files.single.path != null) {
       final File file = File(result.files.single.path!);
       setState(() {
-        _isUploading = true;
         _errorMessage = null;
       });
 
@@ -198,14 +160,9 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
           'name': fileName,
           'visibility': 'public',
         });
-        await _loadFiles(_selectedCourseId!);
       } catch (e) {
         setState(() {
           _errorMessage = 'Error uploading file: $e';
-        });
-      } finally {
-        setState(() {
-          _isUploading = false;
         });
       }
     } else {
@@ -232,8 +189,53 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
       _selectedCourseImageUrl = courseData.data()?['imageURL'];
       _selectedInstructorName = courseData.data()?['instructor'];
     });
+  }
 
-    await _loadFiles(courseId);
+  Future<void> _confirmDeleteFile(BuildContext context, String courseId,
+      String fileId, String fileUrl) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmar exclusão'),
+          content:
+              const Text('Tem certeza de que deseja excluir este arquivo?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Deletar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      await _deleteFile(context, courseId, fileId, fileUrl);
+    }
+  }
+
+  Future<void> _deleteFile(BuildContext context, String courseId, String fileId,
+      String fileUrl) async {
+    try {
+      final ref = FirebaseStorage.instance.refFromURL(fileUrl);
+      await ref.delete();
+
+      await FirebaseFirestore.instance
+          .collection('courses/$courseId/materials')
+          .doc(fileId)
+          .delete();
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting file: $e')),
+        );
+      }
+    }
   }
 
   @override
@@ -275,7 +277,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                   child: Column(
                     children: [
                       UploadButton(
-                        isUploading: _isUploading,
+                        isUploading: false,
                         onPressed: _uploadFile,
                       ),
                     ],
@@ -342,11 +344,54 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                 ),
               if (_errorMessage != null) ErrorMessage(message: _errorMessage!),
               Expanded(
-                child: FileListView(
-                  fileDocs: _fileDocs,
-                  isDarkMode: isDarkMode,
-                  userRole: _userRole ?? 'user',
-                ),
+                child: _selectedCourseId == null
+                    ? Center(child: Text('Select a course to see materials'))
+                    : StreamBuilder<QuerySnapshot>(
+                        stream: _firestore
+                            .collection('courses/$_selectedCourseId/materials')
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+
+                          if (snapshot.hasError) {
+                            return ErrorMessage(
+                                message:
+                                    'Error loading files: ${snapshot.error}');
+                          }
+
+                          if (!snapshot.hasData ||
+                              snapshot.data?.docs.isEmpty == true) {
+                            return const Center(
+                                child: Text('No files available.'));
+                          }
+
+                          final fileDocs = snapshot.data!.docs.map((doc) {
+                            final data = doc.data() as Map<String, dynamic>;
+                            return {
+                              'id': doc.id,
+                              'url': data['url'] as String?,
+                              'name': data['name'] as String?,
+                              'courseId': _selectedCourseId!,
+                              'visibility':
+                                  data['visibility'] as String? ?? 'public',
+                            };
+                          }).toList();
+
+                          return FileListView(
+                            fileDocs: fileDocs,
+                            isDarkMode: isDarkMode,
+                            userRole: _userRole ?? 'user',
+                            onFileDeleted: (courseId, fileId, fileUrl) async {
+                              await _confirmDeleteFile(
+                                  context, courseId, fileId, fileUrl);
+                            },
+                          );
+                        },
+                      ),
               ),
             ],
           ),
