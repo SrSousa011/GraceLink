@@ -4,13 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/materials/upload_button.dart';
 import 'package:churchapp/views/materials/error_message.dart';
-import 'package:dio/dio.dart';
 
 class CourseMaterialsPage extends StatefulWidget {
   const CourseMaterialsPage({super.key});
@@ -54,36 +52,47 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
       final userDoc = await _firestore.collection('users').doc(userId).get();
       _userRole = userDoc.data()?['role'] as String? ?? 'user';
 
-      final registrationSnapshot = await _firestore
-          .collection('courseRegistration')
-          .where('userId', isEqualTo: userId)
-          .get();
+      if (_userRole == 'admin') {
+        final coursesSnapshot = await _firestore.collection('courses').get();
+        _courses = coursesSnapshot.docs.map((doc) {
+          final data = doc.data();
+          return {
+            'id': doc.id,
+            'courseName': data['courseName'] as String? ?? 'Unknown Course',
+          };
+        }).toList();
+      } else {
+        final registrationSnapshot = await _firestore
+            .collection('courseRegistration')
+            .where('userId', isEqualTo: userId)
+            .get();
 
-      if (registrationSnapshot.docs.isNotEmpty) {
-        _courses = await Future.wait(
-          registrationSnapshot.docs.map((doc) async {
-            final courseId = doc['courseId'];
-            final courseDoc =
-                await _firestore.collection('courses').doc(courseId).get();
-            return {
-              'id': courseId,
-              'courseName': courseDoc.data()?['courseName'] as String? ??
-                  'Unknown Course',
-            };
-          }),
-        );
-        if (_courses.isNotEmpty) {
-          _selectedCourseId = _courses.first['id'];
-          await _handleCourseSelection(_selectedCourseId!);
+        if (registrationSnapshot.docs.isNotEmpty) {
+          _courses = await Future.wait(
+            registrationSnapshot.docs.map((doc) async {
+              final courseId = doc['courseId'];
+              final courseDoc =
+                  await _firestore.collection('courses').doc(courseId).get();
+              return {
+                'id': courseId,
+                'courseName': courseDoc.data()?['courseName'] as String? ??
+                    'Unknown Course',
+              };
+            }),
+          );
+          if (_courses.isNotEmpty) {
+            _selectedCourseId = _courses.first['id'];
+            await _handleCourseSelection(_selectedCourseId!);
+          } else {
+            setState(() {
+              _errorMessage = 'User not registered in any course.';
+            });
+          }
         } else {
           setState(() {
             _errorMessage = 'User not registered in any course.';
           });
         }
-      } else {
-        setState(() {
-          _errorMessage = 'User not registered in any course.';
-        });
       }
     } catch (e) {
       setState(() {
@@ -102,7 +111,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
       return doc.data()?['courseName'] as String?;
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error fetching course course name: $e';
+        _errorMessage = 'Error fetching course name: $e';
       });
       return null;
     }
@@ -227,27 +236,6 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     await _loadFiles(courseId);
   }
 
-  Future<void> _handleDownload(String fileUrl, String fileName) async {
-    try {
-      final dio = Dio();
-      final directory = await getExternalStorageDirectory();
-      final downloadDirectory = Directory('${directory?.path}/Download');
-      if (!await downloadDirectory.exists()) {
-        await downloadDirectory.create(recursive: true);
-      }
-      final filePath = '${downloadDirectory.path}/$fileName';
-      await dio.download(fileUrl, filePath);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('File downloaded to $filePath')),
-      );
-    } catch (e) {
-      print('Error downloading file: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error downloading file: $e')),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -255,7 +243,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Course Materials'),
+        title: const Text('Materiais do curso'),
       ),
       body: Container(
         color: isDarkMode ? Colors.black : Colors.white,
@@ -269,7 +257,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
               if (!_isFetchingCourses && _courses.isNotEmpty)
                 DropdownButton<String>(
                   value: _selectedCourseId,
-                  hint: const Text('Select a course'),
+                  hint: const Text('Selecione um curso'),
                   items: _courses.map((course) {
                     return DropdownMenuItem<String>(
                       value: course['id'],
