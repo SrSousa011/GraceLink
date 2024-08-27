@@ -14,7 +14,7 @@ class CourseSelectionDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButton<Course>(
-      hint: const Text('Select a Course'),
+      hint: const Text('Selecione um curso'),
       items: courses.map((course) {
         return DropdownMenuItem<Course>(
           value: course,
