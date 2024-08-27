@@ -44,6 +44,7 @@ class _CourseLiveState extends State<CourseLive> {
           descriptionDetails: courseData['descriptionDetails'] ?? '',
           time: courseData['time'] as Timestamp?,
           videoUrl: courseData['videoUrl'],
+          daysOfWeek: courseData['daysOfWeek'],
         );
       }).toList();
     } catch (e) {
@@ -87,6 +88,7 @@ class _CourseLiveState extends State<CourseLive> {
       });
       _coursesFuture = _fetchCourses();
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Erro ao adicionar o link.')),
       );
@@ -208,6 +210,7 @@ class _CourseLiveState extends State<CourseLive> {
                       final time = course.getFormattedTime();
                       final imageURL = course.imageURL;
                       final videoUrl = course.videoUrl;
+                      final daysOfWeek = course.daysOfWeek ?? 'N/A';
 
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -223,7 +226,8 @@ class _CourseLiveState extends State<CourseLive> {
                                     )
                                   : const Icon(Icons.image, size: 50),
                               title: Text(courseName),
-                              subtitle: Text('Horário: $time'),
+                              subtitle:
+                                  Text('Horário: $time\nDias: $daysOfWeek'),
                               trailing: videoUrl != null && videoUrl.isNotEmpty
                                   ? ElevatedButton(
                                       onPressed: () => _launchURL(videoUrl),

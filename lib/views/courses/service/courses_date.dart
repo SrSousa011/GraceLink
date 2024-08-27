@@ -9,8 +9,9 @@ class Course {
   final double price;
   final DateTime registrationDeadline;
   final String descriptionDetails;
-  final Timestamp? time; // Alterado para Timestamp
+  final Timestamp? time;
   final String? videoUrl;
+  final String? daysOfWeek;
 
   Course({
     required this.courseId,
@@ -23,6 +24,7 @@ class Course {
     required this.descriptionDetails,
     this.time,
     this.videoUrl,
+    this.daysOfWeek,
   });
 
   factory Course.fromDocument(DocumentSnapshot doc) {
@@ -42,6 +44,7 @@ class Course {
       descriptionDetails: data['descriptionDetails'] ?? '',
       time: data['time'] as Timestamp?,
       videoUrl: data['videoUrl'],
+      daysOfWeek: data['daysOfWeek'],
     );
   }
 
@@ -56,6 +59,7 @@ class Course {
       'descriptionDetails': descriptionDetails,
       'time': time,
       'videoUrl': videoUrl,
+      'daysOfWeek': daysOfWeek,
     };
   }
 
