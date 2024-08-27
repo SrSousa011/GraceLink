@@ -9,6 +9,8 @@ class Course {
   final double price;
   final DateTime registrationDeadline;
   final String descriptionDetails;
+  final Timestamp? time; // Alterado para Timestamp
+  final String? videoUrl;
 
   Course({
     required this.courseId,
@@ -19,6 +21,8 @@ class Course {
     required this.price,
     required this.registrationDeadline,
     required this.descriptionDetails,
+    this.time,
+    this.videoUrl,
   });
 
   factory Course.fromDocument(DocumentSnapshot doc) {
@@ -36,6 +40,8 @@ class Course {
       price: (data['price'] as num).toDouble(),
       registrationDeadline: registrationDeadline,
       descriptionDetails: data['descriptionDetails'] ?? '',
+      time: data['time'] as Timestamp?,
+      videoUrl: data['videoUrl'],
     );
   }
 
@@ -48,6 +54,14 @@ class Course {
       'price': price,
       'registrationDeadline': Timestamp.fromDate(registrationDeadline),
       'descriptionDetails': descriptionDetails,
+      'time': time,
+      'videoUrl': videoUrl,
     };
+  }
+
+  String getFormattedTime() {
+    if (time == null) return 'No time set';
+    final dateTime = time!.toDate();
+    return '${dateTime.hour}:${dateTime.minute}';
   }
 }
