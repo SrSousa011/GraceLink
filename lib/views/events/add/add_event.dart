@@ -7,7 +7,7 @@ import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/events/events.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
-import 'package:churchapp/views/notifications/notification_service.dart';
+import 'package:churchapp/views/notifications/notification_event.dart';
 
 class AddEventForm extends StatefulWidget {
   const AddEventForm({super.key});

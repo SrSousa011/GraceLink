@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/event_service.dart';
-import 'package:churchapp/views/notifications/notification_service.dart';
+import 'package:churchapp/views/notifications/notification_event.dart';
 
 class UpdateEventForm extends StatefulWidget {
   final Event event;
