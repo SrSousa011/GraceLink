@@ -1,3 +1,4 @@
+import 'package:churchapp/views/materials/error_message.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -93,10 +94,10 @@ class CourseFileList extends StatelessWidget {
           itemCount: fileDocs.length,
           itemBuilder: (context, index) {
             final file = fileDocs[index];
-            final url = file['url'] as String? ?? '';
-            final name = file['name'] as String? ?? 'Unknown File';
-            final fileId = file['id'] as String? ?? '';
-            final courseId = file['courseId'] as String? ?? '';
+            final url = file['url'] ?? '';
+            final name = file['name'] ?? 'Unknown File';
+            final fileId = file['id'] ?? '';
+            final courseId = file['courseId'] ?? '';
 
             return ListTile(
               title: Text(
@@ -172,27 +173,5 @@ class CourseFileList extends StatelessWidget {
       Navigator.of(context).pop();
       await onFileDeleted(courseId, fileId, fileUrl);
     }
-  }
-}
-
-class ErrorMessage extends StatelessWidget {
-  final String message;
-
-  const ErrorMessage({super.key, required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text(
-          message,
-          style: TextStyle(
-            color: Colors.red,
-            fontSize: 16,
-          ),
-        ),
-      ),
-    );
   }
 }
