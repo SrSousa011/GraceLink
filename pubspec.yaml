@@ -64,6 +64,8 @@ dependencies:
   file_picker: ^8.0.5
   file_saver: ^0.2.13
   fl_chart: ^0.68.0
+  dio: ^5.6.0
+  open_file: ^3.4.0
 
 dev_dependencies:
   flutter_test:
@@ -75,7 +77,6 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.1
-  dio: ^5.6.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
