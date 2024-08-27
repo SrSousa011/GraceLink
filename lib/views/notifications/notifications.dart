@@ -1,6 +1,6 @@
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/notifications/chat_arguments.dart';
-import 'package:churchapp/views/notifications/notification_service.dart';
+import 'package:churchapp/views/notifications/notification_event.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
