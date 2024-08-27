@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/materials/file_list.dart';
 import 'package:churchapp/views/materials/upload_button.dart';
-import 'package:churchapp/views/materials/error_message.dart';
 
 class CourseMaterialsPage extends StatefulWidget {
   const CourseMaterialsPage({super.key});
@@ -25,10 +24,10 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   bool _isFetchingCourses = true;
   String? _selectedCourseId;
   String? _userRole;
-  String? _errorMessage;
   String? _selectedCourseTitle;
   String? _selectedCourseImageUrl;
   String? _selectedInstructorName;
+  String? _errorMessage; // Keeping _errorMessage for now, but will be replaced
 
   @override
   void initState() {
@@ -355,7 +354,14 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                       )
                     : const SizedBox.shrink(),
               ),
-              if (_errorMessage != null) ErrorMessage(message: _errorMessage!),
+              if (_errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
               Expanded(
                 child: _selectedCourseId == null
                     ? const Center(
@@ -372,9 +378,13 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                           }
 
                           if (snapshot.hasError) {
-                            return ErrorMessage(
-                                message:
-                                    'Error loading files: ${snapshot.error}');
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Error loading files: ${snapshot.error}',
+                                style: const TextStyle(color: Colors.red),
+                              ),
+                            );
                           }
 
                           if (!snapshot.hasData ||
@@ -395,7 +405,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                             };
                           }).toList();
 
-                          return FileListView(
+                          return CourseFileList(
                             fileDocs: fileDocs,
                             isDarkMode: isDarkMode,
                             userRole: _userRole ?? 'user',
@@ -403,6 +413,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                               await _confirmDeleteFile(
                                   context, courseId, fileId, fileUrl);
                             },
+                            selectedCourseId: '',
                           );
                         },
                       ),
