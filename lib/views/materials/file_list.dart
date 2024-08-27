@@ -1,5 +1,9 @@
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 
 class FileListView extends StatelessWidget {
   final List<Map<String, dynamic>> fileDocs;
@@ -15,15 +19,40 @@ class FileListView extends StatelessWidget {
     required this.onFileDeleted,
   });
 
-  Future<void> _openFile(String url, BuildContext context) async {
-    final Uri uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open file.')),
+  Future<void> openFile({required String url, String? fileName}) async {
+    final file = await downloadFile(url, fileName!);
+    if (file == null) return;
+    if (kDebugMode) {
+      print('Path: ${file.path}');
+    }
+
+    OpenFile.open(file.path);
+  }
+
+  Future<File?> downloadFile(String url, String name) async {
+    try {
+      final appStorage = await getApplicationDocumentsDirectory();
+      final file = File('${appStorage.path}/$name');
+
+      final response = await Dio().get(
+        url,
+        options: Options(
+          responseType: ResponseType.bytes,
+          followRedirects: false,
+          receiveTimeout: Duration.zero,
+        ),
       );
+
+      final raf = file.openSync(mode: FileMode.write);
+      raf.writeFromSync(response.data);
+      await raf.close();
+
+      return file;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error downloading file: $e');
+      }
+      return null;
     }
   }
 
@@ -53,7 +82,7 @@ class FileListView extends StatelessWidget {
                 icon: const Icon(Icons.open_in_new),
                 onPressed: () async {
                   if (url.isNotEmpty) {
-                    await _openFile(url, context);
+                    await openFile(url: url, fileName: name);
                   } else {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
