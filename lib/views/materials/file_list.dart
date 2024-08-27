@@ -7,7 +7,11 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 
 class CourseFileList extends StatelessWidget {
+<<<<<<< HEAD
   final String selectedCourseId;
+=======
+  final List<Map<String, dynamic>> fileDocs;
+>>>>>>> 4de413b ([UPDATE] coueseFileList)
   final bool isDarkMode;
   final String userRole;
   final Future<void> Function(String, String, String) onFileDeleted;

@@ -413,7 +413,6 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                               await _confirmDeleteFile(
                                   context, courseId, fileId, fileUrl);
                             },
-                            selectedCourseId: '',
                           );
                         },
                       ),
