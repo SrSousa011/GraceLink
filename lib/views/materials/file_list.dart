@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dio/dio.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class FileListView extends StatelessWidget {
   final List<Map<String, dynamic>> fileDocs;
   final bool isDarkMode;
   final String userRole;
-  final Future<void> Function(String fileUrl, String fileName) onDownload;
 
   const FileListView({
     super.key,
     required this.fileDocs,
     required this.isDarkMode,
     required this.userRole,
-    required this.onDownload,
   });
 
   Future<void> _deleteFile(
@@ -38,56 +35,14 @@ class FileListView extends StatelessWidget {
     }
   }
 
-  Future<void> _downloadFile(
-      String fileUrl, String fileName, BuildContext context) async {
-    final shouldDownload = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm Download'),
-          content: Text('Do you want to download "$fileName"?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Download'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (shouldDownload == true) {
-      try {
-        final dio = Dio();
-
-        // Get the Downloads directory
-        final directories = await getExternalStorageDirectories(
-            type: StorageDirectory.downloads);
-        final directory =
-            directories?.first; // Pick the first available directory
-
-        if (directory == null) {
-          throw Exception('Failed to get the Downloads directory.');
-        }
-
-        final filePath = '${directory.path}/$fileName';
-
-        // Download the file
-        await dio.download(fileUrl, filePath);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('File downloaded to $filePath')),
-        );
-      } catch (e) {
-        print('Error downloading file: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error downloading file: $e')),
-        );
-      }
+  Future<void> _openFile(String url, BuildContext context) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open file.')),
+      );
     }
   }
 
@@ -114,10 +69,10 @@ class FileListView extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                icon: const Icon(Icons.download),
+                icon: const Icon(Icons.open_in_new),
                 onPressed: () async {
                   if (url.isNotEmpty) {
-                    await _downloadFile(url, name, context);
+                    await _openFile(url, context);
                   } else {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
