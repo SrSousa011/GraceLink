@@ -1,4 +1,3 @@
-import 'package:churchapp/views/materials/error_message.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,20 +5,20 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 class CourseFileList extends StatelessWidget {
-  final String courseId;
+  final String selectedCourseId;
   final bool isDarkMode;
   final String userRole;
   final Future<void> Function(String, String, String) onFileDeleted;
 
   const CourseFileList({
     super.key,
-    required this.courseId,
+    required this.selectedCourseId,
     required this.isDarkMode,
     required this.userRole,
     required this.onFileDeleted,
+    required List<Map<String, String?>> fileDocs,
   });
 
   Future<File?> downloadFile(String url, String name) async {
@@ -36,17 +35,11 @@ class CourseFileList extends StatelessWidget {
         ),
       );
 
-      if (response.statusCode == 200) {
-        final raf = file.openSync(mode: FileMode.write);
-        raf.writeFromSync(response.data);
-        await raf.close();
-        return file;
-      } else {
-        if (kDebugMode) {
-          print('Failed to download file: ${response.statusCode}');
-        }
-        return null;
-      }
+      final raf = file.openSync(mode: FileMode.write);
+      raf.writeFromSync(response.data);
+      await raf.close();
+
+      return file;
     } catch (e) {
       if (kDebugMode) {
         print('Error downloading file: $e');
@@ -65,67 +58,11 @@ class CourseFileList extends StatelessWidget {
     OpenFile.open(file.path);
   }
 
-  Future<void> _confirmDeleteFile(
-      BuildContext context, String fileId, String fileUrl) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirmar exclusão'),
-          content:
-              const Text('Tem certeza de que deseja excluir este arquivo?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Deletar'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (confirmed == true) {
-      await _deleteFile(context, fileId, fileUrl);
-    }
-  }
-
-  Future<void> _deleteFile(
-      BuildContext context, String fileId, String fileUrl) async {
-    try {
-      // Delete file from Firebase Storage
-      final ref = FirebaseStorage.instance.refFromURL(fileUrl);
-      await ref.delete();
-
-      // Delete file reference from Firestore
-      await FirebaseFirestore.instance
-          .collection('courses/$courseId/materials')
-          .doc(fileId)
-          .delete();
-
-      // Notify the parent widget to refresh
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Arquivo excluído com sucesso')),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao excluir o arquivo: $e')),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
-          .collection('courses/$courseId/materials')
+          .collection('courses/$selectedCourseId/materials')
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -133,8 +70,7 @@ class CourseFileList extends StatelessWidget {
         }
 
         if (snapshot.hasError) {
-          return ErrorMessage(
-              message: 'Error loading files: ${snapshot.error}');
+          return Center(child: Text('Error loading files: ${snapshot.error}'));
         }
 
         if (!snapshot.hasData || snapshot.data?.docs.isEmpty == true) {
@@ -147,7 +83,7 @@ class CourseFileList extends StatelessWidget {
             'id': doc.id,
             'url': data['url'] as String?,
             'name': data['name'] as String?,
-            'courseId': courseId,
+            'courseId': selectedCourseId,
             'visibility': data['visibility'] as String? ?? 'public',
           };
         }).toList();
@@ -159,6 +95,7 @@ class CourseFileList extends StatelessWidget {
             final url = file['url'] ?? '';
             final name = file['name'] ?? 'Unknown File';
             final fileId = file['id'] ?? '';
+            final courseId = file['courseId'] ?? '';
 
             return ListTile(
               title: Text(
@@ -189,8 +126,11 @@ class CourseFileList extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
                       onPressed: () async {
-                        if (fileId.isNotEmpty && url.isNotEmpty) {
-                          await _confirmDeleteFile(context, fileId, url);
+                        if (fileId.isNotEmpty &&
+                            courseId.isNotEmpty &&
+                            url.isNotEmpty) {
+                          await _confirmDeleteFile(
+                              context, courseId, fileId, url);
                         }
                       },
                     ),
@@ -202,5 +142,38 @@ class CourseFileList extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> _confirmDeleteFile(BuildContext context, String courseId,
+      String fileId, String fileUrl) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmar exclusão'),
+          content:
+              const Text('Tem certeza de que deseja excluir este arquivo?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Deletar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      await onFileDeleted(courseId, fileId, fileUrl);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('File deleted successfully')),
+        );
+      }
+    }
   }
 }

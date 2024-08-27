@@ -190,6 +190,25 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     });
   }
 
+  Future<void> _deleteFile(
+      String courseId, String fileId, String fileUrl) async {
+    try {
+      // Delete from Firebase Storage
+      final ref = FirebaseStorage.instance.refFromURL(fileUrl);
+      await ref.delete();
+      // Delete from Firestore
+      await _firestore
+          .collection('courses/$courseId/materials')
+          .doc(fileId)
+          .delete();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting file: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -346,11 +365,24 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                                 child: Text('No files available.'));
                           }
 
+                          final fileDocs = snapshot.data!.docs.map((doc) {
+                            final data = doc.data() as Map<String, dynamic>;
+                            return {
+                              'id': doc.id,
+                              'url': data['url'] as String?,
+                              'name': data['name'] as String?,
+                              'courseId': _selectedCourseId!,
+                              'visibility':
+                                  data['visibility'] as String? ?? 'public',
+                            };
+                          }).toList();
+
                           return CourseFileList(
-                            courseId: _selectedCourseId ?? '',
+                            fileDocs: fileDocs,
                             isDarkMode: isDarkMode,
                             userRole: _userRole ?? 'user',
-                            onFileDeleted: (courseId, fileId, fileUrl) async {},
+                            onFileDeleted: _deleteFile,
+                            selectedCourseId: _selectedCourseId!,
                           );
                         },
                       ),
