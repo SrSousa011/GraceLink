@@ -1,4 +1,4 @@
-import 'package:churchapp/views/courses/adminDashboard/course_live.dart';
+import 'package:churchapp/views/courses/courseLive/course_live.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscriber_info.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/member/become_member_list.dart';
