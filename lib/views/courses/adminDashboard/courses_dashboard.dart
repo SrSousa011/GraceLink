@@ -1,4 +1,4 @@
-import 'package:churchapp/views/courses/adminDashboard/course_live.dart';
+import 'package:churchapp/views/courses/courseLive/course_live.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
