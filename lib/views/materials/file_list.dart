@@ -152,16 +152,17 @@ class CourseFileList extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirm deletion'),
-          content: const Text('Are you sure you want to delete this file?'),
+          title: const Text('Confirmar exclusão'),
+          content:
+              const Text('Tem certeza de que deseja excluir este arquivo?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              child: const Text('Cancelar'),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Delete'),
+              child: const Text('Deletar'),
             ),
           ],
         );

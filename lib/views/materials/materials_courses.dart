@@ -117,7 +117,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   Future<void> _uploadFile() async {
     if (_selectedCourseId == null) {
       setState(() {
-        _errorMessage = 'Select a course first.';
+        _errorMessage = 'Selecione um curso primeiro.';
       });
       return;
     }
@@ -245,7 +245,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Course Materials'),
+        title: const Text('Materiais do curso'),
       ),
       body: Container(
         color: isDarkMode ? Colors.black : Colors.white,
@@ -259,7 +259,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
               if (!_isFetchingCourses && _courses.isNotEmpty)
                 DropdownButton<String>(
                   value: _selectedCourseId,
-                  hint: const Text('Select a course'),
+                  hint: const Text('Selecione um curso'),
                   items: _courses.map((course) {
                     return DropdownMenuItem<String>(
                       value: course['id'],
@@ -365,7 +365,8 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
               Expanded(
                 child: _selectedCourseId == null
                     ? const Center(
-                        child: Text('Select a course to view materials'))
+                        child: Text(
+                            'Selecione um curso para visualizar os materiais'))
                     : StreamBuilder<QuerySnapshot>(
                         stream: _firestore
                             .collection('courses/$_selectedCourseId/materials')
