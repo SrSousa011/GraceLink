@@ -1,45 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class FileListView extends StatelessWidget {
   final List<Map<String, dynamic>> fileDocs;
   final bool isDarkMode;
   final String userRole;
+  final Future<void> Function(String, String, String) onFileDeleted;
 
   const FileListView({
     super.key,
     required this.fileDocs,
     required this.isDarkMode,
     required this.userRole,
+    required this.onFileDeleted,
   });
-
-  Future<void> _deleteFile(
-      BuildContext context, String courseId, String fileId) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('courses/$courseId/materials')
-          .doc(fileId)
-          .delete();
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('File deleted successfully')),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error deleting file: $e')),
-        );
-      }
-    }
-  }
 
   Future<void> _openFile(String url, BuildContext context) async {
     final Uri uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Could not open file.')),
       );
@@ -85,8 +66,12 @@ class FileListView extends StatelessWidget {
               if (userRole == 'admin') ...[
                 IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
-                    _deleteFile(context, courseId, fileId);
+                  onPressed: () async {
+                    if (fileId.isNotEmpty &&
+                        courseId.isNotEmpty &&
+                        url.isNotEmpty) {
+                      await onFileDeleted(courseId, fileId, url);
+                    }
                   },
                 ),
               ],
