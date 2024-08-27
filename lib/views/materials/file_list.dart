@@ -7,18 +7,14 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 
 class CourseFileList extends StatelessWidget {
-<<<<<<< HEAD
-  final String selectedCourseId;
-=======
-  final List<Map<String, dynamic>> fileDocs;
->>>>>>> 4de413b ([UPDATE] coueseFileList)
+  final String courseId;
   final bool isDarkMode;
   final String userRole;
   final Future<void> Function(String, String, String) onFileDeleted;
 
   const CourseFileList({
     super.key,
-    required this.selectedCourseId,
+    required this.courseId,
     required this.isDarkMode,
     required this.userRole,
     required this.onFileDeleted,
@@ -66,7 +62,7 @@ class CourseFileList extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
-          .collection('courses/$selectedCourseId/materials')
+          .collection('courses/$courseId/materials')
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -88,7 +84,7 @@ class CourseFileList extends StatelessWidget {
             'id': doc.id,
             'url': data['url'] as String?,
             'name': data['name'] as String?,
-            'courseId': selectedCourseId,
+            'courseId': courseId,
             'visibility': data['visibility'] as String? ?? 'public',
           };
         }).toList();
