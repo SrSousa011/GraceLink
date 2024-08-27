@@ -27,7 +27,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   String? _selectedCourseTitle;
   String? _selectedCourseImageUrl;
   String? _selectedInstructorName;
-  String? _errorMessage; // Keeping _errorMessage for now, but will be replaced
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -406,6 +406,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                           }).toList();
 
                           return CourseFileList(
+                            courseId: _selectedCourseId ?? '',
                             fileDocs: fileDocs,
                             isDarkMode: isDarkMode,
                             userRole: _userRole ?? 'user',
