@@ -1,3 +1,4 @@
+import 'package:churchapp/views/courses/adminDashboard/course_live.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscriber_info.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/member/become_member_list.dart';
@@ -41,6 +42,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const Notifications());
       case '/videos':
         return MaterialPageRoute(builder: (_) => const Videos());
+      case '/course_live':
+        return MaterialPageRoute(builder: (_) => const CourseLive());
       case '/event_page':
         return MaterialPageRoute(builder: (_) => const Events());
       case '/donations':
