@@ -1,4 +1,3 @@
-import 'package:churchapp/views/materials/file_list.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
+import 'package:churchapp/views/materials/file_list.dart';
 import 'package:churchapp/views/materials/upload_button.dart';
 import 'package:churchapp/views/materials/error_message.dart';
 
@@ -118,7 +118,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   Future<void> _uploadFile() async {
     if (_selectedCourseId == null) {
       setState(() {
-        _errorMessage = 'Selecione um curso primeiro.';
+        _errorMessage = 'Select a course first.';
       });
       return;
     }
@@ -197,17 +197,16 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirmar exclusão'),
-          content:
-              const Text('Tem certeza de que deseja excluir este arquivo?'),
+          title: const Text('Confirm deletion'),
+          content: const Text('Are you sure you want to delete this file?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancelar'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Deletar'),
+              child: const Text('Delete'),
             ),
           ],
         );
@@ -247,7 +246,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Materiais do curso'),
+        title: const Text('Course Materials'),
       ),
       body: Container(
         color: isDarkMode ? Colors.black : Colors.white,
@@ -261,7 +260,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
               if (!_isFetchingCourses && _courses.isNotEmpty)
                 DropdownButton<String>(
                   value: _selectedCourseId,
-                  hint: const Text('Selecione um curso'),
+                  hint: const Text('Select a course'),
                   items: _courses.map((course) {
                     return DropdownMenuItem<String>(
                       value: course['id'],
@@ -286,69 +285,81 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                   ),
                 ),
               const SizedBox(height: 16.0),
-              if (_selectedCourseImageUrl != null)
-                Container(
-                  padding: const EdgeInsets.all(16.0),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: isDarkMode
-                        ? const LinearGradient(
-                            colors: [Color(0xFF3C3C3C), Color(0xFF5A5A5A)],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          )
-                        : const LinearGradient(
-                            colors: [Color(0xFFFFD59C), Color(0xFF62CFF7)],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 120.0,
-                        height: 160.0,
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: _selectedCourseImageUrl != null
+                    ? Container(
+                        key: ValueKey<String>(_selectedCourseImageUrl!),
+                        padding: const EdgeInsets.all(16.0),
+                        width: double.infinity,
                         decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(_selectedCourseImageUrl!),
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.circular(8.0),
+                          gradient: isDarkMode
+                              ? const LinearGradient(
+                                  colors: [
+                                    Color(0xFF3C3C3C),
+                                    Color(0xFF5A5A5A)
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                )
+                              : const LinearGradient(
+                                  colors: [
+                                    Color(0xFFFFD59C),
+                                    Color(0xFF62CFF7)
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                          borderRadius: BorderRadius.circular(16.0),
                         ),
-                      ),
-                      const SizedBox(width: 16.0),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            if (_selectedCourseTitle != null)
-                              Text(
-                                _selectedCourseTitle!,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
+                            Container(
+                              width: 120.0,
+                              height: 160.0,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(_selectedCourseImageUrl!),
+                                  fit: BoxFit.cover,
+                                ),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            const SizedBox(width: 16.0),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (_selectedCourseTitle != null)
+                                    Text(
+                                      _selectedCourseTitle!,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
+                                  if (_selectedInstructorName != null)
+                                    Text(
+                                      '$_selectedInstructorName',
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                    ),
+                                ],
                               ),
-                            if (_selectedInstructorName != null)
-                              Text(
-                                '$_selectedInstructorName',
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
+                            ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
               if (_errorMessage != null) ErrorMessage(message: _errorMessage!),
               Expanded(
                 child: _selectedCourseId == null
                     ? const Center(
-                        child: Text('Selecione um curso para ver os materiais'))
+                        child: Text('Select a course to view materials'))
                     : StreamBuilder<QuerySnapshot>(
                         stream: _firestore
                             .collection('courses/$_selectedCourseId/materials')
