@@ -118,7 +118,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   Future<void> _uploadFile() async {
     if (_selectedCourseId == null) {
       setState(() {
-        _errorMessage = 'Please select a course first.';
+        _errorMessage = 'Selecione um curso primeiro.';
       });
       return;
     }
@@ -215,6 +215,8 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     );
 
     if (confirmed == true) {
+      if (!context.mounted) return;
+      Navigator.of(context).pop();
       await _deleteFile(context, courseId, fileId, fileUrl);
     }
   }
@@ -345,7 +347,8 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
               if (_errorMessage != null) ErrorMessage(message: _errorMessage!),
               Expanded(
                 child: _selectedCourseId == null
-                    ? Center(child: Text('Select a course to see materials'))
+                    ? const Center(
+                        child: Text('Selecione um curso para ver os materiais'))
                     : StreamBuilder<QuerySnapshot>(
                         stream: _firestore
                             .collection('courses/$_selectedCourseId/materials')
