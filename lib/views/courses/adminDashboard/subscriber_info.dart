@@ -18,17 +18,18 @@ class SubscriberInfo extends StatefulWidget {
   });
 
   @override
-  _SubscriberInfoState createState() => _SubscriberInfoState();
+  State<SubscriberInfo> createState() => _SubscriberInfoState();
 }
 
 class _SubscriberInfoState extends State<SubscriberInfo> {
   bool? _status;
-  late DocumentReference _docRef;
-  late Stream<DocumentSnapshot> _statusStream;
+  late DocumentReference<Map<String, dynamic>> _docRef;
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> _statusStream;
 
   @override
   void initState() {
     super.initState();
+
     _docRef = FirebaseFirestore.instance
         .collection('courseRegistration')
         .doc(widget.userId);
@@ -37,9 +38,16 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
 
     _statusStream.listen((docSnapshot) {
       if (docSnapshot.exists) {
-        setState(() {
-          _status = docSnapshot['status'] as bool;
-        });
+        final data = docSnapshot.data();
+        if (data != null) {
+          setState(() {
+            _status = data['status'] ?? false;
+          });
+        } else {
+          setState(() {
+            _status = false;
+          });
+        }
       } else {
         setState(() {
           _status = false;
@@ -52,27 +60,17 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
     if (_status == null) return;
 
     try {
+      final newStatus = !_status!;
+      await _docRef.update({'status': newStatus});
       setState(() {
-        _status = !_status!;
+        _status = newStatus;
       });
-
-      await _docRef.update({'status': _status});
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Status atualizado com sucesso!')),
-        );
-      }
     } catch (e) {
-      setState(() {
-        _status = !_status!;
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao atualizar status: $e')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error updating status: $e'),
+        ),
+      );
     }
   }
 
