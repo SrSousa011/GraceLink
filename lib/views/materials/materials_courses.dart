@@ -190,54 +190,6 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     });
   }
 
-  Future<void> _confirmDeleteFile(BuildContext context, String courseId,
-      String fileId, String fileUrl) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm deletion'),
-          content: const Text('Are you sure you want to delete this file?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (confirmed == true) {
-      if (!context.mounted) return;
-      Navigator.of(context).pop();
-      await _deleteFile(context, courseId, fileId, fileUrl);
-    }
-  }
-
-  Future<void> _deleteFile(BuildContext context, String courseId, String fileId,
-      String fileUrl) async {
-    try {
-      final ref = FirebaseStorage.instance.refFromURL(fileUrl);
-      await ref.delete();
-
-      await FirebaseFirestore.instance
-          .collection('courses/$courseId/materials')
-          .doc(fileId)
-          .delete();
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error deleting file: $e')),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -337,12 +289,11 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                                           .textTheme
                                           .titleLarge
                                           ?.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                              fontWeight: FontWeight.bold),
                                     ),
                                   if (_selectedInstructorName != null)
                                     Text(
-                                      '$_selectedInstructorName',
+                                      _selectedInstructorName!,
                                       style:
                                           Theme.of(context).textTheme.bodyLarge,
                                     ),
@@ -366,7 +317,8 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                 child: _selectedCourseId == null
                     ? const Center(
                         child: Text(
-                            'Selecione um curso para visualizar os materiais'))
+                            'Selecione um curso para visualizar os materiais'),
+                      )
                     : StreamBuilder<QuerySnapshot>(
                         stream: _firestore
                             .collection('courses/$_selectedCourseId/materials')
@@ -394,27 +346,11 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                                 child: Text('No files available.'));
                           }
 
-                          final fileDocs = snapshot.data!.docs.map((doc) {
-                            final data = doc.data() as Map<String, dynamic>;
-                            return {
-                              'id': doc.id,
-                              'url': data['url'] as String?,
-                              'name': data['name'] as String?,
-                              'courseId': _selectedCourseId!,
-                              'visibility':
-                                  data['visibility'] as String? ?? 'public',
-                            };
-                          }).toList();
-
                           return CourseFileList(
                             courseId: _selectedCourseId ?? '',
-                            fileDocs: fileDocs,
                             isDarkMode: isDarkMode,
                             userRole: _userRole ?? 'user',
-                            onFileDeleted: (courseId, fileId, fileUrl) async {
-                              await _confirmDeleteFile(
-                                  context, courseId, fileId, fileUrl);
-                            },
+                            onFileDeleted: (courseId, fileId, fileUrl) async {},
                           );
                         },
                       ),
