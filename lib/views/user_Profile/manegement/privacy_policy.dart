@@ -9,7 +9,7 @@ class PrivacyPolicy extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Privacy Policy'),
+        title: const Text('Política de Privacidade'),
       ),
       body: Container(
         color: isDarkMode ? Colors.grey[900] : Colors.white,
@@ -17,87 +17,87 @@ class PrivacyPolicy extends StatelessWidget {
         child: ListView(
           children: [
             Text(
-              'Privacy Policy',
-              style: Theme.of(context).textTheme.headline4?.copyWith(
+              'Política de Privacidade',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 20),
             Text(
-              'Effective Date: July 2024',
-              style: Theme.of(context).textTheme.subtitle1,
+              'Data de Vigência: Julho de 2024',
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 20),
             Text(
-              'Introduction',
-              style: Theme.of(context).textTheme.headline6?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Welcome to our church\'s mobile application. Your privacy is important to us. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our application. By using our app, you agree to the collection and use of information in accordance with this policy.',
-              style: Theme.of(context).textTheme.bodyText1,
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Information Collection',
-              style: Theme.of(context).textTheme.headline6?.copyWith(
+              'Introdução',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 10),
             Text(
-              'We may collect personal information that you provide to us directly, such as your name, email address, and other contact details. We may also collect information about your use of the application, including your interactions and preferences.',
-              style: Theme.of(context).textTheme.bodyText1,
+              'Bem-vindo ao aplicativo móvel da nossa igreja. Sua privacidade é importante para nós. Esta Política de Privacidade explica como coletamos, usamos, divulgamos e protegemos suas informações quando você usa nosso aplicativo. Ao usar nosso aplicativo, você concorda com a coleta e uso de informações de acordo com esta política.',
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 20),
             Text(
-              'Use of Information',
-              style: Theme.of(context).textTheme.headline6?.copyWith(
+              'Coleta de Informações',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 10),
             Text(
-              'We use your information to improve our services, communicate with you, and provide you with relevant updates and offers. We do not sell or rent your personal information to third parties.',
-              style: Theme.of(context).textTheme.bodyText1,
+              'Podemos coletar informações pessoais que você nos fornece diretamente, como seu nome, endereço de e-mail e outros dados de contato. Também podemos coletar informações sobre o uso do aplicativo, incluindo suas interações e preferências.',
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 20),
             Text(
-              'Data Security',
-              style: Theme.of(context).textTheme.headline6?.copyWith(
+              'Uso das Informações',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 10),
             Text(
-              'We implement reasonable security measures to protect your personal information from unauthorized access, use, or disclosure. However, no method of transmission over the internet or method of electronic storage is 100% secure.',
-              style: Theme.of(context).textTheme.bodyText1,
+              'Usamos suas informações para melhorar nossos serviços, comunicar-nos com você e fornecer atualizações e ofertas relevantes. Não vendemos ou alugamos suas informações pessoais a terceiros.',
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 20),
             Text(
-              'Changes to This Policy',
-              style: Theme.of(context).textTheme.headline6?.copyWith(
+              'Segurança dos Dados',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 10),
             Text(
-              'We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes.',
-              style: Theme.of(context).textTheme.bodyText1,
+              'Implementamos medidas de segurança razoáveis para proteger suas informações pessoais contra acesso, uso ou divulgação não autorizados. No entanto, nenhum método de transmissão pela internet ou método de armazenamento eletrônico é 100% seguro.',
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 20),
             Text(
-              'Contact Us',
-              style: Theme.of(context).textTheme.headline6?.copyWith(
+              'Alterações a Esta Política',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 10),
             Text(
-              'If you have any questions about this Privacy Policy, please contact us at: info@churchapp.org',
-              style: Theme.of(context).textTheme.bodyText1,
+              'Podemos atualizar nossa Política de Privacidade de tempos em tempos. Notificaremos você sobre quaisquer alterações publicando a nova Política de Privacidade nesta página. Recomendamos que você revise esta Política de Privacidade periodicamente para verificar quaisquer mudanças.',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Entre em Contato Conosco',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Se você tiver alguma dúvida sobre esta Política de Privacidade, entre em contato conosco pelo e-mail: info@churchapp.org',
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
           ],
         ),

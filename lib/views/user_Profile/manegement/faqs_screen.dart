@@ -30,7 +30,6 @@ class FAQScreen extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-            // Pergunta 1
             ExpansionTile(
               title: Text(
                 'Qual é o horário dos cultos?',
@@ -48,7 +47,6 @@ class FAQScreen extends StatelessWidget {
                 ),
               ],
             ),
-            // Pergunta 2
             ExpansionTile(
               title: Text(
                 'Como posso me envolver com os grupos de estudo?',
@@ -66,7 +64,6 @@ class FAQScreen extends StatelessWidget {
                 ),
               ],
             ),
-            // Pergunta 3
             ExpansionTile(
               title: Text(
                 'Onde posso encontrar informações sobre eventos?',
@@ -84,7 +81,6 @@ class FAQScreen extends StatelessWidget {
                 ),
               ],
             ),
-            // Pergunta 4
             ExpansionTile(
               title: Text(
                 'Como posso fazer uma doação?',
@@ -103,7 +99,6 @@ class FAQScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            // Seção Como Ajudar
             Text(
               'Como Ajudar',
               style: TextStyle(
@@ -175,7 +170,6 @@ class FAQScreen extends StatelessWidget {
                 ),
               ],
             ),
-            // Seção Apadrinhar
             ExpansionTile(
               title: Text(
                 'Apadrinhe uma criança ou família',
@@ -322,7 +316,6 @@ class FAQScreen extends StatelessWidget {
                 ),
               ],
             ),
-            // Seção Voluntariado
             ExpansionTile(
               title: Text(
                 'Faça voluntariado',
@@ -391,7 +384,6 @@ class FAQScreen extends StatelessWidget {
                 ),
               ],
             ),
-            // Seção Doação Única
             ExpansionTile(
               title: Text(
                 'Faça uma doação única',

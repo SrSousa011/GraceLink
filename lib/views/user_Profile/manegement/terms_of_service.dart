@@ -9,7 +9,7 @@ class TermsOfService extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Terms of Service'),
+        title: const Text('Termos de Serviço'),
       ),
       body: Container(
         color: isDarkMode ? Colors.grey[900] : Colors.white,
@@ -17,87 +17,87 @@ class TermsOfService extends StatelessWidget {
         child: ListView(
           children: [
             Text(
-              'Terms of Service',
-              style: Theme.of(context).textTheme.headline4?.copyWith(
+              'Termos de Serviço',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 20),
             Text(
-              'Effective Date: July 2024',
-              style: Theme.of(context).textTheme.subtitle1,
+              'Data de Vigência: Julho de 2024',
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 20),
             Text(
-              'Acceptance of Terms',
-              style: Theme.of(context).textTheme.headline6?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'By accessing or using our application, you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, please do not use the application.',
-              style: Theme.of(context).textTheme.bodyText1,
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'User Responsibilities',
-              style: Theme.of(context).textTheme.headline6?.copyWith(
+              'Aceitação dos Termos',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 10),
             Text(
-              'You agree to use the application only for lawful purposes and in accordance with these Terms of Service. You are responsible for maintaining the confidentiality of your account and for all activities that occur under your account.',
-              style: Theme.of(context).textTheme.bodyText1,
+              'Ao acessar ou usar nosso aplicativo, você concorda em cumprir e estar vinculado a estes Termos de Serviço. Se você não concordar com estes termos, por favor, não use o aplicativo.',
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 20),
             Text(
-              'Prohibited Activities',
-              style: Theme.of(context).textTheme.headline6?.copyWith(
+              'Responsabilidades do Usuário',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 10),
             Text(
-              'You may not use the application to engage in any unlawful activity or to transmit any content that is harmful, offensive, or otherwise objectionable. You may not attempt to gain unauthorized access to any part of the application or its systems.',
-              style: Theme.of(context).textTheme.bodyText1,
+              'Você concorda em usar o aplicativo apenas para fins legais e de acordo com estes Termos de Serviço. Você é responsável por manter a confidencialidade da sua conta e por todas as atividades que ocorram sob sua conta.',
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 20),
             Text(
-              'Limitation of Liability',
-              style: Theme.of(context).textTheme.headline6?.copyWith(
+              'Atividades Proibidas',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 10),
             Text(
-              'To the extent permitted by law, we shall not be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of the application.',
-              style: Theme.of(context).textTheme.bodyText1,
+              'Você não pode usar o aplicativo para se envolver em qualquer atividade ilegal ou para transmitir qualquer conteúdo que seja prejudicial, ofensivo ou de alguma forma questionável. Você não pode tentar obter acesso não autorizado a qualquer parte do aplicativo ou de seus sistemas.',
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 20),
             Text(
-              'Changes to Terms',
-              style: Theme.of(context).textTheme.headline6?.copyWith(
+              'Limitação de Responsabilidade',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 10),
             Text(
-              'We may update these Terms of Service from time to time. We will notify you of any changes by posting the new Terms of Service on this page. You are advised to review these Terms periodically for any changes.',
-              style: Theme.of(context).textTheme.bodyText1,
+              'Na medida permitida por lei, não seremos responsáveis por quaisquer danos indiretos, incidentais, especiais ou consequenciais que surjam de ou em conexão com o uso do aplicativo.',
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 20),
             Text(
-              'Contact Us',
-              style: Theme.of(context).textTheme.headline6?.copyWith(
+              'Alterações aos Termos',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 10),
             Text(
-              'If you have any questions about these Terms of Service, please contact us at: info@churchapp.org',
-              style: Theme.of(context).textTheme.bodyText1,
+              'Podemos atualizar estes Termos de Serviço de tempos em tempos. Notificaremos você sobre quaisquer alterações publicando os novos Termos de Serviço nesta página. Recomendamos que você revise estes Termos periodicamente para verificar quaisquer mudanças.',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Entre em Contato Conosco',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Se você tiver alguma dúvida sobre estes Termos de Serviço, por favor, entre em contato conosco pelo e-mail: info@churchapp.org',
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
           ],
         ),
