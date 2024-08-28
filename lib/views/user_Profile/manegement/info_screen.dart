@@ -5,8 +5,8 @@ import 'package:churchapp/views/user_Profile/manegement/terms_of_service.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class TelaDeInformacoes extends StatelessWidget {
-  const TelaDeInformacoes({super.key});
+class InfoScreen extends StatelessWidget {
+  const InfoScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
