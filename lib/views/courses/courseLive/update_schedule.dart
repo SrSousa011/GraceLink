@@ -150,9 +150,13 @@ class _UpdateScheduleScreenState extends State<UpdateScheduleScreen> {
     final ThemeData theme = Theme.of(context);
     final Color buttonColor =
         theme.brightness == Brightness.light ? Colors.blue : Colors.grey;
-
     final Color buttonTextColor =
         theme.brightness == Brightness.light ? Colors.white : Colors.black;
+    final Color deleteButtonColor = theme.brightness == Brightness.light
+        ? Colors.redAccent.withOpacity(0.1)
+        : Colors.grey;
+    final Color deleteButtonTextColor =
+        theme.brightness == Brightness.light ? Colors.red : Colors.black;
 
     return Scaffold(
       appBar: AppBar(
@@ -202,15 +206,9 @@ class _UpdateScheduleScreenState extends State<UpdateScheduleScreen> {
                         child: ElevatedButton(
                           onPressed: _clearFields,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                theme.brightness == Brightness.light
-                                    ? Colors.redAccent.withOpacity(0.1)
-                                    : Colors.grey,
+                            backgroundColor: deleteButtonColor,
                             elevation: 0,
-                            foregroundColor:
-                                theme.brightness == Brightness.light
-                                    ? Colors.red
-                                    : Colors.black,
+                            foregroundColor: deleteButtonTextColor,
                             shape: const StadiumBorder(),
                           ),
                           child: const Text(tDelete),
