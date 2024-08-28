@@ -1,6 +1,7 @@
 import 'package:churchapp/views/courses/adminDashboard/courses_dashboard_user.dart';
 import 'package:churchapp/views/courses/courseLive/course_live.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscriber_info.dart';
+import 'package:churchapp/views/member/members_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/member/become_member_list.dart';
 import 'package:churchapp/views/member/become_member.dart';
@@ -84,6 +85,11 @@ class AppRoutes {
         );
       case '/become_member':
         return MaterialPageRoute(builder: (_) => const BecomeMember());
+      case '/member_details':
+        return MaterialPageRoute(
+            builder: (_) => const MemberDetailsScreen(
+                  memberId: '',
+                ));
       case '/manage_course_materials':
         return MaterialPageRoute(builder: (_) => const CourseMaterialsPage());
       case '/about_us':
@@ -92,7 +98,7 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const MembersDashboard());
       case '/member_list':
         final args = settings.arguments as Map<String, dynamic>?;
-        final filter = args?['filter'] ?? 'all'; // Use 'all' as default filter
+        final filter = args?['filter'] ?? 'all';
         return MaterialPageRoute(
           builder: (_) => BecomeMemberList(filter: filter),
         );
