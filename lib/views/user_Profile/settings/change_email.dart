@@ -80,7 +80,7 @@ class ChangeEmailScreen extends StatelessWidget {
                 prefixIcon: Icon(LineAwesomeIcons.envelope),
               ),
             ),
-            const SizedBox(height: tFormHeight - 20),
+            const SizedBox(height: tFormHeight - 40),
             TextFormField(
               controller: _newEmailController,
               decoration: const InputDecoration(
@@ -88,7 +88,7 @@ class ChangeEmailScreen extends StatelessWidget {
                 prefixIcon: Icon(LineAwesomeIcons.envelope),
               ),
             ),
-            const SizedBox(height: tFormHeight - 20),
+            const SizedBox(height: tFormHeight - 40),
             TextFormField(
               controller: _confirmEmailController,
               decoration: const InputDecoration(
@@ -96,7 +96,7 @@ class ChangeEmailScreen extends StatelessWidget {
                 prefixIcon: Icon(LineAwesomeIcons.envelope),
               ),
             ),
-            const SizedBox(height: tFormHeight - 20),
+            const SizedBox(height: tFormHeight - 40),
             const SizedBox(height: tFormHeight),
             SizedBox(
               width: double.infinity,
