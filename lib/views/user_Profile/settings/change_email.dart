@@ -31,6 +31,7 @@ class ChangeEmailScreen extends StatelessWidget {
     try {
       String? userEmail = await AuthenticationService().getCurrentUserEmail();
       if (userEmail != currentEmail) {
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
