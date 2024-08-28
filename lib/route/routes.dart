@@ -79,7 +79,7 @@ class AppRoutes {
             userName: args['userName'] as String,
             registrationDate: args['registrationDate'] as DateTime,
             courseName: args['courseName'] as String,
-            imagePath: args['imagePath'] as String,
+            imagePath: args['imagePath'] as String? ?? '',
           ),
         );
       case '/become_member':
@@ -91,9 +91,11 @@ class AppRoutes {
       case '/members_dashboard':
         return MaterialPageRoute(builder: (_) => const MembersDashboard());
       case '/member_list':
-        final args = settings.arguments as Map<String, String>;
+        final args = settings.arguments as Map<String, dynamic>?;
+        final filter = args?['filter'] ?? 'all'; // Use 'all' as default filter
         return MaterialPageRoute(
-            builder: (_) => BecomeMemberList(filter: args['filter'] ?? 'all'));
+          builder: (_) => BecomeMemberList(filter: filter),
+        );
       case '/admin_panel':
         return MaterialPageRoute(builder: (_) => const AdminPanel());
       case '/donation_report':

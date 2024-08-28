@@ -19,7 +19,7 @@ class _BecomeMemberState extends State<BecomeMember> {
   late TextEditingController _referenceController;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  String selectedCivilStatus = 'Solteiro(a)';
+  String selectedCivilStatus = 'Solteiro';
   String selectedGender = 'Masculino';
   DateTime _birthDate = DateTime.now();
   final NotificationService _notificationService = NotificationService();
@@ -33,6 +33,14 @@ class _BecomeMemberState extends State<BecomeMember> {
     _lastVisitedChurchController = TextEditingController();
     _reasonForMembershipController = TextEditingController();
     _referenceController = TextEditingController();
+  }
+
+  List<String> _getCivilStatusOptions() {
+    if (selectedGender == 'Feminino') {
+      return ['Solteira', 'Casada', 'Divorciada', 'Viúva'];
+    } else {
+      return ['Solteiro', 'Casado', 'Divorciado', 'Viúvo'];
+    }
   }
 
   Future<void> _validateAndSubmit() async {
@@ -52,7 +60,6 @@ class _BecomeMemberState extends State<BecomeMember> {
       }
 
       try {
-        // Save new member data
         await FirebaseFirestore.instance.collection('members').add({
           'fullName': _fullNameController.text,
           'address': _addressController.text,
@@ -67,10 +74,8 @@ class _BecomeMemberState extends State<BecomeMember> {
           'createdById': userId,
         });
 
-        // Notify admin
         await _notifyAdmin(_fullNameController.text);
 
-        // Clear fields and show success dialog
         _clearFields();
         if (mounted) {
           setState(() {
@@ -120,7 +125,7 @@ class _BecomeMemberState extends State<BecomeMember> {
     _lastVisitedChurchController.clear();
     _reasonForMembershipController.clear();
     _referenceController.clear();
-    selectedCivilStatus = 'Solteiro(a)';
+    selectedCivilStatus = 'Solteiro';
     selectedGender = 'Masculino';
     _birthDate = DateTime.now();
   }
@@ -183,22 +188,22 @@ class _BecomeMemberState extends State<BecomeMember> {
                 _buildTextField(
                     _referenceController, 'Referência de um Membro Atual'),
                 const SizedBox(height: 20.0),
-                _buildDropdownField('Estado Civil', selectedCivilStatus, [
-                  'Solteiro(a)',
-                  'Casado(a)',
-                  'Divorciado(a)',
-                  'Viúvo(a)'
-                ], (value) {
+                _buildDropdownField('Estado Civil', selectedCivilStatus,
+                    _getCivilStatusOptions(), (value) {
                   setState(() {
                     selectedCivilStatus = value!;
                   });
                 }),
                 const SizedBox(height: 20.0),
-                _buildDropdownField('Gênero', selectedGender,
-                    ['Masculino', 'Feminino', 'Outro'], (value) {
-                  setState(() {
-                    selectedGender = value!;
-                  });
+                _buildDropdownField(
+                    'Gênero', selectedGender, ['Masculino', 'Feminino'],
+                    (value) {
+                  if (value != null) {
+                    setState(() {
+                      selectedGender = value;
+                      _updateCivilStatus(selectedGender, selectedCivilStatus);
+                    });
+                  }
                 }),
                 const SizedBox(height: 20.0),
                 ElevatedButton(
@@ -235,6 +240,28 @@ class _BecomeMemberState extends State<BecomeMember> {
         return null;
       },
     );
+  }
+
+  void _updateCivilStatus(String gender, String maritalStatus) {
+    setState(() {
+      if (gender == 'Feminino') {
+        if (maritalStatus == 'Casado') {
+          selectedCivilStatus = 'Casada';
+        } else if (maritalStatus == 'Viúvo') {
+          selectedCivilStatus = 'Viúva';
+        } else {
+          selectedCivilStatus = 'Solteira';
+        }
+      } else if (gender == 'Masculino') {
+        if (maritalStatus == 'Casado') {
+          selectedCivilStatus = 'Casado';
+        } else if (maritalStatus == 'Viúvo') {
+          selectedCivilStatus = 'Viúvo';
+        } else {
+          selectedCivilStatus = 'Solteiro';
+        }
+      }
+    });
   }
 
   Widget _buildDropdownField(String label, String selectedValue,

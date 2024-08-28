@@ -220,8 +220,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
   }) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context)
-            .pushNamed('/member_list', arguments: {'filter': filter});
+        Navigator.of(context).pushNamed('/member_list', arguments: {'filter': filter});
       },
       child: Container(
         padding: const EdgeInsets.all(16.0),
