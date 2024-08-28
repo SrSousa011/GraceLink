@@ -59,6 +59,7 @@ class ChangePhoneScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text('Alterar Telefone'),
         leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(LineAwesomeIcons.angle_left_solid),

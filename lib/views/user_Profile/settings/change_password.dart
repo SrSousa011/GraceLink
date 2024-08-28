@@ -61,6 +61,7 @@ class ChangePasswordScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text('Alterar Senha'),
         leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(LineAwesomeIcons.angle_left_solid),
