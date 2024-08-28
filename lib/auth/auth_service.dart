@@ -109,7 +109,7 @@ class AuthenticationService implements BaseAuth {
       return true;
     } catch (error) {
       if (kDebugMode) {
-        print('Error signing up: $error');
+        print('Erro ao criar conta: $error');
       }
       return false;
     }
@@ -127,12 +127,12 @@ class AuthenticationService implements BaseAuth {
       );
     } on FirebaseAuthException catch (e) {
       if (kDebugMode) {
-        print('FirebaseAuthException during sign up: ${e.message}');
+        print('Erro FirebaseAuthException ao criar conta: ${e.message}');
       }
       rethrow;
     } catch (e) {
       if (kDebugMode) {
-        print('Error during sign up: $e');
+        print('Erro ao criar conta: $e');
       }
       rethrow;
     }
@@ -153,12 +153,12 @@ class AuthenticationService implements BaseAuth {
       return userCredential;
     } on FirebaseAuthException catch (e) {
       if (kDebugMode) {
-        print('FirebaseAuthException during sign in: ${e.message}');
+        print('Erro FirebaseAuthException ao fazer login: ${e.message}');
       }
       rethrow;
     } catch (e) {
       if (kDebugMode) {
-        print('Error during sign in: $e');
+        print('Erro ao fazer login: $e');
       }
       rethrow;
     }
@@ -177,7 +177,7 @@ class AuthenticationService implements BaseAuth {
       return user?.uid;
     } catch (e) {
       if (kDebugMode) {
-        print('Error getting current user ID: $e');
+        print('Erro ao obter ID do usuário: $e');
       }
       rethrow;
     }
@@ -196,7 +196,7 @@ class AuthenticationService implements BaseAuth {
       return user?.email;
     } catch (e) {
       if (kDebugMode) {
-        print('Error getting current user email: $e');
+        print('Erro ao obter e-mail do usuário: $e');
       }
       rethrow;
     }
@@ -221,7 +221,7 @@ class AuthenticationService implements BaseAuth {
       await user?.verifyBeforeUpdateEmail(email);
     } catch (error) {
       if (kDebugMode) {
-        print("Email can't be changed: ${error.toString()}");
+        print("Não foi possível alterar o e-mail: ${error.toString()}");
       }
     }
   }
@@ -233,7 +233,7 @@ class AuthenticationService implements BaseAuth {
       await user?.updatePassword(password);
     } catch (error) {
       if (kDebugMode) {
-        print("Password can't be changed: ${error.toString()}");
+        print("Não foi possível alterar a senha: ${error.toString()}");
       }
     }
   }
@@ -245,7 +245,7 @@ class AuthenticationService implements BaseAuth {
       await user?.delete();
     } catch (error) {
       if (kDebugMode) {
-        print("User can't be deleted: ${error.toString()}");
+        print("Não foi possível excluir o usuário: ${error.toString()}");
       }
     }
   }
@@ -255,7 +255,7 @@ class AuthenticationService implements BaseAuth {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
     } catch (e) {
-      throw Exception('Failed to send password reset email: $e');
+      throw Exception('Falha ao enviar e-mail de redefinição de senha: $e');
     }
   }
 
@@ -273,7 +273,8 @@ class AuthenticationService implements BaseAuth {
       });
     } catch (error) {
       if (kDebugMode) {
-        print("Phone number can't be changed: ${error.toString()}");
+        print(
+            "Não foi possível alterar o número de telefone: ${error.toString()}");
       }
       rethrow;
     }
@@ -291,7 +292,7 @@ class AuthenticationService implements BaseAuth {
       await user?.sendEmailVerification();
     } catch (error) {
       if (kDebugMode) {
-        print("Email can't be changed: ${error.toString()}");
+        print("Não foi possível alterar o e-mail: ${error.toString()}");
       }
       rethrow;
     }
@@ -310,7 +311,7 @@ class AuthenticationService implements BaseAuth {
       await user?.updatePassword(newPassword);
     } catch (error) {
       if (kDebugMode) {
-        print("Password can't be changed: ${error.toString()}");
+        print("Não foi possível alterar a senha: ${error.toString()}");
       }
       rethrow;
     }
@@ -330,9 +331,65 @@ class AuthenticationService implements BaseAuth {
       return null;
     } catch (e) {
       if (kDebugMode) {
-        print('Error getting user data: $e');
+        print('Erro ao obter dados do usuário: $e');
       }
-      return null;
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> sendVerificationCode(String phoneNumber) async {
+    try {
+      await _firebaseAuth.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await _firebaseAuth.signInWithCredential(credential);
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          throw Exception(
+              'Falha na verificação do número de telefone: ${e.message}');
+        },
+        codeSent: (String verificationId, int? resendToken) {},
+        codeAutoRetrievalTimeout: (String verificationId) {},
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao enviar código de verificação: $e');
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> verifyCode(String verificationId, String smsCode) async {
+    try {
+      final credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
+      await _firebaseAuth.signInWithCredential(credential);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao verificar código: $e');
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> sendEmailConfirmation(String email) async {
+    try {
+      final user = _firebaseAuth.currentUser;
+      if (user == null) {
+        throw Exception('Nenhum usuário conectado');
+      }
+
+      await user.sendEmailVerification();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao enviar confirmação por e-mail: $e');
+      }
+      rethrow;
     }
   }
 
@@ -340,6 +397,22 @@ class AuthenticationService implements BaseAuth {
   Future<String?> getCurrentUserName() async {
     UserData? userData = await getCurrentUserData();
     return userData?.fullName;
+  }
+
+  @override
+  Future<String?> getUserProfileImageUrl(String userId) async {
+    try {
+      final ref = _storage
+          .ref()
+          .child('userProfilePictures/$userId/profilePicture.jpg');
+      final downloadURL = await ref.getDownloadURL();
+      return downloadURL;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching user profile image URL: $e');
+      }
+      return null;
+    }
   }
 
   @override
@@ -360,208 +433,6 @@ class AuthenticationService implements BaseAuth {
         print('Failed to verify current password: $e');
       }
       return false;
-    }
-  }
-
-  Future<String?> getCurrentUserPhone() async {
-    try {
-      User? user = _firebaseAuth.currentUser;
-      if (user != null) {
-        DocumentSnapshot snapshot =
-            await _firestore.collection('users').doc(user.uid).get();
-        return snapshot.get('phoneNumber');
-      }
-      return null;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error getting current user phone: $e');
-      }
-      return null;
-    }
-  }
-
-  Future<String?> getUserRole() async {
-    try {
-      User? user = _firebaseAuth.currentUser;
-      if (user != null) {
-        DocumentSnapshot userDoc =
-            await _firestore.collection('users').doc(user.uid).get();
-        if (userDoc.exists) {
-          Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
-          return data['role'] as String?;
-        }
-      }
-      return null;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error getting user role: $e');
-      }
-      return null;
-    }
-  }
-
-  Future<void> setUserRole(String role) async {
-    try {
-      User? user = _firebaseAuth.currentUser;
-      if (user != null) {
-        await _firestore
-            .collection('users')
-            .doc(user.uid)
-            .update({'role': role});
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error setting user role: $e');
-      }
-    }
-  }
-
-  Future<String> getUserNameById(String userId) async {
-    try {
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
-
-      if (userSnapshot.exists) {
-        return userSnapshot.get('fullName') ?? 'Usuário Desconhecido';
-      } else {
-        return 'Usuário Desconhecido';
-      }
-    } catch (e) {
-      return 'Erro ao buscar usuário';
-    }
-  }
-
-  Future<String> getTitleById(String userId) async {
-    try {
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection('courseName')
-          .doc(userId)
-          .get();
-
-      if (userSnapshot.exists) {
-        return userSnapshot.get('title') ?? 'Usuário Desconhecido';
-      } else {
-        return 'Usuário Desconhecido';
-      }
-    } catch (e) {
-      return 'Erro ao buscar usuário';
-    }
-  }
-
-  Future<bool> isAdmin(String? currentUserId) async {
-    try {
-      User? user = _firebaseAuth.currentUser;
-      if (user != null) {
-        DocumentSnapshot userDoc =
-            await _firestore.collection('users').doc(user.uid).get();
-        if (userDoc.exists) {
-          Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
-          String? role = data['role'];
-          return role == 'admin';
-        }
-      }
-      return false;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error checking if user is admin: $e');
-      }
-      return false;
-    }
-  }
-
-  @override
-  Future<String?> getUserProfileImageUrl(String userId) async {
-    try {
-      final ref = _storage
-          .ref()
-          .child('userProfilePictures/$userId/profilePicture.jpg');
-      final downloadURL = await ref.getDownloadURL();
-      return downloadURL;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching user profile image URL: $e');
-      }
-      return null;
-    }
-  }
-
-  Future<String?> getUserImageById(String userId) async {
-    try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
-
-      if (snapshot.exists) {
-        final data = snapshot.data();
-        return data?['imagePath'] as String?;
-      } else {
-        if (kDebugMode) {
-          print('User document does not exist');
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching user image URL: $e');
-      }
-    }
-    return null;
-  }
-
-  @override
-  Future<void> sendVerificationCode(String phoneNumber) async {
-    try {
-      await _firebaseAuth.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          await _firebaseAuth.signInWithCredential(credential);
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          throw Exception('Phone number verification failed: ${e.message}');
-        },
-        codeSent: (String verificationId, int? resendToken) {},
-        codeAutoRetrievalTimeout: (String verificationId) {},
-      );
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error sending verification code: $e');
-      }
-      rethrow;
-    }
-  }
-
-  @override
-  Future<void> verifyCode(String verificationId, String smsCode) async {
-    try {
-      final credential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: smsCode,
-      );
-      await _firebaseAuth.signInWithCredential(credential);
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error verifying code: $e');
-      }
-      rethrow;
-    }
-  }
-
-  @override
-  Future<void> sendEmailConfirmation(String email) async {
-    try {
-      final user = _firebaseAuth.currentUser;
-      if (user == null) {
-        throw Exception('No user signed in');
-      }
-
-      await user.sendEmailVerification();
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error sending email confirmation: $e');
-      }
-      rethrow;
     }
   }
 }
