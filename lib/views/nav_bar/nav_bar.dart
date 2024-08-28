@@ -61,7 +61,7 @@ class _NavBarState extends State<NavBar> {
 
         return StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
-              .collection('courseregistration')
+              .collection('courseRegistration')
               .where('userId', isEqualTo: userId)
               .snapshots(),
           builder: (context, courseSnapshot) {
@@ -118,7 +118,9 @@ class _NavBarState extends State<NavBar> {
                     onTap: () {
                       final route = userData.role == 'admin'
                           ? '/courses_dashboard'
-                          : '/courses';
+                          : (isEnrolledInCourse
+                              ? '/courses_user_dashboard'
+                              : '/courses');
                       Navigator.pushNamed(context, route);
                     },
                   ),

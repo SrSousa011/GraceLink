@@ -1,3 +1,4 @@
+import 'package:churchapp/views/courses/adminDashboard/courses_dashboard_user.dart';
 import 'package:churchapp/views/courses/courseLive/course_live.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscriber_info.dart';
 import 'package:flutter/material.dart';
@@ -56,6 +57,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const Courses());
       case '/courses_dashboard':
         return MaterialPageRoute(builder: (_) => const CoursesDashboard());
+      case '/courses_user_dashboard':
+        return MaterialPageRoute(builder: (_) => const CoursesUserDashboard());
       case '/subscribers_list':
         return MaterialPageRoute(
           builder: (_) => const SubscribersList(),
