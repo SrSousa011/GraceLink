@@ -5,7 +5,7 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 const Color tPrimaryColor = Colors.blue;
 const Color tDarkColor = Color.fromARGB(255, 255, 255, 255);
 const double tFormHeight = 50.0;
-const String tEditProfile = 'Update Email';
+const String tEditProfile = 'Atualizar Email';
 
 class ChangeEmailScreen extends StatelessWidget {
   final TextEditingController _currentEmailController = TextEditingController();
@@ -22,7 +22,7 @@ class ChangeEmailScreen extends StatelessWidget {
     if (newEmail != confirmEmail) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('New email and confirmation email do not match'),
+          content: Text('O novo email e a confirmação não correspondem'),
         ),
       );
       return;
@@ -31,9 +31,11 @@ class ChangeEmailScreen extends StatelessWidget {
     try {
       String? userEmail = await AuthenticationService().getCurrentUserEmail();
       if (userEmail != currentEmail) {
-        const SnackBar(
-          content: Text(
-              'Current email does not match the email associated with this account'),
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'O email atual não corresponde ao email associado a esta conta'),
+          ),
         );
         return;
       }
@@ -44,12 +46,12 @@ class ChangeEmailScreen extends StatelessWidget {
       if (!context.mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email changed successfully')),
+        const SnackBar(content: Text('Email alterado com sucesso')),
       );
       Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to change email: $e')),
+        SnackBar(content: Text('Falha ao alterar o email: $e')),
       );
     }
   }
@@ -72,7 +74,7 @@ class ChangeEmailScreen extends StatelessWidget {
             TextFormField(
               controller: _currentEmailController,
               decoration: const InputDecoration(
-                labelText: 'Current Email',
+                labelText: 'Email Atual',
                 prefixIcon: Icon(LineAwesomeIcons.envelope),
               ),
             ),
@@ -80,7 +82,7 @@ class ChangeEmailScreen extends StatelessWidget {
             TextFormField(
               controller: _newEmailController,
               decoration: const InputDecoration(
-                labelText: 'New Email',
+                labelText: 'Novo Email',
                 prefixIcon: Icon(LineAwesomeIcons.envelope),
               ),
             ),
@@ -88,7 +90,7 @@ class ChangeEmailScreen extends StatelessWidget {
             TextFormField(
               controller: _confirmEmailController,
               decoration: const InputDecoration(
-                labelText: 'Confirm New Email',
+                labelText: 'Confirmar Novo Email',
                 prefixIcon: Icon(LineAwesomeIcons.envelope),
               ),
             ),

@@ -21,7 +21,7 @@ class ChangePhoneScreen extends StatelessWidget {
     if (newPhone != confirmPhone) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('New phone and confirmation phone do not match'),
+          content: Text('O novo número e a confirmação não correspondem'),
         ),
       );
       return;
@@ -31,8 +31,11 @@ class ChangePhoneScreen extends StatelessWidget {
       final currentUserPhone =
           await AuthenticationService().getCurrentUserPhone();
       if (currentPhone != currentUserPhone) {
-        const SnackBar(
-          content: Text('Current phone number is incorrect'),
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('O número de telefone atual está incorreto'),
+          ),
         );
         return;
       }
@@ -41,12 +44,13 @@ class ChangePhoneScreen extends StatelessWidget {
           .changePhoneWithConfirmation(currentPhone, newPhone);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Phone changed successfully')),
+        const SnackBar(
+            content: Text('Número de telefone alterado com sucesso')),
       );
       Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to change phone: $e')),
+        SnackBar(content: Text('Falha ao alterar o número de telefone: $e')),
       );
     }
   }
@@ -69,7 +73,7 @@ class ChangePhoneScreen extends StatelessWidget {
             TextFormField(
               controller: _currentPhoneController,
               decoration: const InputDecoration(
-                labelText: 'Current Phone',
+                labelText: 'Telefone Atual',
                 prefixIcon: Icon(LineAwesomeIcons.phone_solid),
               ),
             ),
@@ -77,7 +81,7 @@ class ChangePhoneScreen extends StatelessWidget {
             TextFormField(
               controller: _newPhoneController,
               decoration: const InputDecoration(
-                labelText: 'New Phone',
+                labelText: 'Novo Telefone',
                 prefixIcon: Icon(LineAwesomeIcons.phone_solid),
               ),
             ),
@@ -85,7 +89,7 @@ class ChangePhoneScreen extends StatelessWidget {
             TextFormField(
               controller: _confirmPhoneController,
               decoration: const InputDecoration(
-                labelText: 'Confirm New Phone',
+                labelText: 'Confirmar Novo Telefone',
                 prefixIcon: Icon(LineAwesomeIcons.phone_solid),
               ),
             ),
@@ -100,7 +104,7 @@ class ChangePhoneScreen extends StatelessWidget {
                   shape: const StadiumBorder(),
                 ),
                 child: const Text(
-                  'Update Phone',
+                  'Atualizar Telefone',
                   style: TextStyle(color: tDarkColor),
                 ),
               ),

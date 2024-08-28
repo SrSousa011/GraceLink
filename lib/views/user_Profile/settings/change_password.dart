@@ -23,7 +23,7 @@ class ChangePasswordScreen extends StatelessWidget {
     if (newPassword != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('New Password and confirmation Password do not match'),
+          content: Text('A nova senha e a confirmação não correspondem'),
         ),
       );
       return;
@@ -34,8 +34,11 @@ class ChangePasswordScreen extends StatelessWidget {
           await AuthenticationService().verifyCurrentPassword(currentPassword);
 
       if (!isCurrentPasswordValid) {
-        const SnackBar(
-          content: Text('Current Password is incorrect'),
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('A senha atual está incorreta'),
+          ),
         );
         return;
       }
@@ -44,12 +47,12 @@ class ChangePasswordScreen extends StatelessWidget {
           .changePasswordWithConfirmation(currentPassword, newPassword);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password changed successfully')),
+        const SnackBar(content: Text('Senha alterada com sucesso')),
       );
       Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to change Password: $e')),
+        SnackBar(content: Text('Falha ao alterar a senha: $e')),
       );
     }
   }
@@ -72,7 +75,7 @@ class ChangePasswordScreen extends StatelessWidget {
             TextFormField(
               controller: _currentPasswordController,
               decoration: const InputDecoration(
-                labelText: 'Current Password',
+                labelText: 'Senha Atual',
                 prefixIcon: Icon(LineAwesomeIcons.lock_solid),
               ),
               obscureText: true,
@@ -81,7 +84,7 @@ class ChangePasswordScreen extends StatelessWidget {
             TextFormField(
               controller: _newPasswordController,
               decoration: const InputDecoration(
-                labelText: 'New Password',
+                labelText: 'Nova Senha',
                 prefixIcon: Icon(LineAwesomeIcons.lock_solid),
               ),
               obscureText: true,
@@ -90,7 +93,7 @@ class ChangePasswordScreen extends StatelessWidget {
             TextFormField(
               controller: _confirmPasswordController,
               decoration: const InputDecoration(
-                labelText: 'Confirm New Password',
+                labelText: 'Confirmar Nova Senha',
                 prefixIcon: Icon(LineAwesomeIcons.lock_solid),
               ),
               obscureText: true,
@@ -106,7 +109,7 @@ class ChangePasswordScreen extends StatelessWidget {
                   shape: const StadiumBorder(),
                 ),
                 child: const Text(
-                  'Change Password',
+                  'Alterar Senha',
                   style: TextStyle(color: tDarkColor),
                 ),
               ),
