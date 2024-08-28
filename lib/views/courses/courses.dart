@@ -26,8 +26,8 @@ class _CoursesState extends State<Courses> {
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final gradientColors = isDarkMode
-        ? [Color(0xFF3C3C3C), Color(0xFF5A5A5A)]
-        : [Color(0xFFFFD59C), Color(0xFF62CFF7)];
+        ? [const Color(0xFF3C3C3C), const Color(0xFF5A5A5A)]
+        : [const Color(0xFFFFD59C), const Color(0xFF62CFF7)];
     final textColor = isDarkMode ? Colors.white : Colors.black;
     final subtitleColor = isDarkMode ? Colors.white70 : Colors.black54;
     final descriptionColor = isDarkMode ? Colors.white70 : Colors.black87;
