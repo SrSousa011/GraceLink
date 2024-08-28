@@ -23,58 +23,89 @@ class CourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final buttonColor = isDarkMode ? Colors.blueGrey[800] : Colors.blue;
+    final iconColor = isDarkMode ? buttonColor : Colors.black;
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
-      color: isDarkMode ? Colors.blueGrey[900] : Colors.white,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 80,
-            height: 100,
-            margin: const EdgeInsets.all(8.0),
-            color: Colors.blue,
-            child: imageURL.isNotEmpty
-                ? Image.network(
-                    imageURL,
-                    fit: BoxFit.cover,
-                  )
-                : const Icon(Icons.image, size: 80, color: Colors.white),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ListTile(
-                  title: Text(courseName),
-                  subtitle: Text('Horário: $time\nDias: $daysOfWeek'),
-                  trailing: videoUrl != null && videoUrl!.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.play_arrow),
-                          onPressed: onPlay,
-                          color: isDarkMode ? Colors.grey : Colors.blue,
-                        )
-                      : null,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: isDarkMode
+              ? const LinearGradient(
+                  colors: [Color(0xFF3C3C3C), Color(0xFF5A5A5A)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                )
+              : const LinearGradient(
+                  colors: [Color(0xFFFFD59C), Color(0xFF62CFF7)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                      onPressed: onUpdate,
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: isDarkMode ? Colors.grey : Colors.blue,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 80,
+              height: 100,
+              margin: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(imageURL),
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.circular(8.0),
+                color: isDarkMode ? Colors.blueGrey[900] : Colors.white,
+              ),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListTile(
+                    title: Text(
+                      courseName,
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black,
                       ),
-                      child: const Text('Atualizar'),
+                    ),
+                    subtitle: Text(
+                      'Horário: $time\nDias: $daysOfWeek',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        color: isDarkMode ? Colors.white70 : Colors.black54,
+                      ),
+                    ),
+                    trailing: videoUrl != null && videoUrl!.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(Icons.play_arrow, color: iconColor),
+                            iconSize: 36.0,
+                            onPressed: onPlay,
+                          )
+                        : null,
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        onPressed: onUpdate,
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: buttonColor,
+                        ),
+                        child: const Text('Atualizar'),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
