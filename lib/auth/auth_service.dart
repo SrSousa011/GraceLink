@@ -25,6 +25,8 @@ abstract class BaseAuth {
 
   Future<void> deleteUser();
 
+  Future<void> desactivateUser();
+
   Future<void> sendPasswordResetMail(String email);
 
   Future<void> changeEmail(String email);
@@ -247,6 +249,23 @@ class AuthenticationService implements BaseAuth {
       if (kDebugMode) {
         print("Não foi possível excluir o usuário: ${error.toString()}");
       }
+    }
+  }
+
+  @override
+  Future<void> desactivateUser() async {
+    User? user = _firebaseAuth.currentUser;
+    try {
+      if (user != null) {
+        await _firestore.collection('users').doc(user.uid).update({
+          'isActive': false,
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao desativar usuário: $e');
+      }
+      rethrow;
     }
   }
 
