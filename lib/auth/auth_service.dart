@@ -497,13 +497,16 @@ class AuthenticationService implements BaseAuth {
 
       if (snapshot.exists) {
         final data = snapshot.data();
-        // Verifique se 'imagePath' está presente no documento
         return data?['imagePath'] as String?;
       } else {
-        print('User document does not exist');
+        if (kDebugMode) {
+          print('User document does not exist');
+        }
       }
     } catch (e) {
-      print('Error fetching user image URL: $e');
+      if (kDebugMode) {
+        print('Error fetching user image URL: $e');
+      }
     }
     return null;
   }
