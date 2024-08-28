@@ -25,6 +25,13 @@ class _CoursesState extends State<Courses> {
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final gradientColors = isDarkMode
+        ? [Color(0xFF3C3C3C), Color(0xFF5A5A5A)]
+        : [Color(0xFFFFD59C), Color(0xFF62CFF7)];
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subtitleColor = isDarkMode ? Colors.white70 : Colors.black54;
+    final descriptionColor = isDarkMode ? Colors.white70 : Colors.black87;
+    final priceColor = isDarkMode ? Colors.white70 : Colors.black54;
 
     return Scaffold(
       appBar: AppBar(
@@ -70,17 +77,11 @@ class _CoursesState extends State<Courses> {
                     margin: const EdgeInsets.symmetric(
                         vertical: 4.0, horizontal: 10.0),
                     decoration: BoxDecoration(
-                      gradient: isDarkMode
-                          ? const LinearGradient(
-                              colors: [Color(0xFF3C3C3C), Color(0xFF5A5A5A)],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            )
-                          : const LinearGradient(
-                              colors: [Color(0xFFFFD59C), Color(0xFF62CFF7)],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
+                      gradient: LinearGradient(
+                        colors: gradientColors,
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ),
                       borderRadius: BorderRadius.circular(16.0),
                     ),
                     child: Row(
@@ -107,8 +108,7 @@ class _CoursesState extends State<Courses> {
                                 style: TextStyle(
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold,
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
+                                  color: textColor,
                                 ),
                               ),
                               const SizedBox(height: 8.0),
@@ -117,9 +117,7 @@ class _CoursesState extends State<Courses> {
                                 style: TextStyle(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.normal,
-                                  color: isDarkMode
-                                      ? Colors.white70
-                                      : Colors.black54,
+                                  color: subtitleColor,
                                 ),
                               ),
                               const SizedBox(height: 8.0),
@@ -128,9 +126,7 @@ class _CoursesState extends State<Courses> {
                                 style: TextStyle(
                                   fontSize: 15.0,
                                   fontWeight: FontWeight.normal,
-                                  color: isDarkMode
-                                      ? Colors.white70
-                                      : Colors.black87,
+                                  color: descriptionColor,
                                 ),
                               ),
                               const SizedBox(height: 8.0),
@@ -139,9 +135,7 @@ class _CoursesState extends State<Courses> {
                                 style: TextStyle(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.normal,
-                                  color: isDarkMode
-                                      ? Colors.white70
-                                      : Colors.black54,
+                                  color: priceColor,
                                 ),
                               ),
                             ],
