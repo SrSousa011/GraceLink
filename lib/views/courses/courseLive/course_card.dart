@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CourseCard extends StatelessWidget {
   final String courseName;
@@ -23,8 +25,53 @@ class CourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final buttonColor = isDarkMode ? Colors.blueGrey[800] : Colors.blue;
+    final buttonColor =
+        isDarkMode ? Colors.blueGrey[800] ?? Colors.blueGrey : Colors.blue;
     final iconColor = isDarkMode ? buttonColor : Colors.black;
+
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId == null) {
+      // Se o usuário não estiver logado, não exibe o botão
+      return _buildCourseCard(context,
+          isAdmin: false, buttonColor: buttonColor, iconColor: iconColor);
+    }
+
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return _buildCourseCard(context,
+              isAdmin: false, buttonColor: buttonColor, iconColor: iconColor);
+        }
+
+        if (!snapshot.hasData || !snapshot.data!.exists) {
+          return _buildCourseCard(context,
+              isAdmin: false, buttonColor: buttonColor, iconColor: iconColor);
+        }
+
+        final userDoc = snapshot.data!;
+        final userData = userDoc.data() as Map<String, dynamic>;
+        final bool isAdmin = userData['role'] == 'admin';
+
+        return _buildCourseCard(context,
+            isAdmin: isAdmin, buttonColor: buttonColor, iconColor: iconColor);
+      },
+    );
+  }
+
+  Widget _buildCourseCard(BuildContext context,
+      {required bool isAdmin,
+      required Color buttonColor,
+      required Color iconColor}) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -56,7 +103,9 @@ class CourseCard extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
                 borderRadius: BorderRadius.circular(8.0),
-                color: isDarkMode ? Colors.blueGrey[900] : Colors.white,
+                color: isDarkMode
+                    ? Colors.blueGrey[900] ?? Colors.blueGrey
+                    : Colors.white,
               ),
             ),
             Expanded(
@@ -87,20 +136,21 @@ class CourseCard extends StatelessWidget {
                           )
                         : null,
                   ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        onPressed: onUpdate,
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: buttonColor,
+                  if (isAdmin) // Verifica se o usuário é admin
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                          onPressed: onUpdate,
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: buttonColor,
+                          ),
+                          child: const Text('Atualizar'),
                         ),
-                        child: const Text('Atualizar'),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
