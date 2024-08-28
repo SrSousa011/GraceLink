@@ -1,3 +1,4 @@
+import 'package:churchapp/views/courses/courseLive/course_live.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
@@ -71,19 +72,19 @@ class _UpdateScheduleScreenState extends State<UpdateScheduleScreen> {
         'time': Timestamp.fromDate(DateTime.parse(time)),
         'daysOfWeek': daysOfWeek,
       }).then((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Schedule updated successfully')),
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const CourseLive(),
+          ),
         );
-
-        Navigator.of(context).pop();
       }).catchError((error) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update schedule: $error')),
+          SnackBar(content: Text('Falha ao atualizar a programação: $error')),
         );
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save schedule: $e')),
+        SnackBar(content: Text('Falha ao salvar a programação: $e')),
       );
     }
   }
