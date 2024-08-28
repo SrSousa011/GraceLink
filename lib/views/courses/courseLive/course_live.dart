@@ -1,9 +1,10 @@
 import 'package:churchapp/views/courses/courseLive/course_live_list.dart';
 import 'package:churchapp/views/courses/courseLive/update_schedule.dart';
 import 'package:churchapp/views/courses/service/courses_date.dart';
+import 'package:churchapp/views/courses/service/courses_service.dart';
 import 'package:churchapp/views/notifications/notification_course.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CourseLive extends StatefulWidget {
@@ -15,42 +16,54 @@ class CourseLive extends StatefulWidget {
 
 class _CourseLiveState extends State<CourseLive> {
   late Future<List<Course>> _coursesFuture;
+  late CoursesService _coursesService;
   late NotificationService _notificationService;
+  bool _loading = false;
 
   @override
   void initState() {
     super.initState();
-    _coursesFuture = _fetchCourses();
+    _coursesService = CoursesService();
     _notificationService = NotificationService();
     _notificationService.initialize();
+    _coursesFuture = _fetchCourses();
   }
 
   Future<List<Course>> _fetchCourses() async {
-    try {
-      var courseSnapshots =
-          await FirebaseFirestore.instance.collection('courses').get();
-      return courseSnapshots.docs.map((doc) {
-        final courseData = doc.data();
-        final courseId = doc.id;
+    setState(() => _loading = true);
 
-        return Course(
-          courseId: courseId,
-          courseName: courseData['courseName'] ?? 'Unknown Course',
-          instructor: courseData['instructor'] ?? '',
-          imageURL: courseData['imageURL'] ?? '',
-          description: courseData['description'] ?? '',
-          price: (courseData['price'] as num).toDouble(),
-          registrationDeadline:
-              (courseData['registrationDeadline'] as Timestamp).toDate(),
-          descriptionDetails: courseData['descriptionDetails'] ?? '',
-          time: courseData['time'] as Timestamp?,
-          videoUrl: courseData['videoUrl'],
-          daysOfWeek: courseData['daysOfWeek'],
-        );
-      }).toList();
+    try {
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        setState(() => _loading = false);
+        return [];
+      }
+
+      final courses = await _coursesService.getCourses();
+      final registrations = await Future.wait(
+        courses.map((course) async {
+          final isRegistered = await _coursesService.isUserAlreadySubscribed(
+            courseId: course.courseId,
+            userId: userId,
+          );
+          return {
+            'course': course,
+            'isRegistered': isRegistered,
+          };
+        }),
+      );
+
+      final filteredCourses = registrations
+          .where((entry) => entry['isRegistered'] as bool)
+          .map((entry) => entry['course'] as Course)
+          .toList();
+
+      return filteredCourses;
     } catch (e) {
       debugPrint('Erro ao buscar cursos: $e');
       return [];
+    } finally {
+      setState(() => _loading = false);
     }
   }
 
@@ -90,27 +103,32 @@ class _CourseLiveState extends State<CourseLive> {
           children: [
             const SizedBox(height: 16.0),
             Expanded(
-              child: FutureBuilder<List<Course>>(
-                future: _coursesFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  }
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(
-                        child: Text('Nenhum curso disponível.'));
-                  }
+              child: _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : FutureBuilder<List<Course>>(
+                      future: _coursesFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                        if (snapshot.hasError) {
+                          return Center(
+                              child: Text('Error: ${snapshot.error}'));
+                        }
+                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          return const Center(
+                              child: Text('Nenhum curso disponível.'));
+                        }
 
-                  return CoursesList(
-                    courses: snapshot.data!,
-                    onUpdateSchedule: _navigateToUpdateSchedule,
-                    onLaunchURL: _launchURL,
-                  );
-                },
-              ),
+                        return CoursesList(
+                          courses: snapshot.data!,
+                          onUpdateSchedule: _navigateToUpdateSchedule,
+                          onLaunchURL: _launchURL,
+                        );
+                      },
+                    ),
             ),
           ],
         ),
