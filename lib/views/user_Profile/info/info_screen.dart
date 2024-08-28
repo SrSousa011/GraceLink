@@ -1,7 +1,7 @@
-import 'package:churchapp/views/user_Profile/manegement/about_us.dart';
-import 'package:churchapp/views/user_Profile/manegement/faqs_screen.dart';
-import 'package:churchapp/views/user_Profile/manegement/privacy_policy.dart';
-import 'package:churchapp/views/user_Profile/manegement/terms_of_service.dart';
+import 'package:churchapp/views/user_Profile/info/about_us.dart';
+import 'package:churchapp/views/user_Profile/info/faqs_screen.dart';
+import 'package:churchapp/views/user_Profile/info/privacy_policy.dart';
+import 'package:churchapp/views/user_Profile/info/terms_of_service.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 

@@ -66,6 +66,12 @@ abstract class BaseAuth {
   });
 
   Future<String?> getUserProfileImageUrl(String userId);
+
+  Future<void> sendVerificationCode(String phoneNumber);
+
+  Future<void> verifyCode(String verificationId, String smsCode);
+
+  Future<void> sendEmailConfirmation(String email);
 }
 
 class AuthenticationService implements BaseAuth {
@@ -502,5 +508,60 @@ class AuthenticationService implements BaseAuth {
       }
     }
     return null;
+  }
+
+  @override
+  Future<void> sendVerificationCode(String phoneNumber) async {
+    try {
+      await _firebaseAuth.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await _firebaseAuth.signInWithCredential(credential);
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          throw Exception('Phone number verification failed: ${e.message}');
+        },
+        codeSent: (String verificationId, int? resendToken) {},
+        codeAutoRetrievalTimeout: (String verificationId) {},
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error sending verification code: $e');
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> verifyCode(String verificationId, String smsCode) async {
+    try {
+      final credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
+      await _firebaseAuth.signInWithCredential(credential);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error verifying code: $e');
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> sendEmailConfirmation(String email) async {
+    try {
+      final user = _firebaseAuth.currentUser;
+      if (user == null) {
+        throw Exception('No user signed in');
+      }
+
+      await user.sendEmailVerification();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error sending email confirmation: $e');
+      }
+      rethrow;
+    }
   }
 }
