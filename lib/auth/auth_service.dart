@@ -204,6 +204,23 @@ class AuthenticationService implements BaseAuth {
     }
   }
 
+  Future<String?> getCurrentUserPhone() async {
+    try {
+      User? user = _firebaseAuth.currentUser;
+      if (user != null) {
+        DocumentSnapshot snapshot =
+            await _firestore.collection('users').doc(user.uid).get();
+        return snapshot.get('phoneNumber');
+      }
+      return null;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting current user phone: $e');
+      }
+      return null;
+    }
+  }
+
   @override
   Future<void> sendEmailVerification() async {
     User? user = _firebaseAuth.currentUser;
@@ -266,6 +283,42 @@ class AuthenticationService implements BaseAuth {
         print('Erro ao desativar usuário: $e');
       }
       rethrow;
+    }
+  }
+
+  Future<String?> getUserRole() async {
+    try {
+      User? user = _firebaseAuth.currentUser;
+      if (user != null) {
+        DocumentSnapshot userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
+          return data['role'] as String?;
+        }
+      }
+      return null;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting user role: $e');
+      }
+      return null;
+    }
+  }
+
+  Future<void> setUserRole(String role) async {
+    try {
+      User? user = _firebaseAuth.currentUser;
+      if (user != null) {
+        await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .update({'role': role});
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error setting user role: $e');
+      }
     }
   }
 
