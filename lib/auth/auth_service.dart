@@ -77,9 +77,7 @@ class AuthenticationService implements BaseAuth {
   Future<void> signUpWithPersonalInfo({
     required String firstName,
     required String lastName,
-  }) async {
-    // Implementação necessária
-  }
+  }) async {}
 
   @override
   Future<void> signUpWithDateOfBirthAndGender({
@@ -87,9 +85,7 @@ class AuthenticationService implements BaseAuth {
     required int? selectedMonth,
     required int? selectedYear,
     required String selectedGender,
-  }) async {
-    // Implementação necessária
-  }
+  }) async {}
 
   @override
   Future<bool> signUpWithEmailAndConfirmation({
@@ -102,8 +98,7 @@ class AuthenticationService implements BaseAuth {
     try {
       await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
-        password:
-            'dummyPasswordForVerification', // Use uma senha segura ou gerada dinamicamente
+        password: 'dummyPasswordForVerification',
       );
       return true;
     } catch (error) {
@@ -263,14 +258,12 @@ class AuthenticationService implements BaseAuth {
       String currentPhone, String newPhone) async {
     User? user = _firebaseAuth.currentUser;
     try {
-      // Aqui você precisa implementar o código de verificação de telefone usando o Firebase Authentication
-      // Obtendo o ID de verificação e o código SMS do Firebase Authentication
       await user?.updatePhoneNumber(PhoneAuthProvider.credential(
         verificationId: '<verificationId>',
         smsCode: '<smsCode>',
       ));
       await _firestore.collection('users').doc(user?.uid).update({
-        'phone': newPhone,
+        'phoneNumber': newPhone,
       });
     } catch (error) {
       if (kDebugMode) {
@@ -370,7 +363,7 @@ class AuthenticationService implements BaseAuth {
       if (user != null) {
         DocumentSnapshot snapshot =
             await _firestore.collection('users').doc(user.uid).get();
-        return snapshot.get('phone');
+        return snapshot.get('phoneNumber');
       }
       return null;
     } catch (e) {
@@ -437,7 +430,7 @@ class AuthenticationService implements BaseAuth {
   Future<String> getTitleById(String userId) async {
     try {
       DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection('courses')
+          .collection('courseName')
           .doc(userId)
           .get();
 
