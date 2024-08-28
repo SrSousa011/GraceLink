@@ -4,6 +4,7 @@ import 'package:churchapp/util/imagepicker.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/user_Profile/editProfile/update_profile.dart';
 import 'package:churchapp/views/user_Profile/manegement/user_management_screen.dart';
+import 'package:churchapp/views/user_profile/manegement/info_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -13,7 +14,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:churchapp/views/user_Profile/profile_menu.dart';
 import 'package:churchapp/views/user_Profile/settings/settings.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'manegement/info_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 
@@ -74,7 +74,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('User Profile'),
           actions: [
             IconButton(
               icon: Icon(
@@ -185,7 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           );
                         },
                         child: const Text(
-                          'Edit Profile',
+                          'Editar Perfil',
                         ),
                       ),
                     ),
@@ -193,7 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const Divider(),
                     const SizedBox(height: 10),
                     ProfileMenuWidget(
-                      title: 'Settings',
+                      title: 'Configurações',
                       icon: LineAwesomeIcons.cog_solid,
                       iconColor: iconColor,
                       onPress: () {
@@ -206,7 +205,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                     ),
                     ProfileMenuWidget(
-                      title: 'User Management',
+                      title: 'Gerenciamento de usuários',
                       icon: LineAwesomeIcons.user_check_solid,
                       iconColor: iconColor,
                       onPress: () {
