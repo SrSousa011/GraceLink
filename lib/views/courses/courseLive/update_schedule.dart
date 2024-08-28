@@ -3,13 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
-const String tEditSchedule = 'Edit Schedule';
+const String tEditSchedule = 'Editar agenda';
 const double tDefaultSize = 16.0;
 const double tFormHeight = 20.0;
-const String tTime = 'Time';
-const String tDaysOfWeek = 'Days of the Week';
-const String tSave = 'Save';
-const String tDelete = 'Delete';
+const String tSave = 'Salvar';
+const String tDelete = 'Excluir';
 
 class UpdateScheduleScreen extends StatefulWidget {
   final String courseId;
@@ -23,12 +21,14 @@ class UpdateScheduleScreen extends StatefulWidget {
 class _UpdateScheduleScreenState extends State<UpdateScheduleScreen> {
   late TextEditingController _timeController;
   late TextEditingController _daysOfWeekController;
+  late TextEditingController _videoUrlController;
 
   @override
   void initState() {
     super.initState();
     _timeController = TextEditingController();
     _daysOfWeekController = TextEditingController();
+    _videoUrlController = TextEditingController();
     _fetchCourseData();
   }
 
@@ -36,6 +36,7 @@ class _UpdateScheduleScreenState extends State<UpdateScheduleScreen> {
   void dispose() {
     _timeController.dispose();
     _daysOfWeekController.dispose();
+    _videoUrlController.dispose();
     super.dispose();
   }
 
@@ -51,6 +52,7 @@ class _UpdateScheduleScreenState extends State<UpdateScheduleScreen> {
         _timeController.text =
             (data['time'] as Timestamp?)?.toDate().toString() ?? '';
         _daysOfWeekController.text = data['daysOfWeek'] ?? '';
+        _videoUrlController.text = data['videoUrl'] ?? '';
       }
     } catch (e) {
       if (!mounted) return;
@@ -63,6 +65,7 @@ class _UpdateScheduleScreenState extends State<UpdateScheduleScreen> {
   void _saveScheduleChanges() {
     String time = _timeController.text;
     String daysOfWeek = _daysOfWeekController.text;
+    String videoUrl = _videoUrlController.text;
 
     try {
       FirebaseFirestore.instance
@@ -71,6 +74,7 @@ class _UpdateScheduleScreenState extends State<UpdateScheduleScreen> {
           .update({
         'time': Timestamp.fromDate(DateTime.parse(time)),
         'daysOfWeek': daysOfWeek,
+        'videoUrl': videoUrl,
       }).then((_) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
@@ -93,7 +97,52 @@ class _UpdateScheduleScreenState extends State<UpdateScheduleScreen> {
     setState(() {
       _timeController.clear();
       _daysOfWeekController.clear();
+      _videoUrlController.clear();
     });
+  }
+
+  Widget _timeField() {
+    return TextFormField(
+      controller: _timeController,
+      decoration: const InputDecoration(
+        labelText: 'Horário',
+        prefixIcon: Icon(LineAwesomeIcons.clock),
+      ),
+      keyboardType: TextInputType.datetime,
+      onTap: () async {
+        final time = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.now(),
+        );
+        if (time != null) {
+          _timeController.text = DateTime(
+            time.hour,
+            time.minute,
+          ).toIso8601String();
+        }
+      },
+    );
+  }
+
+  Widget _daysOfWeekField() {
+    return TextFormField(
+      controller: _daysOfWeekController,
+      decoration: const InputDecoration(
+        labelText: 'Dias da Semana',
+        prefixIcon: Icon(LineAwesomeIcons.calendar),
+      ),
+    );
+  }
+
+  Widget _videoUrlField() {
+    return TextFormField(
+      controller: _videoUrlController,
+      decoration: const InputDecoration(
+        labelText: 'Link da Aula (Google Meet)',
+        prefixIcon: Icon(LineAwesomeIcons.external_link_alt_solid),
+      ),
+      keyboardType: TextInputType.url,
+    );
   }
 
   @override
@@ -125,38 +174,11 @@ class _UpdateScheduleScreenState extends State<UpdateScheduleScreen> {
             Form(
               child: Column(
                 children: [
-                  TextFormField(
-                    controller: _timeController,
-                    decoration: const InputDecoration(
-                      labelText: tTime,
-                      prefixIcon: Icon(LineAwesomeIcons.clock),
-                    ),
-                    keyboardType: TextInputType.datetime,
-                    onTap: () async {
-                      final time = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.now(),
-                      );
-                      if (time != null) {
-                        final now = DateTime.now();
-                        _timeController.text = DateTime(
-                          now.year,
-                          now.month,
-                          now.day,
-                          time.hour,
-                          time.minute,
-                        ).toIso8601String();
-                      }
-                    },
-                  ),
+                  _timeField(),
                   const SizedBox(height: tFormHeight - 20),
-                  TextFormField(
-                    controller: _daysOfWeekController,
-                    decoration: const InputDecoration(
-                      labelText: tDaysOfWeek,
-                      prefixIcon: Icon(LineAwesomeIcons.calendar),
-                    ),
-                  ),
+                  _daysOfWeekField(),
+                  const SizedBox(height: tFormHeight - 10),
+                  _videoUrlField(),
                   const SizedBox(height: tFormHeight),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
