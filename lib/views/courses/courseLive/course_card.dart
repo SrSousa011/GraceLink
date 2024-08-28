@@ -22,28 +22,26 @@ class CourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
+      color: isDarkMode ? Colors.blueGrey[900] : Colors.white,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          imageURL.isNotEmpty
-              ? Container(
-                  width: 80,
-                  height: 100,
-                  margin: const EdgeInsets.all(8.0),
-                  child: Image.network(
+          Container(
+            width: 80,
+            height: 100,
+            margin: const EdgeInsets.all(8.0),
+            color: Colors.blue,
+            child: imageURL.isNotEmpty
+                ? Image.network(
                     imageURL,
                     fit: BoxFit.cover,
-                  ),
-                )
-              : Container(
-                  width: 80,
-                  height: 100,
-                  margin: const EdgeInsets.all(8.0),
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.image, size: 80),
-                ),
+                  )
+                : const Icon(Icons.image, size: 80, color: Colors.white),
+          ),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,6 +53,7 @@ class CourseCard extends StatelessWidget {
                       ? IconButton(
                           icon: const Icon(Icons.play_arrow),
                           onPressed: onPlay,
+                          color: isDarkMode ? Colors.grey : Colors.blue,
                         )
                       : null,
                 ),
@@ -66,7 +65,7 @@ class CourseCard extends StatelessWidget {
                       onPressed: onUpdate,
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
-                        backgroundColor: Theme.of(context).primaryColor,
+                        backgroundColor: isDarkMode ? Colors.grey : Colors.blue,
                       ),
                       child: const Text('Atualizar'),
                     ),
