@@ -1,7 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
@@ -14,17 +13,14 @@ class NotificationService {
     await _initializeLocalNotifications();
     await requestNotificationPermission();
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
-    await loadNotificationSettings();
   }
 
-  Future<void> loadNotificationSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    notificationsEnabled = prefs.getBool('notificationsEnabled') ?? true;
-  }
-
-  Future<void> _saveNotificationSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('notificationsEnabled', notificationsEnabled);
+  Future<void> _initializeLocalNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@drawable/app_icon');
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
   Future<void> requestNotificationPermission() async {
@@ -33,7 +29,6 @@ class NotificationService {
       badge: true,
       sound: true,
     );
-
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       if (kDebugMode) {
         print('User granted permission');
@@ -48,18 +43,6 @@ class NotificationService {
         print('User denied permission');
       }
     }
-  }
-
-  Future<void> _initializeLocalNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@drawable/app_icon');
-
-    const InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
-
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
@@ -91,13 +74,13 @@ class NotificationService {
     );
   }
 
-  Future<void> sendNotification(String courseName, String url) async {
+  Future<void> sendAdminNotification(String memberName) async {
     if (!notificationsEnabled) return;
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'your_channel_id',
-      'your_channel_name',
+      'admin_channel_id',
+      'admin_channel_name',
       importance: Importance.max,
       priority: Priority.high,
       showWhen: false,
@@ -106,11 +89,10 @@ class NotificationService {
         NotificationDetails(android: androidPlatformChannelSpecifics);
 
     await _flutterLocalNotificationsPlugin.show(
-      0,
-      'Novo Link Disponível!',
-      'O curso "$courseName" foi atualizado. Clique para acessar o novo link.',
+      1,
+      'Novo Membro Registrado!',
+      'O membro "$memberName" se registrou recentemente.',
       platformChannelSpecifics,
-      payload: url,
     );
   }
 
@@ -118,4 +100,6 @@ class NotificationService {
     notificationsEnabled = enabled;
     _saveNotificationSettings();
   }
+
+  Future<void> _saveNotificationSettings() async {}
 }
