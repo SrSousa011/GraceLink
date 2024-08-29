@@ -29,6 +29,62 @@ class CoursesService {
     }
   }
 
+  Future<bool> isCourseAlreadyPaid({
+    required String courseId,
+    required String userId,
+  }) async {
+    try {
+      if (courseId.isEmpty || userId.isEmpty) {
+        return false; // or throw an exception if appropriate
+      }
+
+      QuerySnapshot querySnapshot = await _registrationsCollection
+          .where('courseId', isEqualTo: courseId)
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return false;
+      }
+
+      var doc = querySnapshot.docs.first;
+      bool status = doc['status'] as bool;
+
+      return status;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> changeStatus({
+    required String courseId,
+    required String userId,
+  }) async {
+    try {
+      if (courseId.isEmpty || userId.isEmpty) {
+        throw Exception('Course ID or User ID is empty');
+      }
+
+      QuerySnapshot querySnapshot = await _registrationsCollection
+          .where('courseId', isEqualTo: courseId)
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        throw Exception('No registration found for the given user and course.');
+      }
+
+      var doc = querySnapshot.docs.first;
+      bool currentStatus = doc['status'] as bool;
+
+      await _registrationsCollection.doc(doc.id).update({
+        'status': !currentStatus,
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<List<Course>> getCourses() async {
     try {
       final querySnapshot =
