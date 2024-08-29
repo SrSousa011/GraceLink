@@ -94,8 +94,7 @@ class NotificationService {
   }) async {
     if (!notificationsEnabled) return;
 
-    final String body =
-        'Local: $location\nHorário: $formattedTime\nAdicionado em: $addedTime';
+    final String body = 'Local: $location\nHorário: $formattedTime';
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
