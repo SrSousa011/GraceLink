@@ -223,7 +223,7 @@ class _HomeState extends State<Home> {
                       MaterialPageRoute(builder: (context) => const Events()),
                     );
                   },
-                  child: const Text('Ver Todos os Eventos'),
+                  child: const Text('Todos os Eventos'),
                 ),
               ],
             ),
