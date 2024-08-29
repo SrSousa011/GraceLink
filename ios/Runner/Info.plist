@@ -79,12 +79,10 @@
         </dict>
     </array>
 
-    <!-- Local Notifications -->
-    <key>UIBackgroundModes</key>
-    <array>
-        <string>fetch</string>
-        <string>remote-notification</string>
-    </array>
-
+    <!-- Additional Configurations -->
+    <key>NSFileProtectionCompleteUntilFirstUserAuthentication</key>
+    <true/>
+    <key>UIFileSharingEnabled</key>
+    <true/>
 </dict>
 </plist>
