@@ -71,13 +71,16 @@ class AppRoutes {
             !args.containsKey('userName') ||
             !args.containsKey('status') ||
             !args.containsKey('registrationDate') ||
-            !args.containsKey('courseName')) {
+            !args.containsKey('courseName') ||
+            !args.containsKey('imagePath')) {
+          // Certifique-se de que todos os parâmetros são passados
           return _errorRoute('Missing one or more arguments');
         }
         return MaterialPageRoute(
           builder: (_) => SubscriberInfo(
             userId: args['userId'] as String,
             userName: args['userName'] as String,
+            status: args['status'] as bool,
             registrationDate: args['registrationDate'] as DateTime,
             courseName: args['courseName'] as String,
             imagePath: args['imagePath'] as String? ?? '',

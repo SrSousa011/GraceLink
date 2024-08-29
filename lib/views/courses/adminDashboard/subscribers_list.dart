@@ -32,6 +32,8 @@ class _SubscribersListState extends State<SubscribersList> {
         registrationsSnapshot.docs.map((doc) async {
           final data = doc.data();
           final courseId = data['courseId'] ?? '';
+          final status =
+              data['status'] ?? false; // Garanta que status seja booleano
           final courseName = courseId.isNotEmpty
               ? await _fetchCourseName(courseId)
               : 'Unknown';
@@ -46,7 +48,7 @@ class _SubscribersListState extends State<SubscribersList> {
                 (data['registrationDate'] as Timestamp?)?.toDate() ??
                     DateTime.now(),
             'courseName': courseName,
-            'status': data['status'] ?? false,
+            'status': status, // Inclua o status aqui
             'imagePath': userData['imagePath'] ?? '',
           };
         }),
@@ -146,6 +148,7 @@ class _SubscribersListState extends State<SubscribersList> {
                       MaterialPageRoute(
                         builder: (context) => SubscriberInfo(
                           userId: registration['userId'],
+                          status: registration['status'],
                           userName: registration['userName'],
                           registrationDate: registration['registrationDate'],
                           courseName: registration['courseName'],
