@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
-import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CourseFileList extends StatelessWidget {
   final String selectedCourseId;
@@ -44,18 +41,10 @@ class CourseFileList extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                icon: const Icon(Icons.open_in_new),
-                onPressed: () async {
-                  if (url.isNotEmpty) {
-                    await _openFile(context, url, name);
-                  }
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.link),
+                icon: const Icon(Icons.open_in_browser_sharp),
                 onPressed: () {
                   if (url.isNotEmpty) {
-                    _showUrl(context, url);
+                    _showUrl(context, url, name);
                   }
                 },
               ),
@@ -78,54 +67,53 @@ class CourseFileList extends StatelessWidget {
     );
   }
 
-  Future<void> _openFile(
-      BuildContext context, String url, String fileName) async {
-    try {
-      // Print the URL to the terminal
-      debugPrint('Opening file with URL: $url');
-
-      final dir = await getTemporaryDirectory();
-      final filePath = '${dir.path}/$fileName';
-
-      debugPrint('Downloading file to: $filePath');
-
-      if (!File(filePath).existsSync()) {
-        final response = await Dio().download(url, filePath);
-        if (response.statusCode == 200) {
-          debugPrint('File downloaded successfully.');
-        } else {
-          throw Exception(
-              'Failed to download file. Status code: ${response.statusCode}');
-        }
-      } else {
-        debugPrint('File already exists.');
-      }
-
-      final result = await OpenFile.open(filePath);
-      if (result.type != ResultType.done) {
-        throw Exception('Failed to open file. Result type: ${result.type}');
-      }
-    } catch (e) {
-      debugPrint('Error opening file: $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error opening file: $e')),
-        );
-      }
-    }
-  }
-
-  void _showUrl(BuildContext context, String url) {
+  void _showUrl(BuildContext context, String url, String fileName) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('File URL'),
-          content: Text(url),
+          title: const Text('Abrir arquivo'),
+          content: Text('Você quer abrir o arquivo "$fileName"?'),
           actions: [
             TextButton(
+              onPressed: () async {
+                await Clipboard.setData(ClipboardData(text: url));
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('URL copiada')),
+                );
+                if (!context.mounted) return;
+                Navigator.of(context).pop();
+              },
+              child: const Text('Copiar URL'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final uri = Uri.parse(url);
+                if (await canLaunchUrl(uri)) {
+                  try {
+                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  } catch (e) {
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Não foi possível abrir o URL')),
+                    );
+                  }
+                } else {
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text(' URL Invalida')),
+                  );
+                }
+                if (!context.mounted) return;
+                Navigator.of(context).pop();
+              },
+              child: const Text('Abrir'),
+            ),
+            TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
+              child: const Text('Cancelar'),
             ),
           ],
         );
@@ -139,17 +127,16 @@ class CourseFileList extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirmar exclusão'),
-          content:
-              const Text('Tem certeza de que deseja excluir este arquivo?'),
+          title: const Text('Confirm Deletion'),
+          content: const Text('Are you sure you want to delete this file?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancelar'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Deletar'),
+              child: const Text('Delete'),
             ),
           ],
         );
