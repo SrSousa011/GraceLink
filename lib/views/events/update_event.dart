@@ -70,6 +70,10 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   }
 
   Future<void> _updateEvent(BuildContext context) async {
+    if (!context.mounted) return;
+    DateFormat('dd/MM/yyyy').format(_selectedDate);
+    final formattedTime = _selectedTime.format(context);
+    final formattedCreatedTime = _selectedTime.format(context);
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty &&
         _locationController.text.isNotEmpty) {
@@ -89,8 +93,10 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
 
         if (_notificationService.notificationsEnabled) {
           await _notificationService.sendNotification(
-            _titleController.text,
-            _descriptionController.text,
+            title: _titleController.text,
+            location: _locationController.text,
+            formattedTime: formattedTime,
+            addedTime: formattedCreatedTime,
           );
         }
 

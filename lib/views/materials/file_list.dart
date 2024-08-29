@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:open_file/open_file.dart';
@@ -11,6 +10,7 @@ class CourseFileList extends StatelessWidget {
   final bool isDarkMode;
   final String userRole;
   final Future<void> Function(String, String, String) onFileDeleted;
+  final List<Map<String, String?>> fileDocs;
 
   const CourseFileList({
     super.key,
@@ -18,127 +18,116 @@ class CourseFileList extends StatelessWidget {
     required this.isDarkMode,
     required this.userRole,
     required this.onFileDeleted,
-    required List<Map<String, String?>> fileDocs,
+    required this.fileDocs,
   });
-
-  Future<File?> downloadFile(String url, String name) async {
-    try {
-      final appStorage = await getApplicationDocumentsDirectory();
-      final file = File('${appStorage.path}/$name');
-
-      final response = await Dio().get(
-        url,
-        options: Options(
-          responseType: ResponseType.bytes,
-          followRedirects: false,
-          receiveTimeout: Duration.zero,
-        ),
-      );
-
-      final raf = file.openSync(mode: FileMode.write);
-      raf.writeFromSync(response.data);
-      await raf.close();
-
-      return file;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error downloading file: $e');
-      }
-      return null;
-    }
-  }
-
-  Future<void> openFile({required String url, String? fileName}) async {
-    final file = await downloadFile(url, fileName!);
-    if (file == null) return;
-    if (kDebugMode) {
-      print('Path: ${file.path}');
-    }
-
-    OpenFile.open(file.path);
-  }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('courses/$selectedCourseId/materials')
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    return ListView.builder(
+      itemCount: fileDocs.length,
+      itemBuilder: (context, index) {
+        final file = fileDocs[index];
+        final url = file['url'] ?? '';
+        final name = file['name'] ?? 'Unknown File';
+        final fileId = file['id'] ?? '';
+        final courseId = file['courseId'] ?? '';
 
-        if (snapshot.hasError) {
-          return Center(child: Text('Error loading files: ${snapshot.error}'));
-        }
-
-        if (!snapshot.hasData || snapshot.data?.docs.isEmpty == true) {
-          return const Center(child: Text('No files available.'));
-        }
-
-        final fileDocs = snapshot.data!.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          return {
-            'id': doc.id,
-            'url': data['url'] as String?,
-            'name': data['name'] as String?,
-            'courseId': selectedCourseId,
-            'visibility': data['visibility'] as String? ?? 'public',
-          };
-        }).toList();
-
-        return ListView.builder(
-          itemCount: fileDocs.length,
-          itemBuilder: (context, index) {
-            final file = fileDocs[index];
-            final url = file['url'] ?? '';
-            final name = file['name'] ?? 'Unknown File';
-            final fileId = file['id'] ?? '';
-            final courseId = file['courseId'] ?? '';
-
-            return ListTile(
-              title: Text(
-                name,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: isDarkMode ? Colors.white70 : Colors.grey[700],
+        return ListTile(
+          title: Text(
+            name,
+            style: TextStyle(
+              fontSize: 16,
+              color: isDarkMode ? Colors.white70 : Colors.grey[700],
+            ),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.open_in_new),
+                onPressed: () async {
+                  if (url.isNotEmpty) {
+                    await _openFile(context, url, name);
+                  }
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.link),
+                onPressed: () {
+                  if (url.isNotEmpty) {
+                    _showUrl(context, url);
+                  }
+                },
+              ),
+              if (userRole == 'admin') ...[
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () async {
+                    if (fileId.isNotEmpty &&
+                        courseId.isNotEmpty &&
+                        url.isNotEmpty) {
+                      await _confirmDeleteFile(context, courseId, fileId, url);
+                    }
+                  },
                 ),
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.open_in_new),
-                    onPressed: () async {
-                      if (url.isNotEmpty) {
-                        await openFile(url: url, fileName: name);
-                      } else {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Invalid URL')),
-                          );
-                        }
-                      }
-                    },
-                  ),
-                  if (userRole == 'admin') ...[
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () async {
-                        if (fileId.isNotEmpty &&
-                            courseId.isNotEmpty &&
-                            url.isNotEmpty) {
-                          await _confirmDeleteFile(
-                              context, courseId, fileId, url);
-                        }
-                      },
-                    ),
-                  ],
-                ],
-              ),
-            );
-          },
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _openFile(
+      BuildContext context, String url, String fileName) async {
+    try {
+      // Print the URL to the terminal
+      debugPrint('Opening file with URL: $url');
+
+      final dir = await getTemporaryDirectory();
+      final filePath = '${dir.path}/$fileName';
+
+      debugPrint('Downloading file to: $filePath');
+
+      if (!File(filePath).existsSync()) {
+        final response = await Dio().download(url, filePath);
+        if (response.statusCode == 200) {
+          debugPrint('File downloaded successfully.');
+        } else {
+          throw Exception(
+              'Failed to download file. Status code: ${response.statusCode}');
+        }
+      } else {
+        debugPrint('File already exists.');
+      }
+
+      final result = await OpenFile.open(filePath);
+      if (result.type != ResultType.done) {
+        throw Exception('Failed to open file. Result type: ${result.type}');
+      }
+    } catch (e) {
+      debugPrint('Error opening file: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error opening file: $e')),
+        );
+      }
+    }
+  }
+
+  void _showUrl(BuildContext context, String url) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('File URL'),
+          content: Text(url),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
         );
       },
     );

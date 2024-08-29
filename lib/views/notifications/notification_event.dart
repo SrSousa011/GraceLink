@@ -4,7 +4,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationService {
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -13,8 +12,8 @@ class NotificationService {
   Future<void> initialize() async {
     await _initializeLocalNotifications();
     await requestNotificationPermission();
-    FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
     await loadNotificationSettings();
+    FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
   }
 
   Future<void> loadNotificationSettings() async {
@@ -28,13 +27,10 @@ class NotificationService {
   }
 
   Future<void> requestNotificationPermission() async {
-    NotificationSettings settings = await _firebaseMessaging.requestPermission(
+    NotificationSettings settings =
+        await FirebaseMessaging.instance.requestPermission(
       alert: true,
-      announcement: true,
       badge: true,
-      carPlay: true,
-      criticalAlert: true,
-      provisional: true,
       sound: true,
     );
 
@@ -69,11 +65,6 @@ class NotificationService {
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     if (!notificationsEnabled) return;
 
-    if (kDebugMode) {
-      print('Message title: ${message.notification?.title}');
-      print('Message body: ${message.notification?.body}');
-    }
-
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'your_channel_id',
@@ -85,27 +76,40 @@ class NotificationService {
     );
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
+
     await _flutterLocalNotificationsPlugin.show(
       0,
       message.notification?.title,
       message.notification?.body,
       platformChannelSpecifics,
+      payload: message.data['url'],
     );
   }
 
-  Future<void> sendNotification(String title, String body) async {
+  Future<void> sendNotification({
+    required String title,
+    required String location,
+    required String formattedTime,
+    required String addedTime,
+  }) async {
     if (!notificationsEnabled) return;
+
+    final String body =
+        'Local: $location\nHorário: $formattedTime\nAdicionado em: $addedTime';
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'your_channel_id',
       'your_channel_name',
+      channelDescription: 'your_channel_description',
       importance: Importance.max,
       priority: Priority.high,
-      showWhen: false,
+      showWhen: true,
     );
+
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
+
     await _flutterLocalNotificationsPlugin.show(
       0,
       title,

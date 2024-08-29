@@ -1,6 +1,6 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationService {
@@ -65,11 +65,6 @@ class NotificationService {
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     if (!notificationsEnabled) return;
 
-    if (kDebugMode) {
-      print('Message title: ${message.notification?.title}');
-      print('Message body: ${message.notification?.body}');
-    }
-
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'your_channel_id',
@@ -77,7 +72,7 @@ class NotificationService {
       channelDescription: 'your_channel_description',
       importance: Importance.max,
       priority: Priority.high,
-      showWhen: false,
+      showWhen: true,
     );
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
@@ -91,24 +86,34 @@ class NotificationService {
     );
   }
 
-  Future<void> sendNotification(String courseName, String url) async {
+  Future<void> sendNotification({
+    required String title,
+    required String location,
+    required String time,
+    required String url,
+  }) async {
     if (!notificationsEnabled) return;
+
+    final notificationTitle = title;
+    final notificationBody =
+        'Local: $location\nHorário: $time\nClique para acessar o link.';
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'your_channel_id',
       'your_channel_name',
+      channelDescription: 'your_channel_description',
       importance: Importance.max,
       priority: Priority.high,
-      showWhen: false,
+      showWhen: true,
     );
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
 
     await _flutterLocalNotificationsPlugin.show(
       0,
-      'Novo Link Disponível!',
-      'O curso "$courseName" foi atualizado. Clique para acessar o novo link.',
+      notificationTitle,
+      notificationBody,
       platformChannelSpecifics,
       payload: url,
     );
