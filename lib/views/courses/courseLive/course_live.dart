@@ -3,6 +3,7 @@ import 'package:churchapp/views/courses/courseLive/update_schedule.dart';
 import 'package:churchapp/views/courses/service/courses_date.dart';
 import 'package:churchapp/views/courses/service/courses_service.dart';
 import 'package:churchapp/views/notifications/notification_course.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -19,6 +20,7 @@ class _CourseLiveState extends State<CourseLive> {
   late CoursesService _coursesService;
   late NotificationService _notificationService;
   bool _loading = false;
+  bool _isAdmin = false;
 
   @override
   void initState() {
@@ -26,7 +28,25 @@ class _CourseLiveState extends State<CourseLive> {
     _coursesService = CoursesService();
     _notificationService = NotificationService();
     _notificationService.initialize();
+    _fetchUserRole();
     _coursesFuture = _fetchCourses();
+  }
+
+  Future<void> _fetchUserRole() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      setState(() {
+        _isAdmin = userDoc.data()?['role'] == 'admin';
+      });
+    } catch (e) {
+      debugPrint('Erro ao buscar papel do usuário: $e');
+    }
   }
 
   Future<List<Course>> _fetchCourses() async {
@@ -40,25 +60,30 @@ class _CourseLiveState extends State<CourseLive> {
       }
 
       final courses = await _coursesService.getCourses();
-      final registrations = await Future.wait(
-        courses.map((course) async {
-          final isRegistered = await _coursesService.isUserAlreadySubscribed(
-            courseId: course.courseId,
-            userId: userId,
-          );
-          return {
-            'course': course,
-            'isRegistered': isRegistered,
-          };
-        }),
-      );
 
-      final filteredCourses = registrations
-          .where((entry) => entry['isRegistered'] as bool)
-          .map((entry) => entry['course'] as Course)
-          .toList();
+      if (_isAdmin) {
+        return courses;
+      } else {
+        final registrations = await Future.wait(
+          courses.map((course) async {
+            final isRegistered = await _coursesService.isUserAlreadySubscribed(
+              courseId: course.courseId,
+              userId: userId,
+            );
+            return {
+              'course': course,
+              'isRegistered': isRegistered,
+            };
+          }),
+        );
 
-      return filteredCourses;
+        final filteredCourses = registrations
+            .where((entry) => entry['isRegistered'] as bool)
+            .map((entry) => entry['course'] as Course)
+            .toList();
+
+        return filteredCourses;
+      }
     } catch (e) {
       debugPrint('Erro ao buscar cursos: $e');
       return [];
