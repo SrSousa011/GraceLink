@@ -77,6 +77,7 @@ class CourseFileList extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () async {
+                // Copia o URL para a área de transferência
                 await Clipboard.setData(ClipboardData(text: url));
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -89,22 +90,17 @@ class CourseFileList extends StatelessWidget {
             ),
             TextButton(
               onPressed: () async {
-                final uri = Uri.parse(url);
-                if (await canLaunchUrl(uri)) {
-                  try {
-                    await launchUrl(uri, mode: LaunchMode.externalApplication);
-                  } catch (e) {
-                    if (!context.mounted) return;
+                final uri = Uri.tryParse(url);
+                if (uri != null) {
+                  // Tenta abrir o URL diretamente
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                } else {
+                  // Se o URI for inválido, apenas mostra a mensagem de erro
+                  if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Não foi possível abrir o URL')),
+                      const SnackBar(content: Text('URL Inválida')),
                     );
                   }
-                } else {
-                  if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text(' URL Invalida')),
-                  );
                 }
                 if (!context.mounted) return;
                 Navigator.of(context).pop();
