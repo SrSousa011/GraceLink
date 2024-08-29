@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:churchapp/views/home/home.dart';
 import 'package:churchapp/views/welcome.dart';
 
+const String logoPath = 'assets/icons/logo.png';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key, required this.root, required this.drawer});
 
@@ -78,6 +80,15 @@ class _SplashScreenState extends State<SplashScreen> {
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Center(
+          child: SizedBox(
+            width: 150,
+            height: 150,
+            child: Image.asset(
+              logoPath,
+            ),
           ),
         ),
       ),
