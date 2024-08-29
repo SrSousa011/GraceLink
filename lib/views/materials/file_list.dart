@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CourseFileList extends StatelessWidget {
@@ -55,7 +54,7 @@ class CourseFileList extends StatelessWidget {
                     if (fileId.isNotEmpty &&
                         courseId.isNotEmpty &&
                         url.isNotEmpty) {
-                      await _confirmDeleteFile(context, courseId, fileId, url);
+                      await _handleFileDeletion(context, courseId, fileId, url);
                     }
                   },
                 ),
@@ -73,29 +72,13 @@ class CourseFileList extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Abrir arquivo'),
-          content: Text('Você quer abrir o arquivo "$fileName"?'),
           actions: [
-            TextButton(
-              onPressed: () async {
-                // Copia o URL para a área de transferência
-                await Clipboard.setData(ClipboardData(text: url));
-                if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('URL copiada')),
-                );
-                if (!context.mounted) return;
-                Navigator.of(context).pop();
-              },
-              child: const Text('Copiar URL'),
-            ),
             TextButton(
               onPressed: () async {
                 final uri = Uri.tryParse(url);
                 if (uri != null) {
-                  // Tenta abrir o URL diretamente
                   await launchUrl(uri, mode: LaunchMode.externalApplication);
                 } else {
-                  // Se o URI for inválido, apenas mostra a mensagem de erro
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('URL Inválida')),
@@ -117,34 +100,42 @@ class CourseFileList extends StatelessWidget {
     );
   }
 
-  Future<void> _confirmDeleteFile(BuildContext context, String courseId,
-      String fileId, String fileUrl) async {
-    final confirmed = await showDialog<bool>(
+  Future<void> _handleFileDeletion(
+    BuildContext context,
+    String courseId,
+    String fileId,
+    String url,
+  ) async {
+    final bool? shouldDelete = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirm Deletion'),
-          content: const Text('Are you sure you want to delete this file?'),
+          title: const Text('Confirmar Exclusão'),
+          content:
+              const Text('Você tem certeza que deseja excluir este arquivo?'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Excluir'),
             ),
             TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Delete'),
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancelar'),
             ),
           ],
         );
       },
     );
 
-    if (confirmed == true) {
-      await onFileDeleted(courseId, fileId, fileUrl);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('File deleted successfully')),
-        );
+    if (shouldDelete == true) {
+      try {
+        await onFileDeleted(courseId, fileId, url);
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Erro ao excluir o arquivo')),
+          );
+        }
       }
     }
   }
