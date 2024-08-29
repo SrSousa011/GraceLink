@@ -46,6 +46,16 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
+    final buttonStyle = ElevatedButton.styleFrom(
+      foregroundColor: Colors.white,
+      backgroundColor: isDarkMode ? Colors.blueGrey : Colors.blue,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.0),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+      side: BorderSide.none,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Informações do Assinante'),
@@ -61,97 +71,95 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Card(
               elevation: 4.0,
               color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
+                padding: const EdgeInsets.all(12.0),
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundImage: widget.imagePath.isNotEmpty
-                              ? NetworkImage(widget.imagePath)
-                              : null,
-                          backgroundColor:
-                              isDarkMode ? Colors.grey[700] : Colors.grey[300],
-                          child: widget.imagePath.isEmpty
-                              ? Icon(
-                                  Icons.person,
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
-                                )
-                              : null,
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                widget.userName,
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Curso: ${widget.courseName}',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: isDarkMode
-                                      ? Colors.grey[300]
-                                      : Colors.black54,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Data de Inscrição: ${DateFormat('d MMMM yyyy').format(widget.registrationDate)}',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: isDarkMode
-                                      ? Colors.grey[300]
-                                      : Colors.black54,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Status:',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 16.0),
-                                decoration: BoxDecoration(
-                                  color: widget.status
-                                      ? Colors.green[700]
-                                      : Colors.red[700],
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
-                                child: Text(
-                                  widget.status ? 'Pago' : 'Não Pago',
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundImage: widget.imagePath.isNotEmpty
+                          ? NetworkImage(widget.imagePath)
+                          : null,
+                      backgroundColor:
+                          isDarkMode ? Colors.grey[700] : Colors.grey[300],
+                      child: widget.imagePath.isEmpty
+                          ? Icon(
+                              Icons.person,
+                              color: isDarkMode ? Colors.white : Colors.black,
+                              size: 32,
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.userName,
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode ? Colors.white : Colors.black,
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 8),
+                          Text(
+                            'Curso: ${widget.courseName}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: isDarkMode
+                                  ? Colors.grey[300]
+                                  : Colors.black54,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Data de Inscrição: ${DateFormat('d MMMM yyyy').format(widget.registrationDate)}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: isDarkMode
+                                  ? Colors.grey[300]
+                                  : Colors.black54,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Status:',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode ? Colors.white : Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 16.0),
+                            decoration: BoxDecoration(
+                              color: widget.status
+                                  ? Colors.green[700]
+                                  : Colors.red[700],
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            child: Text(
+                              widget.status ? 'Pago' : 'Não Pago',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -163,22 +171,20 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
               children: [
                 ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isDarkMode ? Colors.blueGrey : Colors.blue,
-                  ),
+                  style: buttonStyle,
                   child: const Text(
                     'Voltar',
-                    style: TextStyle(color: Colors.white),
                   ),
                 ),
                 ElevatedButton(
                   onPressed: () => _updateStatus(!widget.status),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: widget.status ? Colors.red : Colors.green,
+                  style: buttonStyle.copyWith(
+                    backgroundColor: MaterialStateProperty.all(
+                      widget.status ? Colors.red : Colors.green,
+                    ),
                   ),
                   child: Text(
                     widget.status ? 'Não Pago' : 'Pago',
-                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
               ],
