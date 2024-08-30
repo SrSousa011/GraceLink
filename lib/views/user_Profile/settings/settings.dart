@@ -1,8 +1,8 @@
-import 'package:churchapp/views/user_Profile/settings/change_phone.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:churchapp/views/user_Profile/settings/change_email.dart';
 import 'package:churchapp/views/user_Profile/settings/change_password.dart';
+import 'package:churchapp/views/user_Profile/settings/change_phone.dart';
 import 'package:churchapp/auth/auth_service.dart';
 
 const Color tPrimaryColor = Colors.blue;
@@ -66,11 +66,12 @@ class SettingsScreen extends StatelessWidget {
               leading: const Icon(LineAwesomeIcons.envelope),
               title: const Text('Enviar E-mail de Redefinição de Senha'),
               onTap: () async {
-                String? email =
-                    await AuthenticationService().getCurrentUserEmail();
+                final authService = AuthenticationService();
+                String? email = await authService.getCurrentUserEmail();
+
                 if (email != null) {
                   try {
-                    await AuthenticationService().sendPasswordResetMail(email);
+                    await authService.sendPasswordResetMail(email);
                     if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -85,6 +86,13 @@ class SettingsScreen extends StatelessWidget {
                               'Falha ao enviar e-mail de redefinição de senha: $e')),
                     );
                   }
+                } else {
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content:
+                            Text('Nenhum e-mail encontrado para o usuário')),
+                  );
                 }
               },
             ),
