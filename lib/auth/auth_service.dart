@@ -21,8 +21,6 @@ abstract class BaseAuth {
 
   Future<void> sendEmailVerification();
 
-  Future<bool> isEmailVerified();
-
   Future<void> deleteUser();
 
   Future<void> desactivateUser();
@@ -222,18 +220,6 @@ class AuthenticationService implements BaseAuth {
   }
 
   @override
-  Future<void> sendEmailVerification() async {
-    User? user = _firebaseAuth.currentUser;
-    await user?.sendEmailVerification();
-  }
-
-  @override
-  Future<bool> isEmailVerified() async {
-    User? user = _firebaseAuth.currentUser;
-    return user?.emailVerified ?? false;
-  }
-
-  @override
   Future<void> changeEmail(String email) async {
     User? user = _firebaseAuth.currentUser;
     try {
@@ -410,45 +396,6 @@ class AuthenticationService implements BaseAuth {
   }
 
   @override
-  Future<void> sendVerificationCode(String phoneNumber) async {
-    try {
-      await _firebaseAuth.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          await _firebaseAuth.signInWithCredential(credential);
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          throw Exception(
-              'Falha na verificação do número de telefone: ${e.message}');
-        },
-        codeSent: (String verificationId, int? resendToken) {},
-        codeAutoRetrievalTimeout: (String verificationId) {},
-      );
-    } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao enviar código de verificação: $e');
-      }
-      rethrow;
-    }
-  }
-
-  @override
-  Future<void> verifyCode(String verificationId, String smsCode) async {
-    try {
-      final credential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: smsCode,
-      );
-      await _firebaseAuth.signInWithCredential(credential);
-    } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao verificar código: $e');
-      }
-      rethrow;
-    }
-  }
-
-  @override
   Future<void> sendEmailConfirmation(String email) async {
     try {
       final user = _firebaseAuth.currentUser;
@@ -503,6 +450,182 @@ class AuthenticationService implements BaseAuth {
     } catch (e) {
       if (kDebugMode) {
         print('Failed to verify current password: $e');
+      }
+      return false;
+    }
+  }
+
+  Future<void> updateVerificationStatus() async {
+    User? user = _firebaseAuth.currentUser;
+    if (user == null) return;
+
+    final userId = user.uid;
+    final isEmailVerified = user.emailVerified;
+
+    final isPhoneVerified = await _isPhoneVerified(userId);
+
+    try {
+      await _firestore.collection('usersVerification').doc(userId).set({
+        'isEmailVerified': isEmailVerified,
+        'isPhoneVerified': isPhoneVerified,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao atualizar status de verificação: $e');
+      }
+    }
+  }
+
+  Future<bool> _isPhoneVerified(String userId) async {
+    try {
+      DocumentSnapshot snapshot =
+          await _firestore.collection('usersVerification').doc(userId).get();
+
+      if (snapshot.exists) {
+        return snapshot.get('isPhoneVerified') ?? false;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao verificar status do telefone: $e');
+      }
+      return false;
+    }
+  }
+
+  Future<void> updatePhoneVerificationStatus(
+      String userId, bool isVerified) async {
+    try {
+      await _firestore.collection('usersVerification').doc(userId).update({
+        'isPhoneVerified': isVerified,
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao atualizar o status de verificação do telefone: $e');
+      }
+    }
+  }
+
+  @override
+  Future<void> verifyCode(String verificationId, String smsCode) async {
+    try {
+      final credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
+      final userCredential =
+          await _firebaseAuth.signInWithCredential(credential);
+
+      if (userCredential.user != null) {
+        await updatePhoneVerificationStatus(userCredential.user!.uid, true);
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao verificar código: $e');
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> sendEmailVerification() async {
+    User? user = _firebaseAuth.currentUser;
+    if (user == null) return;
+
+    try {
+      await user.sendEmailVerification();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao enviar confirmação por e-mail: $e');
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> updateEmailVerificationStatus(
+      String userId, bool isVerified) async {
+    try {
+      await _firestore.collection('usersVerification').doc(userId).set({
+        'isEmailVerified': isVerified,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao atualizar o status de verificação do e-mail: $e');
+      }
+    }
+  }
+
+  Future<bool> getEmailVerificationStatus() async {
+    User? user = _firebaseAuth.currentUser;
+    if (user == null) return false;
+
+    try {
+      await user.reload();
+      return user.emailVerified;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao verificar e atualizar o status do e-mail: $e');
+      }
+      return false;
+    }
+  }
+
+  Future<bool> getPhoneVerificationStatus() async {
+    User? user = _firebaseAuth.currentUser;
+    if (user == null) return false;
+
+    try {
+      DocumentSnapshot userDoc =
+          await _firestore.collection('usersVerification').doc(user.uid).get();
+
+      if (userDoc.exists && userDoc.data() is Map<String, dynamic>) {
+        Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
+        return data['isPhoneVerified'] ?? false;
+      }
+      return false;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao verificar o status do telefone: $e');
+      }
+      return false;
+    }
+  }
+
+  Future<void> sendVerificationCode(String phoneNumber) async {
+    await _firebaseAuth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        await _firebaseAuth.signInWithCredential(credential);
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        if (kDebugMode) {
+          print('Erro ao enviar código de verificação: $e');
+        }
+      },
+      codeSent: (String verificationId, int? resendToken) {},
+      codeAutoRetrievalTimeout: (String verificationId) {},
+    );
+  }
+
+  Future<bool> verifyPhoneCode(String verificationId, String smsCode) async {
+    try {
+      final credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
+      await _firebaseAuth.signInWithCredential(credential);
+
+      User? user = _firebaseAuth.currentUser;
+      if (user != null) {
+        await _firestore.collection('usersVerification').doc(user.uid).update({
+          'isPhoneVerified': true,
+        });
+      }
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao verificar o código do telefone: $e');
       }
       return false;
     }

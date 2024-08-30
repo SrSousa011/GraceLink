@@ -1,10 +1,38 @@
-import 'package:churchapp/auth/auth_service.dart';
 import 'package:flutter/material.dart';
+import 'package:churchapp/auth/auth_service.dart';
 
-class UserManagementScreen extends StatelessWidget {
-  final AuthenticationService _authService = AuthenticationService();
-
+class UserManagementScreen extends StatefulWidget {
   UserManagementScreen({super.key});
+
+  @override
+  _UserManagementScreenState createState() => _UserManagementScreenState();
+}
+
+class _UserManagementScreenState extends State<UserManagementScreen> {
+  final AuthenticationService _authService = AuthenticationService();
+  bool _isEmailVerified = false;
+  bool _isPhoneVerified = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkEmailVerificationStatus();
+    _checkPhoneVerificationStatus();
+  }
+
+  Future<void> _checkEmailVerificationStatus() async {
+    bool isVerified = await _authService.getEmailVerificationStatus();
+    setState(() {
+      _isEmailVerified = isVerified;
+    });
+  }
+
+  Future<void> _checkPhoneVerificationStatus() async {
+    bool isVerified = await _authService.getPhoneVerificationStatus();
+    setState(() {
+      _isPhoneVerified = isVerified;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,22 +97,52 @@ class UserManagementScreen extends StatelessWidget {
 
   Widget _buildEmailConfirmationTile(BuildContext context) {
     return ListTile(
-      title:
-          const Text('Confirmar E-mail', style: TextStyle(color: Colors.black)),
-      leading: const Icon(Icons.email, color: Colors.blue),
-      onTap: () {
-        _showEmailDialog(context);
+      title: Text(
+        _isEmailVerified ? 'E-mail Confirmado' : 'Confirmar E-mail',
+        style: TextStyle(color: _isEmailVerified ? Colors.green : Colors.black),
+      ),
+      leading: Icon(
+        Icons.email,
+        color: _isEmailVerified ? Colors.green : Colors.blue,
+      ),
+      onTap: () async {
+        if (!_isEmailVerified) {
+          String? email = await _authService.getCurrentUserEmail();
+          if (email == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text('Não foi possível obter o e-mail do usuário.')),
+            );
+            return;
+          }
+          _showEmailDialog(context, email);
+        }
       },
     );
   }
 
   Widget _buildPhoneVerificationTile(BuildContext context) {
     return ListTile(
-      title: const Text('Confirmar Telefone',
-          style: TextStyle(color: Colors.black)),
-      leading: const Icon(Icons.phone, color: Colors.blue),
-      onTap: () {
-        _showPhoneVerificationDialog(context);
+      title: Text(
+        _isPhoneVerified ? 'Telefone Confirmado' : 'Confirmar Telefone',
+        style: TextStyle(color: _isPhoneVerified ? Colors.green : Colors.black),
+      ),
+      leading: Icon(
+        Icons.phone,
+        color: _isPhoneVerified ? Colors.green : Colors.blue,
+      ),
+      onTap: () async {
+        String? phone = await _authService.getCurrentUserPhone();
+        if (phone == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text(
+                    'Não foi possível obter o número de telefone do usuário.')),
+          );
+          return;
+        }
+        print('Número de telefone do usuário: $phone');
+        _showPhoneVerificationDialog(context, phone);
       },
     );
   }
@@ -121,17 +179,14 @@ class UserManagementScreen extends StatelessWidget {
     );
   }
 
-  void _showEmailDialog(BuildContext context) {
-    TextEditingController emailController = TextEditingController();
-
+  void _showEmailDialog(BuildContext context, String email) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Enviar Confirmação por E-mail'),
-          content: TextField(
-            controller: emailController,
-            decoration: const InputDecoration(labelText: 'E-mail'),
+          title: const Text('Confirmar E-mail'),
+          content: const Text(
+            'Toque em Enviar para receber o código e verificar seu E-mail',
           ),
           actions: <Widget>[
             TextButton(
@@ -144,12 +199,13 @@ class UserManagementScreen extends StatelessWidget {
               child: const Text('Enviar'),
               onPressed: () async {
                 Navigator.of(context).pop();
-                await _authService.sendEmailConfirmation(emailController.text);
+                await _authService.sendEmailVerification();
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                      content: Text('Confirmação por e-mail enviada.')),
+                      content: Text('O código de verificação foi enviado.')),
                 );
+                await _checkEmailVerificationStatus();
               },
             ),
           ],
@@ -158,17 +214,14 @@ class UserManagementScreen extends StatelessWidget {
     );
   }
 
-  void _showPhoneVerificationDialog(BuildContext context) {
-    TextEditingController phoneController = TextEditingController();
-
+  void _showPhoneVerificationDialog(BuildContext context, String phone) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirmar Telefone'),
-          content: TextField(
-            controller: phoneController,
-            decoration: const InputDecoration(labelText: 'Número de Telefone'),
+          title: const Text('Confirme seu Telefone'),
+          content: const Text(
+            'Toque em Enviar para receber o código e verificar seu telefone.',
           ),
           actions: <Widget>[
             TextButton(
@@ -181,14 +234,15 @@ class UserManagementScreen extends StatelessWidget {
               child: const Text('Enviar'),
               onPressed: () async {
                 Navigator.of(context).pop();
-                await _authService.sendVerificationCode(phoneController.text);
+                await _authService.sendVerificationCode(phone);
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                      content: Text('Código de verificação enviado.')),
+                      content: Text('O código de verificação foi enviado.')),
                 );
+                await _checkPhoneVerificationStatus();
               },
-            )
+            ),
           ],
         );
       },
