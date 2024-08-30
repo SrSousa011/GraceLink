@@ -44,16 +44,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     }
 
     try {
-      final emailExists = await authMethods.checkIfEmailExists(email);
-      if (!emailExists) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('O e-mail não está registrado')),
-        );
-        return;
-      }
-
+      // Directly attempt to send the password reset email without checking email existence
       await _authService.sendPasswordResetMail(email);
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('E-mail de redefinição de senha enviado')),
