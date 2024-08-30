@@ -2,6 +2,7 @@ import 'package:churchapp/views/courses/adminDashboard/subscriber_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
 class SubscribersList extends StatefulWidget {
@@ -20,6 +21,7 @@ class _SubscribersListState extends State<SubscribersList> {
   void initState() {
     super.initState();
     _fetchRegistrations();
+    initializeDateFormatting();
   }
 
   Future<void> _fetchRegistrations() async {
@@ -32,8 +34,7 @@ class _SubscribersListState extends State<SubscribersList> {
         registrationsSnapshot.docs.map((doc) async {
           final data = doc.data();
           final courseId = data['courseId'] ?? '';
-          final status =
-              data['status'] ?? false; // Garanta que status seja booleano
+          final status = data['status'] ?? false;
           final courseName = courseId.isNotEmpty
               ? await _fetchCourseName(courseId)
               : 'Unknown';
@@ -48,7 +49,7 @@ class _SubscribersListState extends State<SubscribersList> {
                 (data['registrationDate'] as Timestamp?)?.toDate() ??
                     DateTime.now(),
             'courseName': courseName,
-            'status': status, // Inclua o status aqui
+            'status': status,
             'imagePath': userData['imagePath'] ?? '',
           };
         }),
@@ -95,6 +96,7 @@ class _SubscribersListState extends State<SubscribersList> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    Intl.defaultLocale = 'pt_BR';
 
     return Scaffold(
       appBar: AppBar(
@@ -112,7 +114,7 @@ class _SubscribersListState extends State<SubscribersList> {
                 final registrationDate =
                     registration['registrationDate'] as DateTime;
                 final formattedDate =
-                    DateFormat('d MMMM yyyy').format(registrationDate);
+                    DateFormat('d MMMM yyyy', 'pt_BR').format(registrationDate);
 
                 return ListTile(
                   leading: CircleAvatar(
