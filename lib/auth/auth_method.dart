@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/data/model/user_data.dart';
+import 'package:flutter/foundation.dart';
 
 class AuthMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -186,4 +187,23 @@ class AuthMethods {
         await _firestore.collection('users').doc(currentUser.uid).get();
     return UserData.fromDocument(snap);
   }
+
+  Future<bool> checkIfEmailExists(String email) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      return querySnapshot.docs.isNotEmpty;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error checking email existence: $e');
+      }
+      return false;
+    }
+  }
 }
+
+

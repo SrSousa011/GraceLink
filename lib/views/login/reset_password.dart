@@ -1,7 +1,8 @@
-import 'package:churchapp/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
+import 'package:churchapp/auth/auth_service.dart';
+import '../../auth/auth_method.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -13,7 +14,8 @@ class ResetPasswordScreen extends StatefulWidget {
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _confirmEmailController = TextEditingController();
-  final authService = AuthenticationService();
+  final AuthMethods authMethods = AuthMethods();
+  final AuthenticationService _authService = AuthenticationService();
 
   @override
   void dispose() {
@@ -26,6 +28,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     final email = _emailController.text.trim();
     final confirmEmail = _confirmEmailController.text.trim();
 
+    final emailError = authMethods.validateEmail(email);
+    if (emailError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(emailError)),
+      );
+      return;
+    }
+
     if (email != confirmEmail) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Os e-mails não correspondem')),
@@ -34,15 +44,16 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     }
 
     try {
-      final emailExists = await authService.checkIfEmailExists(email);
+      final emailExists = await authMethods.checkIfEmailExists(email);
       if (!emailExists) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('O e-mail não está registrado')),
         );
         return;
       }
 
-      await authService.sendPasswordResetMail(email);
+      await _authService.sendPasswordResetMail(email);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('E-mail de redefinição de senha enviado')),
