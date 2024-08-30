@@ -31,7 +31,7 @@ class FinancialAnalytics extends StatelessWidget {
         3300
       ];
       final value = values[index].toDouble();
-      final averageIncome = 3200.0;
+      const averageIncome = 3200.0;
 
       return BarChartGroupData(
         x: index + 1,
@@ -47,7 +47,7 @@ class FinancialAnalytics extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Financial Overview'),
+        title: const Text('Visão Financeira'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -56,23 +56,14 @@ class FinancialAnalytics extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Total Balance: €${totalBalance.toStringAsFixed(2)}',
+                'Balanço Mensal',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
-              const SizedBox(height: 16),
-              Text(
-                'Monthly Income: €${monthlyIncome.toStringAsFixed(2)}',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.greenAccent : Colors.green,
-                ),
-              ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               SizedBox(
                 height: 300,
                 child: Column(
@@ -129,23 +120,23 @@ class FinancialAnalytics extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.only(top: 16.0),
+                    const SizedBox(height: 24),
+                    SizedBox(
                       width: double.infinity,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildLegendItem(
-                              'Donations',
+                              'Doações',
                               40.0,
                               const Color.fromARGB(255, 190, 214, 233),
                               isDarkMode),
-                          _buildLegendItem('Operational Costs', 25.0,
+                          _buildLegendItem('Custos Operacionais', 25.0,
                               Colors.green, isDarkMode),
+                          _buildLegendItem('Despesas com Eventos', 20.0,
+                              Colors.red, isDarkMode),
                           _buildLegendItem(
-                              'Event Expenses', 20.0, Colors.red, isDarkMode),
-                          _buildLegendItem(
-                              'Other Costs', 15.0, Colors.orange, isDarkMode),
+                              'Outros Custos', 15.0, Colors.orange, isDarkMode),
                         ],
                       ),
                     ),
@@ -153,6 +144,15 @@ class FinancialAnalytics extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
+              Text(
+                'Balanço Anual',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+              const SizedBox(height: 16),
               SizedBox(
                 height: 400,
                 child: BarChart(
