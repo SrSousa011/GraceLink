@@ -3,6 +3,7 @@ import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/home/home.dart';
 import 'package:churchapp/views/login/local_settings.dart';
+import 'package:churchapp/views/login/reset_password.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
@@ -100,6 +101,7 @@ class _LoginState extends State<Login> {
         title: const Text('Login'),
       ),
       backgroundColor: backgroundColor,
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           _buildLoginForm(textColor!, borderColor!),
@@ -131,7 +133,7 @@ class _LoginState extends State<Login> {
                 const SizedBox(height: 20),
                 _buildPasswordField(textColor, borderColor),
                 const SizedBox(height: 20),
-                _buildLoginButton(),
+                _buildButtonRow(textColor),
               ],
             ),
           ),
@@ -186,20 +188,36 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Widget _buildLoginButton() {
+  Widget _buildButtonRow(Color textColor) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
     final buttonColor = isDarkMode ? const Color(0xFF333333) : Colors.blue;
 
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: buttonColor,
-        shape: const StadiumBorder(),
-        padding: const EdgeInsets.symmetric(vertical: 10.0),
-      ),
-      onPressed: _isLoading ? null : _validateAndSubmit,
-      child: const Text('Login'),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: buttonColor,
+            shape: const StadiumBorder(),
+            padding:
+                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+          ),
+          onPressed: _isLoading ? null : _validateAndSubmit,
+          child: const Text('Login'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const ResetPasswordScreen()),
+            );
+          },
+          child: const Text('Esqueci a Senha'),
+        ),
+      ],
     );
   }
 }

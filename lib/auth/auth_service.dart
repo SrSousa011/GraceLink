@@ -630,4 +630,21 @@ class AuthenticationService implements BaseAuth {
       return false;
     }
   }
+
+  Future<bool> checkIfEmailExists(String email) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      return querySnapshot.docs.isNotEmpty;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error checking email existence: $e');
+      }
+      return false;
+    }
+  }
 }
