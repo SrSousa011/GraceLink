@@ -1,6 +1,7 @@
 import 'package:churchapp/views/courses/adminDashboard/courses_dashboard_user.dart';
 import 'package:churchapp/views/courses/courseLive/course_live.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscriber_info.dart';
+import 'package:churchapp/views/financial_files/financial_files.dart';
 import 'package:churchapp/views/member/members_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/member/become_member_list.dart';
@@ -54,6 +55,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => DonationsList());
       case '/donations_dashboard':
         return MaterialPageRoute(builder: (_) => const DonationsDashboard());
+      case '/financial_files':
+        return MaterialPageRoute(builder: (_) => const FinancialFiles());
       case '/courses':
         return MaterialPageRoute(builder: (_) => const Courses());
       case '/courses_dashboard':
@@ -73,7 +76,6 @@ class AppRoutes {
             !args.containsKey('registrationDate') ||
             !args.containsKey('courseName') ||
             !args.containsKey('imagePath')) {
-          // Certifique-se de que todos os parâmetros são passados
           return _errorRoute('Missing one or more arguments');
         }
         return MaterialPageRoute(

@@ -163,6 +163,14 @@ class _NavBarState extends State<NavBar> {
                   ),
                   if (userData.role == 'admin')
                     _buildListTile(
+                      icon: Icons.attach_money,
+                      text: 'Arquivos Financeiros',
+                      color: iconColor,
+                      onTap: () =>
+                          Navigator.pushNamed(context, '/financial_files'),
+                    ),
+                  if (userData.role == 'admin')
+                    _buildListTile(
                       icon: Icons.admin_panel_settings,
                       text: 'Admin Painel',
                       color: iconColor,
