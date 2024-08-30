@@ -31,7 +31,7 @@ class FinancialAnalytics extends StatelessWidget {
         3300
       ];
       final value = values[index].toDouble();
-      const averageIncome = 3200.0;
+      final averageIncome = 3200.0;
 
       return BarChartGroupData(
         x: index + 1,
@@ -44,6 +44,23 @@ class FinancialAnalytics extends StatelessWidget {
         ],
       );
     });
+
+    final monthNames = [
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro'
+    ];
+    final currentMonth = DateTime.now().month - 1;
+    final currentMonthTotal = incomeData[currentMonth].barRods.first.toY;
 
     return Scaffold(
       appBar: AppBar(
@@ -63,85 +80,106 @@ class FinancialAnalytics extends StatelessWidget {
                   color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
-              const SizedBox(height: 20),
-              SizedBox(
-                height: 300,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: PieChart(
-                        PieChartData(
-                          sections: [
-                            PieChartSectionData(
-                              value: 40.0,
-                              color: const Color.fromARGB(255, 190, 214, 233),
-                              title: '40%',
-                              radius: 100,
-                              titleStyle: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black,
-                                fontSize: 16,
-                              ),
+              const SizedBox(height: 24),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 200,
+                    width: 200,
+                    child: PieChart(
+                      PieChartData(
+                        sections: [
+                          PieChartSectionData(
+                            value: 40.0,
+                            color: const Color.fromARGB(255, 190, 214, 233),
+                            title: '40%',
+                            radius: 80,
+                            titleStyle: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black,
+                              fontSize: 16,
                             ),
-                            PieChartSectionData(
-                              value: 25.0,
-                              color: Colors.green,
-                              title: '25%',
-                              radius: 100,
-                              titleStyle: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black,
-                                fontSize: 16,
-                              ),
+                          ),
+                          PieChartSectionData(
+                            value: 25.0,
+                            color: Colors.green,
+                            title: '25%',
+                            radius: 80,
+                            titleStyle: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black,
+                              fontSize: 16,
                             ),
-                            PieChartSectionData(
-                              value: 20.0,
-                              color: Colors.red,
-                              title: '20%',
-                              radius: 100,
-                              titleStyle: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black,
-                                fontSize: 16,
-                              ),
+                          ),
+                          PieChartSectionData(
+                            value: 20.0,
+                            color: Colors.red,
+                            title: '20%',
+                            radius: 80,
+                            titleStyle: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black,
+                              fontSize: 16,
                             ),
-                            PieChartSectionData(
-                              value: 15.0,
-                              color: Colors.orange,
-                              title: '15%',
-                              radius: 100,
-                              titleStyle: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black,
-                                fontSize: 16,
-                              ),
+                          ),
+                          PieChartSectionData(
+                            value: 15.0,
+                            color: Colors.orange,
+                            title: '15%',
+                            radius: 80,
+                            titleStyle: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black,
+                              fontSize: 16,
                             ),
-                          ],
-                          borderData: FlBorderData(show: false),
-                          sectionsSpace: 0,
-                          centerSpaceRadius: 0,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildLegendItem(
-                              'Doações',
-                              40.0,
-                              const Color.fromARGB(255, 190, 214, 233),
-                              isDarkMode),
-                          _buildLegendItem('Custos Operacionais', 25.0,
-                              Colors.green, isDarkMode),
-                          _buildLegendItem('Despesas com Eventos', 20.0,
-                              Colors.red, isDarkMode),
-                          _buildLegendItem(
-                              'Outros Custos', 15.0, Colors.orange, isDarkMode),
+                          ),
                         ],
+                        borderData: FlBorderData(show: false),
+                        sectionsSpace: 0,
+                        centerSpaceRadius: 0,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(
+                      width: 8), // Espaço reduzido entre o gráfico e a legenda
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLegendItem(
+                          'Doações',
+                          40.0,
+                          const Color.fromARGB(255, 190, 214, 233),
+                          isDarkMode,
+                        ),
+                        _buildLegendItem(
+                          'Custos Operacionais',
+                          25.0,
+                          Colors.green,
+                          isDarkMode,
+                        ),
+                        _buildLegendItem(
+                          'Despesas com Eventos',
+                          20.0,
+                          Colors.red,
+                          isDarkMode,
+                        ),
+                        _buildLegendItem(
+                          'Outros Custos',
+                          15.0,
+                          Colors.orange,
+                          isDarkMode,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${monthNames[currentMonth]}: €${currentMonthTotal.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 24),
               Text(
@@ -152,20 +190,33 @@ class FinancialAnalytics extends StatelessWidget {
                   color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 16), // Espaço entre o título e o gráfico
               SizedBox(
                 height: 400,
                 child: BarChart(
                   BarChartData(
                     barGroups: incomeData,
-                    titlesData: const FlTitlesData(
+                    titlesData: FlTitlesData(
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
                           reservedSize: 40,
+                          getTitlesWidget: (value, meta) {
+                            final month = value.toInt();
+                            return SideTitleWidget(
+                              axisSide: meta.axisSide,
+                              child: Text(
+                                month > 0 ? monthNames[month - 1] : '',
+                                style: TextStyle(
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
-                      leftTitles: AxisTitles(
+                      leftTitles: const AxisTitles(
                         sideTitles: SideTitles(showTitles: false),
                       ),
                     ),

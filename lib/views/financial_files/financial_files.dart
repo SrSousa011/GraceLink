@@ -50,7 +50,6 @@ class _FinancialFilesState extends State<FinancialFiles> {
     final expenseColor = isDarkMode ? Colors.redAccent : Colors.red;
     final secondaryTextColor = isDarkMode ? Colors.grey[300]! : Colors.grey;
 
-    // Dados fictícios para Próximos Lançamentos e Últimas Transações
     final upcomingLaunches = [
       {'title': 'Conferência Anual', 'date': '2024-09-15'},
       {'title': 'Retiro Espiritual', 'date': '2024-10-05'},
@@ -129,7 +128,7 @@ class _FinancialFilesState extends State<FinancialFiles> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Good Morning, Google!',
+                                'Bom Dia',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
