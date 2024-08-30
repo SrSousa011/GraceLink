@@ -4,11 +4,11 @@ import 'package:churchapp/views/user_profile/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
-const String tEditProfile = 'Edit Profile';
+const String tEditProfile = 'Editar Perfil';
 const double tDefaultSize = 16.0;
 const double tFormHeight = 20.0;
-const String tFullName = 'Full Name';
-const String tAddress = 'Address';
+const String tFullName = 'Nome completo';
+const String tAddress = 'Endereço';
 const String tJoined = 'Joined ';
 const String tJoinedAt = '25 Jan 2022';
 const String tDelete = 'Delete';
@@ -50,7 +50,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         .updateUserProfile(widget.userData.id, fullName, address)
         .then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile updated successfully')),
+        const SnackBar(content: Text('Perfil atualizado com sucesso')),
       );
 
       Navigator.of(context).pushReplacement(

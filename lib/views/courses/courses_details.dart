@@ -1,9 +1,9 @@
-import 'package:churchapp/views/courses/courses_date.dart';
+import 'package:churchapp/views/courses/service/courses_date.dart';
+import 'package:churchapp/views/courses/service/courses_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:churchapp/auth/auth_service.dart';
-import 'package:churchapp/views/courses/courses_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CoursesDetails extends StatefulWidget {
@@ -72,7 +72,7 @@ class _CoursesDetailsState extends State<CoursesDetails> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.course.title),
+        title: Text(widget.course.courseName),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -118,6 +118,7 @@ class _CoursesDetailsState extends State<CoursesDetails> {
                           userId: uid,
                           status: false,
                           userName: fullName,
+                          courseName: widget.course.courseName,
                         );
 
                         if (mounted) {

@@ -59,6 +59,16 @@ import flutter_local_notifications
     let methodChannel = FlutterMethodChannel(name: "com.example.notifications", binaryMessenger: controller!.binaryMessenger)
     methodChannel.invokeMethod("navigate", arguments: screen)
   }
+
+  // Handle URL schemes
+  override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+    print("Open URL: \(url.absoluteString)")
+
+    let methodChannel = (window?.rootViewController as? FlutterViewController)?.methodChannel
+    methodChannel?.invokeMethod("handleUrl", arguments: url.absoluteString)
+
+    return true
+  }
 }
 
 // Handle FCM token

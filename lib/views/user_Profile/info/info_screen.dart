@@ -1,7 +1,7 @@
-import 'package:churchapp/views/user_Profile/manegement/about_us.dart';
-import 'package:churchapp/views/user_Profile/manegement/faqs_screen.dart';
-import 'package:churchapp/views/user_Profile/manegement/privacy_policy.dart';
-import 'package:churchapp/views/user_Profile/manegement/terms_of_service.dart';
+import 'package:churchapp/views/user_Profile/info/about_us.dart';
+import 'package:churchapp/views/user_Profile/info/faqs_screen.dart';
+import 'package:churchapp/views/user_Profile/info/privacy_policy.dart';
+import 'package:churchapp/views/user_Profile/info/terms_of_service.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -14,22 +14,27 @@ class InfoScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('App Info'),
+        title: Text(
+          'Informações',
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+        backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
+        iconTheme: IconThemeData(
+          color: isDarkMode ? Colors.white : Colors.black,
+        ),
       ),
       body: Container(
-        color: isDarkMode
-            ? Colors.grey[900]
-            : Colors.white, // Set background color based on theme
+        color: isDarkMode ? Colors.grey[900] : Colors.white,
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
             ListTile(
               title: Text(
-                'Privacy Policy',
-                style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black), // Text color based on theme
+                'Política de Privacidade',
+                style:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
               ),
               onTap: () {
                 Navigator.push(
@@ -42,11 +47,9 @@ class InfoScreen extends StatelessWidget {
             ),
             ListTile(
               title: Text(
-                'Terms of Service',
-                style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black), // Text color based on theme
+                'Termos de Serviço',
+                style:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
               ),
               onTap: () {
                 Navigator.push(
@@ -59,11 +62,9 @@ class InfoScreen extends StatelessWidget {
             ),
             ListTile(
               title: Text(
-                'Contact Support',
-                style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black), // Text color based on theme
+                'Contatar Suporte',
+                style:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
               ),
               onTap: () {
                 _launchEmail();
@@ -71,11 +72,9 @@ class InfoScreen extends StatelessWidget {
             ),
             ListTile(
               title: Text(
-                'FAQs',
-                style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black), // Text color based on theme
+                'Perguntas Frequentes',
+                style:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
               ),
               onTap: () {
                 Navigator.push(
@@ -88,11 +87,9 @@ class InfoScreen extends StatelessWidget {
             ),
             ListTile(
               title: Text(
-                'About Us',
-                style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black), // Text color based on theme
+                'Sobre Nós',
+                style:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
               ),
               onTap: () {
                 Navigator.push(
@@ -105,42 +102,32 @@ class InfoScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Contact Us',
+              'Entre em Contato',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode
-                    ? Colors.white
-                    : Colors.black, // Text color based on theme
+                color: isDarkMode ? Colors.white : Colors.black,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
             ListTile(
               title: Text(
-                '281 Route de Thionville, Hesperange, Luxembourg',
-                style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black), // Text color based on theme
+                '281 Route de Thionville, Hesperange, Luxemburgo',
+                style:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
               ),
               leading: Icon(Icons.location_on,
-                  color: isDarkMode
-                      ? Colors.white
-                      : Colors.black), // Icon color based on theme
+                  color: isDarkMode ? Colors.white : Colors.black),
             ),
             ListTile(
               title: Text(
                 'info@resplandecendonacoes.org',
-                style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black), // Text color based on theme
+                style:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
               ),
               leading: Icon(Icons.email,
-                  color: isDarkMode
-                      ? Colors.white
-                      : Colors.black), // Icon color based on theme
+                  color: isDarkMode ? Colors.white : Colors.black),
               onTap: () {
                 _launchEmail();
               },
@@ -148,36 +135,28 @@ class InfoScreen extends StatelessWidget {
             ListTile(
               title: Text(
                 '+352 691 240 908',
-                style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black), // Text color based on theme
+                style:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
               ),
               leading: Icon(Icons.phone,
-                  color: isDarkMode
-                      ? Colors.white
-                      : Colors.black), // Icon color based on theme
+                  color: isDarkMode ? Colors.white : Colors.black),
               onTap: () {
                 _launchPhone();
               },
             ),
             const SizedBox(height: 20),
             Text(
-              'Last updated: July 2024',
+              'Última atualização: Julho de 2024',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: isDarkMode
-                      ? Colors.grey
-                      : Colors.grey[800]), // Text color based on theme
+              style:
+                  TextStyle(color: isDarkMode ? Colors.grey : Colors.grey[800]),
             ),
             const SizedBox(height: 10),
             Text(
-              'Copyright © 2024 Resplandecendo Nações. All rights reserved.',
+              'Copyright © 2024 Resplandecendo Nações. Todos os direitos reservados.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: isDarkMode
-                      ? Colors.grey
-                      : Colors.grey[800]), // Text color based on theme
+              style:
+                  TextStyle(color: isDarkMode ? Colors.grey : Colors.grey[800]),
             ),
           ],
         ),
@@ -189,13 +168,13 @@ class InfoScreen extends StatelessWidget {
     final Uri emailUri = Uri(
       scheme: 'mailto',
       path: 'info@resplandecendonacoes.org',
-      queryParameters: {'subject': 'Support Request'},
+      queryParameters: {'subject': 'Solicitação de Suporte'},
     );
 
     if (await canLaunchUrl(emailUri)) {
       await launchUrl(emailUri);
     } else {
-      throw 'Could not launch email client';
+      throw 'Não foi possível abrir o cliente de e-mail';
     }
   }
 
@@ -208,7 +187,7 @@ class InfoScreen extends StatelessWidget {
     if (await canLaunchUrl(phoneUri)) {
       await launchUrl(phoneUri);
     } else {
-      throw 'Could not launch phone dialer';
+      throw 'Não foi possível abrir o discador de telefone';
     }
   }
 }

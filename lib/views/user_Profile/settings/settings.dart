@@ -5,8 +5,8 @@ import 'package:churchapp/views/user_Profile/settings/change_email.dart';
 import 'package:churchapp/views/user_Profile/settings/change_password.dart';
 import 'package:churchapp/auth/auth_service.dart';
 
-const Color tPrimaryColor = Colors.blue; // Example primary color
-const Color tDarkColor = Colors.black; // Example dark color
+const Color tPrimaryColor = Colors.blue;
+const Color tDarkColor = Colors.black;
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -19,7 +19,7 @@ class SettingsScreen extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(LineAwesomeIcons.angle_left_solid),
         ),
-        title: const Text('Settings'),
+        title: const Text('Configurações'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -28,7 +28,7 @@ class SettingsScreen extends StatelessWidget {
           children: [
             ListTile(
               leading: const Icon(LineAwesomeIcons.envelope),
-              title: const Text('Change Email'),
+              title: const Text('Alterar E-mail'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -40,7 +40,7 @@ class SettingsScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(LineAwesomeIcons.lock_solid),
-              title: const Text('Change Password'),
+              title: const Text('Alterar Senha'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -52,7 +52,7 @@ class SettingsScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(LineAwesomeIcons.phone_alt_solid),
-              title: const Text('Change Phone'),
+              title: const Text('Alterar Telefone'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -64,7 +64,7 @@ class SettingsScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(LineAwesomeIcons.envelope),
-              title: const Text('Send Password Reset Email'),
+              title: const Text('Enviar E-mail de Redefinição de Senha'),
               onTap: () async {
                 String? email =
                     await AuthenticationService().getCurrentUserEmail();
@@ -74,14 +74,15 @@ class SettingsScreen extends StatelessWidget {
                     if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content: Text('Password reset email sent')),
+                          content:
+                              Text('E-mail de redefinição de senha enviado')),
                     );
                   } catch (e) {
                     if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                          content:
-                              Text('Failed to send password reset email: $e')),
+                          content: Text(
+                              'Falha ao enviar e-mail de redefinição de senha: $e')),
                     );
                   }
                 }

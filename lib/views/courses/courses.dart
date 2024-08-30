@@ -1,8 +1,8 @@
 import 'package:churchapp/views/courses/courses_details.dart';
-import 'package:churchapp/views/courses/courses_service.dart';
+import 'package:churchapp/views/courses/service/courses_date.dart';
+import 'package:churchapp/views/courses/service/courses_service.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:churchapp/views/courses/courses_date.dart';
 
 class Courses extends StatefulWidget {
   const Courses({super.key});
@@ -25,6 +25,13 @@ class _CoursesState extends State<Courses> {
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final gradientColors = isDarkMode
+        ? [const Color(0xFF3C3C3C), const Color(0xFF5A5A5A)]
+        : [const Color(0xFFFFD59C), const Color(0xFF62CFF7)];
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subtitleColor = isDarkMode ? Colors.white70 : Colors.black54;
+    final descriptionColor = isDarkMode ? Colors.white70 : Colors.black87;
+    final priceColor = isDarkMode ? Colors.white70 : Colors.black54;
 
     return Scaffold(
       appBar: AppBar(
@@ -50,6 +57,7 @@ class _CoursesState extends State<Courses> {
           return ListView.builder(
             itemCount: coursesList.length,
             itemBuilder: (context, index) {
+              final course = coursesList[index];
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: GestureDetector(
@@ -58,7 +66,7 @@ class _CoursesState extends State<Courses> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => CoursesDetails(
-                          course: coursesList[index],
+                          course: course,
                           coursesService: _coursesService,
                         ),
                       ),
@@ -69,17 +77,11 @@ class _CoursesState extends State<Courses> {
                     margin: const EdgeInsets.symmetric(
                         vertical: 4.0, horizontal: 10.0),
                     decoration: BoxDecoration(
-                      gradient: isDarkMode
-                          ? const LinearGradient(
-                              colors: [Color(0xFF3C3C3C), Color(0xFF5A5A5A)],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            )
-                          : const LinearGradient(
-                              colors: [Color(0xFFFFD59C), Color(0xFF62CFF7)],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
+                      gradient: LinearGradient(
+                        colors: gradientColors,
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ),
                       borderRadius: BorderRadius.circular(16.0),
                     ),
                     child: Row(
@@ -90,7 +92,7 @@ class _CoursesState extends State<Courses> {
                           height: 230.0,
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: NetworkImage(coursesList[index].imageURL),
+                              image: NetworkImage(course.imageURL),
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.circular(8.0),
@@ -102,45 +104,38 @@ class _CoursesState extends State<Courses> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                coursesList[index].title,
+                                course.courseName,
                                 style: TextStyle(
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold,
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
+                                  color: textColor,
                                 ),
                               ),
                               const SizedBox(height: 8.0),
                               Text(
-                                coursesList[index].instructor,
+                                course.instructor,
                                 style: TextStyle(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.normal,
-                                  color: isDarkMode
-                                      ? Colors.white70
-                                      : Colors.black54,
+                                  color: subtitleColor,
                                 ),
                               ),
                               const SizedBox(height: 8.0),
                               Text(
-                                coursesList[index].description,
+                                course.description,
                                 style: TextStyle(
                                   fontSize: 15.0,
                                   fontWeight: FontWeight.normal,
-                                  color: isDarkMode
-                                      ? Colors.white70
-                                      : Colors.black87,
+                                  color: descriptionColor,
                                 ),
                               ),
                               const SizedBox(height: 8.0),
                               Text(
-                                '${coursesList[index].price} €',
+                                '${course.price} €',
                                 style: TextStyle(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.normal,
-                                  color: isDarkMode
-                                      ? Colors.white70
-                                      : Colors.black54,
+                                  color: priceColor,
                                 ),
                               ),
                             ],

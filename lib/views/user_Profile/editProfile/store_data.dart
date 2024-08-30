@@ -23,13 +23,11 @@ class StoreData {
 
   Future<String> saveData({required Uint8List file}) async {
     try {
-      // Upload image to Firebase Storage
       String imagePath = await uploadImageToStorage('profile_images', file);
 
-      // Save image link to Firestore
       await _firestore.collection('userProfile').doc().set({
         'imagePath': imagePath,
-      }, SetOptions(merge: true)); // Merge with existing data if any
+      }, SetOptions(merge: true));
 
       return 'Success';
     } catch (err) {

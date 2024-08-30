@@ -31,7 +31,7 @@ class UploadButton extends StatelessWidget {
               color: Colors.white,
             ),
       label: Text(
-        isUploading ? 'Uploading...' : 'Upload File',
+        isUploading ? 'Enviando...' : 'Enviar arquivo',
         style: const TextStyle(color: Colors.white),
       ),
       style: ElevatedButton.styleFrom(

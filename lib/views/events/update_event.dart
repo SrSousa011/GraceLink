@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/event_service.dart';
-import 'package:churchapp/views/notifications/notification_service.dart';
+import 'package:churchapp/views/notifications/notification_event.dart';
 
 class UpdateEventForm extends StatefulWidget {
   final Event event;
@@ -70,6 +70,8 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   }
 
   Future<void> _updateEvent(BuildContext context) async {
+    if (!context.mounted) return;
+    DateFormat('dd/MM/yyyy').format(_selectedDate);
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty &&
         _locationController.text.isNotEmpty) {
@@ -85,15 +87,6 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
       );
 
       try {
-        await updateEvent(updatedEvent, widget.event.id);
-
-        if (_notificationService.notificationsEnabled) {
-          await _notificationService.sendNotification(
-            _titleController.text,
-            _descriptionController.text,
-          );
-        }
-
         if (context.mounted) {
           Navigator.pop(context, updatedEvent);
         }

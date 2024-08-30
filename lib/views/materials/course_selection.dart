@@ -1,4 +1,4 @@
-import 'package:churchapp/views/courses/courses_date.dart';
+import 'package:churchapp/views/courses/service/courses_date.dart';
 import 'package:flutter/material.dart';
 
 class CourseSelectionDropdown extends StatelessWidget {
@@ -14,11 +14,11 @@ class CourseSelectionDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButton<Course>(
-      hint: const Text('Select a Course'),
+      hint: const Text('Selecione um curso'),
       items: courses.map((course) {
         return DropdownMenuItem<Course>(
           value: course,
-          child: Text(course.title),
+          child: Text(course.courseName),
         );
       }).toList(),
       onChanged: onChanged,

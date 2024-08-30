@@ -1,3 +1,7 @@
+import 'package:churchapp/views/courses/adminDashboard/courses_dashboard_user.dart';
+import 'package:churchapp/views/courses/courseLive/course_live.dart';
+import 'package:churchapp/views/courses/adminDashboard/subscriber_info.dart';
+import 'package:churchapp/views/member/members_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/member/become_member_list.dart';
 import 'package:churchapp/views/member/become_member.dart';
@@ -8,9 +12,8 @@ import 'package:churchapp/views/materials/materials_courses.dart';
 import 'package:churchapp/views/member/become_dashboard.dart';
 import 'package:churchapp/views/courses/adminDashboard/courses_dashboard.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscribers_list.dart';
-import 'package:churchapp/views/courses/adminDashboard/subscriber_viewer.dart';
 import 'package:churchapp/views/donations/dashboard/donnation_dashboard.dart';
-import 'package:churchapp/views/user_Profile/manegement/about_us.dart';
+import 'package:churchapp/views/user_Profile/info/about_us.dart';
 import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/welcome.dart';
 import 'package:churchapp/views/courses/courses.dart';
@@ -41,6 +44,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const Notifications());
       case '/videos':
         return MaterialPageRoute(builder: (_) => const Videos());
+      case '/course_live':
+        return MaterialPageRoute(builder: (_) => const CourseLive());
       case '/event_page':
         return MaterialPageRoute(builder: (_) => const Events());
       case '/donations':
@@ -53,31 +58,41 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const Courses());
       case '/courses_dashboard':
         return MaterialPageRoute(builder: (_) => const CoursesDashboard());
+      case '/courses_user_dashboard':
+        return MaterialPageRoute(builder: (_) => const CoursesUserDashboard());
       case '/subscribers_list':
         return MaterialPageRoute(
           builder: (_) => const SubscribersList(),
         );
-      case '/subscriber_viewer':
+      case '/subscriber_info':
         final args = settings.arguments as Map<String, dynamic>?;
         if (args == null ||
             !args.containsKey('userId') ||
             !args.containsKey('userName') ||
             !args.containsKey('status') ||
             !args.containsKey('registrationDate') ||
-            !args.containsKey('courseName')) {
+            !args.containsKey('courseName') ||
+            !args.containsKey('imagePath')) {
+          // Certifique-se de que todos os parâmetros são passados
           return _errorRoute('Missing one or more arguments');
         }
         return MaterialPageRoute(
-          builder: (_) => SubscriberViewer(
+          builder: (_) => SubscriberInfo(
             userId: args['userId'] as String,
             userName: args['userName'] as String,
             status: args['status'] as bool,
             registrationDate: args['registrationDate'] as DateTime,
             courseName: args['courseName'] as String,
+            imagePath: args['imagePath'] as String? ?? '',
           ),
         );
       case '/become_member':
         return MaterialPageRoute(builder: (_) => const BecomeMember());
+      case '/member_details':
+        return MaterialPageRoute(
+            builder: (_) => const MemberDetailsScreen(
+                  memberId: '',
+                ));
       case '/manage_course_materials':
         return MaterialPageRoute(builder: (_) => const CourseMaterialsPage());
       case '/about_us':
@@ -85,9 +100,11 @@ class AppRoutes {
       case '/members_dashboard':
         return MaterialPageRoute(builder: (_) => const MembersDashboard());
       case '/member_list':
-        final args = settings.arguments as Map<String, String>;
+        final args = settings.arguments as Map<String, dynamic>?;
+        final filter = args?['filter'] ?? 'all';
         return MaterialPageRoute(
-            builder: (_) => BecomeMemberList(filter: args['filter'] ?? 'all'));
+          builder: (_) => BecomeMemberList(filter: filter),
+        );
       case '/admin_panel':
         return MaterialPageRoute(builder: (_) => const AdminPanel());
       case '/donation_report':

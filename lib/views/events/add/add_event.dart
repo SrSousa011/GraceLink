@@ -7,7 +7,7 @@ import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/events/events.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
-import 'package:churchapp/views/notifications/notification_service.dart';
+import 'package:churchapp/views/notifications/notification_event.dart';
 
 class AddEventForm extends StatefulWidget {
   const AddEventForm({super.key});
@@ -113,6 +113,13 @@ class _AddEventFormState extends State<AddEventForm> {
       }
 
       final eventId = DateTime.now().millisecondsSinceEpoch.toString();
+      final createdDateTime = DateTime.now();
+      if (!context.mounted) return;
+      DateFormat('dd/MM/yyyy').format(_selectedDate!);
+      final formattedTime = _selectedTime!.format(context);
+      final formattedCreatedTime =
+          DateFormat('dd/MM/yyyy HH:mm:ss').format(createdDateTime);
+
       final newEvent = {
         'id': eventId,
         'title': _titleController.text,
@@ -129,8 +136,10 @@ class _AddEventFormState extends State<AddEventForm> {
 
         if (_notificationService.notificationsEnabled) {
           await _notificationService.sendNotification(
-            _titleController.text,
-            _descriptionController.text,
+            title: _titleController.text,
+            location: _locationController.text,
+            formattedTime: formattedTime,
+            addedTime: formattedCreatedTime,
           );
         }
 

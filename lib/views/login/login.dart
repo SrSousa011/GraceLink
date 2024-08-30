@@ -1,17 +1,17 @@
+import 'package:churchapp/auth/auth_method.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/theme/theme_provider.dart';
+import 'package:churchapp/views/home/home.dart';
 import 'package:churchapp/views/login/local_settings.dart';
 import 'package:flutter/material.dart';
-import 'package:churchapp/auth/auth_method.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:churchapp/auth/auth_service.dart';
-import 'package:churchapp/views/home/home.dart';
 import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
-  final BaseAuth auth;
   final VoidCallback? onLoggedIn;
+  final BaseAuth auth;
 
-  const Login({super.key, required this.auth, this.onLoggedIn});
+  const Login({super.key, this.onLoggedIn, required this.auth});
 
   @override
   State<Login> createState() => _LoginState();
@@ -39,33 +39,42 @@ class _LoginState extends State<Login> {
     super.dispose();
   }
 
-  void _loginUser() async {
-    String res = await _authMethods.loginUser(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    );
-
-    if (res.startsWith('Error')) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(res),
-          duration: const Duration(seconds: 3),
-        ),
+  Future<void> _loginUser() async {
+    try {
+      final userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
       );
-    } else {
-      await _localSettings.setUserLoggedIn(true);
-      widget.onLoggedIn?.call();
-      if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Home(
-            auth: widget.auth,
-            userId: FirebaseAuth.instance.currentUser!.uid,
+      if (userCredential.user != null) {
+        await _localSettings.setUserLoggedIn(true);
+        widget.onLoggedIn?.call();
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Home(
+              auth: widget.auth,
+              userId: FirebaseAuth.instance.currentUser!.uid,
+            ),
           ),
-        ),
-      );
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -74,28 +83,7 @@ class _LoginState extends State<Login> {
       setState(() {
         _isLoading = true;
       });
-      try {
-        await widget.auth.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
-        _loginUser();
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Login failed. Please try again.'),
-              duration: Duration(seconds: 3),
-            ),
-          );
-        }
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      }
+      await _loginUser();
     }
   }
 
@@ -162,7 +150,7 @@ class _LoginState extends State<Login> {
         enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: borderColor),
         ),
-        focusedBorder: UnderlineInputBorder(
+        focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.blue),
         ),
       ),
@@ -188,7 +176,7 @@ class _LoginState extends State<Login> {
         enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: borderColor),
         ),
-        focusedBorder: UnderlineInputBorder(
+        focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.blue),
         ),
       ),

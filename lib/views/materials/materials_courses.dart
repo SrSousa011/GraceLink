@@ -1,16 +1,13 @@
-import 'package:churchapp/views/materials/file_list.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
+import 'package:churchapp/views/materials/file_list.dart';
 import 'package:churchapp/views/materials/upload_button.dart';
-import 'package:churchapp/views/materials/error_message.dart';
-import 'package:dio/dio.dart';
 
 class CourseMaterialsPage extends StatefulWidget {
   const CourseMaterialsPage({super.key});
@@ -23,16 +20,14 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  List<Map<String, dynamic>> _fileDocs = [];
-  bool _isUploading = false;
+  List<Map<String, dynamic>> _courses = [];
+  bool _isFetchingCourses = true;
   String? _selectedCourseId;
   String? _userRole;
-  String? _errorMessage;
   String? _selectedCourseTitle;
   String? _selectedCourseImageUrl;
   String? _selectedInstructorName;
-  List<Map<String, String>> _courses = [];
-  bool _isFetchingCourses = true;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -54,36 +49,47 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
       final userDoc = await _firestore.collection('users').doc(userId).get();
       _userRole = userDoc.data()?['role'] as String? ?? 'user';
 
-      final registrationSnapshot = await _firestore
-          .collection('courseregistration')
-          .where('userId', isEqualTo: userId)
-          .get();
+      if (_userRole == 'admin') {
+        final coursesSnapshot = await _firestore.collection('courses').get();
+        _courses = coursesSnapshot.docs.map((doc) {
+          final data = doc.data();
+          return {
+            'id': doc.id,
+            'courseName': data['courseName'] as String? ?? 'Unknown Course',
+          };
+        }).toList();
+      } else {
+        final registrationSnapshot = await _firestore
+            .collection('courseRegistration')
+            .where('userId', isEqualTo: userId)
+            .get();
 
-      if (registrationSnapshot.docs.isNotEmpty) {
-        _courses = await Future.wait(
-          registrationSnapshot.docs.map((doc) async {
-            final courseId = doc['courseId'];
-            final courseDoc =
-                await _firestore.collection('courses').doc(courseId).get();
-            return {
-              'id': courseId,
-              'title':
-                  courseDoc.data()?['title'] as String? ?? 'Unknown Course',
-            };
-          }),
-        );
-        if (_courses.isNotEmpty) {
-          _selectedCourseId = _courses.first['id'];
-          await _handleCourseSelection(_selectedCourseId!);
+        if (registrationSnapshot.docs.isNotEmpty) {
+          _courses = await Future.wait(
+            registrationSnapshot.docs.map((doc) async {
+              final courseId = doc['courseId'];
+              final courseDoc =
+                  await _firestore.collection('courses').doc(courseId).get();
+              return {
+                'id': courseId,
+                'courseName': courseDoc.data()?['courseName'] as String? ??
+                    'Unknown Course',
+              };
+            }),
+          );
+          if (_courses.isNotEmpty) {
+            _selectedCourseId = _courses.first['id'];
+            await _handleCourseSelection(_selectedCourseId!);
+          } else {
+            setState(() {
+              _errorMessage = 'User not registered in any course.';
+            });
+          }
         } else {
           setState(() {
             _errorMessage = 'User not registered in any course.';
           });
         }
-      } else {
-        setState(() {
-          _errorMessage = 'User not registered in any course.';
-        });
       }
     } catch (e) {
       setState(() {
@@ -99,54 +105,19 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   Future<String?> getTitleById(String courseId) async {
     try {
       final doc = await _firestore.collection('courses').doc(courseId).get();
-      return doc.data()?['title'] as String?;
+      return doc.data()?['courseName'] as String?;
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error fetching course title: $e';
+        _errorMessage = 'Error fetching course name: $e';
       });
       return null;
-    }
-  }
-
-  Future<void> _loadFiles(String courseId) async {
-    if (courseId.isEmpty) {
-      setState(() {
-        _errorMessage = 'Course ID cannot be empty.';
-      });
-      return;
-    }
-
-    final query = _userRole == 'admin'
-        ? _firestore.collection('courses/$courseId/materials')
-        : _firestore
-            .collection('courses/$courseId/materials')
-            .where('visibility', isEqualTo: 'public');
-    try {
-      final snapshot = await query.get();
-      setState(() {
-        _fileDocs = snapshot.docs.map((doc) {
-          final data = doc.data();
-          return {
-            'id': doc.id,
-            'url': data['url'] as String?,
-            'name': data['name'] as String?,
-            'courseId': courseId,
-            'visibility': data['visibility'] as String? ?? 'public',
-          };
-        }).toList();
-        _errorMessage = null;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Error loading files: $e';
-      });
     }
   }
 
   Future<void> _uploadFile() async {
     if (_selectedCourseId == null) {
       setState(() {
-        _errorMessage = 'Please select a course first.';
+        _errorMessage = 'Selecione um curso primeiro.';
       });
       return;
     }
@@ -172,7 +143,6 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     if (result != null && result.files.single.path != null) {
       final File file = File(result.files.single.path!);
       setState(() {
-        _isUploading = true;
         _errorMessage = null;
       });
 
@@ -189,14 +159,9 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
           'name': fileName,
           'visibility': 'public',
         });
-        await _loadFiles(_selectedCourseId!);
       } catch (e) {
         setState(() {
           _errorMessage = 'Error uploading file: $e';
-        });
-      } finally {
-        setState(() {
-          _isUploading = false;
         });
       }
     } else {
@@ -223,28 +188,23 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
       _selectedCourseImageUrl = courseData.data()?['imageURL'];
       _selectedInstructorName = courseData.data()?['instructor'];
     });
-
-    await _loadFiles(courseId);
   }
 
-  Future<void> _handleDownload(String fileUrl, String fileName) async {
+  Future<void> _deleteFile(
+      String courseId, String fileId, String fileUrl) async {
     try {
-      final dio = Dio();
-      final directory = await getExternalStorageDirectory();
-      final downloadDirectory = Directory(
-          '${directory?.path}/Download'); // Caminho do diretório de downloads
-      if (!await downloadDirectory.exists()) {
-        await downloadDirectory.create(recursive: true);
-      }
-      final filePath = '${downloadDirectory.path}/$fileName';
-      await dio.download(fileUrl, filePath);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('File downloaded to $filePath')),
-      );
+      // Delete from Firebase Storage
+      final ref = FirebaseStorage.instance.refFromURL(fileUrl);
+      await ref.delete();
+      // Delete from Firestore
+      await _firestore
+          .collection('courses/$courseId/materials')
+          .doc(fileId)
+          .delete();
     } catch (e) {
-      print('Error downloading file: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error downloading file: $e')),
+        SnackBar(content: Text('Error deleting file: $e')),
       );
     }
   }
@@ -256,7 +216,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Course Materials'),
+        title: const Text('Materiais do curso'),
       ),
       body: Container(
         color: isDarkMode ? Colors.black : Colors.white,
@@ -270,11 +230,11 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
               if (!_isFetchingCourses && _courses.isNotEmpty)
                 DropdownButton<String>(
                   value: _selectedCourseId,
-                  hint: const Text('Select a course'),
+                  hint: const Text('Selecione um curso'),
                   items: _courses.map((course) {
                     return DropdownMenuItem<String>(
                       value: course['id'],
-                      child: Text(course['title'] ?? 'Unknown Course'),
+                      child: Text(course['courseName'] ?? 'Unknown Course'),
                     );
                   }).toList(),
                   onChanged: (value) async {
@@ -288,79 +248,144 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                   child: Column(
                     children: [
                       UploadButton(
-                        isUploading: _isUploading,
+                        isUploading: false,
                         onPressed: _uploadFile,
                       ),
                     ],
                   ),
                 ),
               const SizedBox(height: 16.0),
-              if (_selectedCourseImageUrl != null)
-                Container(
-                  padding: const EdgeInsets.all(16.0),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: isDarkMode
-                        ? const LinearGradient(
-                            colors: [Color(0xFF3C3C3C), Color(0xFF5A5A5A)],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          )
-                        : const LinearGradient(
-                            colors: [Color(0xFFFFD59C), Color(0xFF62CFF7)],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 120.0,
-                        height: 160.0,
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: _selectedCourseImageUrl != null
+                    ? Container(
+                        key: ValueKey<String>(_selectedCourseImageUrl!),
+                        padding: const EdgeInsets.all(16.0),
+                        width: double.infinity,
                         decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(_selectedCourseImageUrl!),
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.circular(8.0),
+                          gradient: isDarkMode
+                              ? const LinearGradient(
+                                  colors: [
+                                    Color(0xFF3C3C3C),
+                                    Color(0xFF5A5A5A)
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                )
+                              : const LinearGradient(
+                                  colors: [
+                                    Color(0xFFFFD59C),
+                                    Color(0xFF62CFF7)
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                          borderRadius: BorderRadius.circular(16.0),
                         ),
-                      ),
-                      const SizedBox(width: 16.0),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            if (_selectedCourseTitle != null)
-                              Text(
-                                _selectedCourseTitle!,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
+                            Container(
+                              width: 120.0,
+                              height: 160.0,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(_selectedCourseImageUrl!),
+                                  fit: BoxFit.cover,
+                                ),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            const SizedBox(width: 16.0),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (_selectedCourseTitle != null)
+                                    Text(
+                                      _selectedCourseTitle!,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge
+                                          ?.copyWith(
+                                              fontWeight: FontWeight.bold),
                                     ),
+                                  if (_selectedInstructorName != null)
+                                    Text(
+                                      _selectedInstructorName!,
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                    ),
+                                ],
                               ),
-                            if (_selectedInstructorName != null)
-                              Text(
-                                '$_selectedInstructorName',
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
+                            ),
                           ],
                         ),
-                      ),
-                    ],
+                      )
+                    : const SizedBox.shrink(),
+              ),
+              if (_errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red),
                   ),
                 ),
-              if (_errorMessage != null) ErrorMessage(message: _errorMessage!),
               Expanded(
-                child: FileListView(
-                  fileDocs: _fileDocs,
-                  isDarkMode: isDarkMode,
-                  userRole: _userRole ?? 'user',
-                  onDownload: _handleDownload,
-                ),
+                child: _selectedCourseId == null
+                    ? const Center(
+                        child: Text(
+                            'Selecione um curso para visualizar os materiais'),
+                      )
+                    : StreamBuilder<QuerySnapshot>(
+                        stream: _firestore
+                            .collection('courses/$_selectedCourseId/materials')
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+
+                          if (snapshot.hasError) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Error loading files: ${snapshot.error}',
+                                style: const TextStyle(color: Colors.red),
+                              ),
+                            );
+                          }
+
+                          if (!snapshot.hasData ||
+                              snapshot.data?.docs.isEmpty == true) {
+                            return const Center(
+                                child: Text('No files available.'));
+                          }
+
+                          final fileDocs = snapshot.data!.docs.map((doc) {
+                            final data = doc.data() as Map<String, dynamic>;
+                            return {
+                              'id': doc.id,
+                              'url': data['url'] as String?,
+                              'name': data['name'] as String?,
+                              'courseId': _selectedCourseId!,
+                              'visibility':
+                                  data['visibility'] as String? ?? 'public',
+                            };
+                          }).toList();
+
+                          return CourseFileList(
+                            fileDocs: fileDocs,
+                            isDarkMode: isDarkMode,
+                            userRole: _userRole ?? 'user',
+                            onFileDeleted: _deleteFile,
+                            selectedCourseId: _selectedCourseId!,
+                          );
+                        },
+                      ),
               ),
             ],
           ),

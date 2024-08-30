@@ -1,6 +1,6 @@
+import 'package:churchapp/views/courses/service/courses_date.dart';
+import 'package:churchapp/views/courses/service/courses_service.dart';
 import 'package:flutter/material.dart';
-import 'package:churchapp/views/courses/courses_date.dart';
-import 'package:churchapp/views/courses/courses_service.dart';
 import 'package:churchapp/views/courses/courses_details.dart';
 
 class CoursesList extends StatefulWidget {
@@ -101,7 +101,7 @@ class _CoursesListState extends State<CoursesList> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                course.title,
+                                course.courseName,
                                 style: TextStyle(
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold,

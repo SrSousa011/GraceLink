@@ -1,10 +1,18 @@
+import 'package:churchapp/route/root.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:churchapp/views/home/home.dart';
 import 'package:churchapp/views/welcome.dart';
 
+const String logoPath = 'assets/icons/logo.png';
+
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key, required NavBar drawer, required root});
+  const SplashScreen({super.key, required this.root, required this.drawer});
+
+  final NavBar drawer;
+  final Root root;
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -14,23 +22,48 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 500),
-          pageBuilder: (_, __, ___) => Welcome(
-            title: 'GraceLink',
-            onSignedIn: () {},
+    _checkAuthStatus();
+  }
+
+  Future<void> _checkAuthStatus() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    Timer(const Duration(seconds: 1), () {
+      if (user != null) {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            transitionDuration: const Duration(milliseconds: 500),
+            pageBuilder: (_, __, ___) => Home(
+              auth: widget.root.auth,
+              userId: user.uid,
+            ),
+            transitionsBuilder: (_, animation, __, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
           ),
-          transitionsBuilder: (_, animation, __, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
-        ),
-      );
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            transitionDuration: const Duration(milliseconds: 500),
+            pageBuilder: (_, __, ___) => Welcome(
+              title: 'GraceLink',
+              onSignedIn: () {},
+            ),
+            transitionsBuilder: (_, animation, __, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+          ),
+        );
+      }
     });
   }
 
@@ -47,6 +80,15 @@ class _SplashScreenState extends State<SplashScreen> {
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Center(
+          child: SizedBox(
+            width: 450,
+            height: 450,
+            child: Image.asset(
+              logoPath,
+            ),
           ),
         ),
       ),

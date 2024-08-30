@@ -4,21 +4,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
-import 'package:churchapp/views/courses/adminDashboard/subscribers_list.dart';
 
-class CoursesDashboard extends StatelessWidget {
-  const CoursesDashboard({super.key});
+class CoursesUserDashboard extends StatelessWidget {
+  const CoursesUserDashboard({super.key});
 
   Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>>
-      _fetchCourseRegistrations() async {
+      _fetchCourses() async {
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('courseRegistration')
-          .get();
+      final snapshot =
+          await FirebaseFirestore.instance.collection('courses').get();
       return snapshot.docs;
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching course registrations: $e');
+        print('Error fetching courses: $e');
       }
       return [];
     }
@@ -52,7 +50,7 @@ class CoursesDashboard extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
-          future: _fetchCourseRegistrations(),
+          future: _fetchCourses(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -64,18 +62,6 @@ class CoursesDashboard extends StatelessWidget {
             }
 
             final documents = snapshot.data ?? [];
-
-            final now = DateTime.now();
-            final startOfMonth = DateTime(now.year, now.month, 1);
-            final endOfMonth = DateTime(now.year, now.month + 1, 0);
-
-            final newEnrolled = documents.where((doc) {
-              final data = doc.data();
-              final registrationDate = data['registrationDate'] as Timestamp?;
-              if (registrationDate == null) return false;
-              final date = registrationDate.toDate();
-              return date.isAfter(startOfMonth) && date.isBefore(endOfMonth);
-            }).length;
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -114,7 +100,7 @@ class CoursesDashboard extends StatelessWidget {
                       ),
                       const SizedBox(height: 8.0),
                       Text(
-                        'Aqui está uma visão geral das novas matrículas e dos novos cadastrados',
+                        'Aqui está uma visão geral dos cursos disponíveis e das videoaulas.',
                         style:
                             Theme.of(context).textTheme.titleMedium?.copyWith(
                                   color: Colors.white70,
@@ -127,21 +113,10 @@ class CoursesDashboard extends StatelessWidget {
                         children: [
                           _buildSummaryCard(
                             context,
-                            title: 'Total Matrículas',
+                            title: 'Lista de Cursos',
                             value: documents.length.toString(),
                             onTap: () {
-                              Navigator.of(context)
-                                  .pushNamed('/subscribers_list');
-                            },
-                          ),
-                          _buildSummaryCard(
-                            context,
-                            title: 'Novos Matrículados',
-                            value: newEnrolled.toString(),
-                            onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => const SubscribersList(),
-                              ));
+                              Navigator.of(context).pushNamed('/courses');
                             },
                           ),
                         ],
@@ -160,20 +135,6 @@ class CoursesDashboard extends StatelessWidget {
                     Navigator.of(context).pushNamed('/courses');
                   },
                   child: const Text('Lista de Cursos'),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: buttonBackgroundColor,
-                    shape: const StadiumBorder(),
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const SubscribersList(),
-                    ));
-                  },
-                  child: const Text('Lista de Cadastrados'),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
