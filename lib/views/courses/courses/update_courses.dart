@@ -31,7 +31,7 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
   late TextEditingController _imageUrlController;
 
   final CourseService _courseService = CourseService();
-  final DateFormat _dateFormat = DateFormat('dd/MM/yyyy', 'pt_BR');
+  final DateFormat _dateFormat = DateFormat('dd/MM/yyyy');
   final DateFormat _timeFormat = DateFormat('HH:mm');
 
   @override
