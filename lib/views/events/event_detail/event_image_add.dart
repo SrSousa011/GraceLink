@@ -20,70 +20,21 @@ class ImageAdd {
         _firestore = firestore,
         _picker = picker;
 
-  Future<String?> updateImage() async {
-    try {
-      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-
-      if (pickedFile != null) {
-        File file = File(pickedFile.path);
-        final imageBytes = await file.readAsBytes();
-
-        String fileName = path.basename(file.path);
-        String uniqueFileName =
-            '${DateTime.now().millisecondsSinceEpoch}_$fileName';
-
-        final uploadTask = _storage
-            .ref()
-            .child('eventImages/$uniqueFileName')
-            .putData(imageBytes);
-        final taskSnapshot = await uploadTask;
-
-        final downloadUrl = await taskSnapshot.ref.getDownloadURL();
-        if (kDebugMode) {
-          print('Image uploaded successfully: $downloadUrl');
-        }
-
-        await _firestore
-            .collection('events')
-            .doc(eventId)
-            .update({'imageUrl': downloadUrl});
-
-        return downloadUrl;
-      } else {
-        return null;
-      }
-    } catch (e) {
-      String errorMessage;
-      if (e is FirebaseException) {
-        errorMessage = "Firebase error: ${e.message}";
-      } else if (e is IOException) {
-        errorMessage = "I/O error: ${e.toString()}";
-      } else {
-        errorMessage = "Unexpected error: ${e.toString()}";
-      }
-
-      if (kDebugMode) {
-        print("Error selecting or uploading image: $errorMessage");
-      }
-      return null;
-    }
-  }
-
   Future<void> uploadAndSaveImage({
     required VoidCallback onSuccess,
-    Function(String)? onError,
+    required Function(String) onError,
   }) async {
     try {
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
       if (pickedFile == null) {
-        onError?.call("No image selected.");
+        onError("No image selected.");
         return;
       }
 
       File file = File(pickedFile.path);
       if (!await file.exists()) {
-        onError?.call("Selected file does not exist.");
+        onError("Selected file does not exist.");
         return;
       }
 
@@ -93,6 +44,7 @@ class ImageAdd {
 
       final uploadTask =
           _storage.ref().child('eventImages/$uniqueFileName').putFile(file);
+
       final taskSnapshot = await uploadTask;
 
       final downloadURL = await taskSnapshot.ref.getDownloadURL();
@@ -101,6 +53,10 @@ class ImageAdd {
           .collection('events')
           .doc(eventId)
           .update({'imageUrl': downloadURL});
+
+      if (kDebugMode) {
+        print('Image uploaded successfully: $downloadURL');
+      }
 
       onSuccess();
     } catch (e) {
@@ -117,7 +73,7 @@ class ImageAdd {
         print("Error uploading image: $errorMessage");
       }
 
-      onError?.call(errorMessage);
+      onError(errorMessage);
     }
   }
 }

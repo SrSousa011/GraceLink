@@ -67,9 +67,10 @@ class NotificationService {
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'your_channel_id',
-      'your_channel_name',
-      channelDescription: 'your_channel_description',
+      'update_channel_id', // Unique ID for update notifications
+      'Update Notifications', // Name of the channel
+      channelDescription:
+          'Notifications for event updates', // Description of the channel
       importance: Importance.max,
       priority: Priority.high,
       showWhen: false,
@@ -94,13 +95,14 @@ class NotificationService {
   }) async {
     if (!notificationsEnabled) return;
 
-    final String body = 'Local: $location\nHorário: $formattedTime';
+    final String body = '$location\n $formattedTime\n';
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'your_channel_id',
-      'your_channel_name',
-      channelDescription: 'your_channel_description',
+      'update_channel_id', // Unique ID for update notifications
+      'Update Notifications', // Name of the channel
+      channelDescription:
+          'Notifications for event updates', // Description of the channel
       importance: Importance.max,
       priority: Priority.high,
       showWhen: true,

@@ -1,16 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class EventImage extends StatelessWidget {
-  final String? imageUrl;
   final String? localImagePath;
   final double imageHeight;
+  final Stream<String?>? imageUrlStream;
 
   const EventImage({
     super.key,
-    this.imageUrl,
     this.localImagePath,
+    this.imageUrlStream,
     this.imageHeight = 400.0,
   });
 
@@ -31,28 +30,46 @@ class EventImage extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             )
-          : imageUrl != null && imageUrl!.isNotEmpty
-              ? CachedNetworkImage(
-                  imageUrl: imageUrl!,
-                  fit: BoxFit.cover,
-                  errorWidget: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[300],
-                      child: const Center(
-                        child: Icon(Icons.error, color: Colors.red),
-                      ),
-                    );
-                  },
-                  placeholder: (context, url) {
-                    return Container(
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  },
-                )
-              : const SizedBox.shrink(),
+          : StreamBuilder<String?>(
+              stream: imageUrlStream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Container(
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  return Container(
+                    color: Colors.grey[300],
+                    child: const Center(
+                      child: Icon(Icons.error, color: Colors.red),
+                    ),
+                  );
+                }
+
+                final imageUrl = snapshot.data;
+                if (imageUrl != null && imageUrl.isNotEmpty) {
+                  return Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[300],
+                        child: const Center(
+                          child: Icon(Icons.error, color: Colors.red),
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  return const SizedBox.shrink();
+                }
+              },
+            ),
     );
   }
 }
