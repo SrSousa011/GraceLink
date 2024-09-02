@@ -27,12 +27,10 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
   late TextEditingController _instructorController;
   late TextEditingController _priceController;
   late TextEditingController _registrationDeadlineController;
-  late TextEditingController _timeController;
   late TextEditingController _imageUrlController;
 
   final CourseService _courseService = CourseService();
   final DateFormat _dateFormat = DateFormat('dd/MM/yyyy');
-  final DateFormat _timeFormat = DateFormat('HH:mm');
 
   @override
   void initState() {
@@ -43,7 +41,6 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
     _instructorController = TextEditingController();
     _priceController = TextEditingController();
     _registrationDeadlineController = TextEditingController();
-    _timeController = TextEditingController();
     _imageUrlController = TextEditingController();
     _fetchCourseData();
   }
@@ -56,7 +53,6 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
     _instructorController.dispose();
     _priceController.dispose();
     _registrationDeadlineController.dispose();
-    _timeController.dispose();
     _imageUrlController.dispose();
     super.dispose();
   }
@@ -84,14 +80,6 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
         } else {
           _registrationDeadlineController.clear();
         }
-
-        Timestamp? timeTimestamp = data['time'] as Timestamp?;
-        if (timeTimestamp != null) {
-          _timeController.text = _timeFormat.format(timeTimestamp.toDate());
-        } else {
-          _timeController.clear();
-        }
-
         _imageUrlController.text = data['imageUrl'] ?? '';
       }
     } catch (e) {
@@ -112,9 +100,6 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
         _registrationDeadlineController.text.isNotEmpty
             ? _dateFormat.parse(_registrationDeadlineController.text)
             : null;
-    DateTime? time = _timeController.text.isNotEmpty
-        ? _timeFormat.parse(_timeController.text)
-        : null;
 
     try {
       await _courseService.update(
@@ -125,7 +110,6 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
         instructor: instructor,
         price: price,
         registrationDeadline: registrationDeadline,
-        time: time,
       );
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
@@ -148,7 +132,6 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
       _instructorController.clear();
       _priceController.clear();
       _registrationDeadlineController.clear();
-      _timeController.clear();
       _imageUrlController.clear();
     });
   }
@@ -208,7 +191,7 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
     return TextFormField(
       controller: _registrationDeadlineController,
       decoration: const InputDecoration(
-        labelText: 'Data de Inscrição',
+        labelText: 'Prazo de Inscrição',
         prefixIcon: Icon(LineAwesomeIcons.calendar_alt),
       ),
       keyboardType: TextInputType.datetime,
@@ -223,35 +206,6 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
         if (selectedDate != null) {
           _registrationDeadlineController.text =
               _dateFormat.format(selectedDate);
-        }
-      },
-    );
-  }
-
-  Widget _timeField() {
-    return TextFormField(
-      controller: _timeController,
-      decoration: const InputDecoration(
-        labelText: 'Horário',
-        prefixIcon: Icon(LineAwesomeIcons.clock),
-      ),
-      keyboardType: TextInputType.datetime,
-      onTap: () async {
-        FocusScope.of(context).requestFocus(FocusNode());
-        TimeOfDay? selectedTime = await showTimePicker(
-          context: context,
-          initialTime: TimeOfDay.now(),
-        );
-        if (selectedTime != null) {
-          DateTime now = DateTime.now();
-          DateTime selectedDateTime = DateTime(
-            now.year,
-            now.month,
-            now.day,
-            selectedTime.hour,
-            selectedTime.minute,
-          );
-          _timeController.text = _timeFormat.format(selectedDateTime);
         }
       },
     );
@@ -301,8 +255,6 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
                   _priceField(),
                   const SizedBox(height: tFormHeight),
                   _registrationDeadlineField(),
-                  const SizedBox(height: tFormHeight),
-                  _timeField(),
                   const SizedBox(height: tFormHeight),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
