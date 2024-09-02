@@ -85,7 +85,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
     imageAdd.uploadAndSaveImage(
       onSuccess: () {
-        setState(() {}); // Atualiza o estado local para refletir a nova imagem
+        setState(() {});
       },
       onError: (errorMessage) {
         if (kDebugMode) {
