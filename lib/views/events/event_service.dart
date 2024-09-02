@@ -39,6 +39,23 @@ class Event {
     );
   }
 
+  factory Event.fromSnapshot(DocumentSnapshot snapshot) {
+    final data = snapshot.data() as Map<String, dynamic>;
+    return Event(
+      id: snapshot.id,
+      title: data['title'] ?? '',
+      description: data['description'] ?? '',
+      date: (data['date'] as Timestamp).toDate(),
+      time: TimeOfDay(
+        hour: int.parse(data['time'].split(':')[0]),
+        minute: int.parse(data['time'].split(':')[1]),
+      ),
+      location: data['location'] ?? '',
+      createdBy: data['createdBy'] ?? '',
+      imageUrl: data['imageUrl'],
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'title': title,
