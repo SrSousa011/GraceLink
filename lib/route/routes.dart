@@ -17,7 +17,7 @@ import 'package:churchapp/views/donations/dashboard/donnation_dashboard.dart';
 import 'package:churchapp/views/user_Profile/info/about_us.dart';
 import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/welcome.dart';
-import 'package:churchapp/views/courses/courses.dart';
+import 'package:churchapp/views/courses/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
 import 'package:churchapp/views/events/events.dart';
 import 'package:churchapp/views/home/home.dart';

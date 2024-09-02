@@ -11,7 +11,7 @@ class CourseService {
     String? instructor,
     double? price,
     DateTime? registrationDeadline,
-    String? time,
+    DateTime? time,
   }) async {
     try {
       final updateData = <String, dynamic>{};
@@ -27,7 +27,9 @@ class CourseService {
         updateData['registrationDeadline'] =
             Timestamp.fromDate(registrationDeadline);
       }
-      if (time != null) updateData['time'] = time;
+      if (time != null) {
+        updateData['time'] = Timestamp.fromDate(time);
+      }
 
       await _firestore.collection('courses').doc(courseId).update(updateData);
     } catch (e) {

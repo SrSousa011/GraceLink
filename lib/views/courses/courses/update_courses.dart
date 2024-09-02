@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:churchapp/views/courses/courseLive/course_live.dart';
+import 'package:intl/intl.dart';
 
 const String tEditCourse = 'Editar Curso';
 const double tDefaultSize = 16.0;
@@ -30,6 +31,8 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
   late TextEditingController _imageUrlController;
 
   final CourseService _courseService = CourseService();
+  final DateFormat _dateFormat = DateFormat('dd/MM/yyyy', 'pt_BR');
+  final DateFormat _timeFormat = DateFormat('HH:mm');
 
   @override
   void initState() {
@@ -72,12 +75,23 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
         _descriptionDetailsController.text = data['descriptionDetails'] ?? '';
         _instructorController.text = data['instructor'] ?? '';
         _priceController.text = (data['price'] ?? '').toString();
-        _registrationDeadlineController.text =
-            (data['registrationDeadline'] as Timestamp?)
-                    ?.toDate()
-                    .toIso8601String() ??
-                '';
-        _timeController.text = data['time'] ?? '';
+
+        Timestamp? registrationDeadlineTimestamp =
+            data['registrationDeadline'] as Timestamp?;
+        if (registrationDeadlineTimestamp != null) {
+          _registrationDeadlineController.text =
+              _dateFormat.format(registrationDeadlineTimestamp.toDate());
+        } else {
+          _registrationDeadlineController.clear();
+        }
+
+        Timestamp? timeTimestamp = data['time'] as Timestamp?;
+        if (timeTimestamp != null) {
+          _timeController.text = _timeFormat.format(timeTimestamp.toDate());
+        } else {
+          _timeController.clear();
+        }
+
         _imageUrlController.text = data['imageUrl'] ?? '';
       }
     } catch (e) {
@@ -96,9 +110,11 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
     double? price = double.tryParse(_priceController.text);
     DateTime? registrationDeadline =
         _registrationDeadlineController.text.isNotEmpty
-            ? DateTime.parse(_registrationDeadlineController.text)
+            ? _dateFormat.parse(_registrationDeadlineController.text)
             : null;
-    String time = _timeController.text;
+    DateTime? time = _timeController.text.isNotEmpty
+        ? _timeFormat.parse(_timeController.text)
+        : null;
 
     try {
       await _courseService.update(
@@ -196,6 +212,19 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
         prefixIcon: Icon(LineAwesomeIcons.calendar_alt),
       ),
       keyboardType: TextInputType.datetime,
+      onTap: () async {
+        FocusScope.of(context).requestFocus(FocusNode());
+        DateTime? selectedDate = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime(2000),
+          lastDate: DateTime(2101),
+        );
+        if (selectedDate != null) {
+          _registrationDeadlineController.text =
+              _dateFormat.format(selectedDate);
+        }
+      },
     );
   }
 
@@ -207,17 +236,24 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
         prefixIcon: Icon(LineAwesomeIcons.clock),
       ),
       keyboardType: TextInputType.datetime,
-    );
-  }
-
-  Widget _imageUrlField() {
-    return TextFormField(
-      controller: _imageUrlController,
-      decoration: const InputDecoration(
-        labelText: 'URL da Imagem',
-        prefixIcon: Icon(LineAwesomeIcons.image),
-      ),
-      keyboardType: TextInputType.url,
+      onTap: () async {
+        FocusScope.of(context).requestFocus(FocusNode());
+        TimeOfDay? selectedTime = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.now(),
+        );
+        if (selectedTime != null) {
+          DateTime now = DateTime.now();
+          DateTime selectedDateTime = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            selectedTime.hour,
+            selectedTime.minute,
+          );
+          _timeController.text = _timeFormat.format(selectedDateTime);
+        }
+      },
     );
   }
 
@@ -267,8 +303,6 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
                   _registrationDeadlineField(),
                   const SizedBox(height: tFormHeight),
                   _timeField(),
-                  const SizedBox(height: tFormHeight),
-                  _imageUrlField(),
                   const SizedBox(height: tFormHeight),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
