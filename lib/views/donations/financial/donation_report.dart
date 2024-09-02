@@ -102,7 +102,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                     decoration: BoxDecoration(
                       color: accentColor,
                       borderRadius: const BorderRadius.vertical(
-                        bottom: Radius.circular(80),
+                        bottom: Radius.circular(60),
                       ),
                     ),
                     child: Align(
@@ -159,8 +159,10 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                               decoration: BoxDecoration(
                                 color: cardBackgroundColor,
                                 borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(30),
-                                  bottom: Radius.circular(30),
+                                  top: Radius.circular(
+                                      40), // Reduced corner radius
+                                  bottom: Radius.circular(
+                                      40), // Reduced corner radius
                                 ),
                                 boxShadow: [
                                   BoxShadow(
@@ -217,7 +219,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                     decoration: BoxDecoration(
                       color: isDarkMode ? Colors.grey[850]! : Colors.blue[50]!,
                       borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(30),
+                        top: Radius.circular(20),
                         bottom: Radius.circular(0),
                       ),
                     ),
@@ -455,7 +457,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
         boxShadow: withShadow
             ? [
                 BoxShadow(
