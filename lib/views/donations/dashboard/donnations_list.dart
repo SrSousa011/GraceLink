@@ -48,19 +48,16 @@ class DonationsList extends StatelessWidget {
             itemCount: donations.length,
             itemBuilder: (context, index) {
               final donation = donations[index].data() as Map<String, dynamic>;
-              final fullName = donation['fullName'] ?? 'Unknown';
+              final fullName = donation['fullName'] ?? 'Desconhecido';
               final donationValue = donation['donationValue'] ?? '0.00';
-              final donationType = donation['donationType'] ?? 'No type';
+              final donationType = donation['donationType'] ?? 'Sem tipo';
               final userId = donation['userId'];
               final paymentProofURL = donation['photoURL'] ?? '';
 
               final timestamp = donation['timestamp'] as Timestamp?;
               final date = timestamp != null
                   ? DateFormat('dd/MM/yyyy').format(timestamp.toDate())
-                  : 'Unknown';
-              final time = timestamp != null
-                  ? DateFormat('HH:mm').format(timestamp.toDate())
-                  : 'Unknown';
+                  : 'Desconhecida';
 
               return StreamBuilder<DocumentSnapshot>(
                 stream: _firestore.collection('users').doc(userId).snapshots(),
@@ -128,10 +125,10 @@ class DonationsList extends StatelessWidget {
                           builder: (context) => DonationReceipt(
                             title: 'Detalhes da Doação',
                             from: creatorName,
-                            time: time,
                             date: date,
                             total: donationValue,
                             paymentProofURL: paymentProofURL,
+                            donorPhotoURL: creatorImageUrl,
                           ),
                         ),
                       );

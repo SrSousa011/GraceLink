@@ -3,26 +3,27 @@ import 'package:flutter/material.dart';
 class DonationReceipt extends StatelessWidget {
   final String title;
   final String from;
-  final String time;
   final String date;
   final String total;
   final String paymentProofURL;
+  final String donorPhotoURL;
 
   const DonationReceipt({
     super.key,
     required this.title,
     required this.from,
-    required this.time,
     required this.date,
     required this.total,
     required this.paymentProofURL,
+    required this.donorPhotoURL,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Doação'),
+        title: Text(title),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -30,32 +31,45 @@ class DonationReceipt extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              if (donorPhotoURL.isNotEmpty)
+                Center(
+                  child: Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.blueAccent, width: 2),
+                      image: DecorationImage(
+                        image: NetworkImage(donorPhotoURL),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 20.0),
               Text(
-                'From: $from',
+                'De: $from',
                 style: const TextStyle(
-                  fontSize: 18.0,
-                  color: Colors.grey,
+                  fontSize: 22.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
                 ),
               ),
-              const SizedBox(height: 10.0),
+              const SizedBox(height: 12.0),
               Text(
-                'Time: $time',
-                style: const TextStyle(
+                'Data: $date',
+                style: TextStyle(
                   fontSize: 18.0,
+                  color: Colors.grey[700],
                 ),
               ),
-              const SizedBox(height: 10.0),
+              const SizedBox(height: 12.0),
               Text(
-                'Date: $date',
-                style: const TextStyle(
-                  fontSize: 18.0,
-                ),
-              ),
-              const SizedBox(height: 10.0),
-              Text(
-                'Total:  $total',
-                style: const TextStyle(
-                  fontSize: 18.0,
+                'Total: $total',
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green[700],
                 ),
               ),
               const SizedBox(height: 20.0),
@@ -72,14 +86,21 @@ class DonationReceipt extends StatelessWidget {
                     );
                   },
                   child: Container(
-                    width: double.infinity,
-                    height: 300,
+                    width: 150,
+                    height: 100,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12.0),
                       image: DecorationImage(
                         image: NetworkImage(paymentProofURL),
                         fit: BoxFit.cover,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.4),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: const Align(
                       alignment: Alignment.bottomRight,
@@ -94,7 +115,16 @@ class DonationReceipt extends StatelessWidget {
                     ),
                   ),
                 ),
-              if (paymentProofURL.isEmpty) const Text('No image available.'),
+              if (paymentProofURL.isEmpty)
+                Center(
+                  child: Text(
+                    'Nenhuma imagem disponível.',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -112,7 +142,8 @@ class FullScreenImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Donation Image'),
+        title: const Text('Imagem da Doação'),
+        backgroundColor: Colors.blueAccent,
       ),
       body: Center(
         child: InteractiveViewer(
