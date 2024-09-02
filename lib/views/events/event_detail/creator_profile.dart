@@ -24,23 +24,23 @@ class CreatorProfileOverlay extends StatelessWidget {
         stream: userStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return _buildProfileContent(null, true);
           }
 
           if (!snapshot.hasData || !snapshot.data!.exists) {
-            return _buildProfileContent(null);
+            return _buildProfileContent(null, false);
           }
 
           final userData = snapshot.data!;
           final imageUrl = userData['imagePath'] as String?;
 
-          return _buildProfileContent(imageUrl);
+          return _buildProfileContent(imageUrl, false);
         },
       ),
     );
   }
 
-  Widget _buildProfileContent(String? imageUrl) {
+  Widget _buildProfileContent(String? imageUrl, bool isLoading) {
     return Row(
       children: [
         CircleAvatar(
@@ -49,7 +49,9 @@ class CreatorProfileOverlay extends StatelessWidget {
           radius: 24.0,
           backgroundColor: Colors.grey[300],
           child: imageUrl == null
-              ? const Icon(Icons.person, color: Colors.grey)
+              ? isLoading
+                  ? const CircularProgressIndicator()
+                  : const Icon(Icons.person, color: Colors.grey)
               : null,
         ),
         const SizedBox(width: 8.0),
