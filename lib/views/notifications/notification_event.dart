@@ -67,10 +67,9 @@ class NotificationService {
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'update_channel_id', // Unique ID for update notifications
-      'Update Notifications', // Name of the channel
-      channelDescription:
-          'Notifications for event updates', // Description of the channel
+      'update_channel_id',
+      'Update Notifications',
+      channelDescription: 'Notifications for event updates',
       importance: Importance.max,
       priority: Priority.high,
       showWhen: false,
@@ -99,10 +98,9 @@ class NotificationService {
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'update_channel_id', // Unique ID for update notifications
-      'Update Notifications', // Name of the channel
-      channelDescription:
-          'Notifications for event updates', // Description of the channel
+      'update_channel_id',
+      'Update Notifications',
+      channelDescription: 'Notifications for event updates',
       importance: Importance.max,
       priority: Priority.high,
       showWhen: true,
