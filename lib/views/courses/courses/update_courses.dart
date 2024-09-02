@@ -1,8 +1,8 @@
 import 'package:churchapp/views/courses/courses/course_service.dart';
+import 'package:churchapp/views/courses/courses/courses.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:churchapp/views/courses/courseLive/course_live.dart';
 import 'package:intl/intl.dart';
 
 const String tEditCourse = 'Editar Curso';
@@ -130,7 +130,7 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => const CourseLive(),
+          builder: (context) => const Courses(),
         ),
       );
     } catch (e) {
