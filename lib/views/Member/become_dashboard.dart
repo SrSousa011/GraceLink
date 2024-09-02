@@ -40,18 +40,12 @@ class _MembersDashboardState extends State<MembersDashboard> {
       final startOfMonth = DateTime(now.year, now.month, 1);
       final endOfMonth = DateTime(now.year, now.month + 1, 0);
 
-      final querySnapshot = await _firestore
-          .collection('becomeMember')
-          .where('createdAt',
-              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
-          .where('createdAt',
-              isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
-          .get();
-
+      final querySnapshot = await _firestore.collection('becomeMember').get();
       final members = querySnapshot.docs;
 
       setState(() {
         _totalMembers = members.length;
+
         _totalMen = members
             .where((doc) => (doc.data()['gender'] as String?) == 'Masculino')
             .length;
@@ -59,21 +53,27 @@ class _MembersDashboardState extends State<MembersDashboard> {
             .where((doc) => (doc.data()['gender'] as String?) == 'Feminino')
             .length;
 
-        // Atualização para lidar com campos opcionais
         _totalChildren = members.where((doc) {
           final birthDateTimestamp = doc.data()['birthDate'] as Timestamp?;
           if (birthDateTimestamp == null) return false;
 
           final birthDate = birthDateTimestamp.toDate();
           final age = now.year - birthDate.year;
-          return age <= 12;
+          final isBeforeBirthday = now.month < birthDate.month ||
+              (now.month == birthDate.month && now.day < birthDate.day);
+          return age < 12 || (age == 12 && !isBeforeBirthday);
         }).length;
 
-        _newSignUps = members
-            .length; // Se todos os documentos no intervalo são novas inscrições
+        _newSignUps = members.where((doc) {
+          final createdAtTimestamp = doc.data()['createdAt'] as Timestamp?;
+          if (createdAtTimestamp == null) return false;
+
+          final createdAt = createdAtTimestamp.toDate();
+          return createdAt.isAfter(startOfMonth) &&
+              createdAt.isBefore(endOfMonth);
+        }).length;
       });
     } catch (e) {
-      // Adicione um log para depuração
       print('Failed to fetch member counts: $e');
     }
   }
@@ -220,7 +220,8 @@ class _MembersDashboardState extends State<MembersDashboard> {
   }) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).pushNamed('/member_list', arguments: {'filter': filter});
+        Navigator.of(context)
+            .pushNamed('/member_list', arguments: {'filter': filter});
       },
       child: Container(
         padding: const EdgeInsets.all(16.0),
