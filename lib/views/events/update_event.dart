@@ -1,9 +1,9 @@
+import 'package:churchapp/views/notifications/notification_event.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/event_service.dart';
-import 'package:churchapp/views/notifications/notification_event.dart';
 
 class UpdateEventForm extends StatefulWidget {
   final Event event;
@@ -44,12 +44,17 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final DateTime firstDate = DateTime.now();
+    final DateTime initialDate =
+        _selectedDate.isBefore(firstDate) ? firstDate : _selectedDate;
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime.now(),
+      initialDate: initialDate,
+      firstDate: firstDate,
       lastDate: DateTime(2101),
     );
+
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
@@ -72,6 +77,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   Future<void> _updateEvent(BuildContext context) async {
     if (!context.mounted) return;
     DateFormat('dd/MM/yyyy').format(_selectedDate);
+    final formattedTime = _selectedTime.format(context);
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty &&
         _locationController.text.isNotEmpty) {
@@ -87,6 +93,17 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
       );
 
       try {
+        await updateEvent(updatedEvent, widget.event.id);
+
+        if (_notificationService.notificationsEnabled) {
+          await _notificationService.sendNotification(
+            title: _titleController.text,
+            location: _locationController.text,
+            formattedTime: formattedTime,
+            addedTime: formattedTime,
+          );
+        }
+
         if (context.mounted) {
           Navigator.pop(context, updatedEvent);
         }
