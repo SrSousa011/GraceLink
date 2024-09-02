@@ -33,7 +33,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   final ImagePicker _picker = ImagePicker();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  String? _localImagePath;
 
   @override
   void initState() {
@@ -86,7 +85,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
     imageAdd.uploadAndSaveImage(
       onSuccess: () {
-        setState(() {});
+        setState(() {}); // Atualiza o estado local para refletir a nova imagem
       },
       onError: (errorMessage) {
         if (kDebugMode) {
@@ -94,6 +93,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         }
       },
     );
+  }
+
+  Stream<DocumentSnapshot> _getEventStream() {
+    return _firestore.collection('events').doc(_event.id).snapshots();
   }
 
   @override
@@ -110,16 +113,28 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ),
         title: const Text('Evento'),
       ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: _getEventStream(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            return const Center(child: Text('Evento não encontrado.'));
+          }
+
+          final eventData = snapshot.data!;
+          final updatedEvent = Event.fromSnapshot(eventData);
+
+          return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 StreamBuilder<DocumentSnapshot>(
                   stream: _firestore
                       .collection('users')
-                      .doc(_event.createdBy)
+                      .doc(updatedEvent.createdBy)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -141,26 +156,28 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 Padding(
                   padding: const EdgeInsets.all(0.0),
                   child: EventImage(
-                    imageUrl: _event.imageUrl,
-                    localImagePath: _localImagePath,
+                    imageUrlStream: _getEventStream().map((snapshot) {
+                      final data = snapshot.data() as Map<String, dynamic>;
+                      return data['imageUrl'] as String?;
+                    }),
                   ),
                 ),
                 const SizedBox(height: 16.0),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: EventDetails(
-                    title: _event.title,
-                    description: _event.description,
-                    date: DateFormat('dd/MM/yyyy').format(_event.date),
-                    time: _event.time.format(context),
-                    location: _event.location,
+                    title: updatedEvent.title,
+                    description: updatedEvent.description,
+                    date: DateFormat('dd/MM/yyyy').format(updatedEvent.date),
+                    time: updatedEvent.time.format(context),
+                    location: updatedEvent.location,
                     isDarkMode: isDarkMode,
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+          );
+        },
       ),
       floatingActionButton: _shouldShowPopupMenu()
           ? FloatingActionButton(
@@ -260,9 +277,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   void _navigateToEventScreen() async {
     final result = await Navigator.push<Map<String, dynamic>>(
       context,
-      MaterialPageRoute(
-        builder: (context) => const Events(),
-      ),
+      MaterialPageRoute(builder: (context) => const Events()),
     );
 
     if (result != null && context.mounted) {
