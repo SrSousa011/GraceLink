@@ -113,7 +113,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Good Morning',
+                              'Bom Dia',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -174,7 +174,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                 children: [
                                   _buildFinancialCard(
                                     icon: Icons.account_balance_wallet,
-                                    title: 'Total Balance',
+                                    title: 'Saldo total',
                                     value:
                                         '€ ${totalBalance.toStringAsFixed(2)}',
                                     valueStyle: TextStyle(
@@ -190,7 +190,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                   ),
                                   _buildFinancialCard(
                                     icon: Icons.trending_up,
-                                    title: 'Monthly Income',
+                                    title: 'Renda mensal',
                                     value:
                                         '€ ${monthlyIncome.toStringAsFixed(2)}',
                                     valueStyle: TextStyle(
@@ -227,12 +227,12 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                         Row(
                           children: [
                             Icon(Icons.account_balance,
-                                size: 18, color: accentColor),
+                                size: 22, color: accentColor),
                             const SizedBox(width: 8),
                             Text(
                               'Doações Recentes',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 22,
                                 fontWeight: FontWeight.bold,
                                 color: primaryTextColor,
                               ),
@@ -249,7 +249,8 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                               },
                               child: Text(
                                 'Ver Todos',
-                                style: TextStyle(color: accentColor),
+                                style:
+                                    TextStyle(fontSize: 14, color: accentColor),
                               ),
                             ),
                           ],
