@@ -154,6 +154,18 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 ),
                 const SizedBox(height: 16.0),
                 Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    updatedEvent.title,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                Padding(
                   padding: const EdgeInsets.all(0.0),
                   child: EventImage(
                     imageUrlStream: _getEventStream().map((snapshot) {
@@ -166,11 +178,11 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: EventDetails(
-                    title: updatedEvent.title,
-                    description: updatedEvent.description,
-                    date: DateFormat('dd/MM/yyyy').format(updatedEvent.date),
-                    time: updatedEvent.time.format(context),
-                    location: updatedEvent.location,
+                    description: 'Descrição: ${updatedEvent.description}',
+                    date:
+                        'Data: ${DateFormat('dd/MM/yyyy').format(updatedEvent.date)}',
+                    time: 'Horário: ${updatedEvent.time.format(context)}',
+                    location: 'Localidade: ${updatedEvent.location}',
                     isDarkMode: isDarkMode,
                   ),
                 ),
