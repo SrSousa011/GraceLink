@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class EventDetails extends StatelessWidget {
-  final String title;
+  final String? title;
   final String description;
   final String date;
   final String time;
@@ -10,7 +10,7 @@ class EventDetails extends StatelessWidget {
 
   const EventDetails({
     super.key,
-    required this.title,
+    this.title,
     required this.description,
     required this.date,
     required this.time,
@@ -23,14 +23,15 @@ class EventDetails extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black,
+        if (title != null && title!.isNotEmpty)
+          Text(
+            title!,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
           ),
-        ),
         _buildDetailsText(description),
         _buildDetailsText(date),
         _buildDetailsText(time),
