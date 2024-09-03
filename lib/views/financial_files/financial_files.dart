@@ -1,7 +1,8 @@
 import 'package:churchapp/views/financial_files/expenses.dart';
-import 'package:churchapp/views/financial_files/graphics_screen.dart';
+import 'package:churchapp/views/financial_files/financial_analytics.dart';
 import 'package:churchapp/views/financial_files/incomes.dart';
-import 'package:churchapp/views/financial_files/other.dart';
+import 'package:churchapp/views/financial_files/transaction_history.dart';
+import 'package:churchapp/views/financial_files/upcoming_event.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -117,7 +118,10 @@ class _FinanceScreenState extends State<FinanceScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const GraphicsScreen(),
+                              builder: (context) => const FinancialAnalytics(
+                                totalBalance: 200,
+                                monthlyIncome: 300,
+                              ),
                             ),
                           );
                         },
@@ -254,7 +258,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const ProximosLancamentosScreen(),
+                      builder: (context) => const UpcomingEventsScreen(),
                     ),
                   );
                 },
@@ -273,7 +277,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const HistoricoTransacoesScreen(),
+                      builder: (context) => const TransactionHistoryScreen(),
                     ),
                   );
                 },

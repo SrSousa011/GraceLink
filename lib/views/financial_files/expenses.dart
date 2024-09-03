@@ -1,4 +1,4 @@
-import 'package:churchapp/views/financial_files/other.dart';
+import 'package:churchapp/views/financial_files/extras.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
