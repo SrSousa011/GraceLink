@@ -140,27 +140,26 @@ class _FinanceScreenState extends State<FinanceScreen> {
                               Icon(Icons.account_balance,
                                   size: 24, color: primaryTextColor),
                               const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Saldo Total',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: primaryTextColor,
-                                      ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment
+                                    .start, // Alinha o texto à esquerda do ícone
+                                children: [
+                                  Text(
+                                    'Saldo Total',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: primaryTextColor,
                                     ),
-                                    Text(
-                                      '€ ${totalBalance.toStringAsFixed(2)}',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: primaryTextColor,
-                                      ),
+                                  ),
+                                  Text(
+                                    '€ ${totalBalance.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: primaryTextColor,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
