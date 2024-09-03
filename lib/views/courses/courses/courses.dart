@@ -162,7 +162,7 @@ class _CoursesState extends State<Courses> {
                                   alignment: Alignment.centerRight,
                                   child: ElevatedButton(
                                     onPressed: () {
-                                      Navigator.push(
+                                      Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
