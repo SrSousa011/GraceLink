@@ -22,6 +22,7 @@ class _UpdateScheduleScreenState extends State<UpdateScheduleScreen> {
   late TextEditingController _timeController;
   late TextEditingController _daysOfWeekController;
   late TextEditingController _videoUrlController;
+  TimeOfDay? _initialTime;
 
   @override
   void initState() {
@@ -49,8 +50,17 @@ class _UpdateScheduleScreenState extends State<UpdateScheduleScreen> {
 
       if (courseDoc.exists) {
         var data = courseDoc.data()!;
-        _timeController.text =
-            (data['time'] as Timestamp?)?.toDate().toString() ?? '';
+
+        final timestamp = data['time'] as Timestamp?;
+        if (timestamp != null) {
+          final dateTime = timestamp.toDate();
+          _initialTime =
+              TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
+          final formattedTime =
+              '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+          _timeController.text = formattedTime;
+        }
+
         _daysOfWeekController.text = data['daysOfWeek'] ?? '';
         _videoUrlController.text = data['videoUrl'] ?? '';
       }
@@ -63,18 +73,21 @@ class _UpdateScheduleScreenState extends State<UpdateScheduleScreen> {
   }
 
   void _saveScheduleChanges() {
-    String time = _timeController.text;
-    String daysOfWeek = _daysOfWeekController.text;
-    String videoUrl = _videoUrlController.text;
-
     try {
+      final timeParts = _timeController.text.split(':');
+      final hour = int.parse(timeParts[0]);
+      final minute = int.parse(timeParts[1]);
+
+      final now = DateTime.now();
+      final time = DateTime(now.year, now.month, now.day, hour, minute);
+
       FirebaseFirestore.instance
           .collection('courses')
           .doc(widget.courseId)
           .update({
-        'time': Timestamp.fromDate(DateTime.parse(time)),
-        'daysOfWeek': daysOfWeek,
-        'videoUrl': videoUrl,
+        'time': Timestamp.fromDate(time),
+        'daysOfWeek': _daysOfWeekController.text,
+        'videoUrl': _videoUrlController.text,
       }).then((_) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
@@ -112,13 +125,12 @@ class _UpdateScheduleScreenState extends State<UpdateScheduleScreen> {
       onTap: () async {
         final time = await showTimePicker(
           context: context,
-          initialTime: TimeOfDay.now(),
+          initialTime: _initialTime ?? TimeOfDay.now(),
         );
         if (time != null) {
-          _timeController.text = DateTime(
-            time.hour,
-            time.minute,
-          ).toIso8601String();
+          final formattedTime =
+              '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+          _timeController.text = formattedTime;
         }
       },
     );
