@@ -1,77 +1,62 @@
-import 'package:churchapp/views/financial_files/financial_analytics.dart';
+import 'package:churchapp/views/financial_files/expenses.dart';
+import 'package:churchapp/views/financial_files/graphics_screen.dart';
+import 'package:churchapp/views/financial_files/incomes.dart';
+import 'package:churchapp/views/financial_files/other.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class FinancialFiles extends StatefulWidget {
-  const FinancialFiles({super.key});
+class FinanceScreen extends StatefulWidget {
+  const FinanceScreen({super.key});
 
   @override
-  State<FinancialFiles> createState() => _FinancialFilesState();
+  State<FinanceScreen> createState() => _FinanceScreenState();
 }
 
-class _FinancialFilesState extends State<FinancialFiles> {
+class _FinanceScreenState extends State<FinanceScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  late Future<Map<String, dynamic>> _userData;
 
   @override
   void initState() {
     super.initState();
-    _fetchDonations();
+    _userData = _fetchUserData();
   }
 
-  Future<void> _fetchDonations() async {
-    try {
-      setState(() {});
-    } catch (e) {
-      print('Error fetching donations: $e');
-      setState(() {});
+  Future<Map<String, dynamic>> _fetchUserData() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception('User not authenticated');
+    }
+
+    final doc = await _firestore.collection('users').doc(user.uid).get();
+    if (doc.exists) {
+      return doc.data() as Map<String, dynamic>;
+    } else {
+      throw Exception('User data not found');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      return const Center(child: Text('User not authenticated.'));
-    }
-
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     final backgroundColor = isDarkMode ? Colors.black : Colors.white;
     final primaryTextColor = isDarkMode ? Colors.white : Colors.black;
-    final cardBackgroundColor = isDarkMode ? Colors.grey[800]! : Colors.white;
+    final cardBackgroundColor = isDarkMode ? Colors.grey[800]! : Colors.blue;
+    final cardBackOutgroundColor = isDarkMode
+        ? Colors.grey[800]!
+        : const Color.fromARGB(255, 239, 241, 242);
     final cardTextColor = isDarkMode ? Colors.white : Colors.black;
-    final cardShadowColor = isDarkMode
-        ? Colors.black.withOpacity(0.5)
-        : Colors.black.withOpacity(0.2);
     final accentColor = isDarkMode ? Colors.blueGrey : Colors.blue;
-    final incomeColor = isDarkMode ? Colors.greenAccent : Colors.green;
+    final incomeColor =
+        isDarkMode ? Colors.lightGreenAccent : Colors.lightGreen;
     final expenseColor = isDarkMode ? Colors.redAccent : Colors.red;
-    final secondaryTextColor = isDarkMode ? Colors.grey[300]! : Colors.grey;
-
-    final upcomingLaunches = [
-      {'title': 'Conferência Anual', 'date': '2024-09-15'},
-      {'title': 'Retiro Espiritual', 'date': '2024-10-05'},
-    ];
-
-    final recentTransactions = [
-      {
-        'title': 'Doação para a Igreja',
-        'amount': '€ 50.00',
-        'date': '2024-08-25'
-      },
-      {
-        'title': 'Compra de Material',
-        'amount': '€ 30.00',
-        'date': '2024-08-22'
-      },
-    ];
 
     return Scaffold(
       backgroundColor: backgroundColor,
-      body: StreamBuilder<DocumentSnapshot>(
-        stream: _firestore.collection('users').doc(user.uid).snapshots(),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _userData,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -81,158 +66,174 @@ class _FinancialFilesState extends State<FinancialFiles> {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
 
-          if (!snapshot.hasData || !snapshot.data!.exists) {
+          if (!snapshot.hasData) {
             return const Center(child: Text('User data not found.'));
           }
 
-          final data = snapshot.data!.data() as Map<String, dynamic>;
+          final data = snapshot.data!;
           final userName = data['fullName'] ?? 'User';
+          final totalBalance = data['totalBalance'] ?? 0.0;
+          final totalIncome = data['totalIncome'] ?? 0.0;
+          final totalExpenses = data['totalExpenses'] ?? 0.0;
 
-          return StreamBuilder<QuerySnapshot>(
-            stream: _firestore.collection('donations').snapshots(),
-            builder: (context, donationsSnapshot) {
-              if (donationsSnapshot.connectionState ==
-                  ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (donationsSnapshot.hasError) {
-                return Center(
-                    child: Text(
-                        'Error fetching donations: ${donationsSnapshot.error}'));
-              }
-
-              final donations = donationsSnapshot.data?.docs ?? [];
-              final donationStats = DonationStats.fromDonations(donations);
-              final totalBalance = donationStats.totalBalance;
-              final totalIncome = donationStats.totalIncome;
-              final totalExpenses = donationStats.totalExpenses;
-
-              return SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      decoration: BoxDecoration(
-                        color: accentColor,
-                        borderRadius: const BorderRadius.vertical(
-                          bottom: Radius.circular(80),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height * 0.45,
+                decoration: BoxDecoration(
+                  color: accentColor,
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(60),
+                  ),
+                ),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.only(top: 60.0, left: 16.0, right: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Bom Dia',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: primaryTextColor,
                         ),
                       ),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 60.0, left: 16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      const SizedBox(height: 4), // Menor espaço
+                      Text(
+                        userName,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: primaryTextColor,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Cartão de Saldo Total
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const GraphicsScreen(),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8.0),
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          height: 80.0,
+                          decoration: BoxDecoration(
+                            color: cardBackgroundColor,
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(
-                                'Bom Dia',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: primaryTextColor,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                userName,
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: primaryTextColor,
+                              Icon(Icons.account_balance,
+                                  size: 24, color: primaryTextColor),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Saldo Total',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: primaryTextColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      '€ ${totalBalance.toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: primaryTextColor,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                    ),
-                    Transform.translate(
-                      offset: const Offset(0.0, -100.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => FinancialAnalytics(
-                                totalBalance: totalBalance,
-                                monthlyIncome: totalIncome,
-                              ),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Center(
-                            child: SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.8,
+
+                      const SizedBox(height: 16),
+                      // Cartões de Receitas e Despesas
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ReceitasScreen(),
+                                  ),
+                                );
+                              },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 16.0),
+                                padding: const EdgeInsets.all(8.0),
+                                height: 80.0,
                                 decoration: BoxDecoration(
                                   color: cardBackgroundColor,
-                                  borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(30),
-                                    bottom: Radius.circular(30),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: cardShadowColor,
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
+                                  borderRadius: BorderRadius.circular(15.0),
                                 ),
-                                child: Column(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    _buildFinancialCard(
-                                      icon: Icons.account_balance_wallet,
-                                      title: 'Total Balance',
-                                      value:
-                                          '€ ${totalBalance.toStringAsFixed(2)}',
-                                      valueStyle: TextStyle(
-                                        fontSize: 18,
-                                        color: cardTextColor,
-                                      ),
-                                      withShadow: false,
-                                      backgroundColor: cardBackgroundColor,
-                                      titleStyle: TextStyle(
-                                        fontSize: 18,
-                                        color: cardTextColor,
-                                      ),
-                                    ),
-                                    _buildFinancialCard(
-                                      icon: Icons.trending_up,
-                                      title: 'Total Income',
-                                      value:
-                                          '€ ${totalIncome.toStringAsFixed(2)}',
-                                      valueStyle: TextStyle(
-                                        fontSize: 14,
+                                    Icon(Icons.trending_up,
+                                        size: 24, color: incomeColor),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '€ ${totalIncome.toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                        fontSize: 25,
                                         color: incomeColor,
                                       ),
-                                      withShadow: false,
-                                      backgroundColor: Colors.transparent,
-                                      titleStyle: TextStyle(
-                                        fontSize: 15,
-                                        color: cardTextColor,
-                                      ),
                                     ),
-                                    _buildFinancialCard(
-                                      icon: Icons.trending_down,
-                                      title: 'Despesas',
-                                      value:
-                                          '€ ${totalExpenses.toStringAsFixed(2)}',
-                                      valueStyle: TextStyle(
-                                        fontSize: 14,
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ExpensesScreen(),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8.0),
+                                height: 80.0,
+                                decoration: BoxDecoration(
+                                  color: cardBackgroundColor,
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.trending_down,
+                                        size: 24, color: expenseColor),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '€ ${totalExpenses.toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                        fontSize: 25,
                                         color: expenseColor,
-                                      ),
-                                      withShadow: false,
-                                      backgroundColor: Colors.transparent,
-                                      titleStyle: TextStyle(
-                                        fontSize: 15,
-                                        color: cardTextColor,
                                       ),
                                     ),
                                   ],
@@ -240,177 +241,106 @@ class _FinancialFilesState extends State<FinancialFiles> {
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Text(
-                        'Próximos Lançamentos',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: primaryTextColor,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      decoration: BoxDecoration(
-                        color: cardBackgroundColor,
-                        borderRadius: BorderRadius.circular(15.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: cardShadowColor,
-                            blurRadius: 6,
-                            offset: const Offset(0, 4),
-                          ),
                         ],
                       ),
-                      child: Column(
-                        children: upcomingLaunches.map((launch) {
-                          return ListTile(
-                            leading: Icon(Icons.event, color: primaryTextColor),
-                            title: Text(
-                              launch['title']!,
-                              style: TextStyle(color: primaryTextColor),
-                            ),
-                            subtitle: Text(
-                              'Data: ${launch['date']}',
-                              style: TextStyle(color: secondaryTextColor),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Text(
-                        'Últimas Transações',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: primaryTextColor,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      decoration: BoxDecoration(
-                        color: cardBackgroundColor,
-                        borderRadius: BorderRadius.circular(15.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: cardShadowColor,
-                            blurRadius: 6,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: recentTransactions.map((transaction) {
-                          return ListTile(
-                            leading:
-                                Icon(Icons.payment, color: primaryTextColor),
-                            title: Text(
-                              transaction['title']!,
-                              style: TextStyle(color: primaryTextColor),
-                            ),
-                            trailing: Text(
-                              transaction['amount']!,
-                              style: TextStyle(
-                                color: transaction['amount']!.startsWith('-')
-                                    ? expenseColor
-                                    : incomeColor,
-                              ),
-                            ),
-                            subtitle: Text(
-                              'Data: ${transaction['date']}',
-                              style: TextStyle(color: secondaryTextColor),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
-              );
-            },
+              ),
+              const SizedBox(height: 16),
+              // Manter configurações originais para Próximos Lançamentos e Histórico de Transações
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProximosLancamentosScreen(),
+                    ),
+                  );
+                },
+                child: _buildFinanceSectionCard(
+                  icon: Icons.event_note,
+                  title: 'Próximos Lançamentos',
+                  value: '',
+                  backgroundColor: cardBackOutgroundColor,
+                  titleColor: cardTextColor,
+                  valueColor: cardTextColor,
+                ),
+              ),
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HistoricoTransacoesScreen(),
+                    ),
+                  );
+                },
+                child: _buildFinanceSectionCard(
+                  icon: Icons.history,
+                  title: 'Histórico de Transações',
+                  value: '',
+                  backgroundColor: cardBackOutgroundColor,
+                  titleColor: cardTextColor,
+                  valueColor: cardTextColor,
+                ),
+              ),
+            ],
           );
         },
       ),
     );
   }
 
-  Widget _buildFinancialCard({
+  Widget _buildFinanceSectionCard({
     required IconData icon,
     required String title,
     required String value,
-    required TextStyle valueStyle,
-    required TextStyle titleStyle,
-    bool withShadow = true,
     required Color backgroundColor,
+    required Color titleColor,
+    required Color valueColor,
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 5.0),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(15.0),
-        boxShadow: withShadow
-            ? [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 6,
-                  offset: const Offset(0, 4),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: titleColor,
+            size: 24,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: titleColor,
+                  ),
                 ),
-              ]
-            : null,
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: valueColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      child: ListTile(
-        leading: Icon(icon, size: 30, color: valueStyle.color),
-        title: Text(title, style: titleStyle),
-        trailing: Text(value, style: valueStyle),
-      ),
-    );
-  }
-}
-
-class DonationStats {
-  final double totalBalance;
-  final double totalIncome;
-  final double totalExpenses;
-
-  DonationStats({
-    required this.totalBalance,
-    required this.totalIncome,
-    required this.totalExpenses,
-  });
-
-  factory DonationStats.fromDonations(List<QueryDocumentSnapshot> donations) {
-    double totalIncome = 0;
-    double totalExpenses = 0;
-
-    for (var donationDoc in donations) {
-      final donationData = donationDoc.data() as Map<String, dynamic>;
-      final donationValue =
-          double.tryParse(donationData['donationValue'] ?? '0.00') ?? 0.00;
-
-      if (donationValue > 0) {
-        totalIncome += donationValue;
-      } else {
-        totalExpenses += donationValue.abs();
-      }
-    }
-
-    return DonationStats(
-      totalBalance: totalIncome - totalExpenses,
-      totalIncome: totalIncome,
-      totalExpenses: totalExpenses,
     );
   }
 }
