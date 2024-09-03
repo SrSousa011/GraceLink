@@ -174,8 +174,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ReceitasScreen(),
+                                    builder: (context) => const IncomesScreen(),
                                   ),
                                 );
                               },
