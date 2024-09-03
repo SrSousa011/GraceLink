@@ -56,7 +56,7 @@ class AppRoutes {
       case '/donations_dashboard':
         return MaterialPageRoute(builder: (_) => const DonationsDashboard());
       case '/financial_files':
-        return MaterialPageRoute(builder: (_) => const FinancialFiles());
+        return MaterialPageRoute(builder: (_) => const FinanceScreen());
       case '/courses':
         return MaterialPageRoute(builder: (_) => const Courses());
       case '/courses_dashboard':
