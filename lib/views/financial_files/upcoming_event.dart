@@ -137,8 +137,7 @@ class UpcomingEventsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Upcoming Events'),
-        backgroundColor: Colors.blue[700],
+        title: const Text('Próximos Lançamentos'),
       ),
       backgroundColor: backgroundColor,
       body: Padding(

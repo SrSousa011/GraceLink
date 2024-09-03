@@ -31,7 +31,7 @@ class FinancialAnalytics extends StatelessWidget {
         3300
       ];
       final value = values[index].toDouble();
-      final averageIncome = 3200.0;
+      const averageIncome = 3200.0;
 
       return BarChartGroupData(
         x: index + 1,
@@ -196,27 +196,14 @@ class FinancialAnalytics extends StatelessWidget {
                 child: BarChart(
                   BarChartData(
                     barGroups: incomeData,
-                    titlesData: FlTitlesData(
+                    titlesData: const FlTitlesData(
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
                           reservedSize: 40,
-                          getTitlesWidget: (value, meta) {
-                            final month = value.toInt();
-                            return SideTitleWidget(
-                              axisSide: meta.axisSide,
-                              child: Text(
-                                month > 0 ? monthNames[month - 1] : '',
-                                style: TextStyle(
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
-                                ),
-                              ),
-                            );
-                          },
                         ),
                       ),
-                      leftTitles: const AxisTitles(
+                      leftTitles: AxisTitles(
                         sideTitles: SideTitles(showTitles: false),
                       ),
                     ),
