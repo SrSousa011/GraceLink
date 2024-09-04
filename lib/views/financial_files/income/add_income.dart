@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:churchapp/theme/theme_provider.dart';
+import 'package:file_picker/file_picker.dart';
 
 class AddIncomeForm extends StatefulWidget {
   const AddIncomeForm({super.key});
@@ -21,6 +22,7 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
   String _selectedType = 'Evento';
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
+  String _filePath = '';
 
   @override
   void initState() {
@@ -79,6 +81,7 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
         'time': formattedTime,
         'createdBy': userId,
         'createdAt': createdDateTime,
+        'filePath': _filePath, // Adicionando o caminho do arquivo
       };
 
       try {
@@ -109,6 +112,7 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
+                Navigator.of(context).pop();
               },
               child: const Text('OK'),
             ),
@@ -129,6 +133,7 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
+                Navigator.of(context).pop();
               },
               child: const Text('OK'),
             ),
@@ -136,6 +141,19 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
         );
       },
     );
+  }
+
+  Future<void> _pickFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'],
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      setState(() {
+        _filePath = result.files.single.path ?? '';
+      });
+    }
   }
 
   @override
@@ -186,6 +204,8 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
                 _buildDatePicker(context),
                 const SizedBox(height: 20.0),
                 _buildTimePicker(context),
+                const SizedBox(height: 20.0),
+                _buildFilePicker(),
                 const SizedBox(height: 40.0),
               ],
             ),
@@ -285,6 +305,24 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
               });
             }
           },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFilePicker() {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            _filePath.isEmpty
+                ? 'Nenhum arquivo selecionado'
+                : 'Arquivo: ${_filePath.split('/').last}',
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.attach_file),
+          onPressed: _pickFile,
         ),
       ],
     );
