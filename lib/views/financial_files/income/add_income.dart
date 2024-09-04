@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 
 class AddIncomeForm extends StatefulWidget {
@@ -15,77 +16,85 @@ class AddIncomeForm extends StatefulWidget {
 class _AddIncomeFormState extends State<AddIncomeForm> {
   late TextEditingController _amountController;
   late TextEditingController _descriptionController;
-  late TextEditingController _sourceController; // Updated
-  late TextEditingController _categoryController; // Updated
-  DateTime? _selectedDate;
-  TimeOfDay? _selectedTime;
+  late TextEditingController _sourceController;
+  late TextEditingController _referenceController;
+  String _selectedType = 'Evento';
+  DateTime _selectedDate = DateTime.now();
+  TimeOfDay _selectedTime = TimeOfDay.now();
 
   @override
   void initState() {
     super.initState();
     _amountController = TextEditingController();
     _descriptionController = TextEditingController();
-    _sourceController = TextEditingController(); // Updated
-    _categoryController = TextEditingController(); // Updated
-    _selectedDate = DateTime.now();
-    _selectedTime = TimeOfDay.now();
+    _sourceController = TextEditingController();
+    _referenceController = TextEditingController();
   }
 
   @override
   void dispose() {
     _amountController.dispose();
     _descriptionController.dispose();
-    _sourceController.dispose(); // Updated
-    _categoryController.dispose(); // Updated
+    _sourceController.dispose();
+    _referenceController.dispose();
     super.dispose();
   }
 
   Future<void> _saveIncome(BuildContext context) async {
-    if (_amountController.text.isNotEmpty &&
-        _descriptionController.text.isNotEmpty &&
-        _sourceController.text.isNotEmpty && // Updated
-        _categoryController.text.isNotEmpty && // Updated
-        _selectedDate != null &&
-        _selectedTime != null) {
+    final amountText = _amountController.text;
+    final sourceText = _sourceController.text;
+
+    if (amountText.isNotEmpty && sourceText.isNotEmpty) {
+      final double? amount = double.tryParse(
+        amountText.replaceAll('€', '').replaceAll('.', '').replaceAll(',', '.'),
+      );
+
+      if (amount == null || amount <= 0) {
+        _showErrorDialog(context, 'Erro ao salvar receita',
+            'O valor inserido não é válido.');
+        return;
+      }
+
       final userId = FirebaseAuth.instance.currentUser?.uid;
       if (userId == null) {
-        if (!context.mounted) return;
-        _showErrorDialog(context, 'Erro ao salvar entrada',
+        _showErrorDialog(context, 'Erro ao salvar receita',
             'Não foi possível obter o ID do usuário.');
         return;
       }
 
       final incomeId = DateTime.now().millisecondsSinceEpoch.toString();
       final createdDateTime = DateTime.now();
-      DateFormat('dd/MM/yyyy').format(_selectedDate!);
+      final formattedDate = DateFormat('dd/MM/yyyy').format(_selectedDate);
+      final formattedTime = _selectedTime.format(context);
 
       final newIncome = {
         'id': incomeId,
-        'amount': double.tryParse(_amountController.text) ?? 0.0,
+        'amount': amount,
         'description': _descriptionController.text,
-        'source': _sourceController.text, // Updated
-        'category': _categoryController.text, // Updated
-        'time': _selectedTime!.format(context),
+        'source': _sourceController.text,
+        'reference': _referenceController.text,
+        'category': 'income',
+        'type': _selectedType,
+        'date': formattedDate,
+        'time': formattedTime,
         'createdBy': userId,
         'createdAt': createdDateTime,
       };
 
       try {
         await FirebaseFirestore.instance
-            .collection('incomes') // Changed to 'incomes' for church income
+            .collection('transactions')
             .doc(incomeId)
             .set(newIncome);
 
-        if (!context.mounted) return;
-        Navigator.pop(context);
+        _showSuccessDialog(context, 'Receita adicionada com sucesso!');
       } catch (e) {
-        if (!context.mounted) return;
-        _showErrorDialog(context, 'Erro ao salvar entrada',
-            'Ocorreu um erro ao tentar salvar a entrada: ${e.toString()}');
+        _showErrorDialog(context, 'Erro ao salvar receita',
+            'Ocorreu um erro ao tentar salvar a receita: ${e.toString()}');
       }
     } else {
-      _showErrorDialog(context, 'Erro ao salvar entrada',
-          'Por favor, preencha todos os campos.');
+      _showErrorDialog(context, 'Erro ao salvar receita',
+          'Por favor, preencha todos os campos obrigatórios.');
     }
   }
 
@@ -95,6 +104,26 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Sucesso'),
           content: Text(message),
           actions: <Widget>[
             TextButton(
@@ -126,28 +155,44 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _buildTextField('Fonte', _sourceController, Icons.source,
+                    isDarkMode: isDarkMode),
+                const SizedBox(height: 20.0),
                 _buildTextField(
-                    'Valor', _amountController, Icons.monetization_on,
+                    'Categoria', _referenceController, Icons.category,
+                    isDarkMode: isDarkMode),
+                const SizedBox(height: 20.0),
+                _buildDropdownField(
+                    'Tipo de Receita',
+                    _selectedType,
+                    [
+                      'Evento',
+                      'Venda de Produtos',
+                      'Subscrição',
+                      'Patrocínio',
+                      'Campanha',
+                      'Aluguel de Espaço',
+                      'Oferta',
+                      'Outros',
+                    ],
+                    isDarkMode),
+                _buildTextField('Valor', _amountController, Icons.money,
                     keyboardType: TextInputType.number, isDarkMode: isDarkMode),
                 const SizedBox(height: 20.0),
-                _buildTextField(
-                    'Descrição', _descriptionController, Icons.description,
+                _buildTextField('Descrição (Opcional)', _descriptionController,
+                    Icons.description,
                     isDarkMode: isDarkMode),
                 const SizedBox(height: 20.0),
-                _buildTextField(
-                    'Fonte', _sourceController, Icons.source, // Updated
-                    isDarkMode: isDarkMode),
+                _buildDatePicker(context),
                 const SizedBox(height: 20.0),
-                _buildTextField(
-                    'Categoria', _categoryController, Icons.category, // Updated
-                    isDarkMode: isDarkMode),
-                const SizedBox(height: 20.0),
+                _buildTimePicker(context),
+                const SizedBox(height: 40.0),
               ],
             ),
           ),
           Positioned(
             bottom: 16.0,
-            left: 16.0,
+            right: 16.0,
             child: _buildSaveButton(isDarkMode: isDarkMode),
           ),
         ],
@@ -166,6 +211,82 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
         labelText: labelText,
         icon: Icon(icon, color: isDarkMode ? Colors.white : Colors.blue),
       ),
+      inputFormatters: labelText.contains('Valor')
+          ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9,.]'))]
+          : null,
+    );
+  }
+
+  Widget _buildDropdownField(String labelText, String selectedValue,
+      List<String> options, bool isDarkMode) {
+    return DropdownButtonFormField<String>(
+      value: selectedValue,
+      decoration: InputDecoration(
+        labelText: labelText,
+        icon: Icon(Icons.label, color: isDarkMode ? Colors.white : Colors.blue),
+      ),
+      items: options.map((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+      onChanged: (newValue) {
+        setState(() {
+          _selectedType = newValue ?? _selectedType;
+        });
+      },
+    );
+  }
+
+  Widget _buildDatePicker(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child:
+              Text('Data: ${DateFormat('dd/MM/yyyy').format(_selectedDate)}'),
+        ),
+        IconButton(
+          icon: const Icon(Icons.calendar_today),
+          onPressed: () async {
+            final DateTime? pickedDate = await showDatePicker(
+              context: context,
+              initialDate: _selectedDate,
+              firstDate: DateTime(2000),
+              lastDate: DateTime(2101),
+            );
+            if (pickedDate != null && pickedDate != _selectedDate) {
+              setState(() {
+                _selectedDate = pickedDate;
+              });
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTimePicker(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text('Hora: ${_selectedTime.format(context)}'),
+        ),
+        IconButton(
+          icon: const Icon(Icons.access_time),
+          onPressed: () async {
+            final TimeOfDay? pickedTime = await showTimePicker(
+              context: context,
+              initialTime: _selectedTime,
+            );
+            if (pickedTime != null && pickedTime != _selectedTime) {
+              setState(() {
+                _selectedTime = pickedTime;
+              });
+            }
+          },
+        ),
+      ],
     );
   }
 
