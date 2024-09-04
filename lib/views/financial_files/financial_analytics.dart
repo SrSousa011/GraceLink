@@ -2,12 +2,12 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class FinancialAnalytics extends StatelessWidget {
-  final double totalBalance;
-  final double monthlyIncome;
+  final double totalOverallSum;
+  final double totalMonthlySum;
 
   const FinancialAnalytics({
-    required this.totalBalance,
-    required this.monthlyIncome,
+    required this.totalOverallSum,
+    required this.totalMonthlySum,
     super.key,
   });
 
