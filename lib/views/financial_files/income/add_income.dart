@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:uuid/uuid.dart';
 
 class AddIncomeForm extends StatefulWidget {
   const AddIncomeForm({super.key});
@@ -23,6 +24,7 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   String _filePath = '';
+  final Uuid uuid = const Uuid();
 
   @override
   void initState() {
@@ -64,13 +66,13 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
         return;
       }
 
-      final incomeId = DateTime.now().millisecondsSinceEpoch.toString();
+      final incomeId = uuid.v4();
       final createdDateTime = DateTime.now();
       final formattedDate = DateFormat('dd/MM/yyyy').format(_selectedDate);
       final formattedTime = _selectedTime.format(context);
 
       final newIncome = {
-        'id': incomeId,
+        'transactionsId': incomeId,
         'amount': amount,
         'description': _descriptionController.text,
         'source': _sourceController.text,
@@ -81,7 +83,7 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
         'time': formattedTime,
         'createdBy': userId,
         'createdAt': createdDateTime,
-        'filePath': _filePath, // Adicionando o caminho do arquivo
+        'filePath': _filePath,
       };
 
       try {
@@ -111,7 +113,6 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
               child: const Text('OK'),
