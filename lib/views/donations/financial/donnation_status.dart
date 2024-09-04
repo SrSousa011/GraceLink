@@ -21,6 +21,7 @@ class DonationStats {
       final donationValueStr = data['donationValue']?.toString() ?? '0.00';
       final donationValue = _parseDonationValue(donationValueStr);
       final timestamp = (data['timestamp'] as Timestamp?)?.toDate();
+
       totalBalance += donationValue;
 
       if (timestamp != null && timestamp.isAfter(startOfMonth)) {
