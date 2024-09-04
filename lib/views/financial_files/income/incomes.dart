@@ -1,9 +1,9 @@
+import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/extras.dart';
 import 'package:churchapp/views/financial_files/income/add_income.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:churchapp/views/donations/financial/donnation_status.dart';
 
 class IncomesScreen extends StatelessWidget {
   final DonationStats donationStats;
@@ -69,7 +69,6 @@ class IncomesScreen extends StatelessWidget {
                   color: Colors.green[100],
                 ),
                 const SizedBox(height: 20),
-                // Add more widgets here if needed
               ],
             ),
           );
@@ -84,9 +83,10 @@ class IncomesScreen extends StatelessWidget {
             ),
           );
         },
-        backgroundColor: Colors.green,
+        backgroundColor: const Color(0xFF4CAF50),
         child: const Icon(Icons.add),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
