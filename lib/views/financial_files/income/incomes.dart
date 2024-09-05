@@ -1,3 +1,5 @@
+import 'package:churchapp/views/courses/service/courses_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,8 +8,9 @@ import 'package:churchapp/views/financial_files/income/add_income.dart';
 
 class IncomesScreen extends StatelessWidget {
   final DonationStats donationStats;
+  final CoursesService _coursesService = CoursesService();
 
-  const IncomesScreen({super.key, required this.donationStats});
+  IncomesScreen({super.key, required this.donationStats});
 
   Future<Map<String, double>> _fetchIncomeData() async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -48,6 +51,23 @@ class IncomesScreen extends StatelessWidget {
     };
   }
 
+  Future<Map<String, double>> _fetchCourseRevenueData() async {
+    try {
+      final totalRevenue = await _coursesService.calculateTotalRevenue();
+      final monthlyRevenue = await _coursesService.calculateMonthlyRevenue();
+
+      return {
+        'totalOverallRevenue': totalRevenue,
+        'totalMonthlyRevenue': monthlyRevenue,
+      };
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching course revenue data: $e');
+      }
+      throw e;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,18 +78,22 @@ class IncomesScreen extends StatelessWidget {
       body: FutureBuilder<Map<String, double>>(
         future: Future.wait([
           _fetchIncomeData(),
+          _fetchCourseRevenueData(),
           Future.value({
             'totalBalance': donationStats.totalBalance,
             'monthlyIncome': donationStats.monthlyIncome,
           }),
         ]).then((results) {
           final incomeData = results[0];
-          final donationData = results[1];
+          final courseRevenueData = results[1];
+          final donationData = results[2];
 
-          final totalReceitas =
-              donationData['totalBalance']! + incomeData['totalOverallSum']!;
-          final totalMensalReceitas =
-              donationData['monthlyIncome']! + incomeData['totalMonthlySum']!;
+          final totalReceitas = donationData['totalBalance']! +
+              incomeData['totalOverallSum']! +
+              courseRevenueData['totalOverallRevenue']!;
+          final totalMensalReceitas = donationData['monthlyIncome']! +
+              incomeData['totalMonthlySum']! +
+              courseRevenueData['totalMonthlyRevenue']!;
 
           return {
             'totalReceitas': totalReceitas,
@@ -78,6 +102,10 @@ class IncomesScreen extends StatelessWidget {
             'monthlyIncome': donationData['monthlyIncome']!,
             'totalOverallSum': incomeData['totalOverallSum']!,
             'totalMonthlySum': incomeData['totalMonthlySum']!,
+            'totalOverallCourseRevenue':
+                courseRevenueData['totalOverallRevenue']!,
+            'totalMonthlyCourseRevenue':
+                courseRevenueData['totalMonthlyRevenue']!,
           };
         }),
         builder: (context, snapshot) {
@@ -103,13 +131,13 @@ class IncomesScreen extends StatelessWidget {
                 InfoCard(
                   title: 'Total de Doações',
                   value: '€ ${data['totalBalance']!.toStringAsFixed(2)}',
-                  color: Colors.green[100],
+                  color: Colors.grey[100],
                 ),
                 const SizedBox(height: 20),
                 InfoCard(
                   title: 'Doações Mensais',
                   value: '€ ${data['monthlyIncome']!.toStringAsFixed(2)}',
-                  color: Colors.green[100],
+                  color: Colors.grey[100],
                 ),
                 const SizedBox(height: 20),
                 InfoCard(
@@ -125,15 +153,29 @@ class IncomesScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 InfoCard(
+                  title: 'Total Cursos',
+                  value:
+                      '€ ${data['totalOverallCourseRevenue']!.toStringAsFixed(2)}',
+                  color: Colors.grey[100],
+                ),
+                const SizedBox(height: 20),
+                InfoCard(
+                  title: 'Total Mensal Cursos',
+                  value:
+                      '€ ${data['totalMonthlyCourseRevenue']!.toStringAsFixed(2)}',
+                  color: Colors.grey[100],
+                ),
+                const SizedBox(height: 20),
+                InfoCard(
                   title: 'Total Receitas',
                   value: '€ ${data['totalReceitas']!.toStringAsFixed(2)}',
-                  color: Colors.grey[100],
+                  color: Colors.green[100],
                 ),
                 const SizedBox(height: 20),
                 InfoCard(
                   title: 'Total Mensal Receitas',
                   value: '€ ${data['totalMensalReceitas']!.toStringAsFixed(2)}',
-                  color: Colors.grey[100],
+                  color: Colors.green[100],
                 ),
               ],
             ),
