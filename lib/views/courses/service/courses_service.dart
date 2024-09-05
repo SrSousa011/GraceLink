@@ -231,4 +231,51 @@ class CoursesService {
       rethrow;
     }
   }
+
+  Future<double> calculateAnnualRevenue() async {
+    try {
+      if (kDebugMode) {
+        print('Calculating annual revenue');
+      }
+
+      final coursesSnapshot = await _coursesCollection.get();
+      final courses = coursesSnapshot.docs;
+
+      double annualRevenue = 0.0;
+      DateTime now = DateTime.now();
+      DateTime startOfYear = DateTime(now.year, 1, 1);
+      DateTime endOfYear =
+          DateTime(now.year + 1, 1, 1).subtract(const Duration(days: 1));
+
+      for (var courseDoc in courses) {
+        final courseId = courseDoc.id;
+        final data = courseDoc.data() as Map<String, dynamic>?;
+        final price = data?['price'] as num?;
+        final coursePrice =
+            (price is int) ? price.toDouble() : (price?.toDouble() ?? 0.0);
+
+        final registrationsSnapshot = await _registrationsCollection
+            .where('courseId', isEqualTo: courseId)
+            .where('status', isEqualTo: true)
+            .get();
+
+        final enrolledForYear = registrationsSnapshot.docs.where((doc) {
+          final data = doc.data() as Map<String, dynamic>?;
+          final registrationDate = data?['registrationDate'] as Timestamp?;
+          if (registrationDate == null) return false;
+          final date = registrationDate.toDate();
+          return date.isAfter(startOfYear) && date.isBefore(endOfYear);
+        }).length;
+
+        annualRevenue += enrolledForYear * coursePrice;
+      }
+
+      return annualRevenue;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error calculating annual revenue: $e');
+      }
+      rethrow;
+    }
+  }
 }

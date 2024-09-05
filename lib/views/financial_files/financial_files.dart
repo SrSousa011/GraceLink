@@ -3,7 +3,7 @@ import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/financial_analytics.dart';
 import 'package:churchapp/views/financial_files/income/incomes.dart';
 import 'package:churchapp/views/financial_files/transaction_history.dart';
-import 'package:churchapp/views/financial_files/upcoming_event.dart';
+import 'package:churchapp/views/financial_files/upcomingEvents/upcoming_event.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
