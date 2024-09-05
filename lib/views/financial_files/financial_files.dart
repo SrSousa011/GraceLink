@@ -1,5 +1,4 @@
 import 'package:churchapp/views/financial_files/expenses.dart';
-import 'package:churchapp/views/financial_files/graphics_screen.dart';
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/financial_analytics.dart';
 import 'package:churchapp/views/financial_files/income/incomes.dart';
@@ -116,7 +115,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
     final cardShadowColor = isDarkMode
         ? Colors.black.withOpacity(0.5)
         : Colors.black.withOpacity(0.2);
-    final secondaryTextColor = isDarkMode ? Colors.grey[300]! : Colors.grey;
+    //final secondaryTextColor = isDarkMode ? Colors.grey[300]! : Colors.grey;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -324,7 +323,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
-                                                    ExpensesScreen(),
+                                                    const ExpensesScreen(),
                                               ),
                                             );
                                           },
