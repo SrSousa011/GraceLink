@@ -164,7 +164,6 @@ class _FinanceScreenState extends State<FinanceScreen> {
               final totalAnualExpenses = incomeData['totalAnualExpenses']!;
               final totalMonthlyExpenses = incomeData['totalMonthlyExpenses']!;
 
-              // Calculate saldo total mensal
               final saldoTotalMensal =
                   totalMonthlyReceitas - totalMonthlyExpenses;
 
@@ -209,7 +208,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                     ),
                   ),
                   Transform.translate(
-                    offset: const Offset(0.0, -80.0), // Adjusted position
+                    offset: const Offset(0.0, -80.0),
                     child: GestureDetector(
                       onTap: () {
                         Navigator.push(
