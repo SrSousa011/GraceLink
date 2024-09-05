@@ -290,14 +290,20 @@ class AnnualIncomeChart extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildLegendItem('Doações', safeTotalDonations.toDouble(),
-                kDonationColor, isDarkMode),
-            _buildLegendItem('Cursos', safeTotalCourseRevenue.toDouble(),
-                kCourseColor, isDarkMode),
-            _buildLegendItem(
-                'Outros', safeTotalIncome.toDouble(), kIncomeColor, isDarkMode),
-            _buildLegendItem(
-                'Total', safeTotalReceita.toDouble(), kTotalColor, isDarkMode),
+            Wrap(
+              spacing: 16.0,
+              runSpacing: 8.0,
+              children: [
+                _buildLegendItem('Doações', safeTotalDonations.toDouble(),
+                    kDonationColor, isDarkMode),
+                _buildLegendItem('Cursos', safeTotalCourseRevenue.toDouble(),
+                    kCourseColor, isDarkMode),
+                _buildLegendItem('Outros', safeTotalIncome.toDouble(),
+                    kIncomeColor, isDarkMode),
+                _buildLegendItem('Total', safeTotalReceita.toDouble(),
+                    kTotalColor, isDarkMode),
+              ],
+            ),
           ],
         ),
       ],
@@ -496,69 +502,75 @@ class MonthlyIncomeChart extends StatelessWidget {
     final safeTotalMonthlyReceita =
         totalMonthlyReceita.isFinite ? totalMonthlyReceita : 0;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Receita Mensal',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        const SizedBox(height: 8),
-        SizedBox(
-          height: 240,
-          child: PieChart(
-            PieChartData(
-              sections: [
-                PieChartSectionData(
-                  value: safeTotalMonthlyDonations.toDouble(),
-                  color: kDonationColor,
-                  radius: 60,
-                  titleStyle: TextStyle(
-                    fontSize: 14,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(
+        'Receita Mensal',
+        style: Theme.of(context).textTheme.titleLarge,
+      ),
+      const SizedBox(height: 8),
+      SizedBox(
+        height: 240,
+        child: PieChart(
+          PieChartData(
+            sections: [
+              PieChartSectionData(
+                value: safeTotalMonthlyDonations.toDouble(),
+                color: kDonationColor,
+                radius: 60,
+                titleStyle: TextStyle(
+                  fontSize: 14,
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
-                PieChartSectionData(
-                  value: safeTotalMonthlyCourseRevenue.toDouble(),
-                  color: kCourseColor,
-                  radius: 60,
-                  titleStyle: TextStyle(
-                    fontSize: 14,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
+              ),
+              PieChartSectionData(
+                value: safeTotalMonthlyCourseRevenue.toDouble(),
+                color: kCourseColor,
+                radius: 60,
+                titleStyle: TextStyle(
+                  fontSize: 14,
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
-                PieChartSectionData(
-                  value: safeTotalMonthlyIncome.toDouble(),
-                  color: kIncomeColor,
-                  radius: 60,
-                  titleStyle: TextStyle(
-                    fontSize: 14,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
+              ),
+              PieChartSectionData(
+                value: safeTotalMonthlyIncome.toDouble(),
+                color: kIncomeColor,
+                radius: 60,
+                titleStyle: TextStyle(
+                  fontSize: 14,
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
-              ],
-              borderData: FlBorderData(show: false),
-              centerSpaceRadius: 50,
-              sectionsSpace: 0,
-            ),
+              ),
+            ],
+            borderData: FlBorderData(show: false),
+            centerSpaceRadius: 50,
+            sectionsSpace: 0,
           ),
         ),
-        const SizedBox(height: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildLegendItem('Doações', safeTotalMonthlyDonations.toDouble(),
-                kDonationColor, isDarkMode),
-            _buildLegendItem('Cursos', safeTotalMonthlyCourseRevenue.toDouble(),
-                kCourseColor, isDarkMode),
-            _buildLegendItem('Outros', safeTotalMonthlyIncome.toDouble(),
-                kIncomeColor, isDarkMode),
-            _buildLegendItem('Total', safeTotalMonthlyReceita.toDouble(),
-                kTotalColor, isDarkMode),
-          ],
-        ),
-      ],
-    );
+      ),
+      const SizedBox(height: 16),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 16.0,
+            runSpacing: 8.0,
+            children: [
+              _buildLegendItem('Doações', safeTotalMonthlyDonations.toDouble(),
+                  kDonationColor, isDarkMode),
+              _buildLegendItem(
+                  'Cursos',
+                  safeTotalMonthlyCourseRevenue.toDouble(),
+                  kCourseColor,
+                  isDarkMode),
+              _buildLegendItem('Outros', safeTotalMonthlyIncome.toDouble(),
+                  kIncomeColor, isDarkMode),
+              _buildLegendItem('Total', safeTotalMonthlyReceita.toDouble(),
+                  kTotalColor, isDarkMode),
+            ],
+          ),
+        ],
+      ),
+    ]);
   }
 
   Widget _buildLegendItem(
