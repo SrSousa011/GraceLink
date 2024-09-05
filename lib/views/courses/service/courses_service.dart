@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 class CoursesService {
   final CollectionReference _registrationsCollection =
       FirebaseFirestore.instance.collection('courseRegistration');
+  final CollectionReference _coursesCollection =
+      FirebaseFirestore.instance.collection('courses');
 
   Future<bool> isUserAlreadySubscribed({
     required String courseId,
@@ -35,7 +37,7 @@ class CoursesService {
   }) async {
     try {
       if (courseId.isEmpty || userId.isEmpty) {
-        return false; // or throw an exception if appropriate
+        return false;
       }
 
       QuerySnapshot querySnapshot = await _registrationsCollection
@@ -87,8 +89,7 @@ class CoursesService {
 
   Future<List<Course>> getCourses() async {
     try {
-      final querySnapshot =
-          await FirebaseFirestore.instance.collection('courses').get();
+      final querySnapshot = await _coursesCollection.get();
       return querySnapshot.docs.map((doc) {
         return Course.fromDocument(doc);
       }).toList();
@@ -124,6 +125,108 @@ class CoursesService {
     } catch (e) {
       if (kDebugMode) {
         print('Error registering user for course: $e');
+      }
+      rethrow;
+    }
+  }
+
+  Future<int> getUserCountForCourse(String courseId) async {
+    try {
+      if (kDebugMode) {
+        print('Counting users for courseId: $courseId');
+      }
+
+      QuerySnapshot querySnapshot = await _registrationsCollection
+          .where('courseId', isEqualTo: courseId)
+          .get();
+
+      return querySnapshot.docs.length;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error counting users for course: $e');
+      }
+      rethrow;
+    }
+  }
+
+  Future<double> calculateTotalRevenue() async {
+    try {
+      if (kDebugMode) {
+        print('Calculating total revenue');
+      }
+
+      final coursesSnapshot = await _coursesCollection.get();
+      final courses = coursesSnapshot.docs;
+
+      double totalRevenue = 0.0;
+
+      for (var courseDoc in courses) {
+        final courseId = courseDoc.id;
+        final data = courseDoc.data() as Map<String, dynamic>?;
+        final price = data?['price'] as num?;
+
+        final coursePrice =
+            (price is int) ? price.toDouble() : (price?.toDouble() ?? 0.0);
+
+        final registrationsSnapshot = await _registrationsCollection
+            .where('courseId', isEqualTo: courseId)
+            .where('status', isEqualTo: true)
+            .get();
+
+        totalRevenue += registrationsSnapshot.docs.length * coursePrice;
+      }
+
+      return totalRevenue;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error calculating total revenue: $e');
+      }
+      rethrow;
+    }
+  }
+
+  Future<double> calculateMonthlyRevenue() async {
+    try {
+      if (kDebugMode) {
+        print('Calculating monthly revenue');
+      }
+
+      final coursesSnapshot = await _coursesCollection.get();
+      final courses = coursesSnapshot.docs;
+
+      double monthlyRevenue = 0.0;
+      DateTime now = DateTime.now();
+      DateTime startOfMonth = DateTime(now.year, now.month, 1);
+      DateTime endOfMonth = DateTime(now.year, now.month + 1, 1)
+          .subtract(const Duration(days: 1));
+
+      for (var courseDoc in courses) {
+        final courseId = courseDoc.id;
+        final data = courseDoc.data() as Map<String, dynamic>?;
+        final price = data?['price'] as num?;
+        final coursePrice =
+            (price is int) ? price.toDouble() : (price?.toDouble() ?? 0.0);
+
+        final registrationsSnapshot = await _registrationsCollection
+            .where('courseId', isEqualTo: courseId)
+            .where('status', isEqualTo: true)
+            .get();
+
+        final newEnrolled = registrationsSnapshot.docs.where((doc) {
+          final data = doc.data() as Map<String, dynamic>?;
+          final registrationDate = data?['registrationDate'] as Timestamp?;
+          if (registrationDate == null) return false;
+          final date = registrationDate.toDate();
+          return date.isAfter(startOfMonth) && date.isBefore(endOfMonth);
+        }).length;
+
+        monthlyRevenue += newEnrolled * coursePrice;
+      }
+
+      return monthlyRevenue;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error calculating monthly revenue: $e');
       }
       rethrow;
     }
