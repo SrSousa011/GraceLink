@@ -134,12 +134,12 @@ class IncomesScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    height: 400,
+                    height: 410,
                     child: AnnualIncomeChart(
-                      totalAnnualDonations: data['totalBalance']!,
-                      totalAnnualCourseRevenue:
-                          data['totalOverallCourseRevenue']!,
-                      totalAnnualIncome: data['totalOverallSum']!,
+                      totalReceita: data['totalReceitas']!,
+                      totalDonations: data['totalBalance']!,
+                      totalCourseRevenue: data['totalOverallCourseRevenue']!,
+                      totallIncome: data['totalOverallSum']!,
                       isDarkMode:
                           Theme.of(context).brightness == Brightness.dark,
                     ),
@@ -152,6 +152,7 @@ class IncomesScreen extends StatelessWidget {
                   SizedBox(
                     height: 400,
                     child: MonthlyIncomeChart(
+                      totalMonthlyReceita: data['totalMensalReceitas']!,
                       totalMonthlyIncome: data['totalOverallSum']!,
                       totalMonthlyCourseRevenue:
                           data['totalMonthlyCourseRevenue']!,
@@ -162,9 +163,10 @@ class IncomesScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
-                    height: 400,
+                    height: 450,
                     child: OverallIncomeChart(
-                      totalOverallSum: data['totalReceitas']!,
+                      totalOverallReceita: data['totalReceitas']!,
+                      totalOverallSum: data['totalOverallSum']!,
                       totalOverallCourseRevenue:
                           data['totalOverallCourseRevenue']!,
                       totalOverallDonations: data['totalBalance']!,
@@ -183,32 +185,35 @@ class IncomesScreen extends StatelessWidget {
 }
 
 class AnnualIncomeChart extends StatelessWidget {
-  final double totalAnnualIncome;
-  final double totalAnnualCourseRevenue;
-  final double totalAnnualDonations;
+  final double totalReceita;
+  final double totallIncome;
+  final double totalCourseRevenue;
+  final double totalDonations;
   final bool isDarkMode;
 
   const AnnualIncomeChart({
     super.key,
-    required this.totalAnnualIncome,
-    required this.totalAnnualCourseRevenue,
-    required this.totalAnnualDonations,
+    required this.totallIncome,
+    required this.totalCourseRevenue,
+    required this.totalDonations,
     required this.isDarkMode,
+    required this.totalReceita,
   });
 
   double safeValue(double value) => value.isFinite ? value : 0;
 
   @override
   Widget build(BuildContext context) {
-    final safeTotalAnnualIncome = safeValue(totalAnnualIncome);
-    final safeTotalAnnualCourseRevenue = safeValue(totalAnnualCourseRevenue);
-    final safeTotalAnnualDonations = safeValue(totalAnnualDonations);
+    final safeTotalIncome = safeValue(totallIncome);
+    final safeTotalCourseRevenue = safeValue(totalCourseRevenue);
+    final safeTotalDonations = safeValue(totalDonations);
+    final safeTotalReceita = safeValue(totalReceita);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Receita Total Anual',
+          'Receita Total',
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: 8),
@@ -218,7 +223,7 @@ class AnnualIncomeChart extends StatelessWidget {
             PieChartData(
               sections: [
                 PieChartSectionData(
-                  value: safeTotalAnnualDonations,
+                  value: safeTotalDonations,
                   color: Colors.green,
                   radius: 60,
                   titleStyle: TextStyle(
@@ -227,7 +232,7 @@ class AnnualIncomeChart extends StatelessWidget {
                   ),
                 ),
                 PieChartSectionData(
-                  value: safeTotalAnnualCourseRevenue,
+                  value: safeTotalCourseRevenue,
                   color: Colors.orange,
                   radius: 60,
                   titleStyle: TextStyle(
@@ -236,7 +241,7 @@ class AnnualIncomeChart extends StatelessWidget {
                   ),
                 ),
                 PieChartSectionData(
-                  value: safeTotalAnnualIncome,
+                  value: safeTotalIncome,
                   color: Colors.blue,
                   radius: 60,
                   titleStyle: TextStyle(
@@ -255,12 +260,14 @@ class AnnualIncomeChart extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildLegendItem(
-                'Doações ', safeTotalAnnualDonations, Colors.green, isDarkMode),
-            _buildLegendItem('Cursos ', safeTotalAnnualCourseRevenue,
-                Colors.orange, isDarkMode),
-            _buildLegendItem(
-                'Total ', safeTotalAnnualIncome, Colors.blue, isDarkMode),
+            _buildLegendItem('Doações ', safeTotalDonations,
+                const Color(0xFF4CAF50), isDarkMode),
+            _buildLegendItem('Cursos ', safeTotalCourseRevenue,
+                const Color(0xFF2196F3), isDarkMode),
+            _buildLegendItem('Outros ', safeTotalIncome,
+                const Color(0xFFFF9800), isDarkMode),
+            _buildLegendItem('Total ', safeTotalReceita,
+                const Color(0xFF9C27B0), isDarkMode),
           ],
         ),
       ],
@@ -293,6 +300,7 @@ class AnnualIncomeChart extends StatelessWidget {
 }
 
 class MonthlyIncomeChart extends StatelessWidget {
+  final double totalMonthlyReceita;
   final double totalMonthlyIncome;
   final double totalMonthlyCourseRevenue;
   final double totalMonthlyDonations;
@@ -300,6 +308,7 @@ class MonthlyIncomeChart extends StatelessWidget {
 
   const MonthlyIncomeChart({
     super.key,
+    required this.totalMonthlyReceita,
     required this.totalMonthlyIncome,
     required this.totalMonthlyCourseRevenue,
     required this.totalMonthlyDonations,
@@ -313,6 +322,7 @@ class MonthlyIncomeChart extends StatelessWidget {
     final safeTotalMonthlyIncome = safeValue(totalMonthlyIncome);
     final safeTotalMonthlyCourseRevenue = safeValue(totalMonthlyCourseRevenue);
     final safeTotalMonthlyDonations = safeValue(totalMonthlyDonations);
+    final safeTotalMonthlyReceita = safeValue(totalMonthlyReceita);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -361,12 +371,14 @@ class MonthlyIncomeChart extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildLegendItem('Doações Mensais', safeTotalMonthlyIncome,
-                Colors.blue, isDarkMode),
-            _buildLegendItem('Cursos Mensais', safeTotalMonthlyCourseRevenue,
-                Colors.orange, isDarkMode),
-            _buildLegendItem('Rendimentos Mensais', safeTotalMonthlyDonations,
-                Colors.green, isDarkMode),
+            _buildLegendItem('Doações ', safeTotalMonthlyIncome,
+                const Color(0xFF4CAF50), isDarkMode),
+            _buildLegendItem('Cursos ', safeTotalMonthlyCourseRevenue,
+                const Color(0xFF2196F3), isDarkMode),
+            _buildLegendItem('Outros ', safeTotalMonthlyDonations,
+                const Color(0xFFFF9800), isDarkMode),
+            _buildLegendItem('Total ', safeTotalMonthlyReceita,
+                const Color(0xFF9C27B0), isDarkMode),
           ],
         ),
       ],
@@ -399,6 +411,7 @@ class MonthlyIncomeChart extends StatelessWidget {
 }
 
 class OverallIncomeChart extends StatelessWidget {
+  final double totalOverallReceita;
   final double totalOverallSum;
   final double totalOverallCourseRevenue;
   final double totalOverallDonations;
@@ -410,12 +423,14 @@ class OverallIncomeChart extends StatelessWidget {
     required this.totalOverallCourseRevenue,
     required this.totalOverallDonations,
     required this.isDarkMode,
+    required this.totalOverallReceita,
   });
 
   double safeValue(double value) => value.isFinite ? value : 0;
 
   @override
   Widget build(BuildContext context) {
+    final safeTotalOveralReceita = safeValue(totalOverallReceita);
     final safeTotalOverallSum = safeValue(totalOverallSum);
     final safeTotalOverallCourseRevenue = safeValue(totalOverallCourseRevenue);
     final safeTotalOverallDonations = safeValue(totalOverallDonations);
@@ -482,12 +497,14 @@ class OverallIncomeChart extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildLegendItem('Doações Totais', safeTotalOverallDonations,
-                    Colors.green, isDarkMode),
-                _buildLegendItem('Cursos Totais', safeTotalOverallCourseRevenue,
-                    Colors.orange, isDarkMode),
-                _buildLegendItem('Total Geral', safeTotalOverallSum,
-                    Colors.blue, isDarkMode),
+                _buildLegendItem('Doações ', safeTotalOverallDonations,
+                    const Color(0xFF4CAF50), isDarkMode),
+                _buildLegendItem('Cursos ', safeTotalOverallCourseRevenue,
+                    const Color(0xFF2196F3), isDarkMode),
+                _buildLegendItem('Outros ', safeTotalOverallSum,
+                    const Color(0xFFFF9800), isDarkMode),
+                _buildLegendItem('Total ', safeTotalOveralReceita,
+                    const Color(0xFF9C27B0), isDarkMode),
               ],
             ),
           ),
