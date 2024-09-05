@@ -67,7 +67,8 @@ class IncomesScreen extends StatelessWidget {
   Future<Map<String, double>> _fetchAnnualDonationData() async {
     try {
       return {
-        'totalDonations': donationStats.totalBalance,
+        'totalDonations': donationStats.totalDonnation,
+        'monthlyDonnations': donationStats.monthlyDonnation,
       };
     } catch (e) {
       if (kDebugMode) {
@@ -97,7 +98,8 @@ class IncomesScreen extends StatelessWidget {
           final totalReceitas = donationData['totalDonations']! +
               incomeData['totalOverallSum']! +
               courseRevenueData['totalOverallCourseRevenue']!;
-          final totalMensalReceitas = donationData['totalDonations']! +
+
+          final totalMensalReceitas = donationData['monthlyDonnations']! +
               courseRevenueData['totalMonthlyCourseRevenue']! +
               incomeData['totalOverallSum']!;
 
@@ -163,7 +165,7 @@ class IncomesScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
-                    height: 450,
+                    height: 500,
                     child: OverallIncomeChart(
                       totalOverallReceita: data['totalReceitas']!,
                       totalOverallSum: data['totalOverallSum']!,
@@ -443,9 +445,9 @@ class OverallIncomeChart extends StatelessWidget {
           'Distribuição de Receitas Totais',
           style: Theme.of(context).textTheme.titleLarge,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 50),
         SizedBox(
-          height: 240,
+          height: 270,
           child: BarChart(
             BarChartData(
               alignment: BarChartAlignment.spaceEvenly,
