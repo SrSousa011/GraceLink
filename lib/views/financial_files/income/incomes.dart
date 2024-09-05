@@ -6,6 +6,29 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+// Definindo cores principais
+const Color kDonationColor = Color(0xFF4CAF50); // Verde para doações
+const Color kCourseColor = Color(0xFF2196F3); // Azul para cursos
+const Color kIncomeColor = Color(0xFFFF9800); // Laranja para outros rendimentos
+const Color kTotalColor = Color(0xFF9C27B0); // Roxo para o total
+
+const Color kCourseRevenueColor =
+    Color(0xFF40C4FF); // Azul brilhante para receita de cursos
+const Color kOtherIncomeColor =
+    Color(0xFFFFC107); // Amarelo para outros tipos de receita
+const Color kTotalIncomeColor =
+    Color(0xFFD500F9); // Rosa fluorescente para receita total
+const Color kBackgroundColor = Color(0xFFF5F5F5); // Branco gelo para o fundo
+const Color kDarkGrayColor =
+    Color(0xFF616161); // Cinza médio para textos ou ícones
+const Color kDarkBlueColor = Color(0xFF304FFE); // Azul royal para destaques
+const Color kDarkGreenColor =
+    Color(0xFF00C853); // Verde brilhante para botões ou gráficos
+const Color kDarkOrangeColor =
+    Color(0xFFFF6D00); // Laranja vibrante para avisos
+const Color kDarkPurpleColor =
+    Color(0xFFAA00FF); // Roxo intenso para contrastes
+
 class IncomesScreen extends StatelessWidget {
   final DonationStats donationStats;
   final CoursesService _coursesService = CoursesService();
@@ -83,7 +106,7 @@ class IncomesScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Receitas'),
-        backgroundColor: Colors.green[700],
+        backgroundColor: kDonationColor,
       ),
       body: FutureBuilder<Map<String, double>>(
         future: Future.wait([
@@ -226,7 +249,7 @@ class AnnualIncomeChart extends StatelessWidget {
               sections: [
                 PieChartSectionData(
                   value: safeTotalDonations,
-                  color: Colors.green,
+                  color: kDonationColor,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
@@ -235,7 +258,7 @@ class AnnualIncomeChart extends StatelessWidget {
                 ),
                 PieChartSectionData(
                   value: safeTotalCourseRevenue,
-                  color: Colors.orange,
+                  color: kCourseColor,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
@@ -244,7 +267,7 @@ class AnnualIncomeChart extends StatelessWidget {
                 ),
                 PieChartSectionData(
                   value: safeTotalIncome,
-                  color: const Color(0xFFFF9800),
+                  color: kIncomeColor,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
@@ -262,14 +285,14 @@ class AnnualIncomeChart extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildLegendItem('Doações ', safeTotalDonations,
-                const Color(0xFF4CAF50), isDarkMode),
-            _buildLegendItem('Cursos ', safeTotalCourseRevenue,
-                const Color(0xFF2196F3), isDarkMode),
-            _buildLegendItem('Outros ', safeTotalIncome,
-                const Color(0xFFFF9800), isDarkMode),
-            _buildLegendItem('Total ', safeTotalReceita,
-                const Color(0xFF9C27B0), isDarkMode),
+            _buildLegendItem(
+                'Doações', safeTotalDonations, kDonationColor, isDarkMode),
+            _buildLegendItem(
+                'Cursos', safeTotalCourseRevenue, kCourseColor, isDarkMode),
+            _buildLegendItem(
+                'Outros', safeTotalIncome, kIncomeColor, isDarkMode),
+            _buildLegendItem(
+                'Total', safeTotalReceita, kTotalColor, isDarkMode),
           ],
         ),
       ],
@@ -279,17 +302,17 @@ class AnnualIncomeChart extends StatelessWidget {
   Widget _buildLegendItem(
       String title, double value, Color color, bool isDarkMode) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
           Container(
-            width: 20,
-            height: 20,
+            width: 16,
+            height: 16,
             color: color,
           ),
           const SizedBox(width: 8),
           Text(
-            '$title: € ${value.toStringAsFixed(2)}',
+            '$title: $value',
             style: TextStyle(
               fontSize: 14,
               color: isDarkMode ? Colors.white : Colors.black,
@@ -337,7 +360,7 @@ class MonthlyIncomeChart extends StatelessWidget {
               sections: [
                 PieChartSectionData(
                   value: safeTotalMonthlyIncome,
-                  color: Colors.blue,
+                  color: kIncomeColor,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
@@ -346,7 +369,7 @@ class MonthlyIncomeChart extends StatelessWidget {
                 ),
                 PieChartSectionData(
                   value: safeTotalMonthlyCourseRevenue,
-                  color: Colors.orange,
+                  color: kCourseColor,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
@@ -355,7 +378,7 @@ class MonthlyIncomeChart extends StatelessWidget {
                 ),
                 PieChartSectionData(
                   value: safeTotalMonthlyDonations,
-                  color: Colors.green,
+                  color: kDonationColor,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
@@ -373,14 +396,14 @@ class MonthlyIncomeChart extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildLegendItem('Doações ', safeTotalMonthlyIncome,
-                const Color(0xFF4CAF50), isDarkMode),
+            _buildLegendItem(
+                'Doações ', safeTotalMonthlyIncome, kDonationColor, isDarkMode),
             _buildLegendItem('Cursos ', safeTotalMonthlyCourseRevenue,
-                const Color(0xFF2196F3), isDarkMode),
-            _buildLegendItem('Outros ', safeTotalMonthlyDonations,
-                const Color(0xFFFF9800), isDarkMode),
-            _buildLegendItem('Total ', safeTotalMonthlyReceita,
-                const Color(0xFF9C27B0), isDarkMode),
+                kCourseColor, isDarkMode),
+            _buildLegendItem(
+                'Outros ', safeTotalMonthlyDonations, kIncomeColor, isDarkMode),
+            _buildLegendItem(
+                'Total ', safeTotalMonthlyReceita, kTotalColor, isDarkMode),
           ],
         ),
       ],
@@ -461,7 +484,7 @@ class OverallIncomeChart extends StatelessWidget {
                   barRods: [
                     BarChartRodData(
                       toY: safeTotalOverallDonations,
-                      color: Colors.green,
+                      color: kDonationColor,
                       width: 20,
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -472,7 +495,7 @@ class OverallIncomeChart extends StatelessWidget {
                   barRods: [
                     BarChartRodData(
                       toY: safeTotalOverallCourseRevenue,
-                      color: Colors.orange,
+                      color: kCourseColor,
                       width: 20,
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -483,7 +506,7 @@ class OverallIncomeChart extends StatelessWidget {
                   barRods: [
                     BarChartRodData(
                       toY: safeTotalOverallSum,
-                      color: Colors.blue,
+                      color: kCourseColor,
                       width: 20,
                       borderRadius: BorderRadius.circular(8),
                     ),
