@@ -43,8 +43,8 @@ class Course {
       registrationDeadline: registrationDeadline,
       descriptionDetails: data['descriptionDetails'] ?? '',
       time: data['time'] as Timestamp?,
-      videoUrl: data['videoUrl'],
-      daysOfWeek: data['daysOfWeek'],
+      videoUrl: data['videoUrl'] as String?,
+      daysOfWeek: data['daysOfWeek'] as String?,
     );
   }
 

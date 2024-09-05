@@ -13,8 +13,8 @@ class TransactionHistoryScreen extends StatelessWidget {
     final incomeColor =
         isDarkMode ? Colors.lightGreenAccent : Colors.lightGreen;
     final expenseColor = isDarkMode ? Colors.redAccent : Colors.red;
-    final secondaryTextColor =
-        isDarkMode ? Colors.grey[400]! : Colors.grey[700];
+    //final secondaryTextColor =
+    isDarkMode ? Colors.grey[400]! : Colors.grey[700];
 
     final List<Map<String, dynamic>> recentTransactions = [
       {
