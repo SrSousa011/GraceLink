@@ -151,10 +151,6 @@ class CoursesService {
 
   Future<double> calculateTotalRevenue() async {
     try {
-      if (kDebugMode) {
-        print('Calculating total revenue');
-      }
-
       final coursesSnapshot = await _coursesCollection.get();
       final courses = coursesSnapshot.docs;
 
@@ -187,10 +183,6 @@ class CoursesService {
 
   Future<double> calculateMonthlyRevenue() async {
     try {
-      if (kDebugMode) {
-        print('Calculating monthly revenue');
-      }
-
       final coursesSnapshot = await _coursesCollection.get();
       final courses = coursesSnapshot.docs;
 

@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DonationStats {
-  final double totalBalance;
-  final double monthlyIncome;
+  final double totalDonnation;
+  final double monthlyDonnation;
 
   DonationStats({
-    required this.totalBalance,
-    required this.monthlyIncome,
+    required this.totalDonnation,
+    required this.monthlyDonnation,
   });
 
   factory DonationStats.fromDonations(List<DocumentSnapshot> donations) {
@@ -30,8 +30,8 @@ class DonationStats {
     }
 
     return DonationStats(
-      totalBalance: totalBalance,
-      monthlyIncome: monthlyIncome,
+      totalDonnation: totalBalance,
+      monthlyDonnation: monthlyIncome,
     );
   }
 
