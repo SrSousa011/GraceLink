@@ -67,7 +67,7 @@ class IncomesScreen extends StatelessWidget {
   Future<Map<String, double>> _fetchAnnualDonationData() async {
     try {
       return {
-        'totalAnnualDonations': donationStats.totalBalance,
+        'totalDonations': donationStats.totalBalance,
       };
     } catch (e) {
       if (kDebugMode) {
@@ -94,17 +94,17 @@ class IncomesScreen extends StatelessWidget {
           final courseRevenueData = results[1];
           final donationData = results[2];
 
-          final totalReceitas = donationData['totalAnnualDonations']! +
+          final totalReceitas = donationData['totalDonations']! +
               incomeData['totalOverallSum']! +
               courseRevenueData['totalOverallCourseRevenue']!;
-          final totalMensalReceitas = donationData['totalAnnualDonations']! +
+          final totalMensalReceitas = donationData['totalDonations']! +
               courseRevenueData['totalMonthlyCourseRevenue']! +
               incomeData['totalOverallSum']!;
 
           return {
             'totalReceitas': totalReceitas,
             'totalMensalReceitas': totalMensalReceitas,
-            'totalBalance': donationData['totalAnnualDonations']!,
+            'totalBalance': donationData['totalDonations']!,
             'totalOverallSum': incomeData['totalOverallSum']!,
             'totalOverallCourseRevenue':
                 courseRevenueData['totalOverallCourseRevenue']!,
@@ -242,7 +242,7 @@ class AnnualIncomeChart extends StatelessWidget {
                 ),
                 PieChartSectionData(
                   value: safeTotalIncome,
-                  color: Colors.blue,
+                  color: const Color(0xFFFF9800),
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
