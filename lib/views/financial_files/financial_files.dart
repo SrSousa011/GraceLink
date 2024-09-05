@@ -1,5 +1,8 @@
+import 'package:churchapp/views/financial_files/expenses.dart';
+import 'package:churchapp/views/financial_files/graphics_screen.dart';
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/financial_analytics.dart';
+import 'package:churchapp/views/financial_files/income/incomes.dart';
 import 'package:churchapp/views/financial_files/transaction_history.dart';
 import 'package:churchapp/views/financial_files/upcoming_event.dart';
 import 'package:flutter/material.dart';
@@ -100,8 +103,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor = isDarkMode ? Colors.black : Colors.white;
     final primaryTextColor = isDarkMode ? Colors.white : Colors.black;
-    final cardBackgroundColor =
-        isDarkMode ? Colors.grey[800]! : Colors.white; // Changed to white
+    final cardBackgroundColor = isDarkMode ? Colors.grey[800]! : Colors.white;
     final cardBackOutgroundColor = isDarkMode
         ? Colors.grey[800]!
         : const Color.fromARGB(255, 239, 241, 242);
@@ -115,7 +117,6 @@ class _FinanceScreenState extends State<FinanceScreen> {
         ? Colors.black.withOpacity(0.5)
         : Colors.black.withOpacity(0.2);
     final secondaryTextColor = isDarkMode ? Colors.grey[300]! : Colors.grey;
-    final donationValueColor = isDarkMode ? Colors.greenAccent : Colors.green;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -156,6 +157,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
               }
 
               final incomeData = snapshot.data![0] as Map<String, double>;
+              final donationStats = snapshot.data![1] as DonationStats;
 
               final totalOverallSum = incomeData['totalOverallSum']!;
               final totalMonthlyReceitas = incomeData['totalMonthlySum']!;
@@ -228,10 +230,9 @@ class _FinanceScreenState extends State<FinanceScreen> {
                             width: MediaQuery.of(context).size.width * 0.8,
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                  vertical: 16.0,
-                                  horizontal: 16.0), // Increased padding
+                                  vertical: 16.0, horizontal: 16.0),
                               decoration: BoxDecoration(
-                                color: cardBackgroundColor, // White background
+                                color: cardBackgroundColor,
                                 borderRadius: const BorderRadius.vertical(
                                   top: Radius.circular(40),
                                   bottom: Radius.circular(40),
@@ -246,69 +247,102 @@ class _FinanceScreenState extends State<FinanceScreen> {
                               ),
                               child: Column(
                                 children: [
-                                  // Centralized Saldo Total Card
-                                  _buildFinancialCard(
-                                    icon: Icons.account_balance,
-                                    title: 'Saldo total',
-                                    value:
-                                        '€ ${saldoTotalMensal.toStringAsFixed(2)}',
-                                    valueStyle: TextStyle(
-                                      fontSize: 22, // Increased font size
-                                      color: saldoTotalMensal >= 0
-                                          ? incomeColor
-                                          : expenseColor,
-                                    ),
-                                    withShadow: false,
-                                    backgroundColor:
-                                        Colors.white, // White background
-                                    titleStyle: TextStyle(
-                                      fontSize: 22, // Increased font size
-                                      color: cardTextColor,
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              FinancialAnalytics(
+                                            totalOverallSum: totalOverallSum,
+                                            totalMonthlySum:
+                                                totalMonthlyReceitas,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: _buildFinancialCard(
+                                      icon: Icons.account_balance,
+                                      title: 'Saldo total',
+                                      value:
+                                          '€ ${saldoTotalMensal.toStringAsFixed(2)}',
+                                      valueStyle: TextStyle(
+                                        fontSize: 22,
+                                        color: saldoTotalMensal >= 0
+                                            ? incomeColor
+                                            : expenseColor,
+                                      ),
+                                      withShadow: false,
+                                      backgroundColor: Colors.white,
+                                      titleStyle: TextStyle(
+                                        fontSize: 22,
+                                        color: cardTextColor,
+                                      ),
                                     ),
                                   ),
-                                  const SizedBox(
-                                      height: 16), // Increased spacing
+                                  const SizedBox(height: 16),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
-                                        child: _buildFinancialCard(
-                                          icon: Icons.trending_up,
-                                          title: 'Renda',
-                                          value:
-                                              '€ ${totalMonthlyReceitas.toStringAsFixed(2)}',
-                                          valueStyle: TextStyle(
-                                            fontSize: 14,
-                                            color: incomeColor,
-                                          ),
-                                          withShadow: false,
-                                          backgroundColor:
-                                              Colors.white, // White background
-                                          titleStyle: TextStyle(
-                                            fontSize: 15,
-                                            color: cardTextColor,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    IncomesScreen(
+                                                  donationStats: donationStats,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: _buildFinancialCard(
+                                            icon: Icons.trending_up,
+                                            title: 'Renda',
+                                            value:
+                                                '€ ${totalMonthlyReceitas.toStringAsFixed(2)}',
+                                            valueStyle: TextStyle(
+                                              fontSize: 14,
+                                              color: incomeColor,
+                                            ),
+                                            withShadow: false,
+                                            backgroundColor: Colors.white,
+                                            titleStyle: TextStyle(
+                                              fontSize: 15,
+                                              color: cardTextColor,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(
-                                          width: 1), // Space between cards
+                                      const SizedBox(width: 1),
                                       Expanded(
-                                        child: _buildFinancialCard(
-                                          icon: Icons.trending_down,
-                                          title: 'Despesa',
-                                          value:
-                                              '€ ${totalMonthlyExpenses.toStringAsFixed(2)}',
-                                          valueStyle: TextStyle(
-                                            fontSize: 14,
-                                            color: expenseColor,
-                                          ),
-                                          withShadow: false,
-                                          backgroundColor:
-                                              Colors.white, // White background
-                                          titleStyle: TextStyle(
-                                            fontSize: 15,
-                                            color: cardTextColor,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ExpensesScreen(),
+                                              ),
+                                            );
+                                          },
+                                          child: _buildFinancialCard(
+                                            icon: Icons.trending_down,
+                                            title: 'Despesa',
+                                            value:
+                                                '€ ${totalAnualExpenses.toStringAsFixed(2)}',
+                                            valueStyle: TextStyle(
+                                              fontSize: 14,
+                                              color: expenseColor,
+                                            ),
+                                            withShadow: false,
+                                            backgroundColor: Colors.white,
+                                            titleStyle: TextStyle(
+                                              fontSize: 15,
+                                              color: cardTextColor,
+                                            ),
                                           ),
                                         ),
                                       ),
