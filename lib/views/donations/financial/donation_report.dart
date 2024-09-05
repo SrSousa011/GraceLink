@@ -2,6 +2,7 @@ import 'package:churchapp/views/donations/dashboard/donation_analytics.dart';
 import 'package:churchapp/views/donations/dashboard/donnation_receipt.dart';
 import 'package:churchapp/views/donations/dashboard/donnations_list.dart';
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,7 +28,9 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
     try {
       setState(() {});
     } catch (e) {
-      print('Error fetching donations: $e');
+      if (kDebugMode) {
+        print('Error fetching donations: $e');
+      }
       setState(() {});
     }
   }
@@ -159,10 +162,8 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                               decoration: BoxDecoration(
                                 color: cardBackgroundColor,
                                 borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(
-                                      40), // Reduced corner radius
-                                  bottom: Radius.circular(
-                                      40), // Reduced corner radius
+                                  top: Radius.circular(40),
+                                  bottom: Radius.circular(40),
                                 ),
                                 boxShadow: [
                                   BoxShadow(

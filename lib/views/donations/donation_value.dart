@@ -10,7 +10,7 @@ class DonationValue extends StatelessWidget {
   });
 
   final TextEditingController controller;
-  final void Function(String value) onValueChanged;
+  final void Function(int value) onValueChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,12 @@ class DonationValue extends StatelessWidget {
             decoration: const InputDecoration(
               hintText: 'Digite o valor da sua doação',
             ),
-            onChanged: onValueChanged,
+            onChanged: (value) {
+              int valueInCents =
+                  (double.parse(value.replaceAll(RegExp(r'[^\d]'), '')))
+                      .toInt();
+              onValueChanged(valueInCents);
+            },
           ),
           const SizedBox(height: 20.0),
         ],
