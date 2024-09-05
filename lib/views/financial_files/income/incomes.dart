@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
-import 'package:churchapp/views/financial_files/income/add_income.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class IncomesScreen extends StatelessWidget {
   final DonationStats donationStats;
@@ -64,7 +64,7 @@ class IncomesScreen extends StatelessWidget {
       if (kDebugMode) {
         print('Error fetching course revenue data: $e');
       }
-      throw e;
+      rethrow;
     }
   }
 
@@ -123,96 +123,39 @@ class IncomesScreen extends StatelessWidget {
 
           final data = snapshot.data!;
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListView(
-              children: [
-                const SectionTitle(title: 'Receitas'),
-                InfoCard(
-                  title: 'Total de Doações',
-                  value: '€ ${data['totalBalance']!.toStringAsFixed(2)}',
-                  color: Colors.grey[100],
-                ),
-                const SizedBox(height: 20),
-                InfoCard(
-                  title: 'Doações Mensais',
-                  value: '€ ${data['monthlyIncome']!.toStringAsFixed(2)}',
-                  color: Colors.grey[100],
-                ),
-                const SizedBox(height: 20),
-                InfoCard(
-                  title: 'Total Geral Incomes',
-                  value: '€ ${data['totalOverallSum']!.toStringAsFixed(2)}',
-                  color: Colors.grey[100],
-                ),
-                const SizedBox(height: 20),
-                InfoCard(
-                  title: 'Total Mensal Incomes',
-                  value: '€ ${data['totalMonthlySum']!.toStringAsFixed(2)}',
-                  color: Colors.grey[100],
-                ),
-                const SizedBox(height: 20),
-                InfoCard(
-                  title: 'Total Cursos',
-                  value:
-                      '€ ${data['totalOverallCourseRevenue']!.toStringAsFixed(2)}',
-                  color: Colors.grey[100],
-                ),
-                const SizedBox(height: 20),
-                InfoCard(
-                  title: 'Total Mensal Cursos',
-                  value:
-                      '€ ${data['totalMonthlyCourseRevenue']!.toStringAsFixed(2)}',
-                  color: Colors.grey[100],
-                ),
-                const SizedBox(height: 20),
-                InfoCard(
-                  title: 'Total Receitas',
-                  value: '€ ${data['totalReceitas']!.toStringAsFixed(2)}',
-                  color: Colors.green[100],
-                ),
-                const SizedBox(height: 20),
-                InfoCard(
-                  title: 'Total Mensal Receitas',
-                  value: '€ ${data['totalMensalReceitas']!.toStringAsFixed(2)}',
-                  color: Colors.green[100],
-                ),
-              ],
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 300,
+                    child: MonthlyIncomeChart(
+                      totalMonthlyIncome: data['totalMonthlySum']!,
+                      totalMonthlyCourseRevenue:
+                          data['totalMonthlyCourseRevenue']!,
+                      totalMonthlyDonations: data['monthlyIncome']!,
+                      isDarkMode:
+                          Theme.of(context).brightness == Brightness.dark,
+                    ),
+                  ),
+                  const SizedBox(height: 16), // Space between charts
+                  SizedBox(
+                    height: 300,
+                    child: OverallIncomeChart(
+                      totalOverallSum: data['totalOverallSum']!,
+                      totalOverallCourseRevenue:
+                          data['totalOverallCourseRevenue']!,
+                      totalOverallDonations: data['totalBalance']!,
+                      isDarkMode:
+                          Theme.of(context).brightness == Brightness.dark,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AddIncomeForm(),
-            ),
-          );
-        },
-        backgroundColor: const Color(0xFF4CAF50),
-        child: const Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
-  }
-}
-
-class SectionTitle extends StatelessWidget {
-  final String title;
-
-  const SectionTitle({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
       ),
     );
   }
@@ -235,9 +178,219 @@ class InfoCard extends StatelessWidget {
     return Card(
       color: color,
       child: ListTile(
-        title: Text(title),
+        title: Text(title, style: Theme.of(context).textTheme.bodyLarge),
         trailing: Text(value, style: Theme.of(context).textTheme.titleLarge),
       ),
+    );
+  }
+}
+
+class MonthlyIncomeChart extends StatelessWidget {
+  final double totalMonthlyIncome;
+  final double totalMonthlyCourseRevenue;
+  final double totalMonthlyDonations;
+  final bool isDarkMode;
+
+  const MonthlyIncomeChart({
+    super.key,
+    required this.totalMonthlyIncome,
+    required this.totalMonthlyCourseRevenue,
+    required this.totalMonthlyDonations,
+    required this.isDarkMode,
+  });
+
+  double safeValue(double value) => value.isFinite ? value : 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final safeTotalMonthlyIncome = safeValue(totalMonthlyIncome);
+    final safeTotalMonthlyCourseRevenue = safeValue(totalMonthlyCourseRevenue);
+    final safeTotalMonthlyDonations = safeValue(totalMonthlyDonations);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: 300,
+          child: PieChart(
+            PieChartData(
+              sections: [
+                PieChartSectionData(
+                  value: safeTotalMonthlyIncome,
+                  title:
+                      'Doações Mensais\n€ ${safeTotalMonthlyIncome.toStringAsFixed(2)}',
+                  color: Colors.blue,
+                  radius: 100,
+                  titleStyle: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                ),
+                PieChartSectionData(
+                  value: safeTotalMonthlyCourseRevenue,
+                  title:
+                      'Cursos Mensais\n€ ${safeTotalMonthlyCourseRevenue.toStringAsFixed(2)}',
+                  color: Colors.orange,
+                  radius: 100,
+                  titleStyle: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                ),
+                PieChartSectionData(
+                  value: safeTotalMonthlyDonations,
+                  title:
+                      'Total Income\n€ ${safeTotalMonthlyDonations.toStringAsFixed(2)}',
+                  color: Colors.green,
+                  radius: 100,
+                  titleStyle: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                ),
+              ],
+              borderData: FlBorderData(show: false),
+              centerSpaceRadius: 40,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildLegendItem(
+            'Doações Mensais', safeTotalMonthlyIncome, Colors.blue, isDarkMode),
+        _buildLegendItem('Cursos Mensais', safeTotalMonthlyCourseRevenue,
+            Colors.orange, isDarkMode),
+        _buildLegendItem('Total Mensal', safeTotalMonthlyDonations,
+            Colors.green, isDarkMode),
+      ],
+    );
+  }
+
+  Widget _buildLegendItem(
+      String title, double value, Color color, bool isDarkMode) {
+    return Row(
+      children: [
+        Container(
+          width: 20,
+          height: 20,
+          color: color,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          '$title: € ${value.toStringAsFixed(2)}',
+          style: TextStyle(
+            fontSize: 14,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class OverallIncomeChart extends StatelessWidget {
+  final double totalOverallSum;
+  final double totalOverallCourseRevenue;
+  final double totalOverallDonations;
+  final bool isDarkMode;
+
+  const OverallIncomeChart({
+    super.key,
+    required this.totalOverallSum,
+    required this.totalOverallCourseRevenue,
+    required this.totalOverallDonations,
+    required this.isDarkMode,
+  });
+
+  double safeValue(double value) => value.isFinite ? value : 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final safeTotalOverallSum = safeValue(totalOverallSum);
+    final safeTotalOverallCourseRevenue = safeValue(totalOverallCourseRevenue);
+    final safeTotalOverallDonations = safeValue(totalOverallDonations);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: 300,
+          child: BarChart(
+            BarChartData(
+              alignment: BarChartAlignment.spaceEvenly,
+              titlesData: FlTitlesData(show: true),
+              borderData: FlBorderData(show: false),
+              gridData: FlGridData(show: false),
+              maxY: safeTotalOverallSum,
+              barGroups: [
+                BarChartGroupData(
+                  x: 0,
+                  barRods: [
+                    BarChartRodData(
+                      toY: safeTotalOverallDonations,
+                      color: Colors.green,
+                      width: 20,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ],
+                ),
+                BarChartGroupData(
+                  x: 1,
+                  barRods: [
+                    BarChartRodData(
+                      toY: safeTotalOverallCourseRevenue,
+                      color: Colors.orange,
+                      width: 20,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ],
+                ),
+                BarChartGroupData(
+                  x: 2,
+                  barRods: [
+                    BarChartRodData(
+                      toY: safeTotalOverallSum,
+                      color: Colors.blue,
+                      width: 20,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildLegendItem('Doações Totais', safeTotalOverallDonations,
+            Colors.green, isDarkMode),
+        _buildLegendItem('Cursos Totais', safeTotalOverallCourseRevenue,
+            Colors.orange, isDarkMode),
+        _buildLegendItem(
+            'Total Geral', safeTotalOverallSum, Colors.blue, isDarkMode),
+      ],
+    );
+  }
+
+  Widget _buildLegendItem(
+      String title, double value, Color color, bool isDarkMode) {
+    return Row(
+      children: [
+        Container(
+          width: 20,
+          height: 20,
+          color: color,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          '$title: € ${value.toStringAsFixed(2)}',
+          style: TextStyle(
+            fontSize: 14,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+      ],
     );
   }
 }
