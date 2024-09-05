@@ -134,7 +134,7 @@ class IncomesScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    height: 300,
+                    height: 400,
                     child: AnnualIncomeChart(
                       totalAnnualDonations: data['totalBalance']!,
                       totalAnnualCourseRevenue:
@@ -144,13 +144,13 @@ class IncomesScreen extends StatelessWidget {
                           Theme.of(context).brightness == Brightness.dark,
                     ),
                   ),
-                  const SizedBox(height: 100),
+                  const SizedBox(height: 16),
                   Text(
                     'Receita Mensal',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   SizedBox(
-                    height: 300,
+                    height: 400,
                     child: MonthlyIncomeChart(
                       totalMonthlyIncome: data['totalOverallSum']!,
                       totalMonthlyCourseRevenue:
@@ -162,7 +162,7 @@ class IncomesScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
-                    height: 300,
+                    height: 400,
                     child: OverallIncomeChart(
                       totalOverallSum: data['totalReceitas']!,
                       totalOverallCourseRevenue:
@@ -423,7 +423,7 @@ class OverallIncomeChart extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 100),
+        const SizedBox(height: 16),
         Text(
           'Distribuição de Receitas Totais',
           style: Theme.of(context).textTheme.titleLarge,
@@ -477,16 +477,20 @@ class OverallIncomeChart extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildLegendItem('Doações Totais', safeTotalOverallDonations,
-                Colors.green, isDarkMode),
-            _buildLegendItem('Cursos Totais', safeTotalOverallCourseRevenue,
-                Colors.orange, isDarkMode),
-            _buildLegendItem(
-                'Total Geral', safeTotalOverallSum, Colors.blue, isDarkMode),
-          ],
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildLegendItem('Doações Totais', safeTotalOverallDonations,
+                    Colors.green, isDarkMode),
+                _buildLegendItem('Cursos Totais', safeTotalOverallCourseRevenue,
+                    Colors.orange, isDarkMode),
+                _buildLegendItem('Total Geral', safeTotalOverallSum,
+                    Colors.blue, isDarkMode),
+              ],
+            ),
+          ),
         ),
       ],
     );
@@ -504,11 +508,13 @@ class OverallIncomeChart extends StatelessWidget {
             color: color,
           ),
           const SizedBox(width: 8),
-          Text(
-            '$title: € ${value.toStringAsFixed(2)}',
-            style: TextStyle(
-              fontSize: 14,
-              color: isDarkMode ? Colors.white : Colors.black,
+          Expanded(
+            child: Text(
+              '$title: € ${value.toStringAsFixed(2)}',
+              style: TextStyle(
+                fontSize: 14,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
             ),
           ),
         ],
