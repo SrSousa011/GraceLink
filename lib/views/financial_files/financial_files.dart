@@ -78,8 +78,6 @@ class _FinanceScreenState extends State<FinanceScreen> {
     return {
       'totalOverallSum': totalOverallSum,
       'totalMonthlySum': totalMonthlySum,
-      'totalAnualExpenses': 15000.00, // Hardcoded value
-      'totalMonthlyExpenses': 1200.00, // Hardcoded value
     };
   }
 
