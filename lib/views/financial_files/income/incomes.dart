@@ -53,11 +53,6 @@ class IncomesScreen extends StatelessWidget {
         'totalMonthlyCourseRevenue': revenues['monthlyCourseRevenue'] ?? 0,
       };
 
-      // Adicionando print para verificar os dados obtidos
-      if (kDebugMode) {
-        print('Dados obtidos: $result');
-      }
-
       return result;
     } catch (e) {
       if (kDebugMode) {
@@ -99,7 +94,6 @@ class IncomesScreen extends StatelessWidget {
 
             final data = snapshot.data!;
 
-            // Use os valores convertidos para double
             final totalReceitas = data['totalReceitas'] ?? 0;
             final totalMensalReceitas = data['totalMensalReceitas'] ?? 0;
             final totalBalance = data['totalBalance'] ?? 0;
