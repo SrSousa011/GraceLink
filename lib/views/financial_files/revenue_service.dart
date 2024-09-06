@@ -9,27 +9,49 @@ class RevenueService {
 
   Future<Map<String, double>> fetchAllRevenues(
       DonationStats donationStats) async {
-    final totalReceitas = await _fetchDonationData(donationStats);
-    final monthlyReceitas = await _fetchDonationData(donationStats);
+    try {
+      final donationData = await _fetchDonationData(donationStats);
+      final courseRevenueData = await _fetchCourseRevenueData();
+      final incomeData = await _fetchIncomeData();
 
-    final monthlyCourseRevenue = await _fetchCourseRevenueData();
-    final courseRevenue = await _fetchCourseRevenueData();
+      final totalReceitas = (donationData['totalDonations'] ?? 0) +
+          (courseRevenueData['totalOverallCourseRevenue'] ?? 0) +
+          (incomeData['totalOverallIncome'] ?? 0);
 
-    final monthlyOtherIncome = await _fetchIncomeData();
-    final otherIncome = await _fetchIncomeData();
+      final monthlyReceitas = (donationData['monthlyDonations'] ?? 0) +
+          (courseRevenueData['monthlyCourseRevenue'] ?? 0) +
+          (incomeData['monthlyOtherIncome'] ?? 0);
 
-    return {
-      'monthlyDonations': monthlyReceitas['monthlyDonations'] ?? 0,
-      'totalDonations': totalReceitas['totalDonations'] ?? 0,
-      'monthlyCourse': monthlyCourseRevenue['monthlyCourseRevenue'] ?? 0,
-      'totalCourse': courseRevenue['totalOverallCourseRevenue'] ?? 0,
-      'monthlyOtherIncome': monthlyOtherIncome['monthlyOtherIncome'] ?? 0,
-      'totalOtherIncome': otherIncome['totalOverallIncome'] ?? 0,
-    };
+      return {
+        'totalReceita': totalReceitas,
+        'monthlyReceita': monthlyReceitas,
+        'totalDonations': donationData['totalDonations'] ?? 0,
+        'monthlyDonations': donationData['monthlyDonations'] ?? 0,
+        'totalCourseRevenue':
+            courseRevenueData['totalOverallCourseRevenue'] ?? 0,
+        'monthlyCourseRevenue': courseRevenueData['monthlyCourseRevenue'] ?? 0,
+        'totalOtherIncome': incomeData['totalOverallIncome'] ?? 0,
+        'monthlyOtherIncome': incomeData['monthlyOtherIncome'] ?? 0,
+      };
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching all revenues: $e');
+      }
+      return {
+        'totalReceita': 0.0,
+        'monthlyReceita': 0.0,
+        'totalDonations': 0.0,
+        'monthlyDonations': 0.0,
+        'totalCourseRevenue': 0.0,
+        'monthlyCourseRevenue': 0.0,
+        'totalOtherIncome': 0.0,
+        'monthlyOtherIncome': 0.0,
+      };
+    }
   }
 
   // Fetch de outras rendas (income)
-  Future<Map<String, double?>> _fetchIncomeData() async {
+  Future<Map<String, double>> _fetchIncomeData() async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final user = FirebaseAuth.instance.currentUser;
 
@@ -39,12 +61,8 @@ class RevenueService {
 
     try {
       final now = DateTime.now();
-
-      // Definir o início e o fim do ano atual
       final startOfYear = DateTime(now.year, 1, 1);
       final endOfYear = DateTime(now.year + 1, 1, 1);
-
-      // Definir o início e o fim do mês atual
       final startOfMonth = DateTime(now.year, now.month, 1);
       final endOfMonth = DateTime(now.year, now.month + 1, 1);
 
@@ -62,18 +80,14 @@ class RevenueService {
         final amount = (data['amount'] as num).toDouble();
         final createdAt = (data['createdAt'] as Timestamp).toDate();
 
-        // Calcular a receita anual
         if (createdAt.isAfter(startOfYear) && createdAt.isBefore(endOfYear)) {
           totalAnnualSum += amount;
         }
 
-        // Calcular a receita do mês atual
         if (createdAt.isAfter(startOfMonth) && createdAt.isBefore(endOfMonth)) {
           monthlyIncomeSum += amount;
         }
       }
-
-      // Print dos valores calculados
 
       return {
         'totalOverallIncome': totalAnnualSum,
@@ -91,7 +105,7 @@ class RevenueService {
   }
 
   // Fetch de receitas dos cursos
-  Future<Map<String, double?>> _fetchCourseRevenueData() async {
+  Future<Map<String, double>> _fetchCourseRevenueData() async {
     try {
       final totalRevenue =
           (await _coursesService.calculateTotalRevenue()) as num;
@@ -114,7 +128,7 @@ class RevenueService {
   }
 
   // Fetch de doações
-  Future<Map<String, double?>> _fetchDonationData(
+  Future<Map<String, double>> _fetchDonationData(
       DonationStats donationStats) async {
     try {
       return {

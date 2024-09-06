@@ -39,20 +39,18 @@ class IncomesScreen extends StatelessWidget {
       final revenues = await _revenueService.fetchAllRevenues(donationStats);
 
       final result = {
-        'totalReceitas': (revenues['totalDonations'] as num?)?.toDouble() ??
-            0.0 + (revenues['totalCourse'] as num?)!.toDouble(),
-        'totalMensalReceitas':
-            (revenues['monthlyDonations'] as num?)?.toDouble() ??
-                0.0 + (revenues['monthlyCourse'] as num?)!.toDouble(),
-        'totalBalance': (revenues['totalDonations'] as num?)?.toDouble() ?? 0.0,
-        'totalMonthlyDonations':
-            (revenues['monthlyDonations'] as num?)?.toDouble() ?? 0.0,
-        'totalOverallSum': (revenues['totalDonations'] as num?)?.toDouble() ??
-            0.0 + (revenues['totalCourse'] as num?)!.toDouble(),
-        'totalOverallCourseRevenue':
-            (revenues['totalCourse'] as num?)?.toDouble() ?? 0.0,
-        'totalMonthlyCourseRevenue':
-            (revenues['monthlyCourse'] as num?)?.toDouble() ?? 0.0,
+        'totalReceitas': ((revenues['totalCourseRevenue'] ?? 0) +
+            (revenues['totalOtherIncome'] ?? 0) +
+            (revenues['totalDonations'] ?? 0)),
+        'totalMensalReceitas': ((revenues['monthlyCourseRevenue'] ?? 0) +
+            (revenues['monthlyOtherIncome'] ?? 0) +
+            (revenues['monthlyDonations'] ?? 0)),
+        'totalBalance': revenues['totalDonations'] ?? 0,
+        'totalMonthlyDonations': revenues['monthlyDonations'] ?? 0,
+        'totalOverallSum': revenues['totalCourseRevenue'] ?? 0,
+        'monthlyOtherIncome': revenues['monthlyOtherIncome'] ?? 0,
+        'totalOverallCourseRevenue': revenues['totalCourseRevenue'] ?? 0,
+        'totalMonthlyCourseRevenue': revenues['monthlyCourseRevenue'] ?? 0,
       };
 
       return result;
@@ -136,7 +134,7 @@ class IncomesScreen extends StatelessWidget {
                             Theme.of(context).brightness == Brightness.dark,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 22),
                     SizedBox(
                       height: 500,
                       child: OverallIncomeChart(
