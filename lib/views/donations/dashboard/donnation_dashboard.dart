@@ -96,7 +96,7 @@ class DonationsDashboard extends StatelessWidget {
                 final donations = snapshot.data?.docs ?? [];
                 final donationStats = DonationStats.fromDonations(donations);
 
-                final monthlyIncome = donationStats.monthlyDonnation;
+                final monthlyIncome = donationStats.monthlyDonation;
 
                 final now = DateTime.now();
                 final startOfMonth = DateTime(now.year, now.month, 1);

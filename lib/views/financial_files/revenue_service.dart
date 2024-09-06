@@ -132,8 +132,8 @@ class RevenueService {
       DonationStats donationStats) async {
     try {
       return {
-        'totalDonations': donationStats.totalDonnation.toDouble(),
-        'monthlyDonations': donationStats.monthlyDonnation.toDouble(),
+        'totalDonations': donationStats.totalDonation.toDouble(),
+        'monthlyDonations': donationStats.monthlyDonation.toDouble(),
       };
     } catch (e) {
       if (kDebugMode) {

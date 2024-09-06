@@ -94,8 +94,8 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
 
               final donations = donationsSnapshot.data?.docs ?? [];
               final donationStats = DonationStats.fromDonations(donations);
-              final totalBalance = donationStats.totalDonnation;
-              final monthlyIncome = donationStats.monthlyDonnation;
+              final totalBalance = donationStats.totalDonation;
+              final monthlyIncome = donationStats.monthlyDonation;
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
