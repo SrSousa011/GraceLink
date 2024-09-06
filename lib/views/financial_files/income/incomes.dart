@@ -124,6 +124,7 @@ class IncomesScreen extends StatelessWidget {
                             Theme.of(context).brightness == Brightness.dark,
                       ),
                     ),
+                    const SizedBox(height: 16),
                     SizedBox(
                       height: 400,
                       child: MonthlyIncomeChart(
