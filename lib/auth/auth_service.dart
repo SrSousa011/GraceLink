@@ -592,6 +592,7 @@ class AuthenticationService implements BaseAuth {
     }
   }
 
+  @override
   Future<void> sendVerificationCode(String phoneNumber) async {
     await _firebaseAuth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
