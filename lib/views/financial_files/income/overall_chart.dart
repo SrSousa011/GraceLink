@@ -50,8 +50,8 @@ class OverallIncomeChart extends StatelessWidget {
                   x: 0,
                   barRods: [
                     BarChartRodData(
-                      toY: safeTotalOverallDonations,
-                      color: kDonationColor,
+                      toY: safeTotalOverallCourseRevenue,
+                      color: kCourseColor,
                       width: 20,
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -61,8 +61,8 @@ class OverallIncomeChart extends StatelessWidget {
                   x: 1,
                   barRods: [
                     BarChartRodData(
-                      toY: safeTotalOverallCourseRevenue,
-                      color: kCourseColor,
+                      toY: safeTotalOverallSum,
+                      color: kIncomeColor,
                       width: 20,
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -72,8 +72,8 @@ class OverallIncomeChart extends StatelessWidget {
                   x: 2,
                   barRods: [
                     BarChartRodData(
-                      toY: safeTotalOverallSum,
-                      color: kIncomeColor,
+                      toY: safeTotalOverallDonations,
+                      color: kDonationColor,
                       width: 20,
                       borderRadius: BorderRadius.circular(8),
                     ),
