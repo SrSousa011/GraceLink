@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DonationStats {
-  final double totalDonnation;
-  final double monthlyDonnation;
+  final double totalDonation;
+  final double monthlyDonation;
 
   DonationStats({
-    required this.totalDonnation,
-    required this.monthlyDonnation,
+    required this.totalDonation,
+    required this.monthlyDonation,
   });
 
   factory DonationStats.fromDonations(List<DocumentSnapshot> donations) {
@@ -30,8 +30,8 @@ class DonationStats {
     }
 
     return DonationStats(
-      totalDonnation: totalBalance,
-      monthlyDonnation: monthlyIncome,
+      totalDonation: totalBalance,
+      monthlyDonation: monthlyIncome,
     );
   }
 
@@ -43,5 +43,19 @@ class DonationStats {
         .trim();
 
     return double.tryParse(sanitizedValue) ?? 0.0;
+  }
+
+  factory DonationStats.fromMap(Map<String, dynamic> map) {
+    return DonationStats(
+      totalDonation: (map['totalDonation'] as num?)?.toDouble() ?? 0.0,
+      monthlyDonation: (map['monthlyDonation'] as num?)?.toDouble() ?? 0.0,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'totalDonation': totalDonation,
+      'monthlyDonation': monthlyDonation,
+    };
   }
 }
