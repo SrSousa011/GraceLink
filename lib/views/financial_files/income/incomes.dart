@@ -47,11 +47,16 @@ class IncomesScreen extends StatelessWidget {
             (revenues['monthlyDonations'] ?? 0)),
         'totalBalance': revenues['totalDonations'] ?? 0,
         'totalMonthlyDonations': revenues['monthlyDonations'] ?? 0,
-        'totalOverallSum': revenues['totalCourseRevenue'] ?? 0,
+        'totalOverallSum': revenues['totalOverallIncome'] ?? 0,
         'monthlyOtherIncome': revenues['monthlyOtherIncome'] ?? 0,
         'totalOverallCourseRevenue': revenues['totalCourseRevenue'] ?? 0,
         'totalMonthlyCourseRevenue': revenues['monthlyCourseRevenue'] ?? 0,
       };
+
+      // Adicionando print para verificar os dados obtidos
+      if (kDebugMode) {
+        print('Dados obtidos: $result');
+      }
 
       return result;
     } catch (e) {

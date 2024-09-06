@@ -30,7 +30,7 @@ class RevenueService {
         'totalCourseRevenue':
             courseRevenueData['totalOverallCourseRevenue'] ?? 0,
         'monthlyCourseRevenue': courseRevenueData['monthlyCourseRevenue'] ?? 0,
-        'totalOtherIncome': incomeData['totalOverallIncome'] ?? 0,
+        'totalOverallIncome': incomeData['totalOverallIncome'] ?? 0,
         'monthlyOtherIncome': incomeData['monthlyOtherIncome'] ?? 0,
       };
     } catch (e) {
