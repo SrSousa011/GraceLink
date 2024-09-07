@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class DonationReceipt extends StatelessWidget {
   final String title;
   final String from;
   final String date;
-  final String total;
+  final double total; // Certifique-se de que este valor seja um double
   final String paymentProofURL;
   final String donorPhotoURL;
 
@@ -17,6 +18,12 @@ class DonationReceipt extends StatelessWidget {
     required this.paymentProofURL,
     required this.donorPhotoURL,
   });
+
+  String _formatTotal(double value) {
+    // Função para formatar valores monetários
+    final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: '€');
+    return formatter.format(value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +72,7 @@ class DonationReceipt extends StatelessWidget {
               ),
               const SizedBox(height: 12.0),
               Text(
-                'Total: $total',
+                'Total: ${_formatTotal(total)}', // Atualizado para usar double
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class DonationStats {
   final double totalDonation;
@@ -18,8 +19,7 @@ class DonationStats {
     for (var doc in donations) {
       final data = doc.data() as Map<String, dynamic>;
 
-      final donationValueStr = data['donationValue']?.toString() ?? '0.00';
-      final donationValue = _parseDonationValue(donationValueStr);
+      final donationValue = _parseDonationValue(data['donationValue']);
       final timestamp = (data['timestamp'] as Timestamp?)?.toDate();
 
       totalBalance += donationValue;
@@ -35,14 +35,20 @@ class DonationStats {
     );
   }
 
-  static double _parseDonationValue(String value) {
-    final sanitizedValue = value
-        .replaceAll('€', '')
-        .replaceAll(' ', '')
-        .replaceAll(',', '.')
-        .trim();
+  static double _parseDonationValue(dynamic value) {
+    if (value is num) {
+      return value.toDouble();
+    } else if (value is String) {
+      final sanitizedValue = value
+          .replaceAll('€', '')
+          .replaceAll(' ', '')
+          .replaceAll(',', '.')
+          .trim();
 
-    return double.tryParse(sanitizedValue) ?? 0.0;
+      return double.tryParse(sanitizedValue) ?? 0.0;
+    } else {
+      return 0.0;
+    }
   }
 
   factory DonationStats.fromMap(Map<String, dynamic> map) {
@@ -57,5 +63,10 @@ class DonationStats {
       'totalDonation': totalDonation,
       'monthlyDonation': monthlyDonation,
     };
+  }
+
+  String formatCurrency(double value) {
+    final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: '€');
+    return formatter.format(value);
   }
 }

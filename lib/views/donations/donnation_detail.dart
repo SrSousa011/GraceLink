@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 class DonationDetails extends StatefulWidget {
   final String fullName;
   final String donationType;
-  final String donationValue;
+  final double donationValue;
 
   const DonationDetails({
     super.key,
@@ -56,7 +56,7 @@ class _DonationDetailsState extends State<DonationDetails> {
         'userId': FirebaseAuth.instance.currentUser!.uid,
         'fullName': widget.fullName,
         'donationType': widget.donationType,
-        'donationValue': widget.donationValue,
+        'donationValue': widget.donationValue, // Store as double
         'photoURL': uploadedFileURL,
         'timestamp': FieldValue.serverTimestamp(),
       });
@@ -118,7 +118,7 @@ class _DonationDetailsState extends State<DonationDetails> {
               ),
               const SizedBox(height: 10.0),
               Text(
-                'Valor: ${widget.donationValue}',
+                'Valor: ${widget.donationValue.toStringAsFixed(2)}', // Format double
                 style: const TextStyle(fontSize: 18.0),
               ),
               const Text('Copie o número ISBN e pague fora do aplicativo.'),

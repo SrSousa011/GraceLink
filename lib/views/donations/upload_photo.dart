@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:churchapp/views/donations/donations.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,7 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 class StoragePage extends StatefulWidget {
   final String donationType;
-  final String donationValue;
+  final double donationValue;
   final String fullName;
 
   const StoragePage({

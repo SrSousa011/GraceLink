@@ -34,6 +34,11 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
     }
   }
 
+  String _formatTotal(double value) {
+    final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: '€');
+    return formatter.format(value);
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -167,8 +172,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                   _buildFinancialCard(
                                     icon: Icons.account_balance_wallet,
                                     title: 'Saldo total',
-                                    value:
-                                        '€ ${totalBalance.toStringAsFixed(2)}',
+                                    value: _formatTotal(totalBalance),
                                     valueStyle: TextStyle(
                                       fontSize: 18,
                                       color: cardTextColor,
@@ -183,8 +187,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                   _buildFinancialCard(
                                     icon: Icons.trending_up,
                                     title: 'Renda mensal',
-                                    value:
-                                        '€ ${monthlyIncome.toStringAsFixed(2)}',
+                                    value: _formatTotal(monthlyIncome),
                                     valueStyle: TextStyle(
                                       fontSize: 14,
                                       color: incomeColor,
@@ -269,7 +272,8 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                 final fullName =
                                     donation['fullName'] ?? 'Desconhecido';
                                 final donationValue =
-                                    donation['donationValue'] ?? '0.00';
+                                    (donation['donationValue'] as num)
+                                        .toDouble(); // Convertendo para double
                                 final donationType =
                                     donation['donationType'] ?? 'Sem tipo';
                                 final userId = donation['userId'] ?? '';
@@ -325,7 +329,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                               color: secondaryTextColor),
                                         ),
                                         trailing: Text(
-                                          '+ $donationValue',
+                                          _formatTotal(donationValue),
                                           style: TextStyle(
                                             color: donationValueColor,
                                             fontSize: 16.0,
@@ -390,7 +394,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                         ],
                                       ),
                                       trailing: Text(
-                                        '+ $donationValue',
+                                        _formatTotal(donationValue),
                                         style: TextStyle(
                                           color: donationValueColor,
                                           fontSize: 16.0,

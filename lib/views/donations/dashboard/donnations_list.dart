@@ -8,6 +8,27 @@ class DonationsList extends StatelessWidget {
 
   DonationsList({super.key});
 
+  String _formatTotal(double value) {
+    final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: '€');
+    return formatter.format(value);
+  }
+
+  double _parseDonationValue(dynamic value) {
+    if (value is num) {
+      return value.toDouble();
+    } else if (value is String) {
+      final sanitizedValue = value
+          .replaceAll('€', '')
+          .replaceAll(' ', '')
+          .replaceAll(',', '.')
+          .trim();
+
+      return double.tryParse(sanitizedValue) ?? 0.0;
+    } else {
+      return 0.0;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -49,7 +70,10 @@ class DonationsList extends StatelessWidget {
             itemBuilder: (context, index) {
               final donation = donations[index].data() as Map<String, dynamic>;
               final fullName = donation['fullName'] ?? 'Desconhecido';
-              final donationValue = donation['donationValue'] ?? '0.00';
+
+              final donationValue =
+                  _parseDonationValue(donation['donationValue']);
+
               final donationType = donation['donationType'] ?? 'Sem tipo';
               final userId = donation['userId'];
               final paymentProofURL = donation['photoURL'] ?? '';
@@ -111,7 +135,7 @@ class DonationsList extends StatelessWidget {
                       ],
                     ),
                     trailing: Text(
-                      '+ $donationValue',
+                      _formatTotal(donationValue),
                       style: TextStyle(
                         color: donationValueColor,
                         fontSize: 16.0,

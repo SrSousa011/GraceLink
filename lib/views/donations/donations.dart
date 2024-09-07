@@ -15,20 +15,8 @@ class Donations extends StatefulWidget {
 }
 
 class _DonationsState extends State<Donations> {
-  late TextEditingController donationController;
+  double donationValue = 0.0;
   String donationType = '';
-
-  @override
-  void initState() {
-    super.initState();
-    donationController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    donationController.dispose();
-    super.dispose();
-  }
 
   void onTypeSelected(String type) {
     setState(() {
@@ -36,37 +24,45 @@ class _DonationsState extends State<Donations> {
     });
   }
 
-  void navigateToDonationDetailsScreen(BuildContext context) async {
-    if (donationType.isEmpty || donationController.text.isEmpty) {
-      final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-      final Color errorIconColor = isDarkMode ? Colors.grey : Colors.red;
-      final Color dialogTextColor = isDarkMode ? Colors.white : Colors.black;
+  void showErrorDialog(BuildContext context, String title, String content) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final Color errorIconColor = isDarkMode ? Colors.grey : Colors.red;
+    final Color dialogTextColor = isDarkMode ? Colors.white : Colors.black;
 
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Row(
-              children: <Widget>[
-                Icon(Icons.error, color: errorIconColor),
-                const SizedBox(width: 8.0),
-                Text('Erro', style: TextStyle(color: dialogTextColor)),
-              ],
-            ),
-            content: Text(
-              'Selecione um tipo de doação e insira um valor.',
-              style: TextStyle(color: dialogTextColor),
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('Close', style: TextStyle(color: dialogTextColor)),
-              ),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: <Widget>[
+              Icon(Icons.error, color: errorIconColor),
+              const SizedBox(width: 8.0),
+              Text(title, style: TextStyle(color: dialogTextColor)),
             ],
-          );
-        },
+          ),
+          content: Text(
+            content,
+            style: TextStyle(color: dialogTextColor),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Close', style: TextStyle(color: dialogTextColor)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void navigateToDonationDetailsScreen(BuildContext context) async {
+    if (donationType.isEmpty || donationValue <= 0) {
+      showErrorDialog(
+        context,
+        'Error',
+        'Selecione um tipo de doação e insira um valor válido.',
       );
     } else {
       try {
@@ -79,82 +75,26 @@ class _DonationsState extends State<Donations> {
             MaterialPageRoute(
               builder: (context) => DonationDetails(
                 donationType: donationType,
-                donationValue: donationController.text,
+                donationValue: donationValue,
                 fullName: fullName,
               ),
             ),
           );
         } else {
-          if (!context.mounted) return;
-          final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-          final Color errorIconColor = isDarkMode ? Colors.grey : Colors.red;
-          final Color dialogTextColor =
-              isDarkMode ? Colors.white : Colors.black;
-
-          if (!context.mounted) return;
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Row(
-                  children: <Widget>[
-                    Icon(Icons.error, color: errorIconColor),
-                    const SizedBox(width: 8.0),
-                    Text('Error', style: TextStyle(color: dialogTextColor)),
-                  ],
-                ),
-                content: Text(
-                  'Failed to get user full name.',
-                  style: TextStyle(color: dialogTextColor),
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('Fechar',
-                        style: TextStyle(color: dialogTextColor)),
-                  ),
-                ],
-              );
-            },
+          showErrorDialog(
+            context,
+            'Error',
+            'Failed to get user full name.',
           );
         }
       } catch (e) {
         if (kDebugMode) {
           print('Error fetching user full name: $e');
         }
-        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-        final Color errorIconColor = isDarkMode ? Colors.red : Colors.redAccent;
-        final Color dialogTextColor = isDarkMode ? Colors.white : Colors.black;
-
-        if (!context.mounted) return;
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Row(
-                children: <Widget>[
-                  Icon(Icons.error, color: errorIconColor),
-                  const SizedBox(width: 8.0),
-                  Text('Error', style: TextStyle(color: dialogTextColor)),
-                ],
-              ),
-              content: Text(
-                'Failed to get user full name.',
-                style: TextStyle(color: dialogTextColor),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child:
-                      Text('Close', style: TextStyle(color: dialogTextColor)),
-                ),
-              ],
-            );
-          },
+        showErrorDialog(
+          context,
+          'Error',
+          'Failed to get user full name.',
         );
       }
     }
@@ -186,8 +126,12 @@ class _DonationsState extends State<Donations> {
             children: <Widget>[
               const SizedBox(height: 20.0),
               DonationValue(
-                controller: donationController,
-                onValueChanged: (value) {},
+                onValueChanged: (value) {
+                  setState(() {
+                    donationValue = value;
+                  });
+                },
+                value: donationValue,
               ),
               DonationType(
                 onTypeSelected: onTypeSelected,
