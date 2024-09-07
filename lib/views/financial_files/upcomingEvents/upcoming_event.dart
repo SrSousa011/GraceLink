@@ -1,4 +1,5 @@
-import 'package:churchapp/views/financial_files/upcomingEvents/add_income.dart';
+import 'package:churchapp/views/financial_files/upcomingEvents/add_transaction.dart';
+import 'package:churchapp/views/financial_files/upcomingEvents/transaction_details.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,75 +11,112 @@ class UpcomingEventsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor = isDarkMode ? Colors.black : Colors.white;
-    //final primaryTextColor = isDarkMode ? Colors.white : Colors.black;
-    final cardBackgroundColor = isDarkMode ? Colors.grey[800]! : Colors.white;
     final secondaryTextColor =
         isDarkMode ? Colors.grey[400]! : Colors.grey[700];
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Próximos Lançamentos'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: () {
+              // Adicione lógica para filtros
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.sort),
+            onPressed: () {
+              // Adicione lógica para ordenação
+            },
+          ),
+        ],
       ),
       backgroundColor: backgroundColor,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<List<Map<String, dynamic>>>(
-          future: _fetchTransactions(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: _fetchTransactions(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
+                if (snapshot.hasError) {
+                  return Center(child: Text('Erro: ${snapshot.error}'));
+                }
 
-            if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text('No transactions found.'));
-            }
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                      child: Text('Nenhuma transação encontrada.'));
+                }
 
-            final transactions = snapshot.data!;
+                final transactions = snapshot.data!;
 
-            return ListView.builder(
-              itemCount: transactions.length,
-              itemBuilder: (context, index) {
-                final transaction = transactions[index];
-                final isIncome = transaction['category'] == 'income';
-                final amount = transaction['amount'];
-                final color = isIncome ? Colors.green : Colors.red;
+                return Expanded(
+                  child: ListView.builder(
+                    itemCount: transactions.length,
+                    itemBuilder: (context, index) {
+                      final transaction = transactions[index];
+                      final isIncome = transaction['category'] == 'income';
+                      final amount = transaction['amount'];
+                      final color = isIncome ? Colors.green : Colors.red;
 
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8.0),
-                  color: cardBackgroundColor,
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(16.0),
-                    title: Text(
-                      transaction['description'] ?? 'No Description',
-                      style: TextStyle(
-                        color: color,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    subtitle: Text(
-                      'Date: ${transaction['createdAt']}\n'
-                      'Amount: €$amount',
-                      style: TextStyle(color: secondaryTextColor),
-                    ),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TransactionDetailsScreen(
-                          transaction: transaction,
+                      return ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 16.0),
+                        leading: Icon(
+                          isIncome ? Icons.arrow_upward : Icons.arrow_downward,
                           color: color,
                         ),
-                      ),
-                    ),
+                        title: Text(
+                          transaction['source'] ?? '',
+                          style: TextStyle(
+                            color: color,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _formatDate(transaction['createdAt']),
+                              style: TextStyle(color: secondaryTextColor),
+                            ),
+                            Text(
+                              '${transaction['description']}',
+                              style: TextStyle(color: secondaryTextColor),
+                            ),
+                          ],
+                        ),
+                        trailing: Text(
+                          '€$amount',
+                          style: TextStyle(
+                            color: color,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TransactionDetailsScreen(
+                              transaction: transaction,
+                              color: color,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 );
               },
-            );
-          },
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -86,7 +124,7 @@ class UpcomingEventsScreen extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const AddIncomeForm(),
+              builder: (context) => const AddTransactionForm(),
             ),
           );
         },
@@ -102,7 +140,7 @@ class UpcomingEventsScreen extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      throw Exception('User not authenticated');
+      throw Exception('Usuário não autenticado');
     }
 
     final querySnapshot = await firestore
@@ -115,10 +153,10 @@ class UpcomingEventsScreen extends StatelessWidget {
       return {
         'amount': data['amount'] ?? 'N/A',
         'category': data['category'] ?? 'N/A',
-        'createdAt': data['createdAt']?.toDate().toString() ?? 'N/A',
+        'createdAt': data['createdAt']?.toDate() ?? DateTime.now(),
         'createdBy': data['createdBy'] ?? 'N/A',
         'date': data['date'] ?? 'N/A',
-        'description': data['description'] ?? 'No Description',
+        'description': data['description'] ?? 'Sem Descrição',
         'reference': data['reference'] ?? 'N/A',
         'source': data['source'] ?? 'N/A',
         'time': data['time'] ?? 'N/A',
@@ -126,69 +164,20 @@ class UpcomingEventsScreen extends StatelessWidget {
       };
     }).toList();
   }
-}
 
-class TransactionDetailsScreen extends StatelessWidget {
-  final Map<String, dynamic> transaction;
-  final Color color;
-
-  const TransactionDetailsScreen({
-    super.key,
-    required this.transaction,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Transaction Details'),
-        backgroundColor: color,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            _buildDetailRow(
-                'Description:', transaction['description'] ?? 'No Description'),
-            _buildDetailRow('Amount:', '€${transaction['amount']}'),
-            _buildDetailRow('Date:', transaction['createdAt']),
-            _buildDetailRow('Time:', transaction['time']),
-            _buildDetailRow('Source:', transaction['source'] ?? 'N/A'),
-            _buildDetailRow('Reference:', transaction['reference'] ?? 'N/A'),
-            _buildDetailRow(
-                'Created By:', transaction['createdBy'] ?? 'Unknown'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              style: const TextStyle(
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+  String _formatDate(dynamic date) {
+    if (date == null) return 'N/A';
+    DateTime dt;
+    if (date is Timestamp) {
+      dt = date.toDate();
+    } else if (date is DateTime) {
+      dt = date;
+    } else {
+      return 'N/A';
+    }
+    final day = dt.day.toString().padLeft(2, '0');
+    final month = dt.month.toString().padLeft(2, '0');
+    final year = dt.year;
+    return '$day/$month/$year';
   }
 }
