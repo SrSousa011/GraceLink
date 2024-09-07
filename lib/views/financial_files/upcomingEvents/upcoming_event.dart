@@ -4,8 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class UpcomingEventsScreen extends StatelessWidget {
+class UpcomingEventsScreen extends StatefulWidget {
   const UpcomingEventsScreen({super.key});
+
+  @override
+  _UpcomingEventsScreenState createState() => _UpcomingEventsScreenState();
+}
+
+class _UpcomingEventsScreenState extends State<UpcomingEventsScreen> {
+  String _filter = 'all';
+  bool _isAscending = false; // False para mais recente primeiro
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +29,15 @@ class UpcomingEventsScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: () {
-              // Adicione lógica para filtros
+              _showFilterDialog();
             },
           ),
           IconButton(
             icon: const Icon(Icons.sort),
             onPressed: () {
-              // Adicione lógica para ordenação
+              setState(() {
+                _isAscending = !_isAscending;
+              });
             },
           ),
         ],
@@ -55,12 +65,13 @@ class UpcomingEventsScreen extends StatelessWidget {
                 }
 
                 final transactions = snapshot.data!;
+                final sortedTransactions = _sortTransactions(transactions);
 
                 return Expanded(
                   child: ListView.builder(
-                    itemCount: transactions.length,
+                    itemCount: sortedTransactions.length,
                     itemBuilder: (context, index) {
-                      final transaction = transactions[index];
+                      final transaction = sortedTransactions[index];
                       final isIncome = transaction['category'] == 'income';
                       final amount = transaction['amount'];
                       final color = isIncome ? Colors.green : Colors.red;
@@ -179,5 +190,77 @@ class UpcomingEventsScreen extends StatelessWidget {
     final month = dt.month.toString().padLeft(2, '0');
     final year = dt.year;
     return '$day/$month/$year';
+  }
+
+  List<Map<String, dynamic>> _sortTransactions(
+      List<Map<String, dynamic>> transactions) {
+    if (_filter == 'all') {
+      transactions.sort((a, b) => _isAscending
+          ? a['createdAt'].compareTo(b['createdAt'])
+          : b['createdAt'].compareTo(a['createdAt']));
+    } else {
+      transactions = transactions
+          .where((transaction) => transaction['category'] == _filter)
+          .toList();
+      transactions.sort((a, b) => _isAscending
+          ? a['createdAt'].compareTo(b['createdAt'])
+          : b['createdAt'].compareTo(a['createdAt']));
+    }
+    return transactions;
+  }
+
+  void _showFilterDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Filtrar por Categoria'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(
+                title: const Text('Todas'),
+                value: 'all',
+                groupValue: _filter,
+                onChanged: (value) {
+                  setState(() {
+                    _filter = value!;
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+              RadioListTile<String>(
+                title: const Text('Receitas'),
+                value: 'income',
+                groupValue: _filter,
+                onChanged: (value) {
+                  setState(() {
+                    _filter = value!;
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+              RadioListTile<String>(
+                title: const Text('Despesas'),
+                value: 'expense',
+                groupValue: _filter,
+                onChanged: (value) {
+                  setState(() {
+                    _filter = value!;
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

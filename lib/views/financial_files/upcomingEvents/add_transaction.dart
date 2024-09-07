@@ -247,7 +247,7 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
   Widget _buildDropdownField(String labelText, String selectedValue,
       List<String> options, bool isDarkMode) {
     return DropdownButtonFormField<String>(
-      value: selectedValue,
+      value: options.contains(selectedValue) ? selectedValue : null,
       decoration: InputDecoration(
         labelText: labelText,
         icon: Icon(Icons.label, color: isDarkMode ? Colors.white : Colors.blue),
@@ -272,7 +272,7 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
   }
 
   List<String> _getTransactionTypes() {
-    if (_selectedCategory == 'expenses') {
+    if (_selectedCategory == 'expense') {
       return ['Doação', 'Venda', 'Evento', 'Outro'];
     } else {
       return ['Despesas Gerais', 'Salários', 'Manutenção', 'Serviços'];
@@ -280,7 +280,7 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
   }
 
   void _updateSelectedType() {
-    if (_selectedCategory == 'expenses') {
+    if (_selectedCategory == 'expense') {
       _selectedType = 'Doação';
     } else {
       _selectedType = 'Despesas Gerais';
