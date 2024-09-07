@@ -1,4 +1,3 @@
-import 'package:churchapp/views/donations/dashboard/donation_analytics.dart';
 import 'package:churchapp/views/donations/dashboard/donnation_receipt.dart';
 import 'package:churchapp/views/donations/dashboard/donnations_list.dart';
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
@@ -140,17 +139,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                   Transform.translate(
                     offset: const Offset(0.0, -100.0),
                     child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DonationAnalyticsPage(
-                              totalBalance: totalBalance,
-                              monthlyIncome: monthlyIncome,
-                            ),
-                          ),
-                        );
-                      },
+                      onTap: () {},
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Center(
