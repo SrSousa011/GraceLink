@@ -39,9 +39,12 @@ class _FinanceScreenState extends State<FinanceScreen> {
       throw Exception('User not authenticated');
     }
 
-    final donationStatsDoc =
-        await _firestore.collection('donation_stats').doc(user.uid).get();
-    final donationStats = DonationStats.fromMap(donationStatsDoc.data() ?? {});
+    final donationStatsQuery = await _firestore
+        .collection('donations')
+        .where('userId', isEqualTo: user.uid)
+        .get();
+
+    final donationStats = DonationStats.fromDonations(donationStatsQuery.docs);
 
     try {
       final revenues = await _revenueService.fetchAllRevenues(donationStats);
@@ -85,12 +88,20 @@ class _FinanceScreenState extends State<FinanceScreen> {
       throw Exception('User not authenticated');
     }
 
-    final querySnapshot = await _firestore
-        .collection('donations')
-        .where('userId', isEqualTo: user.uid)
-        .get();
+    try {
+      final querySnapshot = await _firestore
+          .collection('donations')
+          .where('userId', isEqualTo: user.uid)
+          .get();
 
-    return DonationStats.fromDonations(querySnapshot.docs);
+      final donationStats = DonationStats.fromDonations(querySnapshot.docs);
+      return donationStats;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching donation stats: $e');
+      }
+      return DonationStats(totalDonation: 0.0, monthlyDonation: 0.0);
+    }
   }
 
   @override
