@@ -6,27 +6,19 @@ import 'package:churchapp/views/financial_files/revenue_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// Definindo cores principais
-const Color kDonationColor = Color(0xFF4CAF50); // Verde para doações
-const Color kCourseColor = Color(0xFF2196F3); // Azul para cursos
-const Color kIncomeColor = Color(0xFFFF9800); // Laranja para outros rendimentos
-const Color kTotalColor = Color(0xFF9C27B0); // Roxo para o total
-const Color kCourseRevenueColor =
-    Color(0xFF40C4FF); // Azul brilhante para receita de cursos
-const Color kOtherIncomeColor =
-    Color(0xFFFFC107); // Amarelo para outros tipos de receita
-const Color kTotalIncomeColor =
-    Color(0xFFD500F9); // Rosa fluorescente para receita total
-const Color kBackgroundColor = Color(0xFFF5F5F5); // Branco gelo para o fundo
-const Color kDarkGrayColor =
-    Color(0xFF616161); // Cinza médio para textos ou ícones
-const Color kDarkBlueColor = Color(0xFF304FFE); // Azul royal para destaques
-const Color kDarkGreenColor =
-    Color(0xFF00C853); // Verde brilhante para botões ou gráficos
-const Color kDarkOrangeColor =
-    Color(0xFFFF6D00); // Laranja vibrante para avisos
-const Color kDarkPurpleColor =
-    Color(0xFFAA00FF); // Roxo intenso para contrastes
+const Color kDonationColor = Color(0xFF4CAF50);
+const Color kCourseColor = Color(0xFF2196F3);
+const Color kIncomeColor = Color(0xFFFF9800);
+const Color kTotalColor = Color(0xFF9C27B0);
+const Color kCourseRevenueColor = Color(0xFF40C4FF);
+const Color kOtherIncomeColor = Color(0xFFFFC107);
+const Color kTotalIncomeColor = Color(0xFFD500F9);
+const Color kBackgroundColor = Color(0xFFF5F5F5);
+const Color kDarkGrayColor = Color(0xFF616161);
+const Color kDarkBlueColor = Color(0xFF304FFE);
+const Color kDarkGreenColor = Color(0xFF00C853);
+const Color kDarkOrangeColor = Color(0xFFFF6D00);
+const Color kDarkPurpleColor = Color(0xFFAA00FF);
 
 class IncomesScreen extends StatelessWidget {
   final DonationStats donationStats;
@@ -38,20 +30,30 @@ class IncomesScreen extends StatelessWidget {
     try {
       final revenues = await _revenueService.fetchAllRevenues(donationStats);
 
+      final totalCourseRevenue = revenues['totalCourseRevenue'] ?? 0;
+      final totalOtherIncome = revenues['totalOverallIncome'] ?? 0;
+      final totalDonations = revenues['totalDonations'] ?? 0;
+
+      final totalMonthlyCourseRevenue = revenues['monthlyCourseRevenue'] ?? 0;
+      final totalMonthlyOtherIncome = revenues['monthlyOtherIncome'] ?? 0;
+      final totalMonthlyDonations = revenues['monthlyDonations'] ?? 0;
+
       final result = {
-        'totalReceitas': ((revenues['totalCourseRevenue'] ?? 0) +
-            (revenues['totalOtherIncome'] ?? 0) +
-            (revenues['totalDonations'] ?? 0)),
-        'totalMensalReceitas': ((revenues['monthlyCourseRevenue'] ?? 0) +
-            (revenues['monthlyOtherIncome'] ?? 0) +
-            (revenues['monthlyDonations'] ?? 0)),
-        'totalBalance': revenues['totalDonations'] ?? 0,
-        'totalMonthlyDonations': revenues['monthlyDonations'] ?? 0,
-        'totalOverallSum': revenues['totalOverallIncome'] ?? 0,
-        'monthlyOtherIncome': revenues['monthlyOtherIncome'] ?? 0,
-        'totalOverallCourseRevenue': revenues['totalCourseRevenue'] ?? 0,
-        'totalMonthlyCourseRevenue': revenues['monthlyCourseRevenue'] ?? 0,
+        'totalReceitas': totalCourseRevenue + totalOtherIncome + totalDonations,
+        'totalMensalReceitas': totalMonthlyCourseRevenue +
+            totalMonthlyOtherIncome +
+            totalMonthlyDonations,
+        'totalBalance': totalDonations,
+        'totalMonthlyDonations': totalMonthlyDonations,
+        'totalOverallSum': totalOtherIncome,
+        'monthlyOtherIncome': totalMonthlyOtherIncome,
+        'totalOverallCourseRevenue': totalCourseRevenue,
+        'totalMonthlyCourseRevenue': totalMonthlyCourseRevenue,
       };
+
+      if (kDebugMode) {
+        print('Dados obtidos: $result');
+      }
 
       return result;
     } catch (e) {
@@ -64,6 +66,7 @@ class IncomesScreen extends StatelessWidget {
         'totalBalance': 0.0,
         'totalMonthlyDonations': 0.0,
         'totalOverallSum': 0.0,
+        'monthlyOtherIncome': 0.0,
         'totalOverallCourseRevenue': 0.0,
         'totalMonthlyCourseRevenue': 0.0,
       };
