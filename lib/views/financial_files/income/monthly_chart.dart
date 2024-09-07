@@ -115,7 +115,7 @@ class MonthlyIncomeChart extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          '$title: \$${value.toStringAsFixed(2)}',
+          '$title: € ${value.toStringAsFixed(2)}',
           style: TextStyle(
             color: isDarkMode ? Colors.white : Colors.black,
           ),
