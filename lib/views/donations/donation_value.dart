@@ -14,7 +14,7 @@ class DonationValue extends StatefulWidget {
   final void Function(double value) onValueChanged;
 
   @override
-  _DonationValueState createState() => _DonationValueState();
+  State<DonationValue> createState() => _DonationValueState();
 }
 
 class _DonationValueState extends State<DonationValue> {
