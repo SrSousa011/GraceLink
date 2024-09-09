@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class ExpenseService {
+class ExpensesService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -19,8 +19,6 @@ class ExpenseService {
         .where('date', isGreaterThanOrEqualTo: startOfMonth)
         .where('date', isLessThanOrEqualTo: endOfMonth)
         .get();
-
-    print('Número de documentos retornados: ${querySnapshot.docs.length}');
 
     double totalGeneralExpenses = 0.0;
     double totalSalaries = 0.0;
@@ -45,15 +43,6 @@ class ExpenseService {
 
     final totalMonthlyExpenses =
         totalGeneralExpenses + totalSalaries + totalMaintenance + totalServices;
-
-    // Prints para depuração
-    print('Despesas Mensais:');
-    print('- Despesas Gerais: R\$${totalGeneralExpenses.toStringAsFixed(2)}');
-    print('- Salários: R\$${totalSalaries.toStringAsFixed(2)}');
-    print('- Manutenção: R\$${totalMaintenance.toStringAsFixed(2)}');
-    print('- Serviços: R\$${totalServices.toStringAsFixed(2)}');
-    print('- Total Mensal: R\$${totalMonthlyExpenses.toStringAsFixed(2)}');
-
     return {
       'totalGeneralExpenses': totalGeneralExpenses,
       'totalSalaries': totalSalaries,
@@ -78,8 +67,6 @@ class ExpenseService {
         .where('date', isLessThanOrEqualTo: endOfYear)
         .get();
 
-    print('Número de documentos retornados: ${querySnapshot.docs.length}');
-
     double totalSalaries = 0.0;
     double totalMaintenance = 0.0;
     double totalOtherExpenses = 0.0;
@@ -100,14 +87,6 @@ class ExpenseService {
 
     final totalAnnualExpenses =
         totalSalaries + totalMaintenance + totalOtherExpenses;
-
-    // Prints para depuração
-    print('Despesas Anuais:');
-    print('- Salários: R\$${totalSalaries.toStringAsFixed(2)}');
-    print('- Manutenção: R\$${totalMaintenance.toStringAsFixed(2)}');
-    print('- Outras Despesas: R\$${totalOtherExpenses.toStringAsFixed(2)}');
-    print('- Total Anual: R\$${totalAnnualExpenses.toStringAsFixed(2)}');
-
     return {
       'totalSalaries': totalSalaries,
       'totalMaintenance': totalMaintenance,

@@ -28,9 +28,18 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   @override
   void initState() {
     super.initState();
+    final now = DateTime.now();
+    final startOfMonth = DateTime(now.year, now.month, 1);
+    final endOfMonth =
+        DateTime(now.year, now.month + 1, 1).subtract(const Duration(days: 1));
+
+    final startOfYear = DateTime(now.year, 1, 1);
+    final endOfYear =
+        DateTime(now.year + 1, 1, 1).subtract(const Duration(days: 1));
+
     _expensesAndAnnualExpensesFuture = Future.wait([
-      _expensesService.fetchExpenses(),
-      _expensesService.fetchAnnualExpenses(),
+      _expensesService.fetchExpenses(startOfMonth, endOfMonth),
+      _expensesService.fetchAnnualExpenses(startOfYear, endOfYear),
     ]);
   }
 
@@ -60,23 +69,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
           final expenses = snapshot.data![0];
           final annualExpenses = snapshot.data![1];
-
-          // Print dos dados
-          print('Dados das Despesas Mensais:');
-          print('Despesas Gerais: ${expenses['monthlyGeneralExpenses']}');
-          print('Salários: ${expenses['monthlySalaries']}');
-          print('Manutenção: ${expenses['monthlyMaintenance']}');
-          print('Serviços: ${expenses['monthlyServices']}');
-          print(
-              'Total de Despesas Mensais: ${expenses['totalMonthlyExpenses']}');
-
-          print('Dados das Despesas Anuais:');
-          print('Despesas Gerais: ${annualExpenses['annualUtilities']}');
-          print('Salários: ${annualExpenses['annualSalaries']}');
-          print('Manutenção: ${annualExpenses['annualMaintenance']}');
-          print('Outras Despesas: ${annualExpenses['annualOtherExpenses']}');
-          print(
-              'Total de Despesas Anuais: ${annualExpenses['totalAnnualExpenses']}');
 
           final monthlyGeneralExpenses =
               expenses['monthlyGeneralExpenses'] ?? 0.0;
