@@ -16,8 +16,8 @@ class ExpensesService {
         .collection('transactions')
         .where('createdBy', isEqualTo: user.uid)
         .where('category', isEqualTo: 'expense')
-        .where('date', isGreaterThanOrEqualTo: startOfMonth)
-        .where('date', isLessThanOrEqualTo: endOfMonth)
+        .where('createdAt', isGreaterThanOrEqualTo: startOfMonth)
+        .where('createdAt', isLessThanOrEqualTo: endOfMonth)
         .get();
 
     double totalGeneralExpenses = 0.0;
