@@ -1,4 +1,5 @@
 import 'package:churchapp/data/model/user_data.dart';
+import 'package:churchapp/views/financial_files/currency_convert.dart';
 import 'package:churchapp/views/financial_files/expense/expenses_service.dart';
 import 'package:churchapp/views/financial_files/revenue_service.dart';
 import 'package:flutter/foundation.dart';
@@ -325,8 +326,8 @@ class _FinanceScreenState extends State<FinanceScreen> {
                                               _buildFinancialCard(
                                                 icon: Icons.account_balance,
                                                 title: 'Saldo total',
-                                                value:
-                                                    '€ ${totalBalance.toStringAsFixed(2)}',
+                                                value: CurrencyConverter.format(
+                                                    totalBalance),
                                                 valueStyle: TextStyle(
                                                   fontSize: 22,
                                                   color: totalBalance >= 0
@@ -365,8 +366,9 @@ class _FinanceScreenState extends State<FinanceScreen> {
                                                           _buildFinancialCard(
                                                         icon: Icons.trending_up,
                                                         title: 'Renda',
-                                                        value:
-                                                            '€ ${totalReceita.toStringAsFixed(2)}',
+                                                        value: CurrencyConverter
+                                                            .format(
+                                                                totalReceita),
                                                         valueStyle: TextStyle(
                                                           fontSize: 14,
                                                           color: incomeColor,
@@ -398,8 +400,9 @@ class _FinanceScreenState extends State<FinanceScreen> {
                                                         icon:
                                                             Icons.trending_down,
                                                         title: 'Despesa',
-                                                        value:
-                                                            '€ ${totalAnnualExpenses.toStringAsFixed(2)}',
+                                                        value: CurrencyConverter
+                                                            .format(
+                                                                totalAnnualExpenses),
                                                         valueStyle: TextStyle(
                                                           fontSize: 14,
                                                           color: expenseColor,
