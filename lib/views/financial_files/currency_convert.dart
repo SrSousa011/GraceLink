@@ -3,15 +3,21 @@ class CurrencyConverter {
     String integerPart = amount.toStringAsFixed(2).split('.')[0];
     String fractionalPart = amount.toStringAsFixed(2).split('.')[1];
 
-    String formattedIntegerPart = '';
+    StringBuffer formattedIntegerPart = StringBuffer();
+    int count = 0;
+
     for (int i = integerPart.length - 1; i >= 0; i--) {
-      if ((integerPart.length - i) % 3 == 0 && i != integerPart.length - 1) {
-        formattedIntegerPart = '.$formattedIntegerPart';
+      if (count > 0 && count % 3 == 0) {
+        formattedIntegerPart.write('.');
       }
-      formattedIntegerPart = integerPart[i] + formattedIntegerPart;
+      formattedIntegerPart.write(integerPart[i]);
+      count++;
     }
 
-    return '€ $formattedIntegerPart,$fractionalPart';
+    String reversedIntegerPart =
+        formattedIntegerPart.toString().split('').reversed.join('');
+
+    return '€ $reversedIntegerPart,$fractionalPart';
   }
 
   static double parse(String amount) {

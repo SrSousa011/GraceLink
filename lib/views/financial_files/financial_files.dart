@@ -68,10 +68,6 @@ class _FinanceScreenState extends State<FinanceScreen> {
         'monthlyOtherIncome': revenues['monthlyOtherIncome'] ?? 0,
       };
 
-      if (kDebugMode) {
-        print('Dados obtidos: $result');
-      }
-
       return result;
     } catch (e) {
       if (kDebugMode) {
