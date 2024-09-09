@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:churchapp/views/financial_files/expenses.dart';
+import 'package:churchapp/views/financial_files/expense/expenses.dart';
 import 'package:churchapp/views/financial_files/income/incomes.dart';
 import 'package:churchapp/views/financial_files/transaction_history.dart';
 import 'package:churchapp/views/financial_files/upcomingEvents/upcoming_event.dart';
@@ -190,7 +190,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '${_auth.currentUser?.displayName ?? 'User'}',
+                              _auth.currentUser?.displayName ?? 'User',
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -302,7 +302,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
-                                                    const ExpensesScreen(),
+                                                    ExpensesScreen(),
                                               ),
                                             );
                                           },
