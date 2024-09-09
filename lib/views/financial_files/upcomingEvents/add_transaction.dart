@@ -272,16 +272,16 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
   }
 
   List<String> _getTransactionTypes() {
-    if (_selectedCategory == 'expense') {
-      return ['Doação', 'Venda', 'Evento', 'Outro'];
+    if (_selectedCategory == 'income') {
+      return ['Doações Especiais', 'Venda', 'Eventos de Arrecadação', 'Outro'];
     } else {
       return ['Despesas Gerais', 'Salários', 'Manutenção', 'Serviços'];
     }
   }
 
   void _updateSelectedType() {
-    if (_selectedCategory == 'expense') {
-      _selectedType = 'Doação';
+    if (_selectedCategory == 'income') {
+      _selectedType = 'Doações Especiais';
     } else {
       _selectedType = 'Despesas Gerais';
     }
