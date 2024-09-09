@@ -1,3 +1,4 @@
+import 'package:churchapp/views/financial_files/expense/expenses_service.dart'; // Import ExpensesService
 import 'package:churchapp/views/financial_files/revenue_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,14 +24,17 @@ class _FinanceScreenState extends State<FinanceScreen> {
 
   late Future<Map<String, double>> _revenueData;
   late Future<DonationStats> _donationStats;
+  late Future<Map<String, double>> _annualExpenses;
 
   final RevenueService _revenueService = RevenueService();
+  final ExpensesService _expensesService = ExpensesService();
 
   @override
   void initState() {
     super.initState();
     _revenueData = _fetchAllRevenues();
     _donationStats = _fetchDonationStats();
+    _annualExpenses = _fetchAnnualExpenses();
   }
 
   Future<Map<String, double>> _fetchAllRevenues() async {
@@ -82,6 +86,15 @@ class _FinanceScreenState extends State<FinanceScreen> {
     }
   }
 
+  Future<Map<String, double>> _fetchAnnualExpenses() async {
+    final now = DateTime.now();
+    final startOfYear = DateTime(now.year, 1, 1);
+    final endOfYear =
+        DateTime(now.year + 1, 1, 1).subtract(const Duration(days: 1));
+
+    return await _expensesService.fetchAnnualExpenses(startOfYear, endOfYear);
+  }
+
   Future<DonationStats> _fetchDonationStats() async {
     final user = _auth.currentUser;
     if (user == null) {
@@ -124,261 +137,292 @@ class _FinanceScreenState extends State<FinanceScreen> {
         : Colors.black.withOpacity(0.2);
 
     return Scaffold(
-      backgroundColor: backgroundColor,
-      body: FutureBuilder<Map<String, double>>(
-        future: _revenueData,
-        builder: (context, revenueSnapshot) {
-          if (revenueSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (revenueSnapshot.hasError) {
-            return Center(child: Text('Error: ${revenueSnapshot.error}'));
-          }
-
-          if (!revenueSnapshot.hasData) {
-            return const Center(child: Text('Revenue data not found.'));
-          }
-
-          final revenueData = revenueSnapshot.data!;
-          final totalReceita = revenueData['totalReceita'] ?? 0.0;
-          final totalExpenses = revenueData['totalOverallIncome'] ?? 1000.0;
-          final totalBalance = totalReceita - totalExpenses;
-
-          return FutureBuilder<DonationStats>(
-            future: _donationStats,
-            builder: (context, donationSnapshot) {
-              if (donationSnapshot.connectionState == ConnectionState.waiting) {
+        backgroundColor: backgroundColor,
+        body: FutureBuilder<Map<String, double>>(
+            future: _revenueData,
+            builder: (context, revenueSnapshot) {
+              if (revenueSnapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              if (donationSnapshot.hasError) {
-                return Center(child: Text('Error: ${donationSnapshot.error}'));
+              if (revenueSnapshot.hasError) {
+                return Center(child: Text('Error: ${revenueSnapshot.error}'));
               }
 
-              if (!donationSnapshot.hasData) {
-                return const Center(child: Text('Donation stats not found.'));
+              if (!revenueSnapshot.hasData) {
+                return const Center(child: Text('Revenue data not found.'));
               }
 
-              final donationStats = donationSnapshot.data!;
+              final revenueData = revenueSnapshot.data!;
+              final totalReceita = revenueData['totalReceita'] ?? 0.0;
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.3,
-                    decoration: BoxDecoration(
-                      color: accentColor,
-                      borderRadius: const BorderRadius.vertical(
-                        bottom: Radius.circular(60),
-                      ),
-                    ),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 60.0, left: 16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Bom Dia',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: primaryTextColor,
+              return FutureBuilder<Map<String, double>>(
+                future: _annualExpenses,
+                builder: (context, expensesSnapshot) {
+                  if (expensesSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (expensesSnapshot.hasError) {
+                    return Center(
+                        child: Text('Error: ${expensesSnapshot.error}'));
+                  }
+
+                  if (!expensesSnapshot.hasData) {
+                    return const Center(child: Text('Expense data not found.'));
+                  }
+
+                  final expensesData = expensesSnapshot.data!;
+                  final totalAnnualExpenses =
+                      expensesData['totalAnnualExpenses'] ?? 0.0;
+                  final totalBalance = totalReceita - totalAnnualExpenses;
+
+                  return FutureBuilder<DonationStats>(
+                    future: _donationStats,
+                    builder: (context, donationSnapshot) {
+                      if (donationSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      if (donationSnapshot.hasError) {
+                        return Center(
+                            child: Text('Error: ${donationSnapshot.error}'));
+                      }
+
+                      if (!donationSnapshot.hasData) {
+                        return const Center(
+                            child: Text('Donation stats not found.'));
+                      }
+
+                      final donationStats = donationSnapshot.data!;
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: MediaQuery.of(context).size.height * 0.3,
+                            decoration: BoxDecoration(
+                              color: accentColor,
+                              borderRadius: const BorderRadius.vertical(
+                                bottom: Radius.circular(60),
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              _auth.currentUser?.displayName ?? 'User',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: primaryTextColor,
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 60.0, left: 16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Bom Dia',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: primaryTextColor,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      _auth.currentUser?.displayName ?? 'User',
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: primaryTextColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Transform.translate(
-                    offset: const Offset(0.0, -80.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FinancialAnalytics(
-                              totalOverallSum: totalReceita,
-                              totalMonthlySum: totalReceita,
                             ),
                           ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Center(
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 16.0, horizontal: 16.0),
-                              decoration: BoxDecoration(
-                                color: cardBackgroundColor,
-                                borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(40),
-                                  bottom: Radius.circular(40),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: cardShadowColor,
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                children: [
-                                  _buildFinancialCard(
-                                    icon: Icons.account_balance,
-                                    title: 'Saldo total',
-                                    value:
-                                        '€ ${totalBalance.toStringAsFixed(2)}',
-                                    valueStyle: TextStyle(
-                                      fontSize: 22,
-                                      color: totalBalance >= 0
-                                          ? incomeColor
-                                          : expenseColor,
-                                    ),
-                                    withShadow: false,
-                                    backgroundColor: Colors.white,
-                                    titleStyle: TextStyle(
-                                      fontSize: 22,
-                                      color: cardTextColor,
+                          Transform.translate(
+                            offset: const Offset(0.0, -80.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => FinancialAnalytics(
+                                      totalOverallSum: totalReceita,
+                                      totalMonthlySum: totalReceita,
                                     ),
                                   ),
-                                  const SizedBox(height: 16),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    IncomesScreen(
-                                                  donationStats: donationStats,
+                                );
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Center(
+                                  child: SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.8,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16.0, horizontal: 16.0),
+                                      decoration: BoxDecoration(
+                                        color: cardBackgroundColor,
+                                        borderRadius:
+                                            const BorderRadius.vertical(
+                                          top: Radius.circular(40),
+                                          bottom: Radius.circular(40),
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: cardShadowColor,
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          _buildFinancialCard(
+                                            icon: Icons.account_balance,
+                                            title: 'Saldo total',
+                                            value:
+                                                '€ ${totalBalance.toStringAsFixed(2)}',
+                                            valueStyle: TextStyle(
+                                              fontSize: 22,
+                                              color: totalBalance >= 0
+                                                  ? incomeColor
+                                                  : expenseColor,
+                                            ),
+                                            withShadow: false,
+                                            backgroundColor: Colors.white,
+                                            titleStyle: TextStyle(
+                                              fontSize: 22,
+                                              color: cardTextColor,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            IncomesScreen(
+                                                          donationStats:
+                                                              donationStats,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: _buildFinancialCard(
+                                                    icon: Icons.trending_up,
+                                                    title: 'Renda',
+                                                    value:
+                                                        '€ ${totalReceita.toStringAsFixed(2)}',
+                                                    valueStyle: TextStyle(
+                                                      fontSize: 14,
+                                                      color: incomeColor,
+                                                    ),
+                                                    withShadow: false,
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    titleStyle: TextStyle(
+                                                      fontSize: 15,
+                                                      color: cardTextColor,
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
-                                            );
-                                          },
-                                          child: _buildFinancialCard(
-                                            icon: Icons.trending_up,
-                                            title: 'Renda',
-                                            value:
-                                                '€ ${totalReceita.toStringAsFixed(2)}',
-                                            valueStyle: TextStyle(
-                                              fontSize: 14,
-                                              color: incomeColor,
-                                            ),
-                                            withShadow: false,
-                                            backgroundColor: Colors.white,
-                                            titleStyle: TextStyle(
-                                              fontSize: 15,
-                                              color: cardTextColor,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 1),
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ExpensesScreen(),
+                                              const SizedBox(width: 1),
+                                              Expanded(
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const ExpensesScreen(),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: _buildFinancialCard(
+                                                    icon: Icons.trending_down,
+                                                    title: 'Despesa',
+                                                    value:
+                                                        '€ ${totalAnnualExpenses.toStringAsFixed(2)}',
+                                                    valueStyle: TextStyle(
+                                                      fontSize: 14,
+                                                      color: expenseColor,
+                                                    ),
+                                                    withShadow: false,
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    titleStyle: TextStyle(
+                                                      fontSize: 15,
+                                                      color: cardTextColor,
+                                                    ),
+                                                  ),
+                                                ),
                                               ),
-                                            );
-                                          },
-                                          child: _buildFinancialCard(
-                                            icon: Icons.trending_down,
-                                            title: 'Despesa',
-                                            value:
-                                                '€ ${totalExpenses.toStringAsFixed(2)}',
-                                            valueStyle: TextStyle(
-                                              fontSize: 14,
-                                              color: expenseColor,
-                                            ),
-                                            withShadow: false,
-                                            backgroundColor: Colors.white,
-                                            titleStyle: TextStyle(
-                                              fontSize: 15,
-                                              color: cardTextColor,
-                                            ),
+                                            ],
                                           ),
-                                        ),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const UpcomingEventsScreen(),
-                        ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const UpcomingEventsScreen(),
+                                ),
+                              );
+                            },
+                            child: _buildFinanceSectionCard(
+                              icon: Icons.event_note,
+                              title: 'Próximos Lançamentos',
+                              value: '',
+                              backgroundColor: cardBackOutgroundColor,
+                              titleColor: cardTextColor,
+                              valueColor: cardTextColor,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const TransactionHistoryScreen(),
+                                ),
+                              );
+                            },
+                            child: _buildFinanceSectionCard(
+                              icon: Icons.history,
+                              title: 'Histórico de Transações',
+                              value: '',
+                              backgroundColor: cardBackOutgroundColor,
+                              titleColor: cardTextColor,
+                              valueColor: cardTextColor,
+                            ),
+                          ),
+                        ],
                       );
                     },
-                    child: _buildFinanceSectionCard(
-                      icon: Icons.event_note,
-                      title: 'Próximos Lançamentos',
-                      value: '',
-                      backgroundColor: cardBackOutgroundColor,
-                      titleColor: cardTextColor,
-                      valueColor: cardTextColor,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              const TransactionHistoryScreen(),
-                        ),
-                      );
-                    },
-                    child: _buildFinanceSectionCard(
-                      icon: Icons.history,
-                      title: 'Histórico de Transações',
-                      value: '',
-                      backgroundColor: cardBackOutgroundColor,
-                      titleColor: cardTextColor,
-                      valueColor: cardTextColor,
-                    ),
-                  ),
-                ],
+                  );
+                },
               );
-            },
-          );
-        },
-      ),
-    );
+            }));
   }
 }
 
