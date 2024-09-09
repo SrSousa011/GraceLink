@@ -71,17 +71,17 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           final annualExpenses = snapshot.data![1];
 
           final monthlyGeneralExpenses =
-              expenses['monthlyGeneralExpenses'] ?? 0.0;
-          final monthlySalaries = expenses['monthlySalaries'] ?? 0.0;
-          final monthlyMaintenance = expenses['monthlyMaintenance'] ?? 0.0;
-          final monthlyServices = expenses['monthlyServices'] ?? 0.0;
+              expenses['totalGeneralExpenses'] ?? 0.0;
+          final monthlySalaries = expenses['totalSalaries'] ?? 0.0;
+          final monthlyMaintenance = expenses['totalMaintenance'] ?? 0.0;
+          final monthlyServices = expenses['totalServices'] ?? 0.0;
           final totalMonthlyExpenses = expenses['totalMonthlyExpenses'] ?? 0.0;
 
-          final annualUtilities = annualExpenses['annualUtilities'] ?? 0.0;
-          final annualSalaries = annualExpenses['annualSalaries'] ?? 0.0;
-          final annualMaintenance = annualExpenses['annualMaintenance'] ?? 0.0;
-          final annualOtherExpenses =
-              annualExpenses['annualOtherExpenses'] ?? 0.0;
+          final annualGeneralExpenses =
+              annualExpenses['totalGeneralExpenses'] ?? 0.0;
+          final annualSalaries = annualExpenses['totalSalaries'] ?? 0.0;
+          final annualMaintenance = annualExpenses['totalMaintenance'] ?? 0.0;
+          final annualServices = annualExpenses['totalServices'] ?? 0.0;
           final totalAnnualExpenses =
               annualExpenses['totalAnnualExpenses'] ?? 0.0;
 
@@ -101,10 +101,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   ),
                   const SizedBox(height: 40),
                   AnnualExpenseChart(
-                    annualUtilities: annualUtilities,
+                    annualUtilities: annualGeneralExpenses,
                     totalAnnualSalaries: annualSalaries,
                     totalAnnualMaintenance: annualMaintenance,
-                    annualOtherExpenses: annualOtherExpenses,
+                    annualOtherExpenses: annualServices,
                     totalAnnualExpenses: totalAnnualExpenses,
                     isDarkMode: isDarkMode,
                   ),

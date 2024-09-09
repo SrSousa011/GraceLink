@@ -20,10 +20,10 @@ class ExpensesService {
         .where('createdAt', isLessThanOrEqualTo: endOfMonth)
         .get();
 
-    double totalGeneralExpenses = 0.0;
-    double totalSalaries = 0.0;
-    double totalMaintenance = 0.0;
-    double totalServices = 0.0;
+    double monthlyGeneralExpenses = 0.0;
+    double monthlySalaries = 0.0;
+    double monthlyMaintenance = 0.0;
+    double monthlyServices = 0.0;
 
     for (var doc in querySnapshot.docs) {
       final data = doc.data();
@@ -31,23 +31,26 @@ class ExpensesService {
       final type = data['type'] as String;
 
       if (type == 'Despesas Gerais') {
-        totalGeneralExpenses += amount;
+        monthlyGeneralExpenses += amount;
       } else if (type == 'Salários') {
-        totalSalaries += amount;
+        monthlySalaries += amount;
       } else if (type == 'Manutenção') {
-        totalMaintenance += amount;
+        monthlyMaintenance += amount;
       } else if (type == 'Serviços') {
-        totalServices += amount;
+        monthlyServices += amount;
       }
     }
 
-    final totalMonthlyExpenses =
-        totalGeneralExpenses + totalSalaries + totalMaintenance + totalServices;
+    final totalMonthlyExpenses = monthlyGeneralExpenses +
+        monthlySalaries +
+        monthlyMaintenance +
+        monthlyServices;
+
     return {
-      'totalGeneralExpenses': totalGeneralExpenses,
-      'totalSalaries': totalSalaries,
-      'totalMaintenance': totalMaintenance,
-      'totalServices': totalServices,
+      'totalGeneralExpenses': monthlyGeneralExpenses,
+      'totalSalaries': monthlySalaries,
+      'totalMaintenance': monthlyMaintenance,
+      'totalServices': monthlyServices,
       'totalMonthlyExpenses': totalMonthlyExpenses,
     };
   }
@@ -67,30 +70,36 @@ class ExpensesService {
         .where('createdAt', isLessThanOrEqualTo: endOfYear)
         .get();
 
-    double totalSalaries = 0.0;
-    double totalMaintenance = 0.0;
-    double totalOtherExpenses = 0.0;
+    double annualGeneralExpenses = 0.0;
+    double annualSalaries = 0.0;
+    double annualMaintenance = 0.0;
+    double annualServices = 0.0;
 
     for (var doc in querySnapshot.docs) {
       final data = doc.data();
       final amount = (data['amount'] as num).toDouble();
       final type = data['type'] as String;
 
-      if (type == 'Salários') {
-        totalSalaries += amount;
+      if (type == 'Despesas Gerais') {
+        annualGeneralExpenses += amount;
+      } else if (type == 'Salários') {
+        annualSalaries += amount;
       } else if (type == 'Manutenção') {
-        totalMaintenance += amount;
-      } else {
-        totalOtherExpenses += amount;
+        annualMaintenance += amount;
+      } else if (type == 'Serviços') {
+        annualServices += amount;
       }
     }
 
-    final totalAnnualExpenses =
-        totalSalaries + totalMaintenance + totalOtherExpenses;
+    final totalAnnualExpenses = annualGeneralExpenses +
+        annualSalaries +
+        annualMaintenance +
+        annualServices;
     return {
-      'totalSalaries': totalSalaries,
-      'totalMaintenance': totalMaintenance,
-      'totalOtherExpenses': totalOtherExpenses,
+      'totalGeneralExpenses': annualGeneralExpenses,
+      'totalSalaries': annualSalaries,
+      'totalMaintenance': annualMaintenance,
+      'totalServices': annualServices,
       'totalAnnualExpenses': totalAnnualExpenses,
     };
   }
