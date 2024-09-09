@@ -51,10 +51,6 @@ class IncomesScreen extends StatelessWidget {
         'totalMonthlyCourseRevenue': totalMonthlyCourseRevenue,
       };
 
-      if (kDebugMode) {
-        print('Dados obtidos: $result');
-      }
-
       return result;
     } catch (e) {
       if (kDebugMode) {
