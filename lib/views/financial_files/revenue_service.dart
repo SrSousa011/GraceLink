@@ -50,7 +50,6 @@ class RevenueService {
     }
   }
 
-  // Fetch de outras rendas (income)
   Future<Map<String, double>> _fetchIncomeData() async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final user = FirebaseAuth.instance.currentUser;
@@ -104,7 +103,6 @@ class RevenueService {
     }
   }
 
-  // Fetch de receitas dos cursos
   Future<Map<String, double>> _fetchCourseRevenueData() async {
     try {
       final totalRevenue =
@@ -127,7 +125,6 @@ class RevenueService {
     }
   }
 
-  // Fetch de doações
   Future<Map<String, double>> _fetchDonationData(
       DonationStats donationStats) async {
     try {
