@@ -37,7 +37,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
     _revenueData = _fetchAllRevenues();
     _donationStats = _fetchDonationStats();
     _annualExpenses = _fetchAnnualExpenses();
-    _userData = _fetchUserData(); // Fetch user data
+    _userData = _fetchUserData();
   }
 
   Future<Map<String, double>> _fetchAllRevenues() async {
@@ -141,6 +141,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor = isDarkMode ? Colors.black : Colors.white;
+    final containerBackground = isDarkMode ? Colors.grey[800]! : Colors.white;
     final primaryTextColor = isDarkMode ? Colors.white : Colors.black;
     final cardBackgroundColor = isDarkMode ? Colors.grey[800]! : Colors.white;
     final cardBackOutgroundColor = isDarkMode
@@ -333,7 +334,8 @@ class _FinanceScreenState extends State<FinanceScreen> {
                                                       : expenseColor,
                                                 ),
                                                 withShadow: false,
-                                                backgroundColor: Colors.white,
+                                                backgroundColor:
+                                                    containerBackground,
                                                 titleStyle: TextStyle(
                                                   fontSize: 22,
                                                   color: cardTextColor,
@@ -371,7 +373,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                                                         ),
                                                         withShadow: false,
                                                         backgroundColor:
-                                                            Colors.white,
+                                                            containerBackground,
                                                         titleStyle: TextStyle(
                                                           fontSize: 15,
                                                           color: cardTextColor,
@@ -404,7 +406,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                                                         ),
                                                         withShadow: false,
                                                         backgroundColor:
-                                                            Colors.white,
+                                                            containerBackground,
                                                         titleStyle: TextStyle(
                                                           fontSize: 15,
                                                           color: cardTextColor,
