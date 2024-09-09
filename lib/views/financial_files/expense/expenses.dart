@@ -4,26 +4,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+// Cores gerais
+const Color generalExpensesColor = Colors.red;
+const Color expensesColor = Colors.red;
+const Color salariesColor = Colors.blue;
+const Color maintenanceColor = Colors.orange;
+const Color servicesColor = Colors.green;
+const Color totalColor = Colors.purple;
+
+// Cores anuais
+const Color annualSalariesColor = Colors.red;
+const Color annualMaintenanceColor = Colors.green;
+const Color annualOtherExpensesColor = Colors.orange;
+
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
 
   @override
-  _ExpensesScreenState createState() => _ExpensesScreenState();
+  State<ExpensesScreen> createState() => _ExpensesScreenState();
 }
 
 class _ExpensesScreenState extends State<ExpensesScreen> {
   late Future<List<Map<String, double>>> _expensesAndAnnualExpensesFuture;
-
-  // Definindo cores
-  final Color _generalExpensesColor = Colors.red;
-  final Color _salariesColor = Colors.blue;
-  final Color _maintenanceColor = Colors.orange;
-  final Color _servicesColor = Colors.green;
-  final Color _totalColor = Colors.purple;
-  final Color _utilitiesColor = Colors.blue;
-  final Color _annualSalariesColor = Colors.red;
-  final Color _annualMaintenanceColor = Colors.green;
-  final Color _annualOtherExpensesColor = Colors.orange;
 
   @override
   void initState() {
@@ -124,7 +126,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       'totalSalaries': totalSalaries,
       'totalMaintenance': totalMaintenance,
       'totalOtherExpenses': totalOtherExpenses,
-      'totalAnnualExpenses': totalAnnualExpenses, // Adicionando total anual
+      'totalAnnualExpenses': totalAnnualExpenses,
     };
   }
 
@@ -182,27 +184,15 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     totalServices: totalServices,
                     totalMonthlyExpenses: totalMonthlyExpenses,
                     isDarkMode: isDarkMode,
-                    generalExpensesColor: _generalExpensesColor,
-                    salariesColor: _salariesColor,
-                    maintenanceColor: _maintenanceColor,
-                    servicesColor: _servicesColor,
-                    totalColor: _totalColor,
                   ),
                   const SizedBox(height: 40),
                   AnnualExpenseChart(
-                    totalGeneralExpenses:
-                        totalGeneralExpenses, // Ajustado para mostrar despesas gerais
+                    totalGeneralExpenses: totalGeneralExpenses,
                     totalSalaries: totalAnnualSalaries,
                     totalMaintenance: totalAnnualMaintenance,
                     totalServices: totalOtherExpenses,
                     totalAnnualExpenses: totalAnnualExpenses,
                     isDarkMode: isDarkMode,
-                    generalExpensesColor:
-                        _utilitiesColor, // Ajustado para cores correspondentes
-                    salariesColor: _annualSalariesColor,
-                    maintenanceColor: _annualMaintenanceColor,
-                    servicesColor: _annualOtherExpensesColor,
-                    totalColor: _totalColor,
                   ),
                 ],
               ),
