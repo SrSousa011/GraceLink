@@ -1,3 +1,4 @@
+import 'package:churchapp/views/financial_files/currency_convert.dart';
 import 'package:churchapp/views/financial_files/expense/anual_chart.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -128,7 +129,7 @@ class MonthlyExpensesChart extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          '$title: € ${value.toStringAsFixed(2)}',
+          '$title: ${CurrencyConverter.format(value)}',
           style: TextStyle(
             color: isDarkMode ? Colors.white : Colors.black,
           ),
