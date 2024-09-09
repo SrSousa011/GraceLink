@@ -1,3 +1,4 @@
+import 'package:churchapp/views/financial_files/expense/expenses.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -9,13 +10,6 @@ class MonthlyExpensesChart extends StatelessWidget {
   final double totalMonthlyExpenses;
   final bool isDarkMode;
 
-  // Recebendo as cores do ExpensesScreen
-  final Color generalExpensesColor;
-  final Color salariesColor;
-  final Color maintenanceColor;
-  final Color servicesColor;
-  final Color totalColor;
-
   const MonthlyExpensesChart({
     super.key,
     required this.totalGeneralExpenses,
@@ -24,11 +18,6 @@ class MonthlyExpensesChart extends StatelessWidget {
     required this.totalServices,
     required this.totalMonthlyExpenses,
     required this.isDarkMode,
-    required this.generalExpensesColor,
-    required this.salariesColor,
-    required this.maintenanceColor,
-    required this.servicesColor,
-    required this.totalColor,
   });
 
   @override

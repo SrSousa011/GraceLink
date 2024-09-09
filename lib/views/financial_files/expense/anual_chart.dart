@@ -1,3 +1,4 @@
+import 'package:churchapp/views/financial_files/expense/expenses.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -6,14 +7,8 @@ class AnnualExpenseChart extends StatelessWidget {
   final double totalSalaries;
   final double totalMaintenance;
   final double totalServices;
-  final double totalAnnualExpenses; // Inclua a despesa total anual
+  final double totalAnnualExpenses;
   final bool isDarkMode;
-  final Color generalExpensesColor;
-  final Color salariesColor;
-  final Color maintenanceColor;
-  final Color servicesColor;
-  final Color totalColor;
-
   const AnnualExpenseChart({
     super.key,
     required this.totalGeneralExpenses,
@@ -22,11 +17,6 @@ class AnnualExpenseChart extends StatelessWidget {
     required this.totalServices,
     required this.totalAnnualExpenses,
     required this.isDarkMode,
-    required this.generalExpensesColor,
-    required this.salariesColor,
-    required this.maintenanceColor,
-    required this.servicesColor,
-    required this.totalColor,
   });
 
   double safeValue(double? value) => value?.isFinite == true ? value! : 0;
