@@ -1,20 +1,31 @@
-import 'package:churchapp/views/financial_files/expense/expenses.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+const Color generalExpensesColor = Colors.red;
+const Color expensesColor = Colors.red;
+const Color salariesColor = Colors.blue;
+const Color maintenanceColor = Colors.orange;
+const Color servicesColor = Colors.green;
+const Color totalColor = Colors.purple;
+
+const Color annualSalariesColor = Colors.blue;
+const Color annualMaintenanceColor = Colors.orange;
+const Color annualServicesExpensesColor = Colors.green;
+
 class AnnualExpenseChart extends StatelessWidget {
-  final double totalGeneralExpenses;
-  final double totalSalaries;
-  final double totalMaintenance;
-  final double totalServices;
+  final double annualUtilities;
+  final double totalAnnualSalaries;
+  final double totalAnnualMaintenance;
+  final double annualOtherExpenses;
   final double totalAnnualExpenses;
   final bool isDarkMode;
+
   const AnnualExpenseChart({
     super.key,
-    required this.totalGeneralExpenses,
-    required this.totalSalaries,
-    required this.totalMaintenance,
-    required this.totalServices,
+    required this.annualUtilities,
+    required this.totalAnnualSalaries,
+    required this.totalAnnualMaintenance,
+    required this.annualOtherExpenses,
     required this.totalAnnualExpenses,
     required this.isDarkMode,
   });
@@ -23,10 +34,10 @@ class AnnualExpenseChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final safeTotalGeneralExpenses = safeValue(totalGeneralExpenses);
-    final safeTotalSalaries = safeValue(totalSalaries);
-    final safeTotalMaintenance = safeValue(totalMaintenance);
-    final safeTotalServices = safeValue(totalServices);
+    final safeAnnualUtilities = safeValue(annualUtilities);
+    final safeAnnualSalaries = safeValue(totalAnnualSalaries);
+    final safeAnnualMaintenance = safeValue(totalAnnualMaintenance);
+    final safeAnnualOtherExpenses = safeValue(annualOtherExpenses);
     final safeTotalAnnualExpenses = safeValue(totalAnnualExpenses);
 
     return Column(
@@ -44,7 +55,7 @@ class AnnualExpenseChart extends StatelessWidget {
             PieChartData(
               sections: [
                 PieChartSectionData(
-                  value: safeTotalGeneralExpenses,
+                  value: safeAnnualUtilities,
                   color: generalExpensesColor,
                   radius: 60,
                   titleStyle: TextStyle(
@@ -53,8 +64,8 @@ class AnnualExpenseChart extends StatelessWidget {
                   ),
                 ),
                 PieChartSectionData(
-                  value: safeTotalSalaries,
-                  color: salariesColor,
+                  value: safeAnnualSalaries,
+                  color: annualSalariesColor,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
@@ -62,8 +73,8 @@ class AnnualExpenseChart extends StatelessWidget {
                   ),
                 ),
                 PieChartSectionData(
-                  value: safeTotalMaintenance,
-                  color: maintenanceColor,
+                  value: safeAnnualMaintenance,
+                  color: annualMaintenanceColor,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
@@ -71,8 +82,8 @@ class AnnualExpenseChart extends StatelessWidget {
                   ),
                 ),
                 PieChartSectionData(
-                  value: safeTotalServices,
-                  color: servicesColor,
+                  value: safeAnnualOtherExpenses,
+                  color: annualServicesExpensesColor,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
@@ -94,14 +105,14 @@ class AnnualExpenseChart extends StatelessWidget {
               spacing: 16.0,
               runSpacing: 8.0,
               children: [
-                _buildLegendItem('Despesas Gerais', safeTotalGeneralExpenses,
+                _buildLegendItem('Despesas Gerais', safeAnnualUtilities,
                     generalExpensesColor, isDarkMode),
-                _buildLegendItem(
-                    'Salários', safeTotalSalaries, salariesColor, isDarkMode),
-                _buildLegendItem('Manutenção', safeTotalMaintenance,
-                    maintenanceColor, isDarkMode),
-                _buildLegendItem(
-                    'Serviços', safeTotalServices, servicesColor, isDarkMode),
+                _buildLegendItem('Salários', safeAnnualSalaries,
+                    annualSalariesColor, isDarkMode),
+                _buildLegendItem('Manutenção', safeAnnualMaintenance,
+                    annualMaintenanceColor, isDarkMode),
+                _buildLegendItem('Serviços', safeAnnualOtherExpenses,
+                    annualServicesExpensesColor, isDarkMode),
                 _buildLegendItem(
                     'Total', safeTotalAnnualExpenses, totalColor, isDarkMode),
               ],

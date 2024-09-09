@@ -1,33 +1,35 @@
-import 'package:churchapp/views/financial_files/expense/expenses.dart';
+import 'package:churchapp/views/financial_files/expense/anual_chart.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class MonthlyExpensesChart extends StatelessWidget {
-  final double totalGeneralExpenses;
-  final double totalSalaries;
-  final double totalMaintenance;
-  final double totalServices;
+  final double monthlyGeneralExpenses;
+  final double monthlySalaries;
+  final double monthlyMaintenance;
+  final double monthlyServices;
   final double totalMonthlyExpenses;
   final bool isDarkMode;
 
   const MonthlyExpensesChart({
     super.key,
-    required this.totalGeneralExpenses,
-    required this.totalSalaries,
-    required this.totalMaintenance,
-    required this.totalServices,
+    required this.monthlyGeneralExpenses,
+    required this.monthlySalaries,
+    required this.monthlyMaintenance,
+    required this.monthlyServices,
     required this.totalMonthlyExpenses,
     required this.isDarkMode,
   });
 
   @override
   Widget build(BuildContext context) {
-    final safeTotalGeneralExpenses =
-        totalGeneralExpenses.isFinite ? totalGeneralExpenses : 0.0;
-    final safeTotalSalaries = totalSalaries.isFinite ? totalSalaries : 0.0;
-    final safeTotalMaintenance =
-        totalMaintenance.isFinite ? totalMaintenance : 0.0;
-    final safeTotalServices = totalServices.isFinite ? totalServices : 0.0;
+    final safeMonthlyGeneralExpenses =
+        monthlyGeneralExpenses.isFinite ? monthlyGeneralExpenses : 0.0;
+    final safeMonthlySalaries =
+        monthlySalaries.isFinite ? monthlySalaries : 0.0;
+    final safeMonthlyMaintenance =
+        monthlyMaintenance.isFinite ? monthlyMaintenance : 0.0;
+    final safeMonthlyServices =
+        monthlyServices.isFinite ? monthlyServices : 0.0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,7 +45,7 @@ class MonthlyExpensesChart extends StatelessWidget {
             PieChartData(
               sections: [
                 PieChartSectionData(
-                  value: safeTotalGeneralExpenses,
+                  value: safeMonthlyGeneralExpenses,
                   color: generalExpensesColor,
                   radius: 60,
                   titleStyle: TextStyle(
@@ -52,7 +54,7 @@ class MonthlyExpensesChart extends StatelessWidget {
                   ),
                 ),
                 PieChartSectionData(
-                  value: safeTotalSalaries,
+                  value: safeMonthlySalaries,
                   color: salariesColor,
                   radius: 60,
                   titleStyle: TextStyle(
@@ -61,7 +63,7 @@ class MonthlyExpensesChart extends StatelessWidget {
                   ),
                 ),
                 PieChartSectionData(
-                  value: safeTotalMaintenance,
+                  value: safeMonthlyMaintenance,
                   color: maintenanceColor,
                   radius: 60,
                   titleStyle: TextStyle(
@@ -70,7 +72,7 @@ class MonthlyExpensesChart extends StatelessWidget {
                   ),
                 ),
                 PieChartSectionData(
-                  value: safeTotalServices,
+                  value: safeMonthlyServices,
                   color: servicesColor,
                   radius: 60,
                   titleStyle: TextStyle(
@@ -93,14 +95,14 @@ class MonthlyExpensesChart extends StatelessWidget {
               spacing: 16.0,
               runSpacing: 8.0,
               children: [
-                _buildLegendItem('Despesas Gerais', safeTotalGeneralExpenses,
+                _buildLegendItem('Despesas Gerais', safeMonthlyGeneralExpenses,
                     generalExpensesColor, isDarkMode),
                 _buildLegendItem(
-                    'Salários', safeTotalSalaries, salariesColor, isDarkMode),
-                _buildLegendItem('Manutenção', safeTotalMaintenance,
+                    'Salários', safeMonthlySalaries, salariesColor, isDarkMode),
+                _buildLegendItem('Manutenção', safeMonthlyMaintenance,
                     maintenanceColor, isDarkMode),
                 _buildLegendItem(
-                    'Serviços', safeTotalServices, servicesColor, isDarkMode),
+                    'Serviços', safeMonthlyServices, servicesColor, isDarkMode),
                 _buildLegendItem(
                     'Total', totalMonthlyExpenses, totalColor, isDarkMode),
               ],
