@@ -1,10 +1,22 @@
 class CurrencyConverter {
   static String format(double amount) {
-    return '€ ${amount.toStringAsFixed(2).replaceAll('.', ',')}';
+    String integerPart = amount.toStringAsFixed(2).split('.')[0];
+    String fractionalPart = amount.toStringAsFixed(2).split('.')[1];
+
+    String formattedIntegerPart = '';
+    for (int i = integerPart.length - 1; i >= 0; i--) {
+      if ((integerPart.length - i) % 3 == 0 && i != integerPart.length - 1) {
+        formattedIntegerPart = '.$formattedIntegerPart';
+      }
+      formattedIntegerPart = integerPart[i] + formattedIntegerPart;
+    }
+
+    return '€ $formattedIntegerPart,$fractionalPart';
   }
 
   static double parse(String amount) {
-    return double.parse(amount.replaceAll('€ ', '').replaceAll(',', '.'));
+    return double.parse(
+        amount.replaceAll('€ ', '').replaceAll('.', '').replaceAll(',', '.'));
   }
 
   static double parseDonationValue(dynamic value) {
@@ -14,6 +26,7 @@ class CurrencyConverter {
       final sanitizedValue = value
           .replaceAll('€', '')
           .replaceAll(' ', '')
+          .replaceAll('.', '')
           .replaceAll(',', '.')
           .trim();
 
