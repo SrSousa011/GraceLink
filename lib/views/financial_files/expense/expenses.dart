@@ -1,16 +1,18 @@
+import 'package:churchapp/views/financial_files/expense/anual_chart.dart';
 import 'package:churchapp/views/financial_files/expense/monthly_chart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class ExpensesScreen extends StatefulWidget {
+  const ExpensesScreen({super.key});
+
   @override
   _ExpensesScreenState createState() => _ExpensesScreenState();
 }
 
 class _ExpensesScreenState extends State<ExpensesScreen> {
-  late Future<Map<String, double>> _expensesFuture;
+  late Future<List<Map<String, double>>> _expensesAndAnnualExpensesFuture;
 
   // Definindo cores
   final Color _generalExpensesColor = Colors.red;
@@ -18,11 +20,18 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   final Color _maintenanceColor = Colors.orange;
   final Color _servicesColor = Colors.green;
   final Color _totalColor = Colors.purple;
+  final Color _utilitiesColor = Colors.blue;
+  final Color _annualSalariesColor = Colors.red;
+  final Color _annualMaintenanceColor = Colors.green;
+  final Color _annualOtherExpensesColor = Colors.orange;
 
   @override
   void initState() {
     super.initState();
-    _expensesFuture = _fetchExpenses();
+    _expensesAndAnnualExpensesFuture = Future.wait([
+      _fetchExpenses(),
+      _fetchAnnualExpenses(),
+    ]);
   }
 
   Future<Map<String, double>> _fetchExpenses() async {
@@ -72,16 +81,63 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     };
   }
 
+  Future<Map<String, double>> _fetchAnnualExpenses() async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      throw Exception('Usuário não autenticado');
+    }
+
+    final querySnapshot = await firestore
+        .collection('transactions')
+        .where('createdBy', isEqualTo: user.uid)
+        .where('category', isEqualTo: 'expense')
+        .get();
+
+    double totalUtilities = 0.0;
+    double totalSalaries = 0.0;
+    double totalMaintenance = 0.0;
+    double totalOtherExpenses = 0.0;
+
+    for (var doc in querySnapshot.docs) {
+      final data = doc.data();
+      final amount = (data['amount'] as num).toDouble();
+      final type = data['type'] as String;
+
+      if (type == 'Utilidades') {
+        totalUtilities += amount;
+      } else if (type == 'Salários') {
+        totalSalaries += amount;
+      } else if (type == 'Manutenção') {
+        totalMaintenance += amount;
+      } else {
+        totalOtherExpenses += amount;
+      }
+    }
+
+    final totalAnnualExpenses =
+        totalUtilities + totalSalaries + totalMaintenance + totalOtherExpenses;
+
+    return {
+      'totalUtilities': totalUtilities,
+      'totalSalaries': totalSalaries,
+      'totalMaintenance': totalMaintenance,
+      'totalOtherExpenses': totalOtherExpenses,
+      'totalAnnualExpenses': totalAnnualExpenses, // Adicionando total anual
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Despesas Mensais'),
+        title: const Text('Despesas Mensais e Anuais'),
       ),
-      body: FutureBuilder<Map<String, double>>(
-        future: _expensesFuture,
+      body: FutureBuilder<List<Map<String, double>>>(
+        future: _expensesAndAnnualExpensesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -95,22 +151,61 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             return const Center(child: Text('Nenhuma despesa encontrada.'));
           }
 
-          final expenses = snapshot.data!;
+          final expenses = snapshot.data![0];
+          final annualExpenses = snapshot.data![1];
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: MonthlyExpensesChart(
-              totalGeneralExpenses: expenses['totalGeneralExpenses']!,
-              totalSalaries: expenses['totalSalaries']!,
-              totalMaintenance: expenses['totalMaintenance']!,
-              totalServices: expenses['totalServices']!,
-              totalMonthlyExpenses: expenses['totalMonthlyExpenses']!,
-              isDarkMode: isDarkMode,
-              generalExpensesColor: _generalExpensesColor,
-              salariesColor: _salariesColor,
-              maintenanceColor: _maintenanceColor,
-              servicesColor: _servicesColor,
-              totalColor: _totalColor,
+          // Verificações de nulo e presença das chaves nos mapas
+          final totalGeneralExpenses = expenses['totalGeneralExpenses'] ?? 0.0;
+          final totalSalaries = expenses['totalSalaries'] ?? 0.0;
+          final totalMaintenance = expenses['totalMaintenance'] ?? 0.0;
+          final totalServices = expenses['totalServices'] ?? 0.0;
+          final totalMonthlyExpenses = expenses['totalMonthlyExpenses'] ?? 0.0;
+
+          final totalAnnualSalaries = annualExpenses['totalSalaries'] ?? 0.0;
+          final totalAnnualMaintenance =
+              annualExpenses['totalMaintenance'] ?? 0.0;
+          final totalOtherExpenses =
+              annualExpenses['totalOtherExpenses'] ?? 0.0;
+          final totalAnnualExpenses =
+              annualExpenses['totalAnnualExpenses'] ?? 0.0;
+
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  MonthlyExpensesChart(
+                    totalGeneralExpenses: totalGeneralExpenses,
+                    totalSalaries: totalSalaries,
+                    totalMaintenance: totalMaintenance,
+                    totalServices: totalServices,
+                    totalMonthlyExpenses: totalMonthlyExpenses,
+                    isDarkMode: isDarkMode,
+                    generalExpensesColor: _generalExpensesColor,
+                    salariesColor: _salariesColor,
+                    maintenanceColor: _maintenanceColor,
+                    servicesColor: _servicesColor,
+                    totalColor: _totalColor,
+                  ),
+                  const SizedBox(height: 40),
+                  AnnualExpenseChart(
+                    totalGeneralExpenses:
+                        totalGeneralExpenses, // Ajustado para mostrar despesas gerais
+                    totalSalaries: totalAnnualSalaries,
+                    totalMaintenance: totalAnnualMaintenance,
+                    totalServices: totalOtherExpenses,
+                    totalAnnualExpenses: totalAnnualExpenses,
+                    isDarkMode: isDarkMode,
+                    generalExpensesColor:
+                        _utilitiesColor, // Ajustado para cores correspondentes
+                    salariesColor: _annualSalariesColor,
+                    maintenanceColor: _annualMaintenanceColor,
+                    servicesColor: _annualOtherExpensesColor,
+                    totalColor: _totalColor,
+                  ),
+                ],
+              ),
             ),
           );
         },
