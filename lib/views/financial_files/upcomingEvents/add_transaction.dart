@@ -52,13 +52,7 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
   Future<void> _selectFile() async {
     final FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: [
-        'pdf',
-        'doc',
-        'docx',
-        'xls',
-        'xlsx',
-      ],
+      allowedExtensions: ['pdf', 'doc', 'docx', 'xls', 'xlsx'],
     );
 
     if (result != null && result.files.single.path != null) {
@@ -215,34 +209,26 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
   }
 
   Widget _buildTextField(
-    String label,
-    TextEditingController controller,
-    IconData icon, {
-    bool isDarkMode = false,
-    TextInputType? keyboardType,
-  }) {
+      String label, TextEditingController controller, IconData icon,
+      {bool isDarkMode = false, TextInputType? keyboardType}) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon),
+        prefixIcon: Icon(icon, color: isDarkMode ? Colors.white : Colors.black),
         filled: true,
         fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
         ),
       ),
+      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
     );
   }
 
-  Widget _buildDropdownField(
-    String label,
-    String? selectedValue,
-    List<String> options,
-    bool isDarkMode,
-    ValueChanged<String?> onChanged,
-  ) {
+  Widget _buildDropdownField(String label, String? selectedValue,
+      List<String> options, bool isDarkMode, ValueChanged<String?> onChanged) {
     return DropdownButtonFormField<String>(
       value: selectedValue,
       decoration: InputDecoration(
@@ -256,7 +242,9 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
       items: options.map((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(value),
+          child: Text(value,
+              style:
+                  TextStyle(color: isDarkMode ? Colors.white : Colors.black)),
         );
       }).toList(),
       onChanged: onChanged,
@@ -269,17 +257,20 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
       children: [
         Text(
           '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-          style: const TextStyle(fontSize: 16.0),
+          style: TextStyle(
+              fontSize: 16.0,
+              color: Theme.of(context).textTheme.bodyLarge?.color),
         ),
         IconButton(
-          icon: const Icon(Icons.calendar_today),
+          icon: Icon(Icons.calendar_today,
+              color: Theme.of(context).iconTheme.color),
           onPressed: () => _selectDate(context),
         ),
       ],
     );
   }
 
-  Widget _buildFileSelector() {
+  Widget _buildFileSelector({bool isDarkMode = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -297,6 +288,10 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
           ),
         ElevatedButton(
           onPressed: _selectFile,
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: isDarkMode ? Colors.blueGrey[700]! : Colors.blue,
+          ),
           child: const Text('Selecionar Arquivo'),
         ),
       ],
@@ -313,7 +308,9 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
         title: const Text('Adicionar Transação'),
       ),
       body: Container(
-        color: isDarkMode ? Colors.blueGrey[900] : Colors.blue[100],
+        color: isDarkMode
+            ? Colors.blueGrey[900]
+            : const Color.fromARGB(255, 255, 255, 255),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -326,7 +323,7 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
                   ['Rendimento', 'Despesa'], isDarkMode, (String? newValue) {
                 setState(() {
                   _selectedType = newValue;
-                  _selectedCategory = null; // Reset category when type changes
+                  _selectedCategory = null;
                 });
               }),
               const SizedBox(height: 20.0),
@@ -351,7 +348,7 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
               const SizedBox(height: 20.0),
               _buildDatePicker(context),
               const SizedBox(height: 20.0),
-              _buildFileSelector(),
+              _buildFileSelector(isDarkMode: isDarkMode),
               const SizedBox(height: 20.0),
               if (_errorMessage != null)
                 Padding(
