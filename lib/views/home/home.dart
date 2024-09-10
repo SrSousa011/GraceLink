@@ -72,7 +72,7 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> _launchFacebook() async {
-    const nativeUrl = "fb://profile/100088490063123";
+    const nativeUrl = "fb://profile/10008d8490063123";
     const webUrl = "https://www.facebook.com/profile.php?id=100088490063123";
 
     try {
@@ -115,33 +115,41 @@ class _HomeState extends State<Home> {
     final isDarkMode = themeProvider.isDarkMode;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-        actions: [
-          IconButton(
-            icon: Icon(
-              isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              color: isDarkMode ? Colors.white : Colors.black,
+      drawer: const NavBar(),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title: const Text('Home'),
+            floating: true,
+            pinned: false,
+            snap: true,
+            actions: [
+              IconButton(
+                icon: Icon(
+                  isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+                onPressed: () {
+                  themeProvider.toggleTheme();
+                },
+              ),
+            ],
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.all(16.0),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  _buildHeader(),
+                  const SizedBox(height: 20),
+                  _buildUpcomingEventsSection(isDarkMode),
+                  const SizedBox(height: 20),
+                  _buildImportantInfoSection(),
+                ],
+              ),
             ),
-            onPressed: () {
-              themeProvider.toggleTheme();
-            },
           ),
         ],
-      ),
-      drawer: const NavBar(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(),
-            const SizedBox(height: 20),
-            _buildUpcomingEventsSection(isDarkMode),
-            const SizedBox(height: 20),
-            _buildImportantInfoSection(),
-          ],
-        ),
       ),
     );
   }

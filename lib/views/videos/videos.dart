@@ -1,12 +1,12 @@
-import 'package:churchapp/theme/theme_provider.dart';
-import 'package:churchapp/views/videos/video_cache.dart';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as YT;
-import 'package:cached_network_image/cached_network_image.dart';
-import 'videos_service.dart';
+import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
+import 'package:churchapp/views/videos/videos_service.dart';
+import 'package:churchapp/views/videos/video_cache.dart';
 
 class Videos extends StatefulWidget {
   const Videos({super.key});
@@ -189,47 +189,36 @@ class _VideosState extends State<Videos> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('YouTube Links'),
-          actions: [
-            IconButton(
-              onPressed: _isSelectionMode
-                  ? null
-                  : () {
-                      setState(() {
-                        _showAddLinkField = !_showAddLinkField;
-                      });
-                    },
-              icon: const Icon(Icons.add_outlined),
-            ),
-            IconButton(
-              onPressed: _isSelectionMode
-                  ? () => _deleteSelectedVideos(context)
-                  : _toggleSelectionMode,
-              icon: Icon(_isSelectionMode ? Icons.delete : Icons.list),
-            ),
-          ],
-        ),
-        drawer: const NavBar(),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            AnimatedCrossFade(
-              duration: const Duration(milliseconds: 300),
-              crossFadeState: _showAddLinkField
-                  ? CrossFadeState.showSecond
-                  : CrossFadeState.showFirst,
-              firstChild: const SizedBox.shrink(),
-              secondChild: Padding(
-                padding: const EdgeInsets.all(8.0),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('YouTube Links'),
+        actions: [
+          IconButton(
+            onPressed: _isSelectionMode
+                ? null
+                : () {
+                    setState(() {
+                      _showAddLinkField = !_showAddLinkField;
+                    });
+                  },
+            icon: const Icon(Icons.add_outlined),
+          ),
+          IconButton(
+            onPressed: _isSelectionMode
+                ? () => _deleteSelectedVideos(context)
+                : _toggleSelectionMode,
+            icon: Icon(_isSelectionMode ? Icons.delete : Icons.list),
+          ),
+        ],
+      ),
+      drawer: const NavBar(),
+      body: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.all(8.0),
+            sliver: SliverVisibility(
+              visible: _showAddLinkField,
+              sliver: SliverToBoxAdapter(
                 child: Row(
                   children: [
                     Expanded(
@@ -260,22 +249,27 @@ class _VideosState extends State<Videos> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>>(
-                future: _videosService.getVideos(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            sliver: FutureBuilder<List<Map<String, dynamic>>>(
+              future: _videosService.getVideos(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SliverFillRemaining(
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                } else if (snapshot.hasError) {
+                  return SliverFillRemaining(
+                    child: Center(
                       child: Text('Erro: ${snapshot.error}'),
-                    );
-                  } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                    List<Map<String, dynamic>> sortedList = snapshot.data!;
-                    return ListView.builder(
-                      itemCount: sortedList.length,
-                      itemBuilder: (context, index) {
+                    ),
+                  );
+                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  List<Map<String, dynamic>> sortedList = snapshot.data!;
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
                         var videoData = sortedList[index];
                         var videoId = videoData['id'] as String;
                         var videoUrl = videoData['url'] as String;
@@ -304,7 +298,7 @@ class _VideosState extends State<Videos> {
                                           if (videoSnapshot.connectionState ==
                                               ConnectionState.waiting) {
                                             return const SizedBox(
-                                              height: 180, // Increased height
+                                              height: 180,
                                               child: Center(
                                                   child:
                                                       CircularProgressIndicator()),
@@ -323,8 +317,7 @@ class _VideosState extends State<Videos> {
                                                     CachedNetworkImage(
                                                       imageUrl:
                                                           'https://i.ytimg.com/vi/${video.id}/hqdefault.jpg',
-                                                      height:
-                                                          180, // Increased height
+                                                      height: 180,
                                                       width: double.infinity,
                                                       fit: BoxFit.cover,
                                                       placeholder: (context,
@@ -408,17 +401,20 @@ class _VideosState extends State<Videos> {
                           ],
                         );
                       },
-                    );
-                  } else {
-                    return const Center(
+                      childCount: sortedList.length,
+                    ),
+                  );
+                } else {
+                  return const SliverFillRemaining(
+                    child: Center(
                       child: Text('Nenhum vídeo adicionado ainda.'),
-                    );
-                  }
-                },
-              ),
+                    ),
+                  );
+                }
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
