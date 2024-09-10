@@ -203,7 +203,7 @@ class _UpcomingEventsScreenState extends State<UpcomingEventsScreen> {
           : b['createdAt'].compareTo(a['createdAt']));
     } else {
       transactions = transactions
-          .where((transaction) => transaction['category'] == _filter)
+          .where((transaction) => transaction['type'] == _filter)
           .toList();
       transactions.sort((a, b) => _isAscending
           ? a['createdAt'].compareTo(b['createdAt'])
@@ -234,7 +234,7 @@ class _UpcomingEventsScreenState extends State<UpcomingEventsScreen> {
               ),
               RadioListTile<String>(
                 title: const Text('Receitas'),
-                value: 'Rendimentos',
+                value: 'Rendimento',
                 groupValue: _filter,
                 onChanged: (value) {
                   setState(() {
@@ -245,7 +245,7 @@ class _UpcomingEventsScreenState extends State<UpcomingEventsScreen> {
               ),
               RadioListTile<String>(
                 title: const Text('Despesas'),
-                value: 'Despesas',
+                value: 'Despesa',
                 groupValue: _filter,
                 onChanged: (value) {
                   setState(() {
