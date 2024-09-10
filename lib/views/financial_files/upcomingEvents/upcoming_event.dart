@@ -13,7 +13,7 @@ class UpcomingEventsScreen extends StatefulWidget {
 
 class _UpcomingEventsScreenState extends State<UpcomingEventsScreen> {
   String _filter = 'all';
-  bool _isAscending = false; // False para mais recente primeiro
+  bool _isAscending = false;
 
   @override
   Widget build(BuildContext context) {
@@ -72,15 +72,17 @@ class _UpcomingEventsScreenState extends State<UpcomingEventsScreen> {
                     itemCount: sortedTransactions.length,
                     itemBuilder: (context, index) {
                       final transaction = sortedTransactions[index];
-                      final isIncome = transaction['category'] == 'income';
-                      final amount = transaction['amount'];
+                      final isIncome = transaction['type'] == 'Rendimento';
+                      final amount = transaction['amount'].toString();
                       final color = isIncome ? Colors.green : Colors.red;
+                      final icon =
+                          isIncome ? Icons.arrow_upward : Icons.arrow_downward;
 
                       return ListTile(
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 8.0, horizontal: 16.0),
                         leading: Icon(
-                          isIncome ? Icons.arrow_upward : Icons.arrow_downward,
+                          icon,
                           color: color,
                         ),
                         title: Text(
@@ -162,16 +164,17 @@ class _UpcomingEventsScreenState extends State<UpcomingEventsScreen> {
     return querySnapshot.docs.map((doc) {
       final data = doc.data();
       return {
-        'amount': data['amount'] ?? 'N/A',
+        'transactionId': doc.id,
+        'amount': (data['amount'] as num?)?.toString() ??
+            'N/A', // Ensure amount is a string
         'category': data['category'] ?? 'N/A',
         'createdAt': data['createdAt']?.toDate() ?? DateTime.now(),
-        'createdBy': data['createdBy'] ?? 'N/A',
         'date': data['date'] ?? 'N/A',
         'description': data['description'] ?? 'Sem Descrição',
-        'reference': data['reference'] ?? 'N/A',
         'source': data['source'] ?? 'N/A',
-        'time': data['time'] ?? 'N/A',
         'type': data['type'] ?? 'N/A',
+        'filePath':
+            data['filePath'] ?? 'N/A', // Changed from 'pathUrl' to 'filePath'
       };
     }).toList();
   }
@@ -231,7 +234,7 @@ class _UpcomingEventsScreenState extends State<UpcomingEventsScreen> {
               ),
               RadioListTile<String>(
                 title: const Text('Receitas'),
-                value: 'income',
+                value: 'Rendimentos',
                 groupValue: _filter,
                 onChanged: (value) {
                   setState(() {
@@ -242,7 +245,7 @@ class _UpcomingEventsScreenState extends State<UpcomingEventsScreen> {
               ),
               RadioListTile<String>(
                 title: const Text('Despesas'),
-                value: 'expense',
+                value: 'Despesas',
                 groupValue: _filter,
                 onChanged: (value) {
                   setState(() {

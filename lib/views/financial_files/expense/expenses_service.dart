@@ -15,7 +15,7 @@ class ExpensesService {
     final querySnapshot = await _firestore
         .collection('transactions')
         .where('createdBy', isEqualTo: user.uid)
-        .where('category', isEqualTo: 'expense')
+        .where('type', isEqualTo: 'Despesa')
         .where('createdAt', isGreaterThanOrEqualTo: startOfMonth)
         .where('createdAt', isLessThanOrEqualTo: endOfMonth)
         .get();
@@ -28,7 +28,7 @@ class ExpensesService {
     for (var doc in querySnapshot.docs) {
       final data = doc.data();
       final amount = (data['amount'] as num).toDouble();
-      final type = data['type'] as String;
+      final type = data['category'] as String;
 
       if (type == 'Despesas Gerais') {
         monthlyGeneralExpenses += amount;
@@ -65,7 +65,7 @@ class ExpensesService {
     final querySnapshot = await _firestore
         .collection('transactions')
         .where('createdBy', isEqualTo: user.uid)
-        .where('category', isEqualTo: 'expense')
+        .where('type', isEqualTo: 'Despesa')
         .where('createdAt', isGreaterThanOrEqualTo: startOfYear)
         .where('createdAt', isLessThanOrEqualTo: endOfYear)
         .get();
@@ -78,7 +78,7 @@ class ExpensesService {
     for (var doc in querySnapshot.docs) {
       final data = doc.data();
       final amount = (data['amount'] as num).toDouble();
-      final type = data['type'] as String;
+      final type = data['category'] as String;
 
       if (type == 'Despesas Gerais') {
         annualGeneralExpenses += amount;

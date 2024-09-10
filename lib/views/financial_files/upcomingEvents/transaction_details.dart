@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TransactionDetailsScreen extends StatelessWidget {
   final Map<String, dynamic> transaction;
@@ -57,13 +58,6 @@ class TransactionDetailsScreen extends StatelessWidget {
               containerShadowColor,
             ),
             _buildInfoContainer(
-              'Hora:',
-              transaction['time'] ?? 'N/A',
-              infoValueColor,
-              containerColor,
-              containerShadowColor,
-            ),
-            _buildInfoContainer(
               'Fonte:',
               transaction['source'] ?? 'N/A',
               infoValueColor,
@@ -77,20 +71,22 @@ class TransactionDetailsScreen extends StatelessWidget {
               containerColor,
               containerShadowColor,
             ),
-            _buildInfoContainer(
-              'Caminho do Arquivo:',
-              transaction['filePath'] ?? 'N/A',
+            _buildFilePathInfo(
+              context,
+              'Arquivo:',
+              transaction['filePath'] ?? '',
               infoValueColor,
               containerColor,
               containerShadowColor,
             ),
+            const SizedBox(height: 16.0),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoContainer(String title, String? value, Color textColor,
+  Widget _buildInfoContainer(String title, String value, Color textColor,
       Color containerColor, Color shadowColor) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12.0),
@@ -119,7 +115,7 @@ class TransactionDetailsScreen extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              value ?? 'N/A',
+              value,
               textAlign: TextAlign.right,
               style: TextStyle(
                 fontSize: 14.0,
@@ -129,6 +125,91 @@ class TransactionDetailsScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFilePathInfo(
+    BuildContext context,
+    String title,
+    String url,
+    Color textColor,
+    Color containerColor,
+    Color shadowColor,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12.0),
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: containerColor,
+        borderRadius: BorderRadius.circular(8.0),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor,
+            blurRadius: 6.0,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16.0,
+              color: textColor,
+            ),
+          ),
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.link),
+                onPressed: () {
+                  if (url.isNotEmpty) {
+                    _showUrl(context, url);
+                  }
+                },
+                tooltip: 'Abrir Arquivo',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showUrl(BuildContext context, String url) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Abrir arquivo'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                final uri = Uri.tryParse(url);
+                if (uri != null) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                } else {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('URL Inválida')),
+                    );
+                  }
+                }
+                if (!context.mounted) return;
+                Navigator.of(context).pop();
+              },
+              child: const Text('Abrir'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar'),
+            ),
+          ],
+        );
+      },
     );
   }
 

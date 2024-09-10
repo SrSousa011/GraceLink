@@ -68,7 +68,7 @@ class RevenueService {
       final querySnapshot = await firestore
           .collection('transactions')
           .where('createdBy', isEqualTo: user.uid)
-          .where('category', isEqualTo: 'income')
+          .where('type', isEqualTo: 'Rendimento')
           .get();
 
       double totalAnnualSum = 0;
