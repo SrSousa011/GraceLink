@@ -3,6 +3,10 @@ class CurrencyConverter {
     String integerPart = amount.toStringAsFixed(2).split('.')[0];
     String fractionalPart = amount.toStringAsFixed(2).split('.')[1];
 
+    if (integerPart.length <= 3) {
+      return '€ $integerPart,$fractionalPart';
+    }
+
     StringBuffer formattedIntegerPart = StringBuffer();
     int count = 0;
 
