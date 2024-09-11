@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:uuid/uuid.dart';
+import 'package:intl/intl.dart';
 
 class AddTransactionForm extends StatefulWidget {
   const AddTransactionForm({super.key});
@@ -21,11 +22,12 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
   final TextEditingController _referenceController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
   String? _selectedType;
   String? _selectedCategory;
-  DateTime _selectedDate = DateTime.now();
   File? _selectedFile;
   String? _errorMessage;
+  DateTime? _selectedDate;
 
   final List<String> _incomeCategories = [
     'Eventos',
@@ -42,12 +44,6 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
     'Despesas Gerais',
     'Ajuda e Beneficência'
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedDate = DateTime.now();
-  }
 
   Future<void> _selectFile() async {
     final FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -94,7 +90,8 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
     if (_sourceController.text.isEmpty ||
         _selectedType == null ||
         _referenceController.text.isEmpty ||
-        _amountController.text.isEmpty) {
+        _amountController.text.isEmpty ||
+        _selectedDate == null) {
       _showErrorDialog(context, 'Erro ao salvar transação',
           'Por favor, preencha todos os campos obrigatórios.');
       return;
@@ -103,7 +100,6 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
     const uuid = Uuid();
     final String transactionId = uuid.v4();
     final String? userId = FirebaseAuth.instance.currentUser?.uid;
-    final DateTime createdDateTime = DateTime.now();
 
     final newTransaction = {
       'transactionId': transactionId,
@@ -113,9 +109,8 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
       'type': _selectedType,
       'amount': double.tryParse(_amountController.text),
       'description': _descriptionController.text,
-      'date': _selectedDate,
       'createdBy': userId,
-      'createdAt': createdDateTime,
+      'transactionDate': _selectedDate,
     };
 
     try {
@@ -196,23 +191,27 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
     return [];
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+  Future<void> _selectDate() async {
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: _selectedDate,
+      initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != _selectedDate) {
+
+    if (pickedDate != null && pickedDate != _selectedDate) {
       setState(() {
-        _selectedDate = picked;
+        _selectedDate = pickedDate;
+        _dateController.text = DateFormat('dd/MM/yyyy').format(_selectedDate!);
       });
     }
   }
 
   Widget _buildTextField(
       String label, TextEditingController controller, IconData icon,
-      {bool isDarkMode = false, TextInputType? keyboardType}) {
+      {bool isDarkMode = false,
+      TextInputType? keyboardType,
+      GestureTapCallback? onTap}) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
@@ -226,6 +225,7 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
         ),
       ),
       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+      onTap: onTap,
     );
   }
 
@@ -250,27 +250,6 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
         );
       }).toList(),
       onChanged: onChanged,
-    );
-  }
-
-  Widget _buildDatePicker(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Text(
-            '${_selectedDate.day.toString().padLeft(2, '0')}/${_selectedDate.month.toString().padLeft(2, '0')}/${_selectedDate.year}',
-            style: TextStyle(
-                fontSize: 16.0,
-                color: Theme.of(context).textTheme.bodyLarge?.color),
-          ),
-        ),
-        IconButton(
-          icon: Icon(Icons.calendar_today,
-              color: Theme.of(context).iconTheme.color),
-          onPressed: () => _selectDate(context),
-        ),
-      ],
     );
   }
 
@@ -319,61 +298,64 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
         color: isDarkMode
             ? Colors.blueGrey[900]
             : const Color.fromARGB(255, 255, 255, 255),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTextField('Fonte', _sourceController, Icons.source,
-                  isDarkMode: isDarkMode),
-              const SizedBox(height: 20.0),
-              _buildDropdownField('Tipo de Transação', _selectedType,
-                  ['Rendimento', 'Despesa'], isDarkMode, (String? newValue) {
-                setState(() {
-                  _selectedType = newValue;
-                  _selectedCategory = null;
-                });
-              }),
-              const SizedBox(height: 20.0),
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: [
+            _buildTextField(
+                'Fonte', _sourceController, Icons.account_balance_wallet,
+                isDarkMode: isDarkMode),
+            const SizedBox(height: 16.0),
+            _buildDropdownField(
+                'Tipo', _selectedType, ['Rendimento', 'Despesa'], isDarkMode,
+                (value) {
+              setState(() {
+                _selectedType = value;
+                _selectedCategory = null;
+              });
+            }),
+            const SizedBox(height: 16.0),
+            if (_selectedType != null)
               _buildDropdownField(
                   'Categoria', _selectedCategory, _getCategories(), isDarkMode,
-                  (String? newValue) {
+                  (value) {
                 setState(() {
-                  _selectedCategory = newValue;
+                  _selectedCategory = value;
                 });
               }),
-              const SizedBox(height: 20.0),
-              _buildTextField(
-                  'Categoria Interna', _referenceController, Icons.category,
-                  isDarkMode: isDarkMode),
-              const SizedBox(height: 20.0),
-              _buildTextField('Valor', _amountController, Icons.money,
-                  keyboardType: TextInputType.number, isDarkMode: isDarkMode),
-              const SizedBox(height: 20.0),
-              _buildTextField('Descrição (Opcional)', _descriptionController,
-                  Icons.description,
-                  isDarkMode: isDarkMode),
-              const SizedBox(height: 20.0),
-              _buildDatePicker(context),
-              const SizedBox(height: 20.0),
-              _buildFileSelector(isDarkMode: isDarkMode),
-              const SizedBox(height: 20.0),
-              if (_errorMessage != null)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    _errorMessage!,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ),
+            const SizedBox(height: 16.0),
+            _buildTextField('Referência', _referenceController, Icons.label,
+                isDarkMode: isDarkMode),
+            const SizedBox(height: 16.0),
+            _buildTextField('Valor', _amountController, Icons.monetization_on,
+                isDarkMode: isDarkMode, keyboardType: TextInputType.number),
+            const SizedBox(height: 16.0),
+            _buildTextField(
+                'Descrição', _descriptionController, Icons.description,
+                isDarkMode: isDarkMode),
+            const SizedBox(height: 16.0),
+            _buildTextField('Data', _dateController, Icons.date_range,
+                isDarkMode: isDarkMode, onTap: _selectDate),
+            const SizedBox(height: 16.0),
+            _buildFileSelector(isDarkMode: isDarkMode),
+            if (_errorMessage != null) ...[
+              const SizedBox(height: 16.0),
+              Text(
+                _errorMessage!,
+                style: const TextStyle(color: Colors.red, fontSize: 16.0),
+              ),
             ],
-          ),
+            const SizedBox(height: 16.0),
+            ElevatedButton(
+              onPressed: _addTransaction,
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor:
+                    isDarkMode ? Colors.blueGrey[700]! : Colors.blue,
+              ),
+              child: const Text('Adicionar'),
+            ),
+          ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addTransaction,
-        backgroundColor: isDarkMode ? Colors.blueGrey[700] : Colors.blue,
-        child: const Icon(Icons.add),
       ),
     );
   }

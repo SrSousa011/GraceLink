@@ -103,7 +103,7 @@ class _UpcomingEventsScreenState extends State<UpcomingEventsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _formatDate(transaction['createdAt']),
+                              _formatDate(transaction['transactionDate']),
                               style: TextStyle(color: secondaryTextColor),
                             ),
                             Text(
@@ -173,8 +173,7 @@ class _UpcomingEventsScreenState extends State<UpcomingEventsScreen> {
         'transactionId': doc.id,
         'amount': (data['amount'] as num?)?.toString() ?? 'N/A',
         'category': data['category'] ?? 'N/A',
-        'createdAt': data['createdAt']?.toDate() ?? DateTime.now(),
-        'date': data['date'] ?? 'N/A',
+        'transactionDate': data['transactionDate']?.toDate(),
         'description': data['description'] ?? 'Sem Descrição',
         'source': data['source'] ?? 'N/A',
         'type': data['type'] ?? 'N/A',
@@ -203,15 +202,15 @@ class _UpcomingEventsScreenState extends State<UpcomingEventsScreen> {
       List<Map<String, dynamic>> transactions) {
     if (_filter == 'all') {
       transactions.sort((a, b) => _isAscending
-          ? a['createdAt'].compareTo(b['createdAt'])
-          : b['createdAt'].compareTo(a['createdAt']));
+          ? a['transactionDate'].compareTo(b['transactionDate'])
+          : b['transactionDate'].compareTo(a['transactionDate']));
     } else {
       transactions = transactions
           .where((transaction) => transaction['type'] == _filter)
           .toList();
       transactions.sort((a, b) => _isAscending
-          ? a['createdAt'].compareTo(b['createdAt'])
-          : b['createdAt'].compareTo(a['createdAt']));
+          ? a['transactionDate'].compareTo(b['transactionDate'])
+          : b['transactionDate'].compareTo(a['transactionDate']));
     }
     return transactions;
   }

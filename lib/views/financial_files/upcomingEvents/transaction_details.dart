@@ -52,7 +52,7 @@ class TransactionDetailsScreen extends StatelessWidget {
             ),
             _buildInfoContainer(
               'Data:',
-              _formatDate(transaction['createdAt']),
+              _formatDate(transaction['transactionDate']),
               infoValueColor,
               containerColor,
               containerShadowColor,
