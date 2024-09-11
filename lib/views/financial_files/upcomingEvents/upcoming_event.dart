@@ -22,138 +22,135 @@ class _UpcomingEventsScreenState extends State<UpcomingEventsScreen> {
     final secondaryTextColor =
         isDarkMode ? Colors.grey[400]! : Colors.grey[700];
 
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Próximos Lançamentos'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.filter_list),
-              onPressed: () {
-                _showFilterDialog();
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.sort),
-              onPressed: () {
-                setState(() {
-                  _isAscending = !_isAscending;
-                });
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text('Próximos Lançamentos'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: () {
+              _showFilterDialog();
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.sort),
+            onPressed: () {
+              setState(() {
+                _isAscending = !_isAscending;
+              });
+            },
+          ),
+        ],
+      ),
+      backgroundColor: backgroundColor,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: _fetchTransactions(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text('Erro: ${snapshot.error}'));
+                }
+
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                      child: Text('Nenhuma transação encontrada.'));
+                }
+
+                final transactions = snapshot.data!;
+                final sortedTransactions = _sortTransactions(transactions);
+
+                return Expanded(
+                  child: ListView.builder(
+                    itemCount: sortedTransactions.length,
+                    itemBuilder: (context, index) {
+                      final transaction = sortedTransactions[index];
+                      final isIncome = transaction['type'] == 'Rendimento';
+                      final amount = transaction['amount'].toString();
+                      final color = isIncome ? Colors.green : Colors.red;
+                      final icon =
+                          isIncome ? Icons.arrow_upward : Icons.arrow_downward;
+
+                      return ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 16.0),
+                        leading: Icon(
+                          icon,
+                          color: color,
+                        ),
+                        title: Text(
+                          transaction['source'] ?? '',
+                          style: TextStyle(
+                            color: color,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _formatDate(transaction['createdAt']),
+                              style: TextStyle(color: secondaryTextColor),
+                            ),
+                            Text(
+                              '${transaction['description']}',
+                              style: TextStyle(color: secondaryTextColor),
+                            ),
+                          ],
+                        ),
+                        trailing: Text(
+                          '€$amount',
+                          style: TextStyle(
+                            color: color,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TransactionDetailsScreen(
+                              transaction: transaction,
+                              color: color,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
               },
             ),
           ],
         ),
-        backgroundColor: backgroundColor,
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              FutureBuilder<List<Map<String, dynamic>>>(
-                future: _fetchTransactions(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (snapshot.hasError) {
-                    return Center(child: Text('Erro: ${snapshot.error}'));
-                  }
-
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(
-                        child: Text('Nenhuma transação encontrada.'));
-                  }
-
-                  final transactions = snapshot.data!;
-                  final sortedTransactions = _sortTransactions(transactions);
-
-                  return Expanded(
-                    child: ListView.builder(
-                      itemCount: sortedTransactions.length,
-                      itemBuilder: (context, index) {
-                        final transaction = sortedTransactions[index];
-                        final isIncome = transaction['type'] == 'Rendimento';
-                        final amount = transaction['amount'].toString();
-                        final color = isIncome ? Colors.green : Colors.red;
-                        final icon = isIncome
-                            ? Icons.arrow_upward
-                            : Icons.arrow_downward;
-
-                        return ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 8.0, horizontal: 16.0),
-                          leading: Icon(
-                            icon,
-                            color: color,
-                          ),
-                          title: Text(
-                            transaction['source'] ?? '',
-                            style: TextStyle(
-                              color: color,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _formatDate(transaction['createdAt']),
-                                style: TextStyle(color: secondaryTextColor),
-                              ),
-                              Text(
-                                '${transaction['description']}',
-                                style: TextStyle(color: secondaryTextColor),
-                              ),
-                            ],
-                          ),
-                          trailing: Text(
-                            '€$amount',
-                            style: TextStyle(
-                              color: color,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TransactionDetailsScreen(
-                                transaction: transaction,
-                                color: color,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const AddTransactionForm(),
-              ),
-            );
-          },
-          backgroundColor: const Color(0xFF4CAF50),
-          child: const Icon(Icons.add),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AddTransactionForm(),
+            ),
+          );
+        },
+        backgroundColor: const Color(0xFF4CAF50),
+        child: const Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 

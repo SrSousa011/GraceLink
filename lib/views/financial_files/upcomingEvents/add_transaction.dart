@@ -133,10 +133,12 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
             .update({'filePath': fileUrl});
       }
 
+      if (!mounted) return;
       _showSuccessDialog(context, 'Transação adicionada com sucesso!');
       Future.delayed(const Duration(seconds: 2), () {
-        Navigator.of(context).pushReplacement(
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const UpcomingEventsScreen()),
+          (route) => false,
         );
       });
     } catch (e) {
@@ -255,11 +257,13 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-          style: TextStyle(
-              fontSize: 16.0,
-              color: Theme.of(context).textTheme.bodyLarge?.color),
+        Expanded(
+          child: Text(
+            '${_selectedDate.day.toString().padLeft(2, '0')}/${_selectedDate.month.toString().padLeft(2, '0')}/${_selectedDate.year}',
+            style: TextStyle(
+                fontSize: 16.0,
+                color: Theme.of(context).textTheme.bodyLarge?.color),
+          ),
         ),
         IconButton(
           icon: Icon(Icons.calendar_today,
@@ -303,76 +307,73 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final bool isDarkMode = themeProvider.isDarkMode;
 
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Adicionar Transação'),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Adicionar Transação'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        body: Container(
-          color: isDarkMode
-              ? Colors.blueGrey[900]
-              : const Color.fromARGB(255, 255, 255, 255),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTextField('Fonte', _sourceController, Icons.source,
-                    isDarkMode: isDarkMode),
-                const SizedBox(height: 20.0),
-                _buildDropdownField('Tipo de Transação', _selectedType,
-                    ['Rendimento', 'Despesa'], isDarkMode, (String? newValue) {
-                  setState(() {
-                    _selectedType = newValue;
-                    _selectedCategory = null;
-                  });
-                }),
-                const SizedBox(height: 20.0),
-                _buildDropdownField('Categoria', _selectedCategory,
-                    _getCategories(), isDarkMode, (String? newValue) {
-                  setState(() {
-                    _selectedCategory = newValue;
-                  });
-                }),
-                const SizedBox(height: 20.0),
-                _buildTextField(
-                    'Categoria Interna', _referenceController, Icons.category,
-                    isDarkMode: isDarkMode),
-                const SizedBox(height: 20.0),
-                _buildTextField('Valor', _amountController, Icons.money,
-                    keyboardType: TextInputType.number, isDarkMode: isDarkMode),
-                const SizedBox(height: 20.0),
-                _buildTextField('Descrição (Opcional)', _descriptionController,
-                    Icons.description,
-                    isDarkMode: isDarkMode),
-                const SizedBox(height: 20.0),
-                _buildDatePicker(context),
-                const SizedBox(height: 20.0),
-                _buildFileSelector(isDarkMode: isDarkMode),
-                const SizedBox(height: 20.0),
-                if (_errorMessage != null)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      _errorMessage!,
-                      style: const TextStyle(color: Colors.red),
-                    ),
+      ),
+      body: Container(
+        color: isDarkMode
+            ? Colors.blueGrey[900]
+            : const Color.fromARGB(255, 255, 255, 255),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTextField('Fonte', _sourceController, Icons.source,
+                  isDarkMode: isDarkMode),
+              const SizedBox(height: 20.0),
+              _buildDropdownField('Tipo de Transação', _selectedType,
+                  ['Rendimento', 'Despesa'], isDarkMode, (String? newValue) {
+                setState(() {
+                  _selectedType = newValue;
+                  _selectedCategory = null;
+                });
+              }),
+              const SizedBox(height: 20.0),
+              _buildDropdownField(
+                  'Categoria', _selectedCategory, _getCategories(), isDarkMode,
+                  (String? newValue) {
+                setState(() {
+                  _selectedCategory = newValue;
+                });
+              }),
+              const SizedBox(height: 20.0),
+              _buildTextField(
+                  'Categoria Interna', _referenceController, Icons.category,
+                  isDarkMode: isDarkMode),
+              const SizedBox(height: 20.0),
+              _buildTextField('Valor', _amountController, Icons.money,
+                  keyboardType: TextInputType.number, isDarkMode: isDarkMode),
+              const SizedBox(height: 20.0),
+              _buildTextField('Descrição (Opcional)', _descriptionController,
+                  Icons.description,
+                  isDarkMode: isDarkMode),
+              const SizedBox(height: 20.0),
+              _buildDatePicker(context),
+              const SizedBox(height: 20.0),
+              _buildFileSelector(isDarkMode: isDarkMode),
+              const SizedBox(height: 20.0),
+              if (_errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _addTransaction,
-          backgroundColor: isDarkMode ? Colors.blueGrey[700] : Colors.blue,
-          child: const Icon(Icons.add),
-        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addTransaction,
+        backgroundColor: isDarkMode ? Colors.blueGrey[700] : Colors.blue,
+        child: const Icon(Icons.add),
       ),
     );
   }
