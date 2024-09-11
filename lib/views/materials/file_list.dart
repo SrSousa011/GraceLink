@@ -70,31 +70,39 @@ class CourseFileList extends StatelessWidget {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Abrir arquivo'),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                final uri = Uri.tryParse(url);
-                if (uri != null) {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                } else {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('URL Inválida')),
-                    );
+        return PopScope(
+          canPop: false,
+          onPopInvoked: (bool didPop) async {
+            if (didPop) {
+              return;
+            }
+          },
+          child: AlertDialog(
+            title: const Text('Abrir arquivo'),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  final uri = Uri.tryParse(url);
+                  if (uri != null) {
+                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  } else {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('URL Inválida')),
+                      );
+                    }
                   }
-                }
-                if (!context.mounted) return;
-                Navigator.of(context).pop();
-              },
-              child: const Text('Abrir'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancelar'),
-            ),
-          ],
+                  if (!context.mounted) return;
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Abrir'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Cancelar'),
+              ),
+            ],
+          ),
         );
       },
     );

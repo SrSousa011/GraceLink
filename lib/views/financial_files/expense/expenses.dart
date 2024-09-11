@@ -47,72 +47,77 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Despesas'),
-        backgroundColor: expensesColor,
-      ),
-      body: FutureBuilder<List<Map<String, double>>>(
-        future: _expensesAndAnnualExpensesFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {},
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Despesas'),
+          backgroundColor: expensesColor,
+        ),
+        body: FutureBuilder<List<Map<String, double>>>(
+          future: _expensesAndAnnualExpensesFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          if (snapshot.hasError) {
-            return Center(child: Text('Erro: ${snapshot.error}'));
-          }
+            if (snapshot.hasError) {
+              return Center(child: Text('Erro: ${snapshot.error}'));
+            }
 
-          if (!snapshot.hasData) {
-            return const Center(child: Text('Nenhuma despesa encontrada.'));
-          }
+            if (!snapshot.hasData) {
+              return const Center(child: Text('Nenhuma despesa encontrada.'));
+            }
 
-          final expenses = snapshot.data![0];
-          final annualExpenses = snapshot.data![1];
+            final expenses = snapshot.data![0];
+            final annualExpenses = snapshot.data![1];
 
-          final monthlyGeneralExpenses =
-              expenses['totalGeneralExpenses'] ?? 0.0;
-          final monthlySalaries = expenses['totalSalaries'] ?? 0.0;
-          final monthlyMaintenance = expenses['totalMaintenance'] ?? 0.0;
-          final monthlyServices = expenses['totalServices'] ?? 0.0;
-          final totalMonthlyExpenses = expenses['totalMonthlyExpenses'] ?? 0.0;
+            final monthlyGeneralExpenses =
+                expenses['totalGeneralExpenses'] ?? 0.0;
+            final monthlySalaries = expenses['totalSalaries'] ?? 0.0;
+            final monthlyMaintenance = expenses['totalMaintenance'] ?? 0.0;
+            final monthlyServices = expenses['totalServices'] ?? 0.0;
+            final totalMonthlyExpenses =
+                expenses['totalMonthlyExpenses'] ?? 0.0;
 
-          final annualGeneralExpenses =
-              annualExpenses['totalGeneralExpenses'] ?? 0.0;
-          final annualSalaries = annualExpenses['totalSalaries'] ?? 0.0;
-          final annualMaintenance = annualExpenses['totalMaintenance'] ?? 0.0;
-          final annualServices = annualExpenses['totalServices'] ?? 0.0;
-          final totalAnnualExpenses =
-              annualExpenses['totalAnnualExpenses'] ?? 0.0;
+            final annualGeneralExpenses =
+                annualExpenses['totalGeneralExpenses'] ?? 0.0;
+            final annualSalaries = annualExpenses['totalSalaries'] ?? 0.0;
+            final annualMaintenance = annualExpenses['totalMaintenance'] ?? 0.0;
+            final annualServices = annualExpenses['totalServices'] ?? 0.0;
+            final totalAnnualExpenses =
+                annualExpenses['totalAnnualExpenses'] ?? 0.0;
 
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  MonthlyExpensesChart(
-                    monthlyGeneralExpenses: monthlyGeneralExpenses,
-                    monthlySalaries: monthlySalaries,
-                    monthlyMaintenance: monthlyMaintenance,
-                    monthlyServices: monthlyServices,
-                    totalMonthlyExpenses: totalMonthlyExpenses,
-                    isDarkMode: isDarkMode,
-                  ),
-                  const SizedBox(height: 40),
-                  AnnualExpenseChart(
-                    annualUtilities: annualGeneralExpenses,
-                    totalAnnualSalaries: annualSalaries,
-                    totalAnnualMaintenance: annualMaintenance,
-                    annualOtherExpenses: annualServices,
-                    totalAnnualExpenses: totalAnnualExpenses,
-                    isDarkMode: isDarkMode,
-                  ),
-                ],
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    MonthlyExpensesChart(
+                      monthlyGeneralExpenses: monthlyGeneralExpenses,
+                      monthlySalaries: monthlySalaries,
+                      monthlyMaintenance: monthlyMaintenance,
+                      monthlyServices: monthlyServices,
+                      totalMonthlyExpenses: totalMonthlyExpenses,
+                      isDarkMode: isDarkMode,
+                    ),
+                    const SizedBox(height: 40),
+                    AnnualExpenseChart(
+                      annualUtilities: annualGeneralExpenses,
+                      totalAnnualSalaries: annualSalaries,
+                      totalAnnualMaintenance: annualMaintenance,
+                      annualOtherExpenses: annualServices,
+                      totalAnnualExpenses: totalAnnualExpenses,
+                      isDarkMode: isDarkMode,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

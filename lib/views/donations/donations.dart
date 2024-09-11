@@ -113,47 +113,51 @@ class _DonationsState extends State<Donations> {
         ? const Color(0xFF007BFF)
         : Colors.white;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Doações'),
-      ),
-      drawer: const NavBar(),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const SizedBox(height: 20.0),
-              DonationValue(
-                onValueChanged: (value) {
-                  setState(() {
-                    donationValue = value;
-                  });
-                },
-                value: donationValue,
-              ),
-              DonationType(
-                onTypeSelected: onTypeSelected,
-                donationType: donationType,
-                donationTypeButtonColor: donationTypeButtonColor,
-                donationTypeTextColor: donationTypeTextColor,
-              ),
-              const SizedBox(height: 20.0),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    navigateToDonationDetailsScreen(context);
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {},
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Doações'),
+        ),
+        drawer: const NavBar(),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const SizedBox(height: 20.0),
+                DonationValue(
+                  onValueChanged: (value) {
+                    setState(() {
+                      donationValue = value;
+                    });
                   },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: buttonColor,
-                  ),
-                  child: const Text('Próximo'),
+                  value: donationValue,
                 ),
-              ),
-            ],
+                DonationType(
+                  onTypeSelected: onTypeSelected,
+                  donationType: donationType,
+                  donationTypeButtonColor: donationTypeButtonColor,
+                  donationTypeTextColor: donationTypeTextColor,
+                ),
+                const SizedBox(height: 20.0),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      navigateToDonationDetailsScreen(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: buttonColor,
+                    ),
+                    child: const Text('Próximo'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

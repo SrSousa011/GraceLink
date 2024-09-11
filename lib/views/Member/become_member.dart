@@ -165,61 +165,69 @@ class _BecomeMemberState extends State<BecomeMember> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tornar-se Membro'),
-      ),
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildTextField(_fullNameController, 'Nome Completo'),
-                const SizedBox(height: 20.0),
-                _buildTextField(
-                    _lastVisitedChurchController, 'Última Igreja Visitada'),
-                const SizedBox(height: 20.0),
-                _buildTextField(_reasonForMembershipController,
-                    'Razão para Tornar-se Membro'),
-                const SizedBox(height: 20.0),
-                _buildTextField(
-                    _referenceController, 'Referência de um Membro Atual'),
-                const SizedBox(height: 20.0),
-                _buildDropdownField('Estado Civil', selectedCivilStatus,
-                    _getCivilStatusOptions(), (value) {
-                  setState(() {
-                    selectedCivilStatus = value!;
-                  });
-                }),
-                const SizedBox(height: 20.0),
-                _buildDropdownField(
-                    'Gênero', selectedGender, ['Masculino', 'Feminino'],
-                    (value) {
-                  if (value != null) {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) {
+          return;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Tornar-se Membro'),
+        ),
+        body: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildTextField(_fullNameController, 'Nome Completo'),
+                  const SizedBox(height: 20.0),
+                  _buildTextField(
+                      _lastVisitedChurchController, 'Última Igreja Visitada'),
+                  const SizedBox(height: 20.0),
+                  _buildTextField(_reasonForMembershipController,
+                      'Razão para Tornar-se Membro'),
+                  const SizedBox(height: 20.0),
+                  _buildTextField(
+                      _referenceController, 'Referência de um Membro Atual'),
+                  const SizedBox(height: 20.0),
+                  _buildDropdownField('Estado Civil', selectedCivilStatus,
+                      _getCivilStatusOptions(), (value) {
                     setState(() {
-                      selectedGender = value;
-                      _updateCivilStatus(selectedGender, selectedCivilStatus);
+                      selectedCivilStatus = value!;
                     });
-                  }
-                }),
-                const SizedBox(height: 20.0),
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _validateAndSubmit,
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: const Color.fromARGB(255, 90, 175, 249),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
+                  }),
+                  const SizedBox(height: 20.0),
+                  _buildDropdownField(
+                      'Gênero', selectedGender, ['Masculino', 'Feminino'],
+                      (value) {
+                    if (value != null) {
+                      setState(() {
+                        selectedGender = value;
+                        _updateCivilStatus(selectedGender, selectedCivilStatus);
+                      });
+                    }
+                  }),
+                  const SizedBox(height: 20.0),
+                  ElevatedButton(
+                    onPressed: _isLoading ? null : _validateAndSubmit,
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: const Color.fromARGB(255, 90, 175, 249),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
                     ),
+                    child: _isLoading
+                        ? const CircularProgressIndicator()
+                        : const Text('Enviar'),
                   ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text('Enviar'),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
