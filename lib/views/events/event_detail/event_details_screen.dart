@@ -1,20 +1,18 @@
-import 'dart:async';
-import 'package:churchapp/views/events/event_delete.dart';
 import 'package:churchapp/views/events/event_detail/event_details.dart';
-import 'package:churchapp/views/events/event_detail/event_image.dart';
 import 'package:churchapp/views/events/event_detail/event_image_add.dart';
-import 'package:churchapp/views/events/events.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/theme/theme_provider.dart';
-import 'package:churchapp/views/events/update_event.dart';
+import 'package:churchapp/views/events/event_detail/event_image.dart';
 import 'package:churchapp/views/events/event_service.dart';
+import 'package:churchapp/views/events/update_event.dart';
+import 'package:churchapp/views/events/event_delete.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final Event event;
@@ -42,10 +40,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   }
 
   Future<void> _initialize() async {
-    await Future.wait([
-      _checkIfAdmin(),
-      _fetchCurrentUserId(),
-    ]);
+    await Future.wait([_checkIfAdmin(), _fetchCurrentUserId()]);
   }
 
   Future<void> _checkIfAdmin() async {
@@ -105,100 +100,106 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     final isDarkMode = themeProvider.isDarkMode;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back,
-              color: isDarkMode ? Colors.white : Colors.black),
-          onPressed: _navigateToEventScreen,
-        ),
-        title: const Text('Evento'),
-      ),
-      body: StreamBuilder<DocumentSnapshot>(
-        stream: _getEventStream(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Stack(
+        children: [
+          StreamBuilder<DocumentSnapshot>(
+            stream: _getEventStream(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-          if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text('Evento não encontrado.'));
-          }
+              if (!snapshot.hasData || !snapshot.data!.exists) {
+                return const Center(child: Text('Evento não encontrado.'));
+              }
 
-          final eventData = snapshot.data!;
-          final updatedEvent = Event.fromSnapshot(eventData);
+              final eventData = snapshot.data!;
+              final updatedEvent = Event.fromSnapshot(eventData);
 
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                StreamBuilder<DocumentSnapshot>(
-                  stream: _firestore
-                      .collection('users')
-                      .doc(updatedEvent.createdBy)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+              return SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Espaçamento superior para garantir que o conteúdo não sobrescreva o topo
+                    const SizedBox(height: 40.0),
+                    StreamBuilder<DocumentSnapshot>(
+                      stream: _firestore
+                          .collection('users')
+                          .doc(updatedEvent.createdBy)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
 
-                    if (!snapshot.hasData || !snapshot.data!.exists) {
-                      return _buildCreatorInfo('', '');
-                    }
+                        if (!snapshot.hasData || !snapshot.data!.exists) {
+                          return _buildCreatorInfo('', '');
+                        }
 
-                    final userData = snapshot.data!;
-                    final creatorName = userData['fullName'] ?? '';
-                    final creatorImageUrl = userData['imagePath'] ?? '';
+                        final userData = snapshot.data!;
+                        final creatorName = userData['fullName'] ?? '';
+                        final creatorImageUrl = userData['imagePath'] ?? '';
 
-                    return _buildCreatorInfo(creatorName, creatorImageUrl);
-                  },
-                ),
-                const SizedBox(height: 16.0),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    updatedEvent.title,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black,
+                        return _buildCreatorInfo(creatorName, creatorImageUrl);
+                      },
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        updatedEvent.title,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(0.0),
+                      child: EventImage(
+                        imageUrlStream: _getEventStream().map((snapshot) {
+                          final data = snapshot.data() as Map<String, dynamic>;
+                          return data['imageUrl'] as String?;
+                        }),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: EventDetails(
+                        description: 'Descrição: ${updatedEvent.description}',
+                        date:
+                            'Data: ${DateFormat('dd/MM/yyyy').format(updatedEvent.date)}',
+                        time: 'Horário: ${updatedEvent.time.format(context)}',
+                        location: 'Localidade: ${updatedEvent.location}',
+                        isDarkMode: isDarkMode,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16.0),
-                Padding(
-                  padding: const EdgeInsets.all(0.0),
-                  child: EventImage(
-                    imageUrlStream: _getEventStream().map((snapshot) {
-                      final data = snapshot.data() as Map<String, dynamic>;
-                      return data['imageUrl'] as String?;
-                    }),
-                  ),
+              );
+            },
+          ),
+          if (_shouldShowPopupMenu())
+            Positioned(
+              bottom: 20,
+              right: 20,
+              child: ElevatedButton(
+                onPressed: _pickImage,
+                style: ElevatedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(20),
+                  backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
                 ),
-                const SizedBox(height: 16.0),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: EventDetails(
-                    description: 'Descrição: ${updatedEvent.description}',
-                    date:
-                        'Data: ${DateFormat('dd/MM/yyyy').format(updatedEvent.date)}',
-                    time: 'Horário: ${updatedEvent.time.format(context)}',
-                    location: 'Localidade: ${updatedEvent.location}',
-                    isDarkMode: isDarkMode,
-                  ),
+                child: Icon(
+                  Icons.add_a_photo,
+                  color: isDarkMode ? Colors.black : Colors.white,
                 ),
-              ],
+              ),
             ),
-          );
-        },
+        ],
       ),
-      floatingActionButton: _shouldShowPopupMenu()
-          ? FloatingActionButton(
-              onPressed: _pickImage,
-              backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
-              child: Icon(Icons.add_a_photo,
-                  color: isDarkMode ? Colors.black : Colors.white),
-            )
-          : null,
     );
   }
 
@@ -207,8 +208,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     final isDarkMode = themeProvider.isDarkMode;
 
     return Padding(
-      padding:
-          const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 0.0),
+      padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
           CircleAvatar(
@@ -249,7 +249,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                   child: ListTile(
                     leading: Icon(Icons.edit,
                         color: isDarkMode ? Colors.white : Colors.blue),
-                    title: Text('Edit',
+                    title: Text('Editar',
                         style: TextStyle(
                             color: isDarkMode ? Colors.white : Colors.black)),
                   ),
@@ -259,7 +259,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                   child: ListTile(
                     leading: Icon(Icons.delete,
                         color: isDarkMode ? Colors.grey[300] : Colors.red),
-                    title: Text('Delete',
+                    title: Text('Deletar',
                         style: TextStyle(
                             color: isDarkMode ? Colors.white : Colors.red)),
                   ),
@@ -282,28 +282,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     if (updatedEvent != null && context.mounted) {
       setState(() {
         _event = updatedEvent;
-      });
-    }
-  }
-
-  void _navigateToEventScreen() async {
-    final result = await Navigator.push<Map<String, dynamic>>(
-      context,
-      MaterialPageRoute(builder: (context) => const Events()),
-    );
-
-    if (result != null && context.mounted) {
-      setState(() {
-        _event = Event(
-          id: result['id'],
-          title: result['title'],
-          description: result['description'],
-          date: result['date'],
-          time: result['time'],
-          location: result['location'],
-          imageUrl: result['imageUrl'],
-          createdBy: _event.createdBy,
-        );
       });
     }
   }
