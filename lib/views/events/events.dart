@@ -1,8 +1,9 @@
+import 'package:churchapp/data/model/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import necessário para autenticação
 import 'package:churchapp/views/events/add/add_event.dart';
 import 'package:churchapp/views/events/event_detail/event_details_screen.dart';
-import 'package:churchapp/views/events/event_list_item.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/events/event_service.dart';
 
@@ -20,11 +21,13 @@ class _EventsState extends State<Events> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
+  bool _isAdmin = false;
 
   @override
   void initState() {
     super.initState();
     _eventsFuture = _fetchEvents();
+    _fetchCurrentUserData();
   }
 
   Future<List<Event>> _fetchEvents() async {
@@ -59,6 +62,27 @@ class _EventsState extends State<Events> {
       _searchQuery = query;
       _filteredEvents = _filterEvents(_searchQuery);
     });
+  }
+
+  Future<void> _fetchCurrentUserData() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      final userId = user.uid;
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      final userData = UserData.fromDocument(doc);
+
+      setState(() {
+        _isAdmin = userData.role == 'admin'; // Verifique se o usuário é admin
+      });
+    } catch (e) {
+      // Lidar com erros, se necessário
+      print('Erro ao buscar dados do usuário: $e');
+    }
   }
 
   @override
@@ -125,12 +149,103 @@ class _EventsState extends State<Events> {
                 return SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
+                      final event = _filteredEvents[index];
                       return GestureDetector(
                         onTap: () {
-                          _navigateToEventDetailsScreen(
-                              context, _filteredEvents[index]);
+                          _navigateToEventDetailsScreen(context, event);
                         },
-                        child: EventListItem(event: _filteredEvents[index]),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ListTile(
+                                title: StreamBuilder<DocumentSnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(event.createdBy)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return const Text('Carregando...');
+                                    }
+
+                                    final userData =
+                                        UserData.fromDocument(snapshot.data!);
+
+                                    final creatorName =
+                                        userData.fullName.isNotEmpty
+                                            ? userData.fullName
+                                            : 'Criador desconhecido';
+                                    final userImageUrl = userData.imagePath;
+
+                                    return GestureDetector(
+                                      onTap: () {
+                                        _navigateToEventDetailsScreen(
+                                            context, event);
+                                      },
+                                      child: Row(
+                                        children: [
+                                          CircleAvatar(
+                                            backgroundImage: userImageUrl
+                                                    .isNotEmpty
+                                                ? NetworkImage(userImageUrl)
+                                                : const AssetImage(
+                                                        'assets/default_avatar.png')
+                                                    as ImageProvider,
+                                            radius: 15,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            creatorName,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                                subtitle: GestureDetector(
+                                  onTap: () {
+                                    _navigateToEventDetailsScreen(
+                                        context, event);
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Text(
+                                      event.title,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              if (event.imageUrl != null &&
+                                  event.imageUrl!.isNotEmpty)
+                                GestureDetector(
+                                  onTap: () {
+                                    _navigateToEventDetailsScreen(
+                                        context, event);
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.only(top: 8.0),
+                                    width: double.infinity,
+                                    child: Image.network(
+                                      event.imageUrl!,
+                                      height: 200,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              const SizedBox(height: 16),
+                            ],
+                          ),
+                        ),
                       );
                     },
                     childCount: _filteredEvents.length,
@@ -141,13 +256,16 @@ class _EventsState extends State<Events> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _navigateToAddEventScreen(context);
-        },
-        tooltip: 'Novo Evento',
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton:
+          _isAdmin // Exibe o botão de adicionar somente se o usuário for admin
+              ? FloatingActionButton(
+                  onPressed: () {
+                    _navigateToAddEventScreen(context);
+                  },
+                  tooltip: 'Novo Evento',
+                  child: const Icon(Icons.add),
+                )
+              : null,
     );
   }
 
@@ -168,9 +286,9 @@ class _EventsState extends State<Events> {
   }
 
   void _navigateToEventDetailsScreen(BuildContext context, Event event) async {
-    final updatedEvent = await Navigator.push<Event>(
+    final updatedEvent = await Navigator.push(
       context,
-      _createPageRoute(EventDetailsScreen(event: event)) as Route<Event>,
+      _createPageRoute(EventDetailsScreen(event: event)),
     );
 
     if (updatedEvent != null && context.mounted) {
