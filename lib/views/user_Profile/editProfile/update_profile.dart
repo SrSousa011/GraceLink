@@ -47,7 +47,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     UserProfileService userProfileService = UserProfileService();
 
     userProfileService
-        .updateUserProfile(widget.userData.id, fullName, address)
+        .updateUserProfile(widget.userData.userId, fullName, address)
         .then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Perfil atualizado com sucesso')),
@@ -57,7 +57,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         MaterialPageRoute(
           builder: (context) => ProfileScreen(
             userData: UserData(
-              id: widget.userData.id,
+              userId: widget.userData.userId,
               fullName: fullName,
               address: address,
               imagePath: widget.userData.imagePath,
