@@ -103,7 +103,8 @@ class _AddEventFormState extends State<AddEventForm> {
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty &&
         _selectedDate != null &&
-        _selectedTime != null) {
+        _selectedTime != null &&
+        (_imageUrl?.isNotEmpty ?? false)) {
       final userId = await _authenticationService.getCurrentUserId();
       if (userId == null) {
         if (!context.mounted) return;
@@ -157,7 +158,7 @@ class _AddEventFormState extends State<AddEventForm> {
       }
     } else {
       _showErrorDialog(context, 'Erro ao salvar evento',
-          'Por favor, preencha todos os campos.');
+          'Por favor, preencha todos os campos e adicione uma imagem.');
     }
   }
 
@@ -190,8 +191,7 @@ class _AddEventFormState extends State<AddEventForm> {
       appBar: AppBar(
         title: const Text('Novo Evento'),
       ),
-      resizeToAvoidBottomInset:
-          false, // Não redimensiona a tela quando o teclado aparece
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           SingleChildScrollView(
