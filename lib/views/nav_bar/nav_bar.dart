@@ -144,12 +144,6 @@ class _NavBarState extends State<NavBar> {
                     },
                   ),
                   _buildListTile(
-                    icon: Icons.notifications_outlined,
-                    text: 'Notificações',
-                    color: iconColor,
-                    onTap: () => Navigator.pushNamed(context, '/notifications'),
-                  ),
-                  _buildListTile(
                     icon: Icons.video_library_outlined,
                     text: 'Vídeos',
                     color: iconColor,

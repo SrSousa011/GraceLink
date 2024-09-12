@@ -21,7 +21,6 @@ import 'package:churchapp/views/courses/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
 import 'package:churchapp/views/events/events.dart';
 import 'package:churchapp/views/home/home.dart';
-import 'package:churchapp/views/notifications/notifications.dart';
 import 'package:churchapp/views/videos/videos.dart';
 
 class AppRoutes {
@@ -41,8 +40,6 @@ class AppRoutes {
             userId: '',
           ),
         );
-      case '/notifications':
-        return MaterialPageRoute(builder: (_) => const Notifications());
       case '/videos':
         return MaterialPageRoute(builder: (_) => const Videos());
       case '/course_live':
