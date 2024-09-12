@@ -1,7 +1,7 @@
 import 'package:churchapp/data/model/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import necessário para autenticação
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:churchapp/views/events/add/add_event.dart';
 import 'package:churchapp/views/events/event_detail/event_details_screen.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
@@ -77,10 +77,9 @@ class _EventsState extends State<Events> {
       final userData = UserData.fromDocument(doc);
 
       setState(() {
-        _isAdmin = userData.role == 'admin'; // Verifique se o usuário é admin
+        _isAdmin = userData.role == 'admin';
       });
     } catch (e) {
-      // Lidar com erros, se necessário
       print('Erro ao buscar dados do usuário: $e');
     }
   }
@@ -159,68 +158,54 @@ class _EventsState extends State<Events> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              ListTile(
-                                title: StreamBuilder<DocumentSnapshot>(
-                                  stream: FirebaseFirestore.instance
-                                      .collection('users')
-                                      .doc(event.createdBy)
-                                      .snapshots(),
-                                  builder: (context, snapshot) {
-                                    if (!snapshot.hasData) {
-                                      return const Text('Carregando...');
-                                    }
+                              StreamBuilder<DocumentSnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(event.createdBy)
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return const Text('Carregando...');
+                                  }
 
-                                    final userData =
-                                        UserData.fromDocument(snapshot.data!);
+                                  final userData =
+                                      UserData.fromDocument(snapshot.data!);
 
-                                    final creatorName =
-                                        userData.fullName.isNotEmpty
-                                            ? userData.fullName
-                                            : 'Criador desconhecido';
-                                    final userImageUrl = userData.imagePath;
+                                  final creatorName =
+                                      userData.fullName.isNotEmpty
+                                          ? userData.fullName
+                                          : 'Criador desconhecido';
+                                  final userImageUrl = userData.imagePath;
 
-                                    return GestureDetector(
-                                      onTap: () {
-                                        _navigateToEventDetailsScreen(
-                                            context, event);
-                                      },
-                                      child: Row(
-                                        children: [
-                                          CircleAvatar(
-                                            backgroundImage: userImageUrl
-                                                    .isNotEmpty
-                                                ? NetworkImage(userImageUrl)
-                                                : const AssetImage(
-                                                        'assets/default_avatar.png')
-                                                    as ImageProvider,
-                                            radius: 15,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            creatorName,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
+                                  return Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundImage: userImageUrl.isNotEmpty
+                                            ? NetworkImage(userImageUrl)
+                                            : const AssetImage(
+                                                    'assets/default_avatar.png')
+                                                as ImageProvider,
+                                        radius: 16,
                                       ),
-                                    );
-                                  },
-                                ),
-                                subtitle: GestureDetector(
-                                  onTap: () {
-                                    _navigateToEventDetailsScreen(
-                                        context, event);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
-                                    child: Text(
-                                      event.title,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        creatorName,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
+                                    ],
+                                  );
+                                },
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 4.0, left: 40.0),
+                                child: Text(
+                                  event.title,
+                                  style: const TextStyle(
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
@@ -242,7 +227,7 @@ class _EventsState extends State<Events> {
                                     ),
                                   ),
                                 ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 40),
                             ],
                           ),
                         ),
@@ -256,16 +241,15 @@ class _EventsState extends State<Events> {
           ),
         ],
       ),
-      floatingActionButton:
-          _isAdmin // Exibe o botão de adicionar somente se o usuário for admin
-              ? FloatingActionButton(
-                  onPressed: () {
-                    _navigateToAddEventScreen(context);
-                  },
-                  tooltip: 'Novo Evento',
-                  child: const Icon(Icons.add),
-                )
-              : null,
+      floatingActionButton: _isAdmin
+          ? FloatingActionButton(
+              onPressed: () {
+                _navigateToAddEventScreen(context);
+              },
+              tooltip: 'Novo Evento',
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 
