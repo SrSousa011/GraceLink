@@ -121,7 +121,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Espaçamento superior para garantir que o conteúdo não sobrescreva o topo
                     const SizedBox(height: 40.0),
                     StreamBuilder<DocumentSnapshot>(
                       stream: _firestore

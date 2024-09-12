@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserData {
-  final String id;
+  final String userId;
   final String fullName;
   final String address;
   final String imagePath;
   final String? role;
 
   UserData({
-    required this.id,
+    required this.userId,
     required this.fullName,
     required this.address,
     required this.imagePath,
@@ -17,7 +17,7 @@ class UserData {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      'userId': userId,
       'fullName': fullName,
       'address': address,
       'imagePath': imagePath,
@@ -27,7 +27,7 @@ class UserData {
 
   factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
-      id: json['id'] ?? '',
+      userId: json['userId'] ?? '',
       fullName: json['fullName'] ?? '',
       address: json['address'] ?? '',
       imagePath: json['imagePath'] ?? '',
@@ -39,7 +39,7 @@ class UserData {
     final data = doc.data() as Map<String, dynamic>?;
 
     return UserData(
-      id: doc.id,
+      userId: doc.id,
       fullName: data?['fullName'] ?? '',
       address: data?['address'] ?? '',
       imagePath: data?['imagePath'] ?? '',

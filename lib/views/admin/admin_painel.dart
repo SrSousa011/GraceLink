@@ -83,7 +83,7 @@ class _AdminPanelState extends State<AdminPanel> {
                   subtitle: Text('Role: ${user.role ?? 'user'}'),
                   trailing: user.role == 'admin'
                       ? ElevatedButton(
-                          onPressed: () => _demoteFromAdmin(user.id),
+                          onPressed: () => _demoteFromAdmin(user.userId),
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all<Color>(
                               isDarkMode ? Colors.grey : Colors.red,
@@ -97,7 +97,7 @@ class _AdminPanelState extends State<AdminPanel> {
                           child: const Text('Demote'),
                         )
                       : ElevatedButton(
-                          onPressed: () => _promoteToAdmin(user.id),
+                          onPressed: () => _promoteToAdmin(user.userId),
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all<Color>(
                               isDarkMode ? Colors.grey : Colors.blue,

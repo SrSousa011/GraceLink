@@ -69,7 +69,7 @@ class AuthMethods {
       );
 
       UserData userData = UserData(
-        id: userCredential.user!.uid,
+        userId: userCredential.user!.uid,
         fullName: '$firstName $lastName',
         address: address,
         imagePath: imagePath,
@@ -205,5 +205,3 @@ class AuthMethods {
     }
   }
 }
-
-
