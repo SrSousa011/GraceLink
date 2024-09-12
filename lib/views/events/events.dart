@@ -1,4 +1,5 @@
 import 'package:churchapp/data/model/user_data.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -80,7 +81,9 @@ class _EventsState extends State<Events> {
         _isAdmin = userData.role == 'admin';
       });
     } catch (e) {
-      print('Erro ao buscar dados do usuário: $e');
+      if (kDebugMode) {
+        print('Erro ao buscar dados do usuário: $e');
+      }
     }
   }
 
@@ -128,7 +131,7 @@ class _EventsState extends State<Events> {
             ],
           ),
           SliverPadding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(0.0),
             sliver: FutureBuilder<List<Event>>(
               future: _eventsFuture,
               builder: (context, snapshot) {
@@ -158,57 +161,29 @@ class _EventsState extends State<Events> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              StreamBuilder<DocumentSnapshot>(
-                                stream: FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(event.createdBy)
-                                    .snapshots(),
-                                builder: (context, snapshot) {
-                                  if (!snapshot.hasData) {
-                                    return const Text('Carregando...');
-                                  }
-
-                                  final userData =
-                                      UserData.fromDocument(snapshot.data!);
-
-                                  final creatorName =
-                                      userData.fullName.isNotEmpty
-                                          ? userData.fullName
-                                          : 'Criador desconhecido';
-                                  final userImageUrl = userData.imagePath;
-
-                                  return Row(
-                                    children: [
-                                      CircleAvatar(
-                                        backgroundImage: userImageUrl.isNotEmpty
-                                            ? NetworkImage(userImageUrl)
-                                            : const AssetImage(
-                                                    'assets/default_avatar.png')
-                                                as ImageProvider,
-                                        radius: 16,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        creatorName,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
                               Padding(
                                 padding:
-                                    const EdgeInsets.only(top: 4.0, left: 40.0),
+                                    const EdgeInsets.only(top: 4.0, left: 24.0),
                                 child: Text(
                                   event.title,
                                   style: const TextStyle(
-                                    fontSize: 12.0,
+                                    fontSize: 16.0,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
+                              if (event.location.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 24.0, top: 4.0),
+                                  child: Text(
+                                    event.location,
+                                    style: const TextStyle(
+                                      fontSize: 14.0,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
                               if (event.imageUrl != null &&
                                   event.imageUrl!.isNotEmpty)
                                 GestureDetector(
@@ -218,11 +193,10 @@ class _EventsState extends State<Events> {
                                   },
                                   child: Container(
                                     margin: const EdgeInsets.only(top: 8.0),
-                                    width: double.infinity,
+                                    width: MediaQuery.of(context).size.width,
                                     child: Image.network(
                                       event.imageUrl!,
-                                      height: 200,
-                                      width: double.infinity,
+                                      height: 250,
                                       fit: BoxFit.cover,
                                     ),
                                   ),
