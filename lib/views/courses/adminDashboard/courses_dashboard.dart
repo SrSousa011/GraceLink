@@ -29,10 +29,6 @@ class CoursesDashboard extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    final Color appBarColor = isDarkMode
-        ? Colors.blueGrey[900]!
-        : const Color.fromARGB(255, 255, 255, 255);
-
     final Color containerBackgroundColor =
         isDarkMode ? Colors.blueGrey[800]! : Colors.blueAccent;
 
@@ -45,10 +41,6 @@ class CoursesDashboard extends StatelessWidget {
     const Color summaryCardTextColor = Colors.white;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Painel de Cursos'),
-        backgroundColor: appBarColor,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
@@ -80,6 +72,7 @@ class CoursesDashboard extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                const SizedBox(height: 40.0), // Espaçamento adicionado
                 Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
@@ -149,6 +142,8 @@ class CoursesDashboard extends StatelessWidget {
                     ],
                   ),
                 ),
+                const SizedBox(height: 40.0),
+
                 const SizedBox(height: 40.0),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
