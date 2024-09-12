@@ -393,10 +393,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
         if (mounted) {
           Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (context) => Home(
-              auth: widget.auth,
-              userId: userCredential.user!.uid,
-            ),
+            builder: (context) => const Home(),
           ));
         }
       } catch (e) {

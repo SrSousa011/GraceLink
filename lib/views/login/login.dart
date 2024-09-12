@@ -54,10 +54,7 @@ class _LoginState extends State<Login> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => Home(
-              auth: widget.auth,
-              userId: FirebaseAuth.instance.currentUser!.uid,
-            ),
+            builder: (context) => const Home(),
           ),
         );
       }

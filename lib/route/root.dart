@@ -24,10 +24,7 @@ class Root extends StatelessWidget {
               body: Center(child: CircularProgressIndicator()),
             );
           } else if (snapshot.hasData) {
-            return Home(
-              auth: auth,
-              userId: snapshot.data!.uid,
-            );
+            return const Home();
           } else {
             return Login(
               auth: auth,

@@ -144,6 +144,12 @@ class _NavBarState extends State<NavBar> {
                     },
                   ),
                   _buildListTile(
+                    icon: Icons.photo_size_select_actual_outlined,
+                    text: 'Fotos',
+                    color: iconColor,
+                    onTap: () => Navigator.pushNamed(context, '/photos'),
+                  ),
+                  _buildListTile(
                     icon: Icons.video_library_outlined,
                     text: 'Vídeos',
                     color: iconColor,

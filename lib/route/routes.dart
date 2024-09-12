@@ -3,6 +3,7 @@ import 'package:churchapp/views/courses/courseLive/course_live.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscriber_info.dart';
 import 'package:churchapp/views/financial_files/financial_files.dart';
 import 'package:churchapp/views/member/members_detail.dart';
+import 'package:churchapp/views/photos/photos.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/member/become_member_list.dart';
 import 'package:churchapp/views/member/become_member.dart';
@@ -15,7 +16,6 @@ import 'package:churchapp/views/courses/adminDashboard/courses_dashboard.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscribers_list.dart';
 import 'package:churchapp/views/donations/dashboard/donnation_dashboard.dart';
 import 'package:churchapp/views/user_Profile/info/about_us.dart';
-import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/welcome.dart';
 import 'package:churchapp/views/courses/courses/courses.dart';
 import 'package:churchapp/views/donations/donations.dart';
@@ -35,11 +35,10 @@ class AppRoutes {
         );
       case '/home':
         return MaterialPageRoute(
-          builder: (_) => Home(
-            auth: AuthenticationService(),
-            userId: '',
-          ),
+          builder: (_) => const Home(),
         );
+      case '/photos':
+        return MaterialPageRoute(builder: (_) => const PhotoGalleryPage());
       case '/videos':
         return MaterialPageRoute(builder: (_) => const Videos());
       case '/course_live':
