@@ -68,55 +68,51 @@ class _AdminPanelState extends State<AdminPanel> {
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (didPop) {},
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Admin Panel'),
-        ),
-        body: _loading
-            ? const Center(child: CircularProgressIndicator())
-            : ListView.builder(
-                itemCount: _users.length,
-                itemBuilder: (context, index) {
-                  final user = _users[index];
-                  return ListTile(
-                    title: Text(user.fullName),
-                    subtitle: Text('Role: ${user.role ?? 'user'}'),
-                    trailing: user.role == 'admin'
-                        ? ElevatedButton(
-                            onPressed: () => _demoteFromAdmin(user.id),
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                isDarkMode ? Colors.grey : Colors.red,
-                              ),
-                              foregroundColor: MaterialStateProperty.all<Color>(
-                                isDarkMode
-                                    ? Colors.white
-                                    : const Color.fromARGB(255, 255, 255, 255),
-                              ),
-                            ),
-                            child: const Text('Demote'),
-                          )
-                        : ElevatedButton(
-                            onPressed: () => _promoteToAdmin(user.id),
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                isDarkMode ? Colors.grey : Colors.blue,
-                              ),
-                              foregroundColor: MaterialStateProperty.all<Color>(
-                                isDarkMode
-                                    ? Colors.white
-                                    : const Color.fromARGB(255, 255, 255, 255),
-                              ),
-                            ),
-                            child: const Text('Promote'),
-                          ),
-                  );
-                },
-              ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Painel de Admins '),
       ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: _users.length,
+              itemBuilder: (context, index) {
+                final user = _users[index];
+                return ListTile(
+                  title: Text(user.fullName),
+                  subtitle: Text('Role: ${user.role ?? 'user'}'),
+                  trailing: user.role == 'admin'
+                      ? ElevatedButton(
+                          onPressed: () => _demoteFromAdmin(user.id),
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                              isDarkMode ? Colors.grey : Colors.red,
+                            ),
+                            foregroundColor: MaterialStateProperty.all<Color>(
+                              isDarkMode
+                                  ? Colors.white
+                                  : const Color.fromARGB(255, 255, 255, 255),
+                            ),
+                          ),
+                          child: const Text('Demote'),
+                        )
+                      : ElevatedButton(
+                          onPressed: () => _promoteToAdmin(user.id),
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                              isDarkMode ? Colors.grey : Colors.blue,
+                            ),
+                            foregroundColor: MaterialStateProperty.all<Color>(
+                              isDarkMode
+                                  ? Colors.white
+                                  : const Color.fromARGB(255, 255, 255, 255),
+                            ),
+                          ),
+                          child: const Text('Promote'),
+                        ),
+                );
+              },
+            ),
     );
   }
 }

@@ -114,14 +114,7 @@ class _HomeState extends State<Home> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-      },
-      child: Scaffold(
+    return Scaffold(
         drawer: const NavBar(),
         body: CustomScrollView(
           slivers: [
@@ -157,9 +150,7 @@ class _HomeState extends State<Home> {
               ),
             ),
           ],
-        ),
-      ),
-    );
+        ));
   }
 
   Widget _buildHeader() {

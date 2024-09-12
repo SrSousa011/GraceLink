@@ -47,10 +47,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (didPop) {},
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: const Text('Despesas'),
           backgroundColor: expensesColor,
@@ -117,8 +114,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               ),
             );
           },
-        ),
-      ),
-    );
+        ));
   }
 }
