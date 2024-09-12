@@ -1,14 +1,12 @@
+import 'package:churchapp/views/events/event_service.dart';
+import 'package:churchapp/views/events/events.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:churchapp/views/events/events.dart';
 import 'package:churchapp/views/events/event_detail/event_details_screen.dart';
-import 'package:churchapp/views/events/event_list_item.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
-import 'package:churchapp/auth/auth_service.dart';
-import 'package:churchapp/views/events/event_service.dart';
-import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 const String tLogo = 'assets/icons/logo.png';
@@ -18,9 +16,7 @@ const String tFace = 'assets/icons/face.png';
 const String tYoutube = 'assets/icons/youtube.png';
 
 class Home extends StatefulWidget {
-  final BaseAuth auth;
-
-  const Home({super.key, required this.auth, required String userId});
+  const Home({super.key});
 
   @override
   State<Home> createState() => _HomeState();
@@ -40,10 +36,11 @@ class _HomeState extends State<Home> {
         FirebaseFirestore.instance.collection('events');
 
     DateTime now = DateTime.now();
-    DateTime endDate = now.add(const Duration(days: 30));
+    DateTime startOfMonth = DateTime(now.year, now.month, 1);
+    DateTime endOfMonth = DateTime(now.year, now.month + 1, 0);
 
-    Timestamp startTimestamp = Timestamp.fromDate(now);
-    Timestamp endTimestamp = Timestamp.fromDate(endDate);
+    Timestamp startTimestamp = Timestamp.fromDate(startOfMonth);
+    Timestamp endTimestamp = Timestamp.fromDate(endOfMonth);
 
     var snapshot = await events
         .where('date', isGreaterThanOrEqualTo: startTimestamp)
@@ -115,42 +112,43 @@ class _HomeState extends State<Home> {
     final isDarkMode = themeProvider.isDarkMode;
 
     return Scaffold(
-        drawer: const NavBar(),
-        body: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              title: const Text('Home'),
-              floating: true,
-              pinned: false,
-              snap: true,
-              actions: [
-                IconButton(
-                  icon: Icon(
-                    isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                  onPressed: () {
-                    themeProvider.toggleTheme();
-                  },
+      drawer: const NavBar(),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title: const Text('Home'),
+            floating: true,
+            pinned: false,
+            snap: true,
+            actions: [
+              IconButton(
+                icon: Icon(
+                  isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
-              ],
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.all(16.0),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    _buildHeader(),
-                    const SizedBox(height: 20),
-                    _buildUpcomingEventsSection(isDarkMode),
-                    const SizedBox(height: 20),
-                    _buildImportantInfoSection(),
-                  ],
-                ),
+                onPressed: () {
+                  themeProvider.toggleTheme();
+                },
+              ),
+            ],
+          ),
+          SliverPadding(
+            padding: EdgeInsets.zero,
+            sliver: SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  _buildHeader(),
+                  const SizedBox(height: 20),
+                  _buildUpcomingEventsSection(isDarkMode),
+                  const SizedBox(height: 20),
+                  _buildImportantInfoSection(),
+                ],
               ),
             ),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildHeader() {
@@ -203,36 +201,80 @@ class _HomeState extends State<Home> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Próximos Eventos:',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                'Próximos Eventos:',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
             ),
             const SizedBox(height: 10),
-            Column(
-              children: [
-                ...events.map((event) => GestureDetector(
-                      onTap: () {
-                        _navigateToEventDetailsScreen(context, event);
-                      },
-                      child: EventListItem(event: event),
-                    )),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        isDarkMode ? const Color(0xFF333333) : Colors.blue,
-                    shape: const StadiumBorder(),
-                    foregroundColor: Colors.white,
+            ...events.map((event) {
+              return GestureDetector(
+                onTap: () {
+                  _navigateToEventDetailsScreen(context, event);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16.0, bottom: 4.0),
+                        child: Text(
+                          event.title,
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      ),
+                      if (event.location.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16.0),
+                          child: Text(
+                            event.location,
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              color:
+                                  isDarkMode ? Colors.white70 : Colors.black54,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 8.0),
+                      if (event.imageUrl != null && event.imageUrl!.isNotEmpty)
+                        Container(
+                          margin: EdgeInsets.zero,
+                          padding: EdgeInsets.zero,
+                          width: double.infinity,
+                          child: Image.network(
+                            event.imageUrl!,
+                            height: 250,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      const SizedBox(height: 10),
+                    ],
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Events()),
-                    );
-                  },
-                  child: const Text('Todos os Eventos'),
                 ),
-              ],
+              );
+            }),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    isDarkMode ? const Color(0xFF333333) : Colors.blue,
+                shape: const StadiumBorder(),
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Events()),
+                );
+              },
+              child: const Text('Todos os Eventos'),
             ),
           ],
         );
@@ -260,12 +302,11 @@ class _HomeState extends State<Home> {
         const Text(
           'Cultos:\n'
           'Domingos 10h da manhã\n'
-          'Segundas 19h30\n'
-          'Quartas 19h30',
+          'Segundas 19h30',
           style: TextStyle(fontSize: 16),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -310,11 +351,27 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Future<void> _navigateToEventDetailsScreen(
-      BuildContext context, Event event) async {
-    await Navigator.push<Event>(
+  void _navigateToEventDetailsScreen(BuildContext context, Event event) async {
+    await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => EventDetailsScreen(event: event)),
+      _createPageRoute(EventDetailsScreen(event: event)),
+    );
+  }
+
+  PageRouteBuilder _createPageRoute(Widget page) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeInOut;
+
+        var tween = Tween(begin: begin, end: end);
+        var offsetAnimation =
+            animation.drive(tween.chain(CurveTween(curve: curve)));
+
+        return SlideTransition(position: offsetAnimation, child: child);
+      },
     );
   }
 }
