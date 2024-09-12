@@ -9,46 +9,113 @@ class PhotoGalleryPage extends StatefulWidget {
   const PhotoGalleryPage({super.key});
 
   @override
-  _PhotoGalleryPageState createState() => _PhotoGalleryPageState();
+  State<PhotoGalleryPage> createState() => _PhotoGalleryPageState();
 }
 
 class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   final ImagePicker _picker = ImagePicker();
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final List<XFile> _pickedFiles = [];
+  final TextEditingController _locationController = TextEditingController();
 
-  Future<void> _pickAndUploadImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+  Future<void> _pickImages() async {
+    final pickedFiles = await _picker.pickMultiImage();
 
-    if (pickedFile != null) {
-      try {
-        final fileName = path.basename(pickedFile.path);
-        final file = await pickedFile.readAsBytes();
-        final storageRef = _storage.ref().child('photos/$fileName');
+    if (pickedFiles.isNotEmpty) {
+      setState(() {
+        _pickedFiles.addAll(pickedFiles);
+      });
+      _showLocationDialog();
+    }
+  }
 
-        // Upload the image
-        final uploadTask = storageRef.putData(file);
+  void _showLocationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Adicionar Localização'),
+          content: TextField(
+            controller: _locationController,
+            decoration: const InputDecoration(
+              labelText: 'Localização',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _addLocationAndUpload();
+              },
+              child: const Text('Adicionar'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _addLocationAndUpload() async {
+    final location = _locationController.text.trim();
+    if (location.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, adicione uma localização.')),
+      );
+      return;
+    }
+
+    try {
+      final uploadId = DateTime.now().millisecondsSinceEpoch.toString();
+
+      for (final file in _pickedFiles) {
+        final fileName = path.basename(file.path);
+        final fileData = await file.readAsBytes();
+        final storageRef = _storage.ref().child('photos/$uploadId/$fileName');
+
+        final uploadTask = storageRef.putData(fileData);
         final snapshot = await uploadTask.whenComplete(() {});
         final downloadUrl = await snapshot.ref.getDownloadURL();
 
-        // Save the image URL to Firestore
-        await _firestore.collection('photos').add({'url': downloadUrl});
+        await _firestore.collection('photos').add({
+          'url': downloadUrl,
+          'uploadId': uploadId,
+          'location': location,
+        });
+      }
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Foto carregada com sucesso')),
-        );
-      } catch (e) {
-        if (kDebugMode) {
-          print('Erro ao carregar a imagem: $e');
-        }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Fotos carregadas com sucesso')),
+      );
+
+      setState(() {
+        _pickedFiles.clear();
+        _locationController.clear();
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao carregar a imagem: $e');
       }
     }
   }
 
-  Stream<List<String>> _getPhotoUrls() {
+  Stream<List<Map<String, dynamic>>> _getPhotosWithLocations() {
     return _firestore.collection('photos').snapshots().map(
-          (snapshot) =>
-              snapshot.docs.map((doc) => doc['url'] as String).toList(),
+          (snapshot) => snapshot.docs.map((doc) {
+            final data = doc.data();
+            return {
+              'url': data['url'] as String,
+              'uploadId': data['uploadId'] as String,
+              'location': data['location'] as String,
+            };
+          }).toList(),
         );
   }
 
@@ -57,45 +124,108 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Galeria de Fotos'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_a_photo),
-            onPressed: _pickAndUploadImage,
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: StreamBuilder<List<Map<String, dynamic>>>(
+              stream: _getPhotosWithLocations(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text('Erro: ${snapshot.error}'));
+                }
+
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('Nenhuma foto encontrada.'));
+                }
+
+                final photos = snapshot.data!;
+                final groupedPhotos = <String, List<Map<String, dynamic>>>{};
+
+                for (var photo in photos) {
+                  final uploadId = photo['uploadId']!;
+                  if (!groupedPhotos.containsKey(uploadId)) {
+                    groupedPhotos[uploadId] = [];
+                  }
+                  groupedPhotos[uploadId]!.add(photo);
+                }
+
+                return ListView.builder(
+                  itemCount: groupedPhotos.length,
+                  itemBuilder: (context, index) {
+                    final uploadId = groupedPhotos.keys.elementAt(index);
+                    final group = groupedPhotos[uploadId]!;
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            group.first['location'] ??
+                                'Localização não informada',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        GridView.builder(
+                          padding: const EdgeInsets.all(8.0),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 8.0,
+                            mainAxisSpacing: 8.0,
+                          ),
+                          itemCount: group.length,
+                          itemBuilder: (context, index) {
+                            final photo = group[index];
+                            return Image.network(
+                              photo['url']!,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),
-      body: StreamBuilder<List<String>>(
-        stream: _getPhotoUrls(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text('Erro: ${snapshot.error}'));
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Nenhuma foto encontrada.'));
-          }
-
-          final photoUrls = snapshot.data!;
-
-          return GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 4.0,
-              mainAxisSpacing: 4.0,
+      floatingActionButton: Container(
+        margin: const EdgeInsets.all(16.0),
+        child: FloatingActionButton(
+          onPressed: _pickImages,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            width: 80,
+            height: 80,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 77, 93, 233),
+                  Color.fromARGB(255, 247, 207, 107),
+                  Color.fromARGB(255, 237, 117, 80),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              shape: BoxShape.circle,
             ),
-            itemCount: photoUrls.length,
-            itemBuilder: (context, index) {
-              return Image.network(
-                photoUrls[index],
-                fit: BoxFit.cover,
-              );
-            },
-          );
-        },
+            child: const Icon(Icons.add, color: Colors.white, size: 40),
+          ),
+        ),
       ),
     );
   }
