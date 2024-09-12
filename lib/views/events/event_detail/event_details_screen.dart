@@ -1,5 +1,3 @@
-import 'package:churchapp/views/events/event_detail/event_details.dart';
-import 'package:churchapp/views/events/event_detail/event_image_add.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -10,9 +8,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/event_detail/event_image.dart';
-import 'package:churchapp/views/events/event_service.dart';
-import 'package:churchapp/views/events/update_event.dart';
+import 'package:churchapp/views/events/event_detail/event_image_add.dart';
 import 'package:churchapp/views/events/event_delete.dart';
+import 'package:churchapp/views/events/update_event.dart';
+import 'package:churchapp/views/events/event_service.dart';
+import 'package:churchapp/views/events/event_detail/event_details.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final Event event;
@@ -100,24 +100,25 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     final isDarkMode = themeProvider.isDarkMode;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          StreamBuilder<DocumentSnapshot>(
-            stream: _getEventStream(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            StreamBuilder<DocumentSnapshot>(
+              stream: _getEventStream(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-              if (!snapshot.hasData || !snapshot.data!.exists) {
-                return const Center(child: Text('Evento não encontrado.'));
-              }
+                if (!snapshot.hasData || !snapshot.data!.exists) {
+                  return const Center(child: Text('Evento não encontrado.'));
+                }
 
-              final eventData = snapshot.data!;
-              final updatedEvent = Event.fromSnapshot(eventData);
+                final eventData = snapshot.data!;
+                final updatedEvent = Event.fromSnapshot(eventData);
 
-              return SingleChildScrollView(
-                child: Column(
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Espaçamento superior para garantir que o conteúdo não sobrescreva o topo
@@ -176,29 +177,28 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                         isDarkMode: isDarkMode,
                       ),
                     ),
+                    if (_shouldShowPopupMenu())
+                      Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: ElevatedButton(
+                            onPressed: _pickImage,
+                            style: ElevatedButton.styleFrom(
+                              shape: const CircleBorder(),
+                              padding: const EdgeInsets.all(20.0),
+                              backgroundColor:
+                                  isDarkMode ? Colors.grey[800] : Colors.blue,
+                            ),
+                            child: Icon(
+                              Icons.add_a_photo,
+                              color: isDarkMode ? Colors.black : Colors.white,
+                            ),
+                          )),
                   ],
-                ),
-              );
-            },
-          ),
-          if (_shouldShowPopupMenu())
-            Positioned(
-              bottom: 20,
-              right: 20,
-              child: ElevatedButton(
-                onPressed: _pickImage,
-                style: ElevatedButton.styleFrom(
-                  shape: const CircleBorder(),
-                  padding: const EdgeInsets.all(20),
-                  backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
-                ),
-                child: Icon(
-                  Icons.add_a_photo,
-                  color: isDarkMode ? Colors.black : Colors.white,
-                ),
-              ),
+                );
+              },
             ),
-        ],
+          ],
+        ),
       ),
     );
   }
