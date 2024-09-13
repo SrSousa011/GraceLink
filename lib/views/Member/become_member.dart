@@ -1,3 +1,4 @@
+import 'package:churchapp/views/member/terms_and_condictions.dart';
 import 'package:churchapp/views/notifications/notification_become_member.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -76,38 +77,44 @@ class _BecomeMemberState extends State<BecomeMember> {
 
         await _notifyAdmin(_fullNameController.text);
 
-        _clearFields();
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('Sucesso'),
-                content: const Text('Cadastro realizado com sucesso!'),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text('OK'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                          '/home', (Route<dynamic> route) => false);
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => TermsAndConditionsScreen(
+              onAccept: () {
+                _clearFields();
+                if (mounted) {
+                  setState(() {
+                    _isLoading = false;
+                  });
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Sucesso'),
+                        content: const Text('Cadastro realizado com sucesso!'),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('OK'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  '/home', (Route<dynamic> route) => false);
+                            },
+                          ),
+                        ],
+                      );
                     },
-                  ),
-                ],
-              );
-            },
-          );
-        }
+                  );
+                }
+              },
+            ),
+          ),
+        );
       } catch (e) {
         if (mounted) {
           setState(() {
             _isLoading = false;
           });
-
           _showErrorDialog('Erro', 'Falha ao cadastrar membro: $e');
         }
       }
