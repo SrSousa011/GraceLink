@@ -2,9 +2,11 @@ import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/donations/upload_photo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 const String tSumupLogo = 'assets/icons/sumup.png';
 
@@ -86,9 +88,12 @@ class _DonationDetailsState extends State<DonationDetails> {
 
   Future<void> _launchURL() async {
     const url = 'https://pay.sumup.com/b2c/QV9E8TAZ';
-    final Uri uri = Uri.parse(url);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      throw Exception('Não foi possível abrir o link $url');
+    try {
+      await launchUrlString(url, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -123,12 +128,12 @@ class _DonationDetailsState extends State<DonationDetails> {
                 style: const TextStyle(fontSize: 18.0),
               ),
               const SizedBox(height: 10.0),
-              InkWell(
+              GestureDetector(
                 onTap: _launchURL,
                 child: Image.asset(
                   tSumupLogo,
-                  height: 40.0,
-                  width: 40.0,
+                  width: 50,
+                  height: 50,
                 ),
               ),
               const SizedBox(height: 10.0),
