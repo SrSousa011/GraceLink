@@ -2,11 +2,71 @@ import 'package:churchapp/views/user_Profile/info/about_us.dart';
 import 'package:churchapp/views/user_Profile/info/faqs_screen.dart';
 import 'package:churchapp/views/user_Profile/info/privacy_policy.dart';
 import 'package:churchapp/views/user_Profile/info/terms_of_service.dart';
+import 'package:churchapp/views/user_Profile/info/contact_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:churchapp/auth/auth_service.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
-class InfoScreen extends StatelessWidget {
+class InfoScreen extends StatefulWidget {
   const InfoScreen({super.key});
+
+  @override
+  State<InfoScreen> createState() => _InfoScreenState();
+}
+
+class _InfoScreenState extends State<InfoScreen> {
+  String? userName;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    final authService = AuthenticationService();
+    String? currentUserName = await authService.getCurrentUserName();
+    setState(() {
+      userName = currentUserName;
+    });
+  }
+
+  String _createWhatsAppUrl(String phoneNumber) {
+    final String message =
+        'Olá, meu nome é $userName e estou entrando em contato através do aplicativo GraceLink. Gostaria de saber mais informações sobre [o assunto específico]. Agradeço desde já pela atenção!';
+    final Uri uri = Uri.parse('https://wa.me/$phoneNumber')
+        .replace(queryParameters: {'text': message});
+    return uri.toString();
+  }
+
+  Future<void> _openWhatsApp(String phoneNumber) async {
+    if (userName == null) return;
+
+    final nativeUrl =
+        'whatsapp://send?phone=$phoneNumber&text=Olá, meu nome é $userName e estou entrando em contato através do aplicativo GraceLink. Gostaria de saber mais informações sobre [o assunto específico]. Agradeço desde já pela atenção!';
+    final webUrl = _createWhatsAppUrl(phoneNumber);
+
+    try {
+      await launchUrlString(nativeUrl, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      await launchUrlString(webUrl, mode: LaunchMode.platformDefault);
+    }
+  }
+
+  Future<void> _launchEmail() async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'info@resplandecendonacoes.org',
+      queryParameters: {'subject': 'Solicitação de Suporte'},
+    );
+
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    } else {
+      throw 'Não foi possível abrir o cliente de e-mail';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +127,12 @@ class InfoScreen extends StatelessWidget {
                     TextStyle(color: isDarkMode ? Colors.white : Colors.black),
               ),
               onTap: () {
-                _launchEmail();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ContactScreen(),
+                  ),
+                );
               },
             ),
             ListTile(
@@ -113,7 +178,7 @@ class InfoScreen extends StatelessWidget {
             const SizedBox(height: 10),
             ListTile(
               title: Text(
-                '281 Route de Thionville, Hesperange, Luxemburgo',
+                'Endereço:\nRBM Rue de Rodange 67B, 6791 Aubange, Bélgica',
                 style:
                     TextStyle(color: isDarkMode ? Colors.white : Colors.black),
               ),
@@ -128,9 +193,7 @@ class InfoScreen extends StatelessWidget {
               ),
               leading: Icon(Icons.email,
                   color: isDarkMode ? Colors.white : Colors.black),
-              onTap: () {
-                _launchEmail();
-              },
+              onTap: _launchEmail,
             ),
             ListTile(
               title: Text(
@@ -141,7 +204,7 @@ class InfoScreen extends StatelessWidget {
               leading: Icon(Icons.phone,
                   color: isDarkMode ? Colors.white : Colors.black),
               onTap: () {
-                _launchPhone();
+                _openWhatsApp('+352691240908');
               },
             ),
             const SizedBox(height: 20),
@@ -162,32 +225,5 @@ class InfoScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _launchEmail() async {
-    final Uri emailUri = Uri(
-      scheme: 'mailto',
-      path: 'info@resplandecendonacoes.org',
-      queryParameters: {'subject': 'Solicitação de Suporte'},
-    );
-
-    if (await canLaunchUrl(emailUri)) {
-      await launchUrl(emailUri);
-    } else {
-      throw 'Não foi possível abrir o cliente de e-mail';
-    }
-  }
-
-  Future<void> _launchPhone() async {
-    final Uri phoneUri = Uri(
-      scheme: 'tel',
-      path: '+352691240908',
-    );
-
-    if (await canLaunchUrl(phoneUri)) {
-      await launchUrl(phoneUri);
-    } else {
-      throw 'Não foi possível abrir o discador de telefone';
-    }
   }
 }
