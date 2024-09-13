@@ -100,6 +100,14 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     final isDarkMode = themeProvider.isDarkMode;
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Evento',
+          style: TextStyle(
+            fontSize: 20,
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,43 +129,106 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 40.0),
-                    StreamBuilder<DocumentSnapshot>(
-                      stream: _firestore
-                          .collection('users')
-                          .doc(updatedEvent.createdBy)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        }
-
-                        if (!snapshot.hasData || !snapshot.data!.exists) {
-                          return _buildCreatorInfo('', '');
-                        }
-
-                        final userData = snapshot.data!;
-                        final creatorName = userData['fullName'] ?? '';
-                        final creatorImageUrl = userData['imagePath'] ?? '';
-
-                        return _buildCreatorInfo(creatorName, creatorImageUrl);
-                      },
+                    const SizedBox(height: 4.0),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              updatedEvent.title,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: isDarkMode ? Colors.white : Colors.black,
+                              ),
+                            ),
+                          ),
+                          if (_shouldShowPopupMenu())
+                            PopupMenuButton<String>(
+                              onSelected: (value) {
+                                if (value == 'edit') {
+                                  _navigateToUpdateEventScreen(context, _event);
+                                } else if (value == 'delete') {
+                                  EventDelete.confirmDeleteEvent(
+                                    context,
+                                    _event.id,
+                                    _event.title,
+                                  );
+                                } else if (value == 'changeImage') {
+                                  _pickImage();
+                                }
+                              },
+                              itemBuilder: (BuildContext context) =>
+                                  <PopupMenuEntry<String>>[
+                                PopupMenuItem<String>(
+                                  value: 'edit',
+                                  child: ListTile(
+                                    leading: Icon(Icons.edit,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.blue),
+                                    title: Text('Editar',
+                                        style: TextStyle(
+                                            color: isDarkMode
+                                                ? Colors.white
+                                                : Colors.black)),
+                                  ),
+                                ),
+                                PopupMenuItem<String>(
+                                  value: 'delete',
+                                  child: ListTile(
+                                    leading: Icon(Icons.delete,
+                                        color: isDarkMode
+                                            ? Colors.grey[300]
+                                            : Colors.red),
+                                    title: Text('Deletar',
+                                        style: TextStyle(
+                                            color: isDarkMode
+                                                ? Colors.white
+                                                : Colors.red)),
+                                  ),
+                                ),
+                                PopupMenuItem<String>(
+                                  value: 'changeImage',
+                                  child: ListTile(
+                                    leading: Icon(Icons.image,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.blue),
+                                    title: Text('Nova foto',
+                                        style: TextStyle(
+                                            color: isDarkMode
+                                                ? Colors.white
+                                                : Colors.black)),
+                                  ),
+                                ),
+                              ],
+                              icon: Icon(Icons.more_vert,
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black),
+                            ),
+                        ],
+                      ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.only(
+                          left: 12.0,
+                          top:
+                              2.0), // Ajuste o padding para aproximar a localização do título
                       child: Text(
-                        updatedEvent.title,
+                        updatedEvent.location,
                         style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: isDarkMode ? Colors.white : Colors.black,
+                          fontSize: 14,
+                          color:
+                              isDarkMode ? Colors.grey[400] : Colors.grey[700],
                         ),
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(0.0),
+                      padding: const EdgeInsets.all(
+                          0.0), // Remova o padding desnecessário
                       child: EventImage(
                         imageUrlStream: _getEventStream().map((snapshot) {
                           final data = snapshot.data() as Map<String, dynamic>;
@@ -166,108 +237,22 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(12.0),
                       child: EventDetails(
-                        description: 'Descrição: ${updatedEvent.description}',
+                        description: updatedEvent.description,
                         date:
                             'Data: ${DateFormat('dd/MM/yyyy').format(updatedEvent.date)}',
                         time: 'Horário: ${updatedEvent.time.format(context)}',
-                        location: 'Localidade: ${updatedEvent.location}',
+                        location: '',
                         isDarkMode: isDarkMode,
                       ),
                     ),
-                    if (_shouldShowPopupMenu())
-                      Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: ElevatedButton(
-                            onPressed: _pickImage,
-                            style: ElevatedButton.styleFrom(
-                              shape: const CircleBorder(),
-                              padding: const EdgeInsets.all(20.0),
-                              backgroundColor:
-                                  isDarkMode ? Colors.grey[800] : Colors.blue,
-                            ),
-                            child: Icon(
-                              Icons.add_a_photo,
-                              color: isDarkMode ? Colors.black : Colors.white,
-                            ),
-                          )),
                   ],
                 );
               },
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildCreatorInfo(String name, String imageUrl) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundImage:
-                imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
-            radius: 20,
-            child: imageUrl.isEmpty
-                ? Icon(Icons.person, color: Colors.grey[600])
-                : null,
-          ),
-          const SizedBox(width: 8.0),
-          Expanded(
-            child: Text(
-              name,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black,
-              ),
-            ),
-          ),
-          if (_shouldShowPopupMenu())
-            PopupMenuButton<String>(
-              onSelected: (value) {
-                if (value == 'edit') {
-                  _navigateToUpdateEventScreen(context, _event);
-                } else if (value == 'delete') {
-                  EventDelete.confirmDeleteEvent(
-                    context,
-                    _event.id,
-                    _event.title,
-                  );
-                }
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                PopupMenuItem<String>(
-                  value: 'edit',
-                  child: ListTile(
-                    leading: Icon(Icons.edit,
-                        color: isDarkMode ? Colors.white : Colors.blue),
-                    title: Text('Editar',
-                        style: TextStyle(
-                            color: isDarkMode ? Colors.white : Colors.black)),
-                  ),
-                ),
-                PopupMenuItem<String>(
-                  value: 'delete',
-                  child: ListTile(
-                    leading: Icon(Icons.delete,
-                        color: isDarkMode ? Colors.grey[300] : Colors.red),
-                    title: Text('Deletar',
-                        style: TextStyle(
-                            color: isDarkMode ? Colors.white : Colors.red)),
-                  ),
-                ),
-              ],
-              icon: Icon(Icons.more_vert,
-                  color: isDarkMode ? Colors.white : Colors.black),
-            ),
-        ],
       ),
     );
   }
