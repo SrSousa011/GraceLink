@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:churchapp/data/model/photos_data.dart';
+import 'package:churchapp/views/photos/photo_viwer.dart';
 import 'package:churchapp/views/photos/preview_screen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -252,11 +253,24 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
                             itemCount: group.length,
                             itemBuilder: (context, index) {
                               final photo = group[index];
-                              return CachedNetworkImage(
-                                imageUrl: photo.url,
-                                fit: BoxFit.cover,
-                                errorWidget: (context, url, error) =>
-                                    const Icon(Icons.error),
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => FullScreenPhotoPage(
+                                        photoUrls:
+                                            group.map((p) => p.url).toList(),
+                                        initialIndex: index,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: CachedNetworkImage(
+                                  imageUrl: photo.url,
+                                  fit: BoxFit.cover,
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
+                                ),
                               );
                             },
                           ),
