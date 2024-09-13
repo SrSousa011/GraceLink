@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:path/path.dart' as path;
-import 'package:image/image.dart' as img;
+import 'dart:typed_data';
 
 class PhotoGalleryPage extends StatefulWidget {
   const PhotoGalleryPage({super.key});
@@ -128,43 +128,29 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
 
     try {
       final uploadId = DateTime.now().millisecondsSinceEpoch.toString();
+      final locationDocRef = _firestore.collection('photos').doc(location);
+      final List<String> imageUrls = [];
 
       for (final file in _pickedFiles) {
-        // Ler a imagem como bytes
-        final fileData = await file.readAsBytes();
-
-        // Decodificar a imagem
-        final image = img.decodeImage(fileData);
-
-        if (image == null) {
-          throw Exception('Não foi possível decodificar a imagem.');
-        }
-
-        // Redimensionar a imagem
-        final resizedImage = img.copyResize(image,
-            width: 800); // Ajuste o tamanho conforme necessário
-
-        // Codificar a imagem redimensionada de volta para bytes
-        final resizedFileData = img.encodeJpg(resizedImage,
-            quality: 85); // Ajuste a qualidade conforme necessário
-
         final fileName =
             '${path.basename(file.path).replaceAll(RegExp(r'\.[^\.]+$'), '')}_$location${path.extension(file.path)}';
 
+        final fileData = await file.readAsBytes();
         final storageRef = _storage.ref().child('photos/$fileName/$uploadId');
 
-        final uploadTask =
-            storageRef.putData(Uint8List.fromList(resizedFileData));
+        final uploadTask = storageRef.putData(Uint8List.fromList(fileData));
         final snapshot = await uploadTask.whenComplete(() {});
         final downloadUrl = await snapshot.ref.getDownloadURL();
 
-        await _firestore.collection('photos').add({
-          'url': downloadUrl,
-          'uploadId': uploadId,
-          'location': location,
-          'createdAt': Timestamp.now(),
-        });
+        imageUrls.add(downloadUrl);
       }
+
+      await locationDocRef.set({
+        'location': location,
+        'uploadId': uploadId,
+        'createdAt': Timestamp.now(),
+        'urls': imageUrls,
+      });
 
       setState(() {
         _pickedFiles.clear();
@@ -183,9 +169,15 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
           .collection('photos')
           .orderBy('createdAt', descending: true)
           .get();
-      return querySnapshot.docs
-          .map((doc) => PhotoData.fromDocument(doc))
-          .toList();
+      return querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        return PhotoData(
+          urls: List<String>.from(data['urls'] ?? []),
+          uploadId: '',
+          location: data['location'] ?? '',
+          createdAt: data['createdAt'] as Timestamp,
+        );
+      }).toList();
     } catch (e) {
       if (kDebugMode) {
         print('Erro ao recuperar as fotos: $e');
@@ -228,11 +220,11 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
                 final groupedPhotos = <String, List<PhotoData>>{};
 
                 for (var photo in photos) {
-                  final uploadId = photo.uploadId;
-                  if (!groupedPhotos.containsKey(uploadId)) {
-                    groupedPhotos[uploadId] = [];
+                  final location = photo.location;
+                  if (!groupedPhotos.containsKey(location)) {
+                    groupedPhotos[location] = [];
                   }
-                  groupedPhotos[uploadId]!.add(photo);
+                  groupedPhotos[location]!.add(photo);
                 }
 
                 final groupedKeys = groupedPhotos.keys.toList();
@@ -243,8 +235,8 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
                       if (index >= groupedKeys.length) {
                         return null;
                       }
-                      final uploadId = groupedKeys[index];
-                      final group = groupedPhotos[uploadId]!;
+                      final location = groupedKeys[index];
+                      final group = groupedPhotos[location]!;
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,8 +244,8 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              group.first.location.isNotEmpty
-                                  ? group.first.location
+                              location.isNotEmpty
+                                  ? location
                                   : 'Localização não informada',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -271,23 +263,39 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
                               crossAxisSpacing: 8.0,
                               mainAxisSpacing: 8.0,
                             ),
-                            itemCount: group.length,
+                            itemCount: group.fold<int>(
+                                0, (prev, photo) => prev + photo.urls.length),
                             itemBuilder: (context, index) {
-                              final photo = group[index];
+                              int count = 0;
+                              PhotoData? selectedPhoto;
+
+                              for (var photo in group) {
+                                if (index < count + photo.urls.length) {
+                                  selectedPhoto = photo;
+                                  break;
+                                }
+                                count += photo.urls.length;
+                              }
+
+                              if (selectedPhoto == null) {
+                                return const SizedBox.shrink();
+                              }
+
+                              final photoUrl =
+                                  selectedPhoto.urls[index - count];
                               return GestureDetector(
                                 onTap: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (context) => FullScreenPhotoPage(
-                                        photoUrls:
-                                            group.map((p) => p.url).toList(),
-                                        initialIndex: index,
+                                        photoUrls: selectedPhoto!.urls,
+                                        initialIndex: index - count,
                                       ),
                                     ),
                                   );
                                 },
                                 child: CachedNetworkImage(
-                                  imageUrl: photo.url,
+                                  imageUrl: photoUrl,
                                   fit: BoxFit.cover,
                                   errorWidget: (context, url, error) =>
                                       const Icon(Icons.error),

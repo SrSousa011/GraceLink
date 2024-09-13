@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PhotoData {
-  final String url;
+  final List<String> urls;
   final String uploadId;
   final String location;
   final Timestamp createdAt;
 
   PhotoData({
-    required this.url,
+    required this.urls,
     required this.uploadId,
     required this.location,
     required this.createdAt,
@@ -16,7 +16,7 @@ class PhotoData {
   factory PhotoData.fromDocument(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return PhotoData(
-      url: data['url'] as String,
+      urls: List<String>.from(data['urls'] ?? []),
       uploadId: data['uploadId'] as String,
       location: data['location'] as String,
       createdAt: data['createdAt'] as Timestamp,
@@ -25,7 +25,7 @@ class PhotoData {
 
   factory PhotoData.fromMap(Map<String, dynamic> map) {
     return PhotoData(
-      url: map['url'] as String,
+      urls: List<String>.from(map['urls'] ?? []),
       uploadId: map['uploadId'] as String,
       location: map['location'] as String,
       createdAt: map['createdAt'] as Timestamp,
@@ -34,7 +34,7 @@ class PhotoData {
 
   Map<String, dynamic> toMap() {
     return {
-      'url': url,
+      'urls': urls,
       'uploadId': uploadId,
       'location': location,
       'createdAt': createdAt,
