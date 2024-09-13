@@ -4,11 +4,13 @@ class PhotoData {
   final String url;
   final String uploadId;
   final String location;
+  final Timestamp createdAt;
 
   PhotoData({
     required this.url,
     required this.uploadId,
     required this.location,
+    required this.createdAt,
   });
 
   factory PhotoData.fromDocument(DocumentSnapshot doc) {
@@ -17,6 +19,7 @@ class PhotoData {
       url: data['url'] as String,
       uploadId: data['uploadId'] as String,
       location: data['location'] as String,
+      createdAt: data['createdAt'] as Timestamp,
     );
   }
 
@@ -25,6 +28,7 @@ class PhotoData {
       url: map['url'] as String,
       uploadId: map['uploadId'] as String,
       location: map['location'] as String,
+      createdAt: map['createdAt'] as Timestamp,
     );
   }
 
@@ -33,6 +37,7 @@ class PhotoData {
       'url': url,
       'uploadId': uploadId,
       'location': location,
+      'createdAt': createdAt,
     };
   }
 }
