@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:path/path.dart' as path;
+import 'package:image/image.dart' as img;
 
 class PhotoGalleryPage extends StatefulWidget {
   const PhotoGalleryPage({super.key});
@@ -129,13 +130,31 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
       final uploadId = DateTime.now().millisecondsSinceEpoch.toString();
 
       for (final file in _pickedFiles) {
+        // Ler a imagem como bytes
+        final fileData = await file.readAsBytes();
+
+        // Decodificar a imagem
+        final image = img.decodeImage(fileData);
+
+        if (image == null) {
+          throw Exception('Não foi possível decodificar a imagem.');
+        }
+
+        // Redimensionar a imagem
+        final resizedImage = img.copyResize(image,
+            width: 800); // Ajuste o tamanho conforme necessário
+
+        // Codificar a imagem redimensionada de volta para bytes
+        final resizedFileData = img.encodeJpg(resizedImage,
+            quality: 85); // Ajuste a qualidade conforme necessário
+
         final fileName =
             '${path.basename(file.path).replaceAll(RegExp(r'\.[^\.]+$'), '')}_$location${path.extension(file.path)}';
 
-        final fileData = await file.readAsBytes();
         final storageRef = _storage.ref().child('photos/$fileName/$uploadId');
 
-        final uploadTask = storageRef.putData(fileData);
+        final uploadTask =
+            storageRef.putData(Uint8List.fromList(resizedFileData));
         final snapshot = await uploadTask.whenComplete(() {});
         final downloadUrl = await snapshot.ref.getDownloadURL();
 
