@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -106,17 +107,23 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
     }
   }
 
-  Stream<List<Map<String, dynamic>>> _getPhotosWithLocations() {
-    return _firestore.collection('photos').snapshots().map(
-          (snapshot) => snapshot.docs.map((doc) {
-            final data = doc.data();
-            return {
-              'url': data['url'] as String,
-              'uploadId': data['uploadId'] as String,
-              'location': data['location'] as String,
-            };
-          }).toList(),
-        );
+  Future<List<Map<String, dynamic>>> _getPhotosWithLocations() async {
+    try {
+      final querySnapshot = await _firestore.collection('photos').get();
+      return querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        return {
+          'url': data['url'] as String,
+          'uploadId': data['uploadId'] as String,
+          'location': data['location'] as String,
+        };
+      }).toList();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao recuperar as fotos: $e');
+      }
+      return [];
+    }
   }
 
   @override
@@ -125,82 +132,79 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
       appBar: AppBar(
         title: const Text('Galeria de Fotos'),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<List<Map<String, dynamic>>>(
-              stream: _getPhotosWithLocations(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _getPhotosWithLocations(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                if (snapshot.hasError) {
-                  return Center(child: Text('Erro: ${snapshot.error}'));
-                }
+          if (snapshot.hasError) {
+            return Center(child: Text('Erro: ${snapshot.error}'));
+          }
 
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('Nenhuma foto encontrada.'));
-                }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Nenhuma foto encontrada.'));
+          }
 
-                final photos = snapshot.data!;
-                final groupedPhotos = <String, List<Map<String, dynamic>>>{};
+          final photos = snapshot.data!;
+          final groupedPhotos = <String, List<Map<String, dynamic>>>{};
 
-                for (var photo in photos) {
-                  final uploadId = photo['uploadId']!;
-                  if (!groupedPhotos.containsKey(uploadId)) {
-                    groupedPhotos[uploadId] = [];
-                  }
-                  groupedPhotos[uploadId]!.add(photo);
-                }
+          for (var photo in photos) {
+            final uploadId = photo['uploadId']!;
+            if (!groupedPhotos.containsKey(uploadId)) {
+              groupedPhotos[uploadId] = [];
+            }
+            groupedPhotos[uploadId]!.add(photo);
+          }
 
-                return ListView.builder(
-                  itemCount: groupedPhotos.length,
-                  itemBuilder: (context, index) {
-                    final uploadId = groupedPhotos.keys.elementAt(index);
-                    final group = groupedPhotos[uploadId]!;
+          return ListView.builder(
+            itemCount: groupedPhotos.length,
+            itemBuilder: (context, index) {
+              final uploadId = groupedPhotos.keys.elementAt(index);
+              final group = groupedPhotos[uploadId]!;
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            group.first['location'] ??
-                                'Localização não informada',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                        GridView.builder(
-                          padding: const EdgeInsets.all(8.0),
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 8.0,
-                            mainAxisSpacing: 8.0,
-                          ),
-                          itemCount: group.length,
-                          itemBuilder: (context, index) {
-                            final photo = group[index];
-                            return Image.network(
-                              photo['url']!,
-                              fit: BoxFit.cover,
-                            );
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      group.first['location'] ?? 'Localização não informada',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  GridView.builder(
+                    padding: const EdgeInsets.all(8.0),
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 8.0,
+                      mainAxisSpacing: 8.0,
+                    ),
+                    itemCount: group.length,
+                    itemBuilder: (context, index) {
+                      final photo = group[index];
+                      return CachedNetworkImage(
+                        imageUrl: photo['url']!,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) =>
+                            const CircularProgressIndicator(),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                      );
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        },
       ),
       floatingActionButton: Container(
         margin: const EdgeInsets.all(16.0),
@@ -214,7 +218,6 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color.fromARGB(255, 77, 93, 233),
                   Color.fromARGB(255, 247, 207, 107),
                   Color.fromARGB(255, 237, 117, 80),
                 ],

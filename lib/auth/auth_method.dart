@@ -1,3 +1,4 @@
+import 'package:churchapp/data/model/photos_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/data/model/user_data.dart';
@@ -186,6 +187,24 @@ class AuthMethods {
     DocumentSnapshot snap =
         await _firestore.collection('users').doc(currentUser.uid).get();
     return UserData.fromDocument(snap);
+  }
+
+  Future<List<PhotoData>> getPhotosDetails(String uploadId) async {
+    try {
+      final photoCollection = FirebaseFirestore.instance.collection('photos');
+
+      final querySnapshot =
+          await photoCollection.where('uploadId', isEqualTo: uploadId).get();
+
+      return querySnapshot.docs
+          .map((doc) => PhotoData.fromDocument(doc))
+          .toList();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao recuperar detalhes das fotos: $e');
+      }
+      return [];
+    }
   }
 
   Future<bool> checkIfEmailExists(String email) async {
