@@ -70,6 +70,7 @@ dependencies:
   geocoding: ^3.0.0
   image_cropper: ^8.0.1
   image: ^4.2.0
+  image_gallery_saver: ^2.0.3
 
 dev_dependencies:
   flutter_test:
