@@ -130,7 +130,6 @@ class _DonationDetailsState extends State<DonationDetails> {
               GestureDetector(
                 onTap: _launchURL,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
                       'Pagar',
