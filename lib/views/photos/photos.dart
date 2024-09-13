@@ -144,11 +144,6 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
         });
       }
 
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Fotos carregadas com sucesso')),
-      );
-
       setState(() {
         _pickedFiles.clear();
         _locationController.clear();
@@ -181,7 +176,10 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Galeria de Fotos'),
+        title: const Text(
+          'Galeria de Foto',
+          style: TextStyle(fontSize: 20),
+        ),
       ),
       body: CustomScrollView(
         slivers: [
