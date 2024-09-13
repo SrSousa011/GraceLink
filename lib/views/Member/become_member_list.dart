@@ -115,12 +115,35 @@ class BecomeMemberList extends StatelessWidget {
                         color: primaryTextColor,
                       ),
                     ),
-                    subtitle: Text(
-                      member['address'] as String? ?? 'Não encontrado',
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        color: secondaryTextColor,
-                      ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          member['address'] as String? ?? 'Não encontrado',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            color: secondaryTextColor,
+                          ),
+                        ),
+                        if (member['baptismDate'] != null &&
+                            member['baptismDate'] is Timestamp)
+                          Text(
+                            'Data de Batismo: ${_formatDate((member['baptismDate'] as Timestamp).toDate())}',
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                        if (member['conversionDate'] != null &&
+                            member['conversionDate'] is Timestamp)
+                          Text(
+                            'Data de Conversão: ${_formatDate((member['conversionDate'] as Timestamp).toDate())}',
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                      ],
                     ),
                     onTap: () {
                       Navigator.push(
@@ -172,5 +195,9 @@ class BecomeMemberList extends StatelessWidget {
       default:
         return _firestore.collection('becomeMember').snapshots();
     }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 }
