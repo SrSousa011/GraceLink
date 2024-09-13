@@ -6,12 +6,14 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
+    <!-- For Android 11 (API level 30) and above -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage"/>
+
     <application
         android:label="GraceLink"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:enableOnBackInvokedCallback="true"
-        android:requestLegacyExternalStorage="true">
+        android:enableOnBackInvokedCallback="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -22,8 +24,7 @@
             android:windowSoftInputMode="adjustResize">
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
-              android:resource="@style/NormalTheme"
-              />
+              android:resource="@style/NormalTheme"/>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -39,17 +40,16 @@
         </activity>
         <meta-data
             android:name="flutterEmbedding"
-            android:value="2" />
+            android:value="2"/>
         <!-- Default Notification Channel -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="@string/default_notification_channel_id" />
+            android:value="@string/default_notification_channel_id"/>
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/app_icon"/>
     </application>
 
-    <!-- Move <queries> here -->
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>

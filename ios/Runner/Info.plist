@@ -66,6 +66,10 @@
     <string>Camera Library Usage</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Microphone Library Usage</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>We need your location to provide better services.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>We need your location to provide better services.</string>
 
     <!-- URL Types for HTTP/HTTPS -->
     <key>CFBundleURLTypes</key>
