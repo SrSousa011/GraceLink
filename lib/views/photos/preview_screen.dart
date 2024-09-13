@@ -30,8 +30,8 @@ class PreviewScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 30.0),
             SizedBox(
-              height: MediaQuery.of(context).size.width * 0.9,
-              width: MediaQuery.of(context).size.width * 1.3,
+              height: MediaQuery.of(context).size.width * 0.8,
+              width: MediaQuery.of(context).size.width * 0.8,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: files.length,
@@ -39,9 +39,12 @@ class PreviewScreen extends StatelessWidget {
                   final file = files[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    child: Image.file(
-                      File(file.path),
-                      fit: BoxFit.cover,
+                    child: AspectRatio(
+                      aspectRatio: 1.0,
+                      child: Image.file(
+                        File(file.path),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   );
                 },
