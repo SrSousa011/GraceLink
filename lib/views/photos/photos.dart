@@ -129,9 +129,11 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
       final uploadId = DateTime.now().millisecondsSinceEpoch.toString();
 
       for (final file in _pickedFiles) {
-        final fileName = path.basename(file.path);
+        final fileName =
+            '${path.basename(file.path).replaceAll(RegExp(r'\.[^\.]+$'), '')}_$location${path.extension(file.path)}';
+
         final fileData = await file.readAsBytes();
-        final storageRef = _storage.ref().child('photos/$uploadId/$fileName');
+        final storageRef = _storage.ref().child('photos/$fileName/$uploadId');
 
         final uploadTask = storageRef.putData(fileData);
         final snapshot = await uploadTask.whenComplete(() {});
