@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -26,37 +25,51 @@ class PreviewScreen extends StatelessWidget {
           style: TextStyle(fontSize: 20),
         ),
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 30.0),
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 0.6,
-            width: MediaQuery.of(context).size.width * 0.6,
-            child: Image.file(
-              File(imageFile.path),
-              fit: BoxFit.cover,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 30.0),
+            SizedBox(
+              height: MediaQuery.of(context).size.width * 0.9,
+              width: MediaQuery.of(context).size.width * 1.3,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: files.length,
+                itemBuilder: (context, index) {
+                  final file = files[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Image.file(
+                      File(file.path),
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-          const SizedBox(height: 16.0),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                const Icon(Icons.location_on, color: Colors.blue),
-                const SizedBox(width: 8.0),
-                Expanded(
-                  child: TextField(
-                    controller: locationController,
-                    decoration: const InputDecoration(
-                      hintText: 'Adicionar Localização',
-                      border: InputBorder.none,
+            const SizedBox(height: 16.0),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  const Icon(Icons.location_on, color: Colors.blue),
+                  const SizedBox(width: 8.0),
+                  Expanded(
+                    child: TextField(
+                      controller: locationController,
+                      decoration: const InputDecoration(
+                        hintText: 'Adicionar Localização',
+                        border: InputBorder.none,
+                      ),
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.done,
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
