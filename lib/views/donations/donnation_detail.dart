@@ -129,10 +129,22 @@ class _DonationDetailsState extends State<DonationDetails> {
               const SizedBox(height: 10.0),
               GestureDetector(
                 onTap: _launchURL,
-                child: Image.asset(
-                  tSumupLogo,
-                  width: 50,
-                  height: 50,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Pagar',
+                      style: TextStyle(
+                        fontSize: 18.0,
+                      ),
+                    ),
+                    const SizedBox(width: 10.0),
+                    Image.asset(
+                      tSumupLogo,
+                      width: 50,
+                      height: 50,
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 10.0),
