@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 
 class TermsAndConditionsScreen extends StatelessWidget {
   final VoidCallback onAccept;
+  final VoidCallback onSubmit;
 
-  const TermsAndConditionsScreen({super.key, required this.onAccept});
+  const TermsAndConditionsScreen({
+    super.key,
+    required this.onAccept,
+    required this.onSubmit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +95,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
+                onSubmit();
                 onAccept();
                 Navigator.of(context).pop();
               },

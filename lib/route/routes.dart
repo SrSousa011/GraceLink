@@ -2,11 +2,11 @@ import 'package:churchapp/views/courses/adminDashboard/courses_dashboard_user.da
 import 'package:churchapp/views/courses/courseLive/course_live.dart';
 import 'package:churchapp/views/courses/adminDashboard/subscriber_info.dart';
 import 'package:churchapp/views/financial_files/financial_files.dart';
+import 'package:churchapp/views/member/become_member.dart';
 import 'package:churchapp/views/member/members_detail.dart';
 import 'package:churchapp/views/photos/photos.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/member/become_member_list.dart';
-import 'package:churchapp/views/member/become_member.dart';
 import 'package:churchapp/views/admin/admin_painel.dart';
 import 'package:churchapp/views/donations/dashboard/donnations_list.dart';
 import 'package:churchapp/views/donations/financial/donation_report.dart';
