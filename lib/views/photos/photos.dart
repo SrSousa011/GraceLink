@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:churchapp/data/model/photos_data.dart';
+import 'package:churchapp/views/photos/ask_permission.dart';
 import 'package:churchapp/views/photos/photo_viwer.dart';
 import 'package:churchapp/views/photos/preview_screen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -8,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:path/path.dart' as path;
-import 'dart:typed_data';
 
 class PhotoGalleryPage extends StatefulWidget {
   const PhotoGalleryPage({super.key});
@@ -24,6 +24,12 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   final List<XFile> _pickedFiles = [];
   XFile? _selectedImage;
   final TextEditingController _locationController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    PermissionHandler.requestStoragePermission(context);
+  }
 
   Future<void> _showImageSourceSelection() async {
     showDialog(
@@ -299,15 +305,15 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
                                   fit: BoxFit.cover,
                                   errorWidget: (context, url, error) =>
                                       const Icon(Icons.error),
+                                  placeholder: (context, url) =>
+                                      const CircularProgressIndicator(),
                                 ),
                               );
                             },
                           ),
-                          const SizedBox(height: 20),
                         ],
                       );
                     },
-                    childCount: groupedKeys.length,
                   ),
                 );
               },
@@ -315,26 +321,9 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
           ),
         ],
       ),
-      floatingActionButton: Container(
-        width: 60,
-        height: 60,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 247, 207, 107),
-              Color.fromARGB(255, 237, 117, 80),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          shape: BoxShape.circle,
-        ),
-        child: FloatingActionButton(
-          onPressed: _showImageSourceSelection,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          child: const Icon(Icons.add, color: Colors.white, size: 40),
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showImageSourceSelection,
+        child: const Icon(Icons.add),
       ),
     );
   }
