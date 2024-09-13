@@ -106,6 +106,7 @@ flutter:
       - assets/icons/face.png
       - assets/icons/youtube.png
       - assets/icons/sumup.png
+      - assets/icons/whatsapp.png
 
       - assets/imagens/bacground-image-center.jpg
       - assets/imagens/dizimo.jpg
