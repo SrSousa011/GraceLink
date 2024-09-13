@@ -1,10 +1,12 @@
-import 'dart:async';
 import 'package:churchapp/theme/theme_provider.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/views/donations/upload_photo.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+const String tSumupLogo = 'assets/icons/sumup.png';
 
 class DonationDetails extends StatefulWidget {
   final String fullName;
@@ -56,7 +58,7 @@ class _DonationDetailsState extends State<DonationDetails> {
         'userId': FirebaseAuth.instance.currentUser!.uid,
         'fullName': widget.fullName,
         'donationType': widget.donationType,
-        'donationValue': widget.donationValue, // Store as double
+        'donationValue': widget.donationValue,
         'photoURL': uploadedFileURL,
         'timestamp': FieldValue.serverTimestamp(),
       });
@@ -82,10 +84,19 @@ class _DonationDetailsState extends State<DonationDetails> {
     }
   }
 
+  Future<void> _launchURL() async {
+    const url = 'https://pay.sumup.com/b2c/QV9E8TAZ';
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw Exception('Não foi possível abrir o link $url');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detalhes da doação'),
@@ -102,26 +113,26 @@ class _DonationDetailsState extends State<DonationDetails> {
                 style: const TextStyle(fontSize: 18.0),
               ),
               const SizedBox(height: 10.0),
-              const SelectableText(
-                'ISBN: 978-3-16-148410-0',
-                style: TextStyle(fontSize: 18.0),
-              ),
-              const SizedBox(height: 10.0),
-              const Text(
-                'Nome do banco: Banque et Caisse d\'Épargne de l\'État',
-                style: TextStyle(fontSize: 18.0),
-              ),
-              const SizedBox(height: 10.0),
               Text(
                 'Doação para: ${widget.donationType}',
                 style: const TextStyle(fontSize: 18.0),
               ),
               const SizedBox(height: 10.0),
               Text(
-                'Valor: ${widget.donationValue.toStringAsFixed(2)}', // Format double
+                'Valor: ${widget.donationValue.toStringAsFixed(2)}',
                 style: const TextStyle(fontSize: 18.0),
               ),
-              const Text('Copie o número ISBN e pague fora do aplicativo.'),
+              const SizedBox(height: 10.0),
+              InkWell(
+                onTap: _launchURL,
+                child: Image.asset(
+                  tSumupLogo,
+                  height: 40.0,
+                  width: 40.0,
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              const Text('Após pagamento enviar comprovante'),
               const SizedBox(height: 30.0),
               if (uploadStatus == null) ...[
                 ElevatedButton(
