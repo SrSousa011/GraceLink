@@ -12,6 +12,17 @@ class DonationsDashboard extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
+    final Color containerBackgroundColor =
+        isDarkMode ? Colors.blueGrey[800]! : Colors.blueAccent;
+
+    final Color containerBoxShadowColor =
+        isDarkMode ? Colors.blueGrey[800]! : Colors.grey[300]!;
+
+    final Color buttonBackgroundColor =
+        isDarkMode ? Colors.blueGrey[800]! : Colors.blue;
+
+    const Color summaryCardTextColor = Colors.white;
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(top: 60.0, left: 16.0, right: 16.0),
@@ -23,15 +34,15 @@ class DonationsDashboard extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: isDarkMode
-                      ? [Colors.grey[850]!, Colors.grey[800]!]
-                      : [Colors.blueAccent, Colors.blue],
+                      ? [containerBackgroundColor, Colors.grey[800]!]
+                      : [containerBackgroundColor, Colors.blueAccent],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(16.0),
                 boxShadow: [
                   BoxShadow(
-                    color: isDarkMode ? Colors.black54 : Colors.grey[400]!,
+                    color: containerBoxShadowColor,
                     blurRadius: 12.0,
                     offset: const Offset(0, 6),
                   ),
@@ -58,10 +69,10 @@ class DonationsDashboard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildActionButton(
+                      _buildSummaryBlueCard(
                         context,
                         icon: Icons.monetization_on,
-                        label: 'Doações',
+                        title: 'Doações',
                         onPressed: () {
                           Navigator.of(context).pushNamed('/donations');
                         },
@@ -113,13 +124,6 @@ class DonationsDashboard extends StatelessWidget {
                 return Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: isDarkMode
-                          ? [Colors.grey[850]!, Colors.grey[800]!]
-                          : [Colors.blueAccent, Colors.blue],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
                     borderRadius: BorderRadius.circular(12.0),
                     boxShadow: [
                       BoxShadow(
@@ -146,12 +150,12 @@ class DonationsDashboard extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _buildSummaryCard(
+                          _buildSummaryBlueCard(
                             context,
                             title: 'Doações do mês',
                             value: '€ ${monthlyIncome.toStringAsFixed(2)}',
                           ),
-                          _buildSummaryCard(
+                          _buildSummaryBlueCard(
                             context,
                             title: 'Doadores mês',
                             value: numberOfDonationsThisMonth.toString(),
@@ -162,6 +166,64 @@ class DonationsDashboard extends StatelessWidget {
                   ),
                 );
               },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryBlueCard(BuildContext context,
+      {required String title,
+      String? value,
+      VoidCallback? onPressed,
+      IconData? icon}) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+
+    final Color summaryCardBackgroundColor =
+        isDarkMode ? Colors.blueGrey[800]! : Colors.blueAccent;
+
+    final Color summaryCardBoxShadowColor =
+        isDarkMode ? Colors.black54 : Colors.grey[300]!;
+
+    const Color summaryCardTextColor = Colors.white;
+
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 150.0),
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [summaryCardBackgroundColor, Colors.blue[300]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(12.0),
+          boxShadow: [
+            BoxShadow(
+              color: summaryCardBoxShadowColor,
+              blurRadius: 6.0,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: Colors.white),
+                const SizedBox(width: 8.0),
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: summaryCardTextColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ],
             ),
           ],
         ),

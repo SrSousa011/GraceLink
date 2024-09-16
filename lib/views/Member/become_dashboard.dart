@@ -21,7 +21,6 @@ class _MembersDashboardState extends State<MembersDashboard> {
   int _totalChildren = 0;
   int _newSignUps = 0;
 
-  late Color _appBarColor;
   late Color _summaryCardColorStart;
   late Color _summaryCardColorEnd;
   late Color _buttonColor;
@@ -86,9 +85,6 @@ class _MembersDashboardState extends State<MembersDashboard> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    _appBarColor = isDarkMode
-        ? Colors.blueGrey[900]!
-        : const Color.fromARGB(255, 255, 255, 255);
     _summaryCardColorStart =
         isDarkMode ? Colors.blueGrey[800]! : Colors.blueAccent;
     _summaryCardColorEnd = isDarkMode ? Colors.blueGrey[600]! : Colors.blue;
@@ -100,10 +96,6 @@ class _MembersDashboardState extends State<MembersDashboard> {
     _statCardColorEnd = isDarkMode ? Colors.blueGrey[600]! : Colors.blue;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Painel de Membros'),
-        backgroundColor: _appBarColor,
-      ),
       drawer: const NavBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -113,6 +105,70 @@ class _MembersDashboardState extends State<MembersDashboard> {
             _buildSummaryCard(context),
             const SizedBox(height: 20),
             _buildActionButtons(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryBlueCard(
+    BuildContext context,
+    String title,
+    String value, {
+    required String filter,
+  }) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+
+    final Color summaryCardBackgroundColor =
+        isDarkMode ? Colors.blueGrey[800]! : Colors.blueAccent;
+
+    final Color summaryCardBoxShadowColor =
+        isDarkMode ? Colors.black54 : Colors.grey[300]!;
+
+    const Color summaryCardTextColor = Colors.white;
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context)
+            .pushNamed('/member_list', arguments: {'filter': filter});
+      },
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 150.0),
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [summaryCardBackgroundColor, Colors.blue[300]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(12.0),
+          boxShadow: [
+            BoxShadow(
+              color: summaryCardBoxShadowColor,
+              blurRadius: 6.0,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: summaryCardTextColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              value,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: summaryCardTextColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
           ],
         ),
       ),
@@ -161,7 +217,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: _buildStatCard(
+              child: _buildSummaryBlueCard(
                 context,
                 'Total de Membros',
                 _totalMembers.toString(),
@@ -170,7 +226,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
             ),
             const SizedBox(width: 16.0),
             Expanded(
-              child: _buildStatCard(
+              child: _buildSummaryBlueCard(
                 context,
                 'Novas Inscrições',
                 _newSignUps.toString(),
@@ -184,7 +240,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: _buildStatCard(
+              child: _buildSummaryBlueCard(
                 context,
                 'Total de Homens',
                 _totalMen.toString(),
@@ -193,7 +249,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
             ),
             const SizedBox(width: 14.0),
             Expanded(
-              child: _buildStatCard(
+              child: _buildSummaryBlueCard(
                 context,
                 'Total de Mulheres',
                 _totalWomen.toString(),
@@ -202,7 +258,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
             ),
             const SizedBox(width: 14.0),
             Expanded(
-              child: _buildStatCard(
+              child: _buildSummaryBlueCard(
                 context,
                 'Total de Crianças',
                 _totalChildren.toString(),
