@@ -73,7 +73,7 @@ class AuthMethods {
         userId: userCredential.user!.uid,
         fullName: '$firstName $lastName',
         address: address,
-        imagePath: imagePath,
+        photoUrl: imagePath,
       );
 
       await _firestore
@@ -82,6 +82,8 @@ class AuthMethods {
           .set(userData.toJson());
 
       return 'User $firstName $lastName registered successfully';
+    } on FirebaseAuthException catch (e) {
+      return 'Error: ${e.message}';
     } catch (err) {
       return 'Error: ${err.toString()}';
     }
@@ -104,6 +106,8 @@ class AuthMethods {
       );
 
       return 'User ${userCredential.user!.displayName ?? 'User'} logged in successfully';
+    } on FirebaseAuthException catch (e) {
+      return 'Error: ${e.message}';
     } catch (err) {
       return 'Error: ${err.toString()}';
     }
@@ -191,7 +195,7 @@ class AuthMethods {
 
   Future<List<PhotoData>> getPhotosDetails(String uploadId) async {
     try {
-      final photoCollection = FirebaseFirestore.instance.collection('photos');
+      final photoCollection = _firestore.collection('photos');
 
       final querySnapshot =
           await photoCollection.where('uploadId', isEqualTo: uploadId).get();
@@ -201,7 +205,7 @@ class AuthMethods {
           .toList();
     } catch (e) {
       if (kDebugMode) {
-        print('Erro ao recuperar detalhes das fotos: $e');
+        print('Error retrieving photo details: $e');
       }
       return [];
     }
