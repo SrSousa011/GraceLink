@@ -119,6 +119,19 @@ class MemberDetailsScreen extends StatelessWidget {
                     memberData['civilStatus'],
                     isDarkMode ? infoTitleColorDark : infoValueColorLight,
                     isDarkMode ? containerColorDark : containerColorLight),
+                _buildInfoContainer(
+                    'Experiência Anterior na Igreja',
+                    memberData['hasPreviousChurchExperience'] == true
+                        ? 'Sim'
+                        : 'Não',
+                    isDarkMode ? infoTitleColorDark : infoValueColorLight,
+                    isDarkMode ? containerColorDark : containerColorLight),
+                if (memberData['hasPreviousChurchExperience'] == true)
+                  _buildInfoContainer(
+                      'Igreja Anterior',
+                      memberData['previousChurch'],
+                      isDarkMode ? infoTitleColorDark : infoValueColorLight,
+                      isDarkMode ? containerColorDark : containerColorLight),
                 const SizedBox(height: 16.0),
                 if (memberData.containsKey('membershipDate') &&
                     memberData['membershipDate'] != null)
@@ -126,6 +139,22 @@ class MemberDetailsScreen extends StatelessWidget {
                     'Data de Adesão',
                     _formatDate(
                         (memberData['membershipDate'] as Timestamp).toDate()),
+                    isDarkMode ? infoTitleColorDark : infoValueColorLight,
+                    isDarkMode ? containerColorDark : containerColorLight,
+                  ),
+                if (memberData['baptismDate'] != null &&
+                    memberData['baptismDate'].isNotEmpty)
+                  _buildInfoContainer(
+                    'Data de Batismo',
+                    memberData['baptismDate'],
+                    isDarkMode ? infoTitleColorDark : infoValueColorLight,
+                    isDarkMode ? containerColorDark : containerColorLight,
+                  ),
+                if (memberData['conversionDate'] != null &&
+                    memberData['conversionDate'].isNotEmpty)
+                  _buildInfoContainer(
+                    'Data de Conversão',
+                    memberData['conversionDate'],
                     isDarkMode ? infoTitleColorDark : infoValueColorLight,
                     isDarkMode ? containerColorDark : containerColorLight,
                   ),
