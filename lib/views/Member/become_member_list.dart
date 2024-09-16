@@ -97,6 +97,8 @@ class BecomeMemberList extends StatelessWidget {
                   final creatorName =
                       userData['fullName'] as String? ?? 'Desconhecido';
                   final creatorImageUrl = userData['imagePath'] as String?;
+                  final creatorAddress =
+                      userData['address'] as String? ?? 'Não encontrado';
 
                   return ListTile(
                     leading:
@@ -119,7 +121,7 @@ class BecomeMemberList extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          member['address'] as String? ?? 'Não encontrado',
+                          creatorAddress,
                           style: TextStyle(
                             fontSize: 14.0,
                             color: secondaryTextColor,
