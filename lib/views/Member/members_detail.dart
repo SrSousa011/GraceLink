@@ -119,13 +119,6 @@ class MemberDetailsScreen extends StatelessWidget {
                     memberData['civilStatus'],
                     isDarkMode ? infoTitleColorDark : infoValueColorLight,
                     isDarkMode ? containerColorDark : containerColorLight),
-                _buildInfoContainer(
-                    'Experiência Anterior na Igreja',
-                    memberData['hasPreviousChurchExperience'] == true
-                        ? 'Sim'
-                        : 'Não',
-                    isDarkMode ? infoTitleColorDark : infoValueColorLight,
-                    isDarkMode ? containerColorDark : containerColorLight),
                 if (memberData['hasPreviousChurchExperience'] == true)
                   _buildInfoContainer(
                       'Igreja Anterior',
@@ -133,28 +126,26 @@ class MemberDetailsScreen extends StatelessWidget {
                       isDarkMode ? infoTitleColorDark : infoValueColorLight,
                       isDarkMode ? containerColorDark : containerColorLight),
                 const SizedBox(height: 16.0),
-                if (memberData.containsKey('membershipDate') &&
-                    memberData['membershipDate'] != null)
+                if (memberData['membershipDate'] != null)
                   _buildInfoContainer(
                     'Data de Adesão',
-                    _formatDate(
-                        (memberData['membershipDate'] as Timestamp).toDate()),
+                    _formatDateFromField(memberData['membershipDate']),
                     isDarkMode ? infoTitleColorDark : infoValueColorLight,
                     isDarkMode ? containerColorDark : containerColorLight,
                   ),
                 if (memberData['baptismDate'] != null &&
-                    memberData['baptismDate'].isNotEmpty)
+                    memberData['baptismDate'] != '')
                   _buildInfoContainer(
                     'Data de Batismo',
-                    memberData['baptismDate'],
+                    _formatDateFromField(memberData['baptismDate']),
                     isDarkMode ? infoTitleColorDark : infoValueColorLight,
                     isDarkMode ? containerColorDark : containerColorLight,
                   ),
                 if (memberData['conversionDate'] != null &&
-                    memberData['conversionDate'].isNotEmpty)
+                    memberData['conversionDate'] != '')
                   _buildInfoContainer(
                     'Data de Conversão',
-                    memberData['conversionDate'],
+                    _formatDateFromField(memberData['conversionDate']),
                     isDarkMode ? infoTitleColorDark : infoValueColorLight,
                     isDarkMode ? containerColorDark : containerColorLight,
                   ),
@@ -220,6 +211,20 @@ class MemberDetailsScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _formatDateFromField(dynamic field) {
+    if (field is Timestamp) {
+      return _formatDate(field.toDate());
+    } else if (field is String) {
+      try {
+        final date = DateTime.parse(field);
+        return _formatDate(date);
+      } catch (e) {
+        return 'Data inválida';
+      }
+    }
+    return 'Data não disponível';
   }
 
   String _formatDate(DateTime date) {
