@@ -16,9 +16,11 @@ class BecomeMemberService {
     required DateTime membershipDate,
     required String createdById,
     required String gender,
+    DateTime? baptismDate,
+    DateTime? conversionDate,
   }) async {
     try {
-      await _memberCollection.add({
+      final memberData = {
         'fullName': fullName,
         'address': address,
         'phoneNumber': phoneNumber,
@@ -31,7 +33,16 @@ class BecomeMemberService {
         'createdAt': Timestamp.fromDate(membershipDate),
         'gender': gender,
         'birthDate': birthDate != null ? Timestamp.fromDate(birthDate) : null,
-      });
+      };
+
+      if (baptismDate != null) {
+        memberData['baptismDate'] = Timestamp.fromDate(baptismDate);
+      }
+      if (conversionDate != null) {
+        memberData['conversionDate'] = Timestamp.fromDate(conversionDate);
+      }
+
+      await _memberCollection.add(memberData);
     } catch (e) {
       throw Exception('Failed to add member: $e');
     }

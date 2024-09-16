@@ -51,26 +51,24 @@ class _BecomeMemberState extends State<BecomeMember> {
     }
   }
 
-  Future<void> _navigateToTermsAndConditions() async {
+  Future<bool> _navigateToTermsAndConditions() async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => TermsAndConditionsScreen(
-          onAccept: () {
+          onAccept: () {},
+          onSubmit: () {
             _validateAndSubmit();
           },
-          onSubmit: () {},
         ),
       ),
     );
 
-    if (result == true) {
-      ();
-    }
+    return result == true;
   }
 
   Future<void> _validateAndSubmit() async {
     final form = _formKey.currentState;
-    if (form != null && form.validate()) {
+    if (form!.validate()) {
       setState(() {
         _isLoading = true;
       });
@@ -85,7 +83,7 @@ class _BecomeMemberState extends State<BecomeMember> {
       }
 
       try {
-        await FirebaseFirestore.instance.collection('members').add({
+        final memberData = {
           'fullName': _fullNameController.text,
           'address': _addressController.text,
           'phoneNumber': _phoneNumberController.text,
@@ -99,10 +97,15 @@ class _BecomeMemberState extends State<BecomeMember> {
           'createdById': userId,
           'hasPreviousChurchExperience': _hasPreviousChurchExperience,
           'previousChurch': _previousChurchController.text,
-          'baptismDate': _formatDateForFirestore(_baptismDateController.text),
-          'conversionDate':
-              _formatDateForFirestore(_conversionDateController.text),
-        });
+          'baptismDate': _baptismDateController.text.isNotEmpty
+              ? _formatDateForFirestore(_baptismDateController.text)
+              : null,
+          'conversionDate': _conversionDateController.text.isNotEmpty
+              ? _formatDateForFirestore(_conversionDateController.text)
+              : null,
+        };
+
+        await FirebaseFirestore.instance.collection('members').add(memberData);
 
         await _notifyAdmin(_fullNameController.text);
 
@@ -286,7 +289,12 @@ class _BecomeMemberState extends State<BecomeMember> {
                 ],
                 const SizedBox(height: 20.0),
                 ElevatedButton(
-                  onPressed: _navigateToTermsAndConditions,
+                  onPressed: () async {
+                    bool accepted = await _navigateToTermsAndConditions();
+                    if (accepted) {
+                      _validateAndSubmit();
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: const Color.fromARGB(255, 90, 175, 249),
@@ -384,9 +392,6 @@ class _BecomeMemberState extends State<BecomeMember> {
       ),
       readOnly: true,
       validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Este campo não pode estar vazio';
-        }
         return null;
       },
     );
