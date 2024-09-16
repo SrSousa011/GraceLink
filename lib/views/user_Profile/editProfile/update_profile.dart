@@ -60,7 +60,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               userId: widget.userData.userId,
               fullName: fullName,
               address: address,
-              imagePath: widget.userData.imagePath,
+              photoUrl: widget.userData.photoUrl,
             ),
           ),
         ),
