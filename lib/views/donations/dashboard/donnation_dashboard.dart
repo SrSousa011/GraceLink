@@ -64,10 +64,10 @@ class DonationsDashboard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildSummaryBlueCard(
+                      _buildActionButton(
                         context,
                         icon: Icons.monetization_on,
-                        title: 'Doações',
+                        label: 'Doações',
                         onPressed: () {
                           Navigator.of(context).pushNamed('/donations');
                         },
@@ -211,15 +211,27 @@ class DonationsDashboard extends StatelessWidget {
               children: [
                 Icon(icon, color: Colors.white),
                 const SizedBox(width: 8.0),
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: summaryCardTextColor,
-                        fontWeight: FontWeight.bold,
-                      ),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: summaryCardTextColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
                 ),
               ],
             ),
+            if (value != null) ...[
+              const SizedBox(height: 8.0),
+              Text(
+                value,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: summaryCardTextColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ],
           ],
         ),
       ),
@@ -233,65 +245,22 @@ class DonationsDashboard extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-        elevation: 4.0,
-      ),
-      icon: Icon(icon, color: Colors.white),
-      label: Text(label, style: const TextStyle(color: Colors.white)),
-      onPressed: onPressed,
-    );
-  }
-
-  Widget _buildSummaryCard(BuildContext context,
-      {required String title, required String value}) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
-
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: isDarkMode
-                ? [Colors.grey[850]!, Colors.grey[800]!]
-                : [Colors.blueAccent, Colors.blue],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+        child: ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            padding:
+                const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+            elevation: 4.0,
           ),
-          borderRadius: BorderRadius.circular(12.0),
-          boxShadow: [
-            BoxShadow(
-              color: isDarkMode ? Colors.black54 : Colors.grey[400]!,
-              blurRadius: 6.0,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              value,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-          ],
+          icon: Icon(icon, color: Colors.white),
+          label: Text(label, style: const TextStyle(color: Colors.white)),
+          onPressed: onPressed,
         ),
       ),
     );
