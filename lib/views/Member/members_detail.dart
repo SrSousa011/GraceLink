@@ -31,7 +31,7 @@ class MemberDetailsScreen extends StatelessWidget {
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance
-            .collection('becomeMember')
+            .collection('members')
             .doc(memberId)
             .get(),
         builder: (context, snapshot) {

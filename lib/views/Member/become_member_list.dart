@@ -173,27 +173,27 @@ class BecomeMemberList extends StatelessWidget {
     switch (filter) {
       case 'male':
         return _firestore
-            .collection('becomeMember')
+            .collection('members')
             .where('gender', isEqualTo: 'Masculino')
             .snapshots();
       case 'female':
         return _firestore
-            .collection('becomeMember')
+            .collection('members')
             .where('gender', isEqualTo: 'Feminino')
             .snapshots();
       case 'children':
         return _firestore
-            .collection('becomeMember')
+            .collection('members')
             .where('birthDate', isGreaterThanOrEqualTo: twelveYearsAgo)
             .snapshots();
       case 'new':
         return _firestore
-            .collection('becomeMember')
+            .collection('members')
             .where('createdAt', isGreaterThanOrEqualTo: startOfMonth)
             .snapshots();
       case 'all':
       default:
-        return _firestore.collection('becomeMember').snapshots();
+        return _firestore.collection('members').snapshots();
     }
   }
 

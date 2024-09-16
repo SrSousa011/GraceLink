@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
@@ -40,7 +41,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
       final startOfMonth = DateTime(now.year, now.month, 1);
       final endOfMonth = DateTime(now.year, now.month + 1, 0);
 
-      final querySnapshot = await _firestore.collection('becomeMember').get();
+      final querySnapshot = await _firestore.collection('members').get();
       final members = querySnapshot.docs;
 
       setState(() {
@@ -74,7 +75,9 @@ class _MembersDashboardState extends State<MembersDashboard> {
         }).length;
       });
     } catch (e) {
-      print('Failed to fetch member counts: $e');
+      if (kDebugMode) {
+        print('Failed to fetch member counts: $e');
+      }
     }
   }
 
