@@ -110,7 +110,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         title: const Text(
           'Evento',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
           ),
         ),
       ),

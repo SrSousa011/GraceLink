@@ -27,7 +27,7 @@ class EventDetails extends StatelessWidget {
           Text(
             title!,
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: isDarkMode ? Colors.white : Colors.black,
             ),
