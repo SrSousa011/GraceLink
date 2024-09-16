@@ -64,18 +64,18 @@ class DonationsDashboard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildActionButton(
+                      _buildSummaryBlueCard(
                         context,
                         icon: Icons.monetization_on,
-                        label: 'Doações',
+                        title: 'Doações',
                         onPressed: () {
                           Navigator.of(context).pushNamed('/donations');
                         },
                       ),
-                      _buildActionButton(
+                      _buildSummaryBlueCard(
                         context,
                         icon: Icons.report,
-                        label: 'Relatório de Doações',
+                        title: 'Relatório de Doações',
                         onPressed: () {
                           Navigator.of(context).pushNamed('/donation_report');
                         },
