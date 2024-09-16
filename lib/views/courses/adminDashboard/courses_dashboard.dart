@@ -72,7 +72,7 @@ class CoursesDashboard extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 40.0), // Espaçamento adicionado
+                const SizedBox(height: 40.0),
                 Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
@@ -143,7 +143,6 @@ class CoursesDashboard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 40.0),
-
                 const SizedBox(height: 40.0),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
