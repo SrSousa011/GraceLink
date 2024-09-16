@@ -4,15 +4,17 @@ class UserData {
   final String userId;
   final String fullName;
   final String address;
-  final String imagePath;
+  final String photoUrl;
   final String? role;
+  final String? phoneNumber;
 
   UserData({
     required this.userId,
     required this.fullName,
     required this.address,
-    required this.imagePath,
+    required this.photoUrl,
     this.role,
+    this.phoneNumber,
   });
 
   Map<String, dynamic> toJson() {
@@ -20,8 +22,9 @@ class UserData {
       'userId': userId,
       'fullName': fullName,
       'address': address,
-      'imagePath': imagePath,
+      'imagePath': photoUrl,
       'role': role,
+      'phoneNumber': phoneNumber,
     };
   }
 
@@ -30,8 +33,9 @@ class UserData {
       userId: json['userId'] ?? '',
       fullName: json['fullName'] ?? '',
       address: json['address'] ?? '',
-      imagePath: json['imagePath'] ?? '',
+      photoUrl: json['imagePath'] ?? '',
       role: json['role'] as String?,
+      phoneNumber: json['phoneNumber'] as String?,
     );
   }
 
@@ -42,8 +46,9 @@ class UserData {
       userId: doc.id,
       fullName: data?['fullName'] ?? '',
       address: data?['address'] ?? '',
-      imagePath: data?['imagePath'] ?? '',
+      photoUrl: data?['imagePath'] ?? '',
       role: data?['role'] as String?,
+      phoneNumber: data?['phoneNumber'] as String?,
     );
   }
 }
