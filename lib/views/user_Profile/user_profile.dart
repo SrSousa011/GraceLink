@@ -117,8 +117,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             backgroundColor: isDarkMode
                                 ? Colors.grey[800]
                                 : Colors.grey[200],
-                            backgroundImage: userData.imagePath.isNotEmpty
-                                ? CachedNetworkImageProvider(userData.imagePath)
+                            backgroundImage: userData.photoUrl.isNotEmpty
+                                ? CachedNetworkImageProvider(userData.photoUrl)
                                 : const AssetImage(tAvatar) as ImageProvider,
                           ),
                         ),
