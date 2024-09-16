@@ -18,11 +18,6 @@ class DonationsDashboard extends StatelessWidget {
     final Color containerBoxShadowColor =
         isDarkMode ? Colors.blueGrey[800]! : Colors.grey[300]!;
 
-    final Color buttonBackgroundColor =
-        isDarkMode ? Colors.blueGrey[800]! : Colors.blue;
-
-    const Color summaryCardTextColor = Colors.white;
-
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(top: 60.0, left: 16.0, right: 16.0),
