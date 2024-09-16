@@ -1,3 +1,4 @@
+import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/views/member/terms_and_condictions.dart';
 import 'package:churchapp/views/notifications/notification_become_member.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -41,6 +42,37 @@ class _BecomeMemberState extends State<BecomeMember> {
     _previousChurchController = TextEditingController();
     _baptismDateController = TextEditingController();
     _conversionDateController = TextEditingController();
+    _loadUserData();
+  }
+
+  Future<UserData?> _fetchUserData() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      return null;
+    }
+    try {
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      if (docSnapshot.exists) {
+        return UserData.fromDocument(docSnapshot);
+      }
+    } catch (e) {
+      // Handle error
+    }
+    return null;
+  }
+
+  Future<void> _loadUserData() async {
+    final userData = await _fetchUserData();
+    if (userData != null) {
+      setState(() {
+        _fullNameController.text = userData.fullName;
+        _addressController.text = userData.address;
+        _phoneNumberController.text = userData.phoneNumber ?? '';
+      });
+    }
   }
 
   List<String> _getCivilStatusOptions() {
@@ -143,7 +175,7 @@ class _BecomeMemberState extends State<BecomeMember> {
           _showErrorDialog('Erro', 'Falha ao cadastrar membro: $e');
         }
       }
-    }
+    } else {}
   }
 
   Future<void> _notifyAdmin(String memberName) async {
@@ -290,10 +322,7 @@ class _BecomeMemberState extends State<BecomeMember> {
                 const SizedBox(height: 20.0),
                 ElevatedButton(
                   onPressed: () async {
-                    bool accepted = await _navigateToTermsAndConditions();
-                    if (accepted) {
-                      _validateAndSubmit();
-                    }
+                    await _navigateToTermsAndConditions();
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
@@ -305,7 +334,7 @@ class _BecomeMemberState extends State<BecomeMember> {
                   child: _isLoading
                       ? const CircularProgressIndicator()
                       : const Text('Enviar'),
-                ),
+                )
               ],
             ),
           ),
