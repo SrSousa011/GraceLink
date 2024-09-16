@@ -1,4 +1,3 @@
-import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:flutter/material.dart';
 
 class AboutUs extends StatelessWidget {
@@ -17,10 +16,6 @@ class AboutUs extends StatelessWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sobre Nós'),
-      ),
-      drawer: const NavBar(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

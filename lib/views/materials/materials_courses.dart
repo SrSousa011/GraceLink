@@ -216,7 +216,10 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Materiais do curso'),
+        title: const Text(
+          'Materiais do curs',
+          style: TextStyle(fontSize: 18),
+        ),
       ),
       body: Container(
         color: isDarkMode ? Colors.black : Colors.white,

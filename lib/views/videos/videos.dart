@@ -191,7 +191,10 @@ class _VideosState extends State<Videos> {
     final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('YouTube Links'),
+        title: const Text(
+          'Videos',
+          style: TextStyle(fontSize: 18),
+        ),
         actions: [
           IconButton(
             onPressed: _isSelectionMode
