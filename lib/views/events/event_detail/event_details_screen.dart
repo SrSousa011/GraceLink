@@ -1,3 +1,4 @@
+import 'package:churchapp/views/events/events.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -101,10 +102,15 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back,
+              color: isDarkMode ? Colors.white : Colors.black),
+          onPressed: _navigateToEventScreen,
+        ),
         title: const Text(
           'Evento',
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 16,
           ),
         ),
       ),
@@ -135,11 +141,13 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(top: 4.0, left: 12.0),
                             child: Text(
                               updatedEvent.title,
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: isDarkMode ? Colors.white : Colors.black,
                               ),
@@ -213,22 +221,18 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(
-                          left: 12.0,
-                          top:
-                              2.0), // Ajuste o padding para aproximar a localização do título
+                      padding: const EdgeInsets.only(left: 12.0, top: 4.0),
                       child: Text(
                         updatedEvent.location,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           color:
                               isDarkMode ? Colors.grey[400] : Colors.grey[700],
                         ),
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(
-                          0.0), // Remova o padding desnecessário
+                      padding: const EdgeInsets.all(0.0),
                       child: EventImage(
                         imageUrlStream: _getEventStream().map((snapshot) {
                           final data = snapshot.data() as Map<String, dynamic>;
@@ -237,7 +241,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(12.0),
+                      padding: const EdgeInsets.only(left: 12.0, top: 4.0),
                       child: EventDetails(
                         description: updatedEvent.description,
                         date:
@@ -266,6 +270,28 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     if (updatedEvent != null && context.mounted) {
       setState(() {
         _event = updatedEvent;
+      });
+    }
+  }
+
+  void _navigateToEventScreen() async {
+    final result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(builder: (context) => const Events()),
+    );
+
+    if (result != null && context.mounted) {
+      setState(() {
+        _event = Event(
+          id: result['id'],
+          title: result['title'],
+          description: result['description'],
+          date: result['date'],
+          time: result['time'],
+          location: result['location'],
+          imageUrl: result['imageUrl'],
+          createdBy: _event.createdBy,
+        );
       });
     }
   }
