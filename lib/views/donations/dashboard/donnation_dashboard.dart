@@ -119,6 +119,13 @@ class DonationsDashboard extends StatelessWidget {
                 return Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: isDarkMode
+                          ? [containerBackgroundColor, Colors.grey[800]!]
+                          : [containerBackgroundColor, Colors.blueAccent],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(12.0),
                     boxShadow: [
                       BoxShadow(
