@@ -98,7 +98,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
     return Scaffold(
       drawer: const NavBar(),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0).copyWith(top: 60.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
