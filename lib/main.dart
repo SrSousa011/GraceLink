@@ -1,3 +1,4 @@
+import 'package:churchapp/provider/photo_provider.dart';
 import 'package:churchapp/route/root.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -19,6 +20,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => PhotoProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const MyApp(),

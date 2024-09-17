@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:churchapp/provider/photo_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/data/model/photos_data.dart';
 import 'package:churchapp/views/photos/edit.dart';
 import 'package:churchapp/views/photos/photo_viwer.dart';
+import 'package:provider/provider.dart';
 
 class PhotoItem extends StatelessWidget {
   final PhotoData photo;
@@ -53,7 +55,7 @@ class PhotoItem extends StatelessWidget {
                     );
 
                     if (result == true) {
-                      // Add code to refresh data here
+                      context.read<PhotoProvider>().fetchPhotos();
                     }
                   },
                 ),

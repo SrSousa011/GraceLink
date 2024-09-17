@@ -30,29 +30,27 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
     super.dispose();
   }
 
-  Future<void> _updatePhoto() async {
-    final newLocation = _locationController.text.trim();
 
-    if (newLocation.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Location cannot be empty')),
-      );
-      return;
-    }
+  void _updatePhoto() async {
+  final newLocation = _locationController.text.trim();
 
-    try {
-      if (_photoUrls.isEmpty) {
-        throw Exception('Photo URLs are empty');
-      }
-      await _photosService.savePhotoData(newLocation, _photoUrls);
-      if (!mounted) return;
-      Navigator.of(context).pop(true);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error updating photo: $e')),
-      );
-    }
+  if (newLocation.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Location cannot be empty')),
+    );
+    return;
   }
+
+  try {
+    await _photosService.savePhotoData(newLocation, _photoUrls);
+    Navigator.of(context).pop(true);
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error updating photo: $e')),
+    );
+  }
+}
+
 
   void _reorderPhotos(int oldIndex, int newIndex) {
     setState(() {
