@@ -1,4 +1,5 @@
 import 'package:churchapp/data/model/photos_data.dart';
+import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/views/photos/image_source.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as path;
 import 'photo_item.dart';
 import 'preview_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import for FirebaseAuth
 
 class PhotoGalleryPage extends StatefulWidget {
   const PhotoGalleryPage({super.key});
@@ -30,11 +32,35 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   final List<PhotoData> _allPhotos = [];
   List<PhotoData> _filteredPhotos = [];
   final String _searchQuery = '';
+  bool _isAdmin = false;
 
   @override
   void initState() {
     super.initState();
     _fetchPhotos();
+    _fetchUserRole();
+  }
+
+  Future<void> _fetchUserRole() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      final userId = user.uid;
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      final userData = UserData.fromDocument(doc);
+
+      setState(() {
+        _isAdmin = userData.role == 'admin';
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao buscar dados do usuário: $e');
+      }
+    }
   }
 
   Future<void> _fetchPhotos() async {
@@ -207,10 +233,12 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
               _filteredPhotos.map((photo) => PhotoItem(photo: photo)).toList(),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showImageSourceSelection,
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: _isAdmin
+          ? FloatingActionButton(
+              onPressed: _showImageSourceSelection,
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 
