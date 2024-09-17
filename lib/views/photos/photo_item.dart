@@ -1,18 +1,31 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:churchapp/data/model/photos_data.dart';
-import 'package:churchapp/views/photos/edit_image.dart'; // Ensure this import is correct
-import 'package:churchapp/views/photos/photo_viwer.dart';
 import 'package:flutter/material.dart';
+import 'package:churchapp/data/model/photos_data.dart';
+import 'package:churchapp/views/photos/edit.dart';
+import 'package:churchapp/views/photos/photo_viwer.dart';
 
-class PhotoItem extends StatelessWidget {
+class PhotoItem extends StatefulWidget {
   final PhotoData photo;
-  final bool isAdmin; // Add this parameter
+  final bool isAdmin;
 
   const PhotoItem({
     super.key,
     required this.photo,
     required this.isAdmin,
-  }); // Add this parameter to constructor
+  });
+
+  @override
+  State<PhotoItem> createState() => _PhotoItemState();
+}
+
+class _PhotoItemState extends State<PhotoItem> {
+  late PhotoData _photo;
+
+  @override
+  void initState() {
+    super.initState();
+    _photo = widget.photo;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +42,8 @@ class PhotoItem extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  photo.location.isNotEmpty
-                      ? photo.location
+                  _photo.location.isNotEmpty
+                      ? _photo.location
                       : 'Localização não informada',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
@@ -39,26 +52,30 @@ class PhotoItem extends StatelessWidget {
                   ),
                 ),
               ),
-              if (isAdmin) // Conditionally show the edit icon
+              if (widget.isAdmin)
                 IconButton(
                   icon: const Icon(
                     Icons.edit,
                     color: Colors.black,
                   ),
-                  onPressed: () {
-                    Navigator.of(context).push(
+                  onPressed: () async {
+                    final result = await Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => EditPhotoScreen(
-                          photo: photo, // Pass the photo to the EditPhotoScreen
-                        ),
+                        builder: (context) => EditPhotoScreen(photo: _photo),
                       ),
                     );
+
+                    if (result == true) {
+                      setState(() {
+                        _photo = _photo;
+                      });
+                    }
                   },
                 ),
             ],
           ),
         ),
-        if (photo.urls.isNotEmpty)
+        if (_photo.urls.isNotEmpty)
           Stack(
             children: [
               SizedBox(
@@ -69,21 +86,21 @@ class PhotoItem extends StatelessWidget {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => FullScreenPhotoPage(
-                          photoUrls: photo.urls,
+                          photoUrls: _photo.urls,
                           initialIndex: 0,
                         ),
                       ),
                     );
                   },
                   child: CachedNetworkImage(
-                    imageUrl: photo.urls[0],
+                    imageUrl: _photo.urls[0],
                     fit: BoxFit.cover,
                     errorWidget: (context, url, error) =>
                         const Icon(Icons.error),
                   ),
                 ),
               ),
-              if (photo.urls.length > 1)
+              if (_photo.urls.length > 1)
                 Positioned(
                   bottom: 8.0,
                   right: 8.0,
