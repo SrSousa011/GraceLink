@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:churchapp/data/model/photos_data.dart';
-import 'package:churchapp/views/photos/ask_permission.dart';
 import 'package:churchapp/views/photos/photo_viwer.dart';
 import 'package:churchapp/views/photos/preview_screen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -25,10 +24,58 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   XFile? _selectedImage;
   final TextEditingController _locationController = TextEditingController();
 
+  final int _limit = 20; // Número de fotos por página
+  DocumentSnapshot? _lastDocument;
+  bool _hasMorePhotos = true;
+  final List<PhotoData> _allPhotos = [];
+  List<PhotoData> _filteredPhotos = [];
+  final String _searchQuery = '';
+
   @override
   void initState() {
     super.initState();
-    PermissionHandler.requestStoragePermission(context);
+    _fetchPhotos(); // Carregar fotos inicialmente
+  }
+
+  Future<void> _fetchPhotos() async {
+    if (!_hasMorePhotos) return;
+
+    try {
+      Query query = _firestore
+          .collection('photos')
+          .orderBy('createdAt', descending: true)
+          .limit(_limit);
+
+      if (_lastDocument != null) {
+        query = query.startAfterDocument(_lastDocument!);
+      }
+
+      QuerySnapshot snapshot = await query.get();
+      final photosData = snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return PhotoData(
+          urls: List<String>.from(data['urls'] ?? []),
+          uploadId: data['uploadId'] ?? '',
+          location: data['location'] ?? '',
+          createdAt: data['createdAt'] as Timestamp,
+        );
+      }).toList();
+
+      setState(() {
+        _allPhotos.addAll(photosData);
+        _filteredPhotos = _filterPhotos(_searchQuery);
+
+        if (snapshot.docs.length < _limit) {
+          _hasMorePhotos = false;
+        } else {
+          _lastDocument = snapshot.docs.last;
+        }
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao buscar fotos: $e');
+      }
+    }
   }
 
   Future<void> _showImageSourceSelection() async {
@@ -73,7 +120,6 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
 
   Future<void> _pickMultipleImages() async {
     final pickedFiles = await _picker.pickMultiImage();
-
     if (pickedFiles.isNotEmpty) {
       setState(() {
         _pickedFiles.clear();
@@ -86,7 +132,6 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
 
   Future<void> _pickSingleImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-
     if (pickedFile != null) {
       setState(() {
         _pickedFiles.clear();
@@ -99,7 +144,6 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
 
   Future<void> _pickImageFromCamera() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.camera);
-
     if (pickedFile != null) {
       setState(() {
         _pickedFiles.clear();
@@ -169,29 +213,6 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
     }
   }
 
-  Future<List<PhotoData>> _getPhotosWithLocations() async {
-    try {
-      final querySnapshot = await _firestore
-          .collection('photos')
-          .orderBy('createdAt', descending: true)
-          .get();
-      return querySnapshot.docs.map((doc) {
-        final data = doc.data();
-        return PhotoData(
-          urls: List<String>.from(data['urls'] ?? []),
-          uploadId: '',
-          location: data['location'] ?? '',
-          createdAt: data['createdAt'] as Timestamp,
-        );
-      }).toList();
-    } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao recuperar as fotos: $e');
-      }
-      return [];
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -201,130 +222,100 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
           style: TextStyle(fontSize: 20),
         ),
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.all(8.0),
-            sliver: FutureBuilder<List<PhotoData>>(
-              future: _getPhotosWithLocations(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-                if (snapshot.hasError) {
-                  return const SliverFillRemaining(
-                      child: Center(child: Text('Erro ao carregar fotos')));
-                }
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const SliverFillRemaining(
-                      child: Center(child: Text('Nenhuma foto encontrada')));
-                }
-
-                final photos = snapshot.data!;
-                final groupedPhotos = <String, List<PhotoData>>{};
-
-                for (var photo in photos) {
-                  final location = photo.location;
-                  if (!groupedPhotos.containsKey(location)) {
-                    groupedPhotos[location] = [];
-                  }
-                  groupedPhotos[location]!.add(photo);
-                }
-
-                final groupedKeys = groupedPhotos.keys.toList();
-
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (index >= groupedKeys.length) {
-                        return null;
-                      }
-                      final location = groupedKeys[index];
-                      final group = groupedPhotos[location]!;
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              location.isNotEmpty
-                                  ? location
-                                  : 'Localização não informada',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (scrollInfo) {
+          if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+            _fetchPhotos();
+          }
+          return false;
+        },
+        child: ListView(
+          children: _filteredPhotos
+              .map((photo) => Container(
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    height: 300.0,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            photo.location.isNotEmpty
+                                ? photo.location
+                                : 'Localização não informada',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.white,
+                              backgroundColor: Colors.black54,
                             ),
                           ),
-                          GridView.builder(
-                            padding: const EdgeInsets.all(8.0),
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 8.0,
-                              mainAxisSpacing: 8.0,
-                            ),
-                            itemCount: group.fold<int>(
-                                0, (prev, photo) => prev + photo.urls.length),
-                            itemBuilder: (context, index) {
-                              int count = 0;
-                              PhotoData? selectedPhoto;
-
-                              for (var photo in group) {
-                                if (index < count + photo.urls.length) {
-                                  selectedPhoto = photo;
-                                  break;
-                                }
-                                count += photo.urls.length;
-                              }
-
-                              if (selectedPhoto == null) {
-                                return const SizedBox.shrink();
-                              }
-
-                              final photoUrl =
-                                  selectedPhoto.urls[index - count];
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => FullScreenPhotoPage(
-                                        photoUrls: selectedPhoto!.urls,
-                                        initialIndex: index - count,
-                                      ),
+                        ),
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: photo.urls.length,
+                                itemBuilder: (context, index) {
+                                  final photoUrl = photo.urls[index];
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              FullScreenPhotoPage(
+                                            photoUrls: photo.urls,
+                                            initialIndex: index,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: CachedNetworkImage(
+                                      imageUrl: photoUrl,
+                                      fit: BoxFit.cover,
+                                      width: MediaQuery.of(context).size.width,
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error),
+                                      placeholder: (context, url) =>
+                                          const CircularProgressIndicator(),
                                     ),
                                   );
                                 },
-                                child: CachedNetworkImage(
-                                  imageUrl: photoUrl,
-                                  fit: BoxFit.cover,
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
-                                  placeholder: (context, url) =>
-                                      const CircularProgressIndicator(),
+                              ),
+                              const Positioned(
+                                bottom: 8.0,
+                                right: 8.0,
+                                child: Icon(
+                                  Icons.photo_library,
+                                  color: Colors.white,
+                                  size: 30.0,
                                 ),
-                              );
-                            },
+                              ),
+                            ],
                           ),
-                        ],
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+                        ),
+                      ],
+                    ),
+                  ))
+              .toList(),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showImageSourceSelection,
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  List<PhotoData> _filterPhotos(String query) {
+    if (query.isEmpty) {
+      return _allPhotos;
+    } else {
+      return _allPhotos
+          .where((photo) =>
+              photo.location.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
   }
 }
