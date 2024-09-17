@@ -1,13 +1,15 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:typed_data';
+
 import 'package:churchapp/data/model/photos_data.dart';
-import 'package:churchapp/views/photos/photo_viwer.dart';
-import 'package:churchapp/views/photos/preview_screen.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:churchapp/views/photos/image_source.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as path;
+import 'photo_item.dart';
+import 'preview_screen.dart';
 
 class PhotoGalleryPage extends StatefulWidget {
   const PhotoGalleryPage({super.key});
@@ -24,7 +26,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   XFile? _selectedImage;
   final TextEditingController _locationController = TextEditingController();
 
-  final int _limit = 20; // Número de fotos por página
+  final int _limit = 20;
   DocumentSnapshot? _lastDocument;
   bool _hasMorePhotos = true;
   final List<PhotoData> _allPhotos = [];
@@ -34,7 +36,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   @override
   void initState() {
     super.initState();
-    _fetchPhotos(); // Carregar fotos inicialmente
+    _fetchPhotos();
   }
 
   Future<void> _fetchPhotos() async {
@@ -82,37 +84,10 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Selecionar ou Capturar a Foto'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Selecionar Múltiplas Fotos'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _pickMultipleImages();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo),
-                title: const Text('Escolher uma Foto'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _pickSingleImage();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text('Tirar uma Nova Foto'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _pickImageFromCamera();
-                },
-              ),
-            ],
-          ),
+        return ImageSourceDialog(
+          onPickMultiple: _pickMultipleImages,
+          onPickSingle: _pickSingleImage,
+          onPickFromCamera: _pickImageFromCamera,
         );
       },
     );
@@ -230,75 +205,8 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
           return false;
         },
         child: ListView(
-          children: _filteredPhotos
-              .map((photo) => Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    height: 300.0,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            photo.location.isNotEmpty
-                                ? photo.location
-                                : 'Localização não informada',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: Colors.white,
-                              backgroundColor: Colors.black54,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Stack(
-                            children: [
-                              ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: photo.urls.length,
-                                itemBuilder: (context, index) {
-                                  final photoUrl = photo.urls[index];
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              FullScreenPhotoPage(
-                                            photoUrls: photo.urls,
-                                            initialIndex: index,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: CachedNetworkImage(
-                                      imageUrl: photoUrl,
-                                      fit: BoxFit.cover,
-                                      width: MediaQuery.of(context).size.width,
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.error),
-                                      placeholder: (context, url) =>
-                                          const CircularProgressIndicator(),
-                                    ),
-                                  );
-                                },
-                              ),
-                              const Positioned(
-                                bottom: 8.0,
-                                right: 8.0,
-                                child: Icon(
-                                  Icons.photo_library,
-                                  color: Colors.white,
-                                  size: 30.0,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ))
-              .toList(),
+          children:
+              _filteredPhotos.map((photo) => PhotoItem(photo: photo)).toList(),
         ),
       ),
       floatingActionButton: FloatingActionButton(
