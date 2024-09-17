@@ -11,6 +11,9 @@ class PhotoProvider with ChangeNotifier {
   Future<void> fetchPhotos() async {
     _photos =
         (_photosService.getPhotosWithLocationsStream()) as List<PhotoData>;
+
+    _photos.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
     notifyListeners();
   }
 
