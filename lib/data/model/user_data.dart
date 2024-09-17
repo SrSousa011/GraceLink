@@ -7,6 +7,7 @@ class UserData {
   final String photoUrl;
   final String? role;
   final String? phoneNumber;
+  final DateTime? birthDate;
 
   UserData({
     required this.userId,
@@ -15,6 +16,7 @@ class UserData {
     required this.photoUrl,
     this.role,
     this.phoneNumber,
+    this.birthDate,
   });
 
   Map<String, dynamic> toJson() {
@@ -25,6 +27,7 @@ class UserData {
       'imagePath': photoUrl,
       'role': role,
       'phoneNumber': phoneNumber,
+      'birthDate': birthDate != null ? Timestamp.fromDate(birthDate!) : null,
     };
   }
 
@@ -36,6 +39,9 @@ class UserData {
       photoUrl: json['imagePath'] ?? '',
       role: json['role'] as String?,
       phoneNumber: json['phoneNumber'] as String?,
+      birthDate: json['birthDate'] != null
+          ? (json['birthDate'] as Timestamp).toDate()
+          : null,
     );
   }
 
@@ -49,6 +55,9 @@ class UserData {
       photoUrl: data?['imagePath'] ?? '',
       role: data?['role'] as String?,
       phoneNumber: data?['phoneNumber'] as String?,
+      birthDate: data?['birthDate'] != null
+          ? (data?['birthDate'] as Timestamp).toDate()
+          : null,
     );
   }
 }

@@ -25,8 +25,6 @@ class _MembersDashboardState extends State<MembersDashboard> {
   late Color _summaryCardColorEnd;
   late Color _buttonColor;
   late Color _textColor;
-  late Color _statCardColorStart;
-  late Color _statCardColorEnd;
 
   @override
   void initState() {
@@ -38,7 +36,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
     try {
       final now = DateTime.now();
       final startOfMonth = DateTime(now.year, now.month, 1);
-      final endOfMonth = DateTime(now.year, now.month + 1, 0);
+      final endOfMonth = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
 
       final querySnapshot = await _firestore.collection('members').get();
       final members = querySnapshot.docs;
@@ -49,6 +47,7 @@ class _MembersDashboardState extends State<MembersDashboard> {
         _totalMen = members
             .where((doc) => (doc.data()['gender'] as String?) == 'Masculino')
             .length;
+
         _totalWomen = members
             .where((doc) => (doc.data()['gender'] as String?) == 'Feminino')
             .length;
@@ -61,16 +60,20 @@ class _MembersDashboardState extends State<MembersDashboard> {
           final age = now.year - birthDate.year;
           final isBeforeBirthday = now.month < birthDate.month ||
               (now.month == birthDate.month && now.day < birthDate.day);
-          return age < 12 || (age == 12 && !isBeforeBirthday);
+          final isChild = age < 12 || (age == 12 && !isBeforeBirthday);
+
+          return isChild;
         }).length;
 
         _newSignUps = members.where((doc) {
-          final createdAtTimestamp = doc.data()['createdAt'] as Timestamp?;
+          final createdAtTimestamp = doc.data()['membershipDate'] as Timestamp?;
           if (createdAtTimestamp == null) return false;
 
           final createdAt = createdAtTimestamp.toDate();
-          return createdAt.isAfter(startOfMonth) &&
-              createdAt.isBefore(endOfMonth);
+          final isNewSignUp =
+              createdAt.isAfter(startOfMonth) && createdAt.isBefore(endOfMonth);
+
+          return isNewSignUp;
         }).length;
       });
     } catch (e) {
@@ -91,9 +94,6 @@ class _MembersDashboardState extends State<MembersDashboard> {
     _buttonColor = isDarkMode ? Colors.blueGrey[700]! : Colors.blueAccent;
     _textColor =
         isDarkMode ? Colors.white : const Color.fromARGB(255, 255, 255, 255);
-    _statCardColorStart =
-        isDarkMode ? Colors.blueGrey[800]! : Colors.blueAccent;
-    _statCardColorEnd = isDarkMode ? Colors.blueGrey[600]! : Colors.blue;
 
     return Scaffold(
       drawer: const NavBar(),
@@ -268,60 +268,6 @@ class _MembersDashboardState extends State<MembersDashboard> {
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildStatCard(
-    BuildContext context,
-    String title,
-    String value, {
-    required String filter,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context)
-            .pushNamed('/member_list', arguments: {'filter': filter});
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [_statCardColorStart, _statCardColorEnd],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(12.0),
-          boxShadow: [
-            BoxShadow(
-              color: _textColor == Colors.white
-                  ? Colors.black54
-                  : Colors.grey[400]!,
-              blurRadius: 6.0,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: _textColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              value,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: _textColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

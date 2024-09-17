@@ -127,24 +127,6 @@ class BecomeMemberList extends StatelessWidget {
                             color: secondaryTextColor,
                           ),
                         ),
-                        if (member['baptismDate'] != null &&
-                            member['baptismDate'] is Timestamp)
-                          Text(
-                            'Data de Batismo: ${_formatDate((member['baptismDate'] as Timestamp).toDate())}',
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              color: secondaryTextColor,
-                            ),
-                          ),
-                        if (member['conversionDate'] != null &&
-                            member['conversionDate'] is Timestamp)
-                          Text(
-                            'Data de Conversão: ${_formatDate((member['conversionDate'] as Timestamp).toDate())}',
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              color: secondaryTextColor,
-                            ),
-                          ),
                       ],
                     ),
                     onTap: () {
@@ -197,9 +179,5 @@ class BecomeMemberList extends StatelessWidget {
       default:
         return _firestore.collection('members').snapshots();
     }
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 }
