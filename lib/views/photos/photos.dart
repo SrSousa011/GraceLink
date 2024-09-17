@@ -229,8 +229,12 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
           return false;
         },
         child: ListView(
-          children:
-              _filteredPhotos.map((photo) => PhotoItem(photo: photo)).toList(),
+          children: _filteredPhotos
+              .map((photo) => PhotoItem(
+                    photo: photo,
+                    isAdmin: _isAdmin,
+                  ))
+              .toList(),
         ),
       ),
       floatingActionButton: _isAdmin
