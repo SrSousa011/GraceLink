@@ -1,53 +1,22 @@
+import 'package:churchapp/auth/auth_method.dart';
 import 'package:churchapp/data/model/user_data.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:churchapp/views/events/event_service.dart';
 
 class UserProvider with ChangeNotifier {
   UserData? _user;
-  Event? _currentEvent;
+  final AuthMethods _authMethods = AuthMethods();
 
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  UserData? get getUser => _user;
 
-  UserData? get user => _user;
-  Event? get currentEvent => _currentEvent;
-
-  void setUser(UserData userData) {
-    _user = userData;
-    notifyListeners();
-  }
-
-  void clearUser() {
-    _user = null;
-    notifyListeners();
-  }
-
-  Future<UserData?> getCurrentUserData() async {
+  Future<void> refreshUser() async {
     try {
-      User? user = _firebaseAuth.currentUser;
-      if (user != null) {
-        DocumentSnapshot snapshot =
-            await _firestore.collection('users').doc(user.uid).get();
-        if (snapshot.exists) {
-          return UserData.fromDocument(snapshot);
-        } else {
-          return null;
-        }
-      } else {
-        return null;
-      }
+      UserData user = await _authMethods.getUserDetails();
+      _user = user;
+      notifyListeners();
     } catch (e) {
       if (kDebugMode) {
-        print('Error getting user data: $e');
+        print('Error refreshing user: $e');
       }
-      return null;
     }
-  }
-
-  void updateEvent(Event event) {
-    _currentEvent = event;
-    notifyListeners();
   }
 }

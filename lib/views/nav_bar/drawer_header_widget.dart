@@ -85,9 +85,9 @@ class DrawerHeaderWidget extends StatelessWidget {
                   CircleAvatar(
                     radius: 72,
                     backgroundColor: Colors.grey[200],
-                    child: userData.imagePath.isNotEmpty
+                    child: userData.photoUrl.isNotEmpty
                         ? CachedNetworkImage(
-                            imageUrl: userData.imagePath,
+                            imageUrl: userData.photoUrl,
                             imageBuilder: (context, imageProvider) =>
                                 CircleAvatar(
                               radius: 72,

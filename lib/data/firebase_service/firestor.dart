@@ -32,7 +32,7 @@ class FirebaseService {
       await _firebaseFirestore.collection('events').doc(postId).set({
         'postImage': postImage,
         'username': user.fullName,
-        'profileImage': user.imagePath,
+        'profileImage': user.photoUrl,
         'caption': caption,
         'location': location,
         'uid': _auth.currentUser!.uid,
