@@ -4,7 +4,7 @@ import 'package:churchapp/data/model/photos_data.dart';
 import 'package:churchapp/views/photos/edit.dart';
 import 'package:churchapp/views/photos/photo_viwer.dart';
 
-class PhotoItem extends StatefulWidget {
+class PhotoItem extends StatelessWidget {
   final PhotoData photo;
   final bool isAdmin;
 
@@ -13,19 +13,6 @@ class PhotoItem extends StatefulWidget {
     required this.photo,
     required this.isAdmin,
   });
-
-  @override
-  State<PhotoItem> createState() => _PhotoItemState();
-}
-
-class _PhotoItemState extends State<PhotoItem> {
-  late PhotoData _photo;
-
-  @override
-  void initState() {
-    super.initState();
-    _photo = widget.photo;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,17 +29,17 @@ class _PhotoItemState extends State<PhotoItem> {
             children: [
               Expanded(
                 child: Text(
-                  _photo.location.isNotEmpty
-                      ? _photo.location
+                  photo.location.isNotEmpty
+                      ? photo.location
                       : 'Localização não informada',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: Color.fromARGB(255, 0, 0, 0),
+                    color: Colors.black,
                   ),
                 ),
               ),
-              if (widget.isAdmin)
+              if (isAdmin)
                 IconButton(
                   icon: const Icon(
                     Icons.edit,
@@ -61,21 +48,19 @@ class _PhotoItemState extends State<PhotoItem> {
                   onPressed: () async {
                     final result = await Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => EditPhotoScreen(photo: _photo),
+                        builder: (context) => EditPhotoScreen(photo: photo),
                       ),
                     );
 
                     if (result == true) {
-                      setState(() {
-                        _photo = _photo;
-                      });
+                      // Add code to refresh data here
                     }
                   },
                 ),
             ],
           ),
         ),
-        if (_photo.urls.isNotEmpty)
+        if (photo.urls.isNotEmpty)
           Stack(
             children: [
               SizedBox(
@@ -86,21 +71,21 @@ class _PhotoItemState extends State<PhotoItem> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => FullScreenPhotoPage(
-                          photoUrls: _photo.urls,
+                          photoUrls: photo.urls,
                           initialIndex: 0,
                         ),
                       ),
                     );
                   },
                   child: CachedNetworkImage(
-                    imageUrl: _photo.urls[0],
+                    imageUrl: photo.urls[0],
                     fit: BoxFit.cover,
                     errorWidget: (context, url, error) =>
                         const Icon(Icons.error),
                   ),
                 ),
               ),
-              if (_photo.urls.length > 1)
+              if (photo.urls.length > 1)
                 Positioned(
                   bottom: 8.0,
                   right: 8.0,
