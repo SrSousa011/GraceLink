@@ -1,12 +1,18 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:churchapp/data/model/photos_data.dart';
+import 'package:churchapp/views/photos/edit_image.dart'; // Ensure this import is correct
 import 'package:churchapp/views/photos/photo_viwer.dart';
 import 'package:flutter/material.dart';
 
 class PhotoItem extends StatelessWidget {
   final PhotoData photo;
+  final bool isAdmin; // Add this parameter
 
-  const PhotoItem({super.key, required this.photo});
+  const PhotoItem({
+    super.key,
+    required this.photo,
+    required this.isAdmin,
+  }); // Add this parameter to constructor
 
   @override
   Widget build(BuildContext context) {
@@ -18,15 +24,38 @@ class PhotoItem extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(
-            photo.location.isNotEmpty
-                ? photo.location
-                : 'Localização não informada',
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: Color.fromARGB(255, 0, 0, 0),
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  photo.location.isNotEmpty
+                      ? photo.location
+                      : 'Localização não informada',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Color.fromARGB(255, 0, 0, 0),
+                  ),
+                ),
+              ),
+              if (isAdmin) // Conditionally show the edit icon
+                IconButton(
+                  icon: const Icon(
+                    Icons.edit,
+                    color: Colors.black,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => EditPhotoScreen(
+                          photo: photo, // Pass the photo to the EditPhotoScreen
+                        ),
+                      ),
+                    );
+                  },
+                ),
+            ],
           ),
         ),
         if (photo.urls.isNotEmpty)
