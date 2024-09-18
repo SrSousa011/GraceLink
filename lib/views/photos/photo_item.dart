@@ -21,6 +21,13 @@ class PhotoItem extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final iconColor = isDarkMode ? Colors.white : Colors.black;
+    final overlayColor = isDarkMode
+        ? Colors.white.withOpacity(0.7)
+        : Colors.black.withOpacity(0.7);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -34,18 +41,18 @@ class PhotoItem extends StatelessWidget {
                   photo.location.isNotEmpty
                       ? photo.location
                       : 'Localização não informada',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: Colors.black,
+                    color: textColor,
                   ),
                 ),
               ),
               if (isAdmin)
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.edit,
-                    color: Colors.black,
+                    color: iconColor,
                   ),
                   onPressed: () async {
                     final result = await Navigator.of(context).push(
@@ -55,6 +62,7 @@ class PhotoItem extends StatelessWidget {
                     );
 
                     if (result == true) {
+                      if (!context.mounted) return;
                       context.read<PhotoProvider>().fetchPhotos();
                     }
                   },
@@ -94,12 +102,12 @@ class PhotoItem extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(6.0),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
+                      color: overlayColor,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.photo_library,
-                      color: Colors.white,
+                      color: textColor,
                       size: 24.0,
                     ),
                   ),
