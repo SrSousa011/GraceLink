@@ -41,7 +41,7 @@ class PhotosService {
         'location': location,
       });
     } catch (e) {
-      throw Exception('Failed to update profile: $e');
+      throw Exception('Erro ao atualizar localização: $e');
     }
   }
 

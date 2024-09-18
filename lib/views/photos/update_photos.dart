@@ -11,7 +11,7 @@ const double tDefaultSize = 16.0;
 const double tFormHeight = 20.0;
 const String tLocation = 'Localização';
 const String tDelete = 'Excluir';
-const String tJoined = 'Adicionado em: '; // Corrigido para incluir algum texto
+const String tJoined = '';
 
 class UpdatePhotos extends StatefulWidget {
   final PhotoData photoData;
@@ -54,7 +54,7 @@ class _UpdatePhotosState extends State<UpdatePhotos> {
         const SnackBar(content: Text('Localização atualizada com sucesso')),
       );
 
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(true); // Notifica que houve uma atualização
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Falha ao atualizar a localização: $error')),
