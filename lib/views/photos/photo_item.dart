@@ -1,17 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:churchapp/views/photos/edit.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/data/model/photos_data.dart';
-
 import 'package:churchapp/views/photos/photo_viwer.dart';
 
 class PhotoItem extends StatelessWidget {
   final PhotoData photo;
   final bool isAdmin;
+  final Function(String) onDownload;
 
   const PhotoItem({
     super.key,
     required this.photo,
     required this.isAdmin,
+    required this.onDownload,
   });
 
   @override
@@ -44,6 +46,35 @@ class PhotoItem extends StatelessWidget {
                     color: textColor,
                   ),
                 ),
+              ),
+              PopupMenuButton<String>(
+                onSelected: (value) {
+                  if (value == 'edit' && isAdmin) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => UpdatePhotos(
+                          photoData: photo, // Adicionado o parâmetro correto
+                        ),
+                      ),
+                    );
+                  } else if (value == 'download') {
+                    onDownload(
+                        photo.uploadId); // Garantir que uploadId não seja nulo
+                  }
+                },
+                itemBuilder: (BuildContext context) {
+                  return [
+                    if (isAdmin)
+                      const PopupMenuItem<String>(
+                        value: 'edit',
+                        child: Text('Edit'),
+                      ),
+                    const PopupMenuItem<String>(
+                      value: 'download',
+                      child: Text('Download'),
+                    ),
+                  ];
+                },
               ),
             ],
           ),

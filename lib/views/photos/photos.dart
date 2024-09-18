@@ -9,7 +9,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as path;
 import 'photo_item.dart';
 import 'preview_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import for FirebaseAuth
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PhotoGalleryPage extends StatefulWidget {
   const PhotoGalleryPage({super.key});
@@ -212,6 +212,14 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
     }
   }
 
+  void _handleDownload(String uploadId) async {
+    // Logic to handle download based on uploadId
+    // This method should be implemented based on your download requirements.
+    if (kDebugMode) {
+      print('Download initiated for uploadId: $uploadId');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -233,6 +241,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
               .map((photo) => PhotoItem(
                     photo: photo,
                     isAdmin: _isAdmin,
+                    onDownload: _handleDownload,
                   ))
               .toList(),
         ),

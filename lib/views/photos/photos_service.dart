@@ -35,17 +35,35 @@ class PhotosService {
     }
   }
 
-  Future<void> savePhotoData(String location, List<String> imageUrls) async {
+  Future<void> updateLocation(String uploadId, String location) async {
+    try {
+      await _firestore.collection('photos').doc(uploadId).update({
+        'location': location,
+      });
+    } catch (e) {
+      throw Exception('Failed to update profile: $e');
+    }
+  }
+
+  Future<void> updatePhotoData(
+      String location, // ID do documento
+      List<String> imageUrls, // Novos URLs de imagens
+      String uploadId // ID de upload associado
+      ) async {
     final locationDocRef = _firestore.collection('photos').doc(location);
 
     try {
-      await locationDocRef.set({
-        'location': location,
-        'uploadId': DateTime.now().millisecondsSinceEpoch.toString(),
+      // Atualiza os campos específicos
+      await locationDocRef.update({
         'urls': imageUrls,
+        'uploadId': uploadId,
+        'updatedAt': FieldValue
+            .serverTimestamp(), // Adiciona um campo de timestamp para rastrear quando foi atualizado
       });
     } catch (e) {
-      throw Exception('Error saving photo data: $e');
+      // Melhorar a captura e registro de erros para depuração
+      print('Error updating photo data: $e');
+      throw Exception('Error updating photo data: $e');
     }
   }
 
@@ -92,7 +110,7 @@ class PhotosService {
         final data = doc.data();
         return PhotoData(
           urls: List<String>.from(data['urls'] ?? []),
-          uploadId: doc.id,
+          uploadId: data['uploadId'] ?? '',
           location: data['location'] ?? '',
           createdAt: data['createdAt'] as Timestamp,
         );
