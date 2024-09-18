@@ -68,24 +68,35 @@ class PhotoItem extends StatelessWidget {
                       PopupMenuItem<String>(
                         value: 'edit',
                         child: ListTile(
-                          leading: Icon(LineAwesomeIcons.pencil_alt_solid,
-                              color:
-                                  isDarkMode ? Colors.grey[300] : Colors.red),
-                          title: Text('Editar',
-                              style: TextStyle(
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.red)),
+                          leading: Icon(
+                            LineAwesomeIcons.pencil_alt_solid,
+                            color: isDarkMode
+                                ? Colors.grey[300]
+                                : const Color.fromARGB(255, 0, 255, 38),
+                          ),
+                          title: Text(
+                            'Editar',
+                            style: TextStyle(
+                              color: isDarkMode
+                                  ? Colors.white
+                                  : const Color.fromARGB(255, 0, 0, 0),
+                            ),
+                          ),
                         ),
                       ),
                     PopupMenuItem<String>(
                       value: 'download',
                       child: ListTile(
-                        leading: Icon(LineAwesomeIcons.cloud_download_alt_solid,
-                            color: isDarkMode ? Colors.white : Colors.blue),
-                        title: Text('Download',
-                            style: TextStyle(
-                                color:
-                                    isDarkMode ? Colors.white : Colors.black)),
+                        leading: Icon(
+                          LineAwesomeIcons.cloud_download_alt_solid,
+                          color: isDarkMode ? Colors.white : Colors.blue,
+                        ),
+                        title: Text(
+                          'Download',
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
+                        ),
                       ),
                     ),
                   ];
