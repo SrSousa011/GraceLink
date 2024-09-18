@@ -11,7 +11,7 @@ const double tDefaultSize = 16.0;
 const double tFormHeight = 20.0;
 const String tLocation = 'Localização';
 const String tDelete = 'Excluir';
-const String tJoined = '';
+const String tJoined = 'Adicionado em: '; // Corrigido para incluir algum texto
 
 class UpdatePhotos extends StatefulWidget {
   final PhotoData photoData;
@@ -126,12 +126,12 @@ class _UpdatePhotosState extends State<UpdatePhotos> {
                       Text.rich(
                         TextSpan(
                           text: tJoined,
-                          style: TextStyle(fontSize: 12),
+                          style: const TextStyle(fontSize: 12),
                           children: [
                             TextSpan(
                               text:
                                   _formatTimestamp(widget.photoData.createdAt),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
                               ),
