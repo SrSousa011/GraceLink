@@ -1,8 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:churchapp/views/photos/edit.dart';
+import 'package:churchapp/views/photos/update_photos.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/data/model/photos_data.dart';
 import 'package:churchapp/views/photos/photo_viwer.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 class PhotoItem extends StatelessWidget {
   final PhotoData photo;
@@ -53,25 +54,39 @@ class PhotoItem extends StatelessWidget {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => UpdatePhotos(
-                          photoData: photo, // Adicionado o parâmetro correto
+                          photoData: photo,
                         ),
                       ),
                     );
                   } else if (value == 'download') {
-                    onDownload(
-                        photo.uploadId); // Garantir que uploadId não seja nulo
+                    onDownload(photo.uploadId);
                   }
                 },
                 itemBuilder: (BuildContext context) {
                   return [
                     if (isAdmin)
-                      const PopupMenuItem<String>(
+                      PopupMenuItem<String>(
                         value: 'edit',
-                        child: Text('Edit'),
+                        child: ListTile(
+                          leading: Icon(LineAwesomeIcons.pencil_alt_solid,
+                              color:
+                                  isDarkMode ? Colors.grey[300] : Colors.red),
+                          title: Text('Editar',
+                              style: TextStyle(
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.red)),
+                        ),
                       ),
-                    const PopupMenuItem<String>(
+                    PopupMenuItem<String>(
                       value: 'download',
-                      child: Text('Download'),
+                      child: ListTile(
+                        leading: Icon(LineAwesomeIcons.cloud_download_alt_solid,
+                            color: isDarkMode ? Colors.white : Colors.blue),
+                        title: Text('Download',
+                            style: TextStyle(
+                                color:
+                                    isDarkMode ? Colors.white : Colors.black)),
+                      ),
                     ),
                   ];
                 },
