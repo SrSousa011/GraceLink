@@ -3,7 +3,6 @@ import 'package:churchapp/route/root.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-import 'package:churchapp/provider/user_provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/route/routes.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
@@ -19,7 +18,6 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => PhotoProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],

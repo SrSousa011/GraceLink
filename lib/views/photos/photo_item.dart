@@ -1,10 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:churchapp/provider/photo_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/data/model/photos_data.dart';
-import 'package:churchapp/views/photos/edit.dart';
+
 import 'package:churchapp/views/photos/photo_viwer.dart';
-import 'package:provider/provider.dart';
 
 class PhotoItem extends StatelessWidget {
   final PhotoData photo;
@@ -23,10 +21,9 @@ class PhotoItem extends StatelessWidget {
 
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDarkMode ? Colors.white : Colors.black;
-    final iconColor = isDarkMode ? Colors.white : Colors.black;
     final overlayColor = isDarkMode
-        ? Colors.white.withOpacity(0.7)
-        : Colors.black.withOpacity(0.7);
+        ? Colors.black.withOpacity(0.7)
+        : Colors.white.withOpacity(0.7);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,25 +45,6 @@ class PhotoItem extends StatelessWidget {
                   ),
                 ),
               ),
-              if (isAdmin)
-                IconButton(
-                  icon: Icon(
-                    Icons.edit,
-                    color: iconColor,
-                  ),
-                  onPressed: () async {
-                    final result = await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => EditPhotoScreen(photo: photo),
-                      ),
-                    );
-
-                    if (result == true) {
-                      if (!context.mounted) return;
-                      context.read<PhotoProvider>().fetchPhotos();
-                    }
-                  },
-                ),
             ],
           ),
         ),

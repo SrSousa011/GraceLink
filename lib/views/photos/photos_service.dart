@@ -42,7 +42,6 @@ class PhotosService {
       await locationDocRef.set({
         'location': location,
         'uploadId': DateTime.now().millisecondsSinceEpoch.toString(),
-        'createdAt': Timestamp.now(),
         'urls': imageUrls,
       });
     } catch (e) {
