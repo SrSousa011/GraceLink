@@ -10,7 +10,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:churchapp/views/financial_files/expense/expenses.dart';
 import 'package:churchapp/views/financial_files/income/incomes.dart';
 import 'package:churchapp/views/financial_files/upcomingEvents/upcoming_event.dart';
-import 'package:churchapp/views/financial_files/financial_analytics.dart';
 
 class FinanceScreen extends StatefulWidget {
   const FinanceScreen({super.key});
@@ -270,17 +269,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                           Transform.translate(
                             offset: const Offset(0.0, -80.0),
                             child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => FinancialAnalytics(
-                                      totalOverallSum: totalReceita,
-                                      totalMonthlySum: totalReceita,
-                                    ),
-                                  ),
-                                );
-                              },
+                              onTap: () {},
                               child: Container(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 8.0),
