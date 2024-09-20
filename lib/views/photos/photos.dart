@@ -62,29 +62,6 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
     }
   }
 
-  Future<List<PhotoData>> _fetchPhotos() async {
-    CollectionReference photos =
-        FirebaseFirestore.instance.collection('photos');
-    var snapshot = await photos.orderBy('createdAt', descending: true).get();
-
-    final photosList = snapshot.docs.map((doc) {
-      final data = doc.data() as Map<String, dynamic>;
-      return PhotoData(
-        urls: List<String>.from(data['urls'] ?? []),
-        uploadId: data['uploadId'] ?? '',
-        location: data['location'] ?? '',
-        createdAt: data['createdAt'] as Timestamp,
-      );
-    }).toList();
-
-    setState(() {
-      _allPhotos = photosList;
-      _filteredPhotos = _filterPhotos(_searchQuery);
-    });
-
-    return photosList;
-  }
-
   List<PhotoData> _filterPhotos(String query) {
     if (query.isEmpty) {
       return _allPhotos;
@@ -208,7 +185,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
     }
   }
 
-  Future<void> _handleOpenUrl(String uploadId) async {
+  Future<void> _handleDowload(String uploadId) async {
     try {
       final photoDoc =
           await _firestore.collection('photos').doc(uploadId).get();
@@ -379,7 +356,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
                       return PhotoItem(
                         photo: photo,
                         isAdmin: _isAdmin,
-                        onDownload: _handleOpenUrl,
+                        onDownload: _handleDowload,
                       );
                     },
                     childCount: _filteredPhotos.length,
