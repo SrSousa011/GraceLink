@@ -219,8 +219,9 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
       String location = data['location'] ?? 'default_location';
 
       if (imageUrls.isNotEmpty) {
-        for (String imageUrl in imageUrls) {
-          await _downloadImage(imageUrl, location);
+        for (int i = 0; i < imageUrls.length; i++) {
+          String imageUrl = imageUrls[i];
+          await _downloadImage(imageUrl, location, i + 1);
         }
       } else {
         if (mounted) {
@@ -240,7 +241,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
     }
   }
 
-  Future<void> _downloadImage(String url, String location) async {
+  Future<void> _downloadImage(String url, String location, int index) async {
     try {
       Directory? directory;
 
@@ -256,7 +257,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
         await directory.create(recursive: true);
       }
 
-      final filePath = '${directory.path}/$location.jpg';
+      final filePath = '${directory.path}/$location-$index.jpg';
       final response = await Dio().download(url, filePath);
 
       if (response.statusCode == 200) {
