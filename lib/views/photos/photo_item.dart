@@ -1,9 +1,62 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/data/model/photos_data.dart';
 import 'package:churchapp/views/photos/update_photos.dart';
 import 'package:churchapp/views/photos/photo_viwer.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+
+class PhotosScreen extends StatelessWidget {
+  final bool isAdmin;
+
+  const PhotosScreen({super.key, required this.isAdmin});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Galeria de Fotos'),
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('photos')
+            .orderBy('createdAt', descending: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('Nenhuma foto encontrada.'));
+          }
+
+          final photos = snapshot.data!.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return PhotoData(
+              urls: List<String>.from(data['urls'] ?? []),
+              uploadId: data['uploadId'] ?? '',
+              location: data['location'] ?? '',
+              createdAt: data['createdAt'] as Timestamp,
+            );
+          }).toList();
+
+          return ListView(
+            children: photos.map((photo) {
+              return PhotoItem(
+                photo: photo,
+                isAdmin: isAdmin,
+                onDownload: (uploadId) {
+                  // Implement your download functionality here
+                },
+              );
+            }).toList(),
+          );
+        },
+      ),
+    );
+  }
+}
 
 class PhotoItem extends StatelessWidget {
   final PhotoData photo;
@@ -11,11 +64,11 @@ class PhotoItem extends StatelessWidget {
   final Function(String) onDownload;
 
   const PhotoItem({
-    super.key,
+    Key? key,
     required this.photo,
     required this.isAdmin,
     required this.onDownload,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
