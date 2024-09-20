@@ -1,7 +1,6 @@
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/income/anual_chart.dart';
 import 'package:churchapp/views/financial_files/income/monthly_chart.dart';
-import 'package:churchapp/views/financial_files/income/overall_chart.dart';
 import 'package:churchapp/views/financial_files/revenue_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -128,18 +127,6 @@ class IncomesScreen extends StatelessWidget {
                         totalMonthlyIncome: totalOverallSum,
                         totalMonthlyCourseRevenue: totalMonthlyCourseRevenue,
                         totalMonthlyDonations: totalMonthlyDonations,
-                        isDarkMode:
-                            Theme.of(context).brightness == Brightness.dark,
-                      ),
-                    ),
-                    const SizedBox(height: 22),
-                    SizedBox(
-                      height: 500,
-                      child: OverallIncomeChart(
-                        totalOverallReceita: totalReceitas,
-                        totalOverallSum: totalOverallSum,
-                        totalOverallCourseRevenue: totalOverallCourseRevenue,
-                        totalOverallDonations: totalBalance,
                         isDarkMode:
                             Theme.of(context).brightness == Brightness.dark,
                       ),
