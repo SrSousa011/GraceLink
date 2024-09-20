@@ -35,13 +35,11 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   String _searchQuery = '';
   List<PhotoData> _allPhotos = [];
   List<PhotoData> _filteredPhotos = [];
-  Future<List<PhotoData>>? _photosFuture;
 
   @override
   void initState() {
     super.initState();
     _fetchUserRole();
-    _photosFuture = _fetchPhotos();
   }
 
   Future<void> _fetchUserRole() async {
@@ -336,8 +334,11 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
           ),
           SliverPadding(
             padding: const EdgeInsets.all(0.0),
-            sliver: FutureBuilder<List<PhotoData>>(
-              future: _photosFuture,
+            sliver: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('photos')
+                  .orderBy('createdAt', descending: true)
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const SliverToBoxAdapter(
@@ -350,6 +351,20 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
                     child: Center(child: Text('Erro: ${snapshot.error}')),
                   );
                 }
+
+                final photosList = snapshot.data?.docs.map((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      return PhotoData(
+                        urls: List<String>.from(data['urls'] ?? []),
+                        uploadId: data['uploadId'] ?? '',
+                        location: data['location'] ?? '',
+                        createdAt: data['createdAt'] as Timestamp,
+                      );
+                    }).toList() ??
+                    [];
+
+                _allPhotos = photosList;
+                _filteredPhotos = _filterPhotos(_searchQuery);
 
                 if (_filteredPhotos.isEmpty) {
                   return const SliverToBoxAdapter(
