@@ -216,11 +216,12 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
 
       final data = photoDoc.data();
       final imageUrls = List<String>.from(data!['urls'] ?? []);
-      String imageUrl = imageUrls.isNotEmpty ? imageUrls.first : '';
       String location = data['location'] ?? 'default_location';
 
-      if (imageUrl.isNotEmpty) {
-        await _downloadImage(imageUrl, location);
+      if (imageUrls.isNotEmpty) {
+        for (String imageUrl in imageUrls) {
+          await _downloadImage(imageUrl, location);
+        }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
