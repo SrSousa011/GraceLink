@@ -1,12 +1,17 @@
+import 'dart:io';
 import 'package:churchapp/data/model/photos_data.dart';
 import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/views/photos/image_source.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'photo_item.dart';
 import 'preview_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -212,11 +217,80 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
     }
   }
 
-  void _handleDownload(String uploadId) async {
-    // Logic to handle download based on uploadId
-    // This method should be implemented based on your download requirements.
-    if (kDebugMode) {
-      print('Download initiated for uploadId: $uploadId');
+  void _handleOpenUrl(String uploadId) async {
+    try {
+      final photoDoc =
+          await _firestore.collection('photos').doc(uploadId).get();
+      if (!photoDoc.exists) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Arquivo não encontrado!')),
+        );
+        return;
+      }
+
+      final data = photoDoc.data();
+      final imageUrls = List<String>.from(data!['urls'] ?? []);
+
+      String imageUrl = imageUrls.isNotEmpty ? imageUrls.first : '';
+
+      String location = data['location'] ?? 'default_location';
+
+      if (imageUrl.isNotEmpty) {
+        await _downloadImage(imageUrl, location);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('URL da imagem não disponível.')),
+        );
+      }
+    } catch (e) {
+      print('Erro ao abrir a imagem: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao abrir a imagem: $e'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _downloadImage(String url, String location) async {
+    try {
+      Directory? directory;
+
+      if (Platform.isAndroid) {
+        directory = await getExternalStorageDirectory();
+      } else if (Platform.isIOS) {
+        directory =
+            await getApplicationDocumentsDirectory(); // Usar Documents para iOS
+      } else {
+        throw UnsupportedError('Plataforma não suportada');
+      }
+
+      if (directory != null && !await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+
+      final filePath = '${directory!.path}/$location.jpg';
+
+      final response = await Dio().download(url, filePath);
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Download concluído!')),
+        );
+
+        print('Imagem salva em: $filePath');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Erro no download.')),
+        );
+      }
+    } catch (e) {
+      print('Erro ao fazer download: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao fazer download: $e'),
+        ),
+      );
     }
   }
 
@@ -241,7 +315,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
               .map((photo) => PhotoItem(
                     photo: photo,
                     isAdmin: _isAdmin,
-                    onDownload: _handleDownload,
+                    onDownload: _handleOpenUrl, // Alterado para abrir a URL
                   ))
               .toList(),
         ),

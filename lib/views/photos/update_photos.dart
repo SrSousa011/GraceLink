@@ -1,5 +1,4 @@
 import 'package:churchapp/data/model/photos_data.dart';
-import 'package:churchapp/views/photos/photos_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
@@ -44,22 +43,29 @@ class _UpdatePhotosState extends State<UpdatePhotos> {
     return DateFormat('d MMM yyyy').format(date);
   }
 
-  void _saveLocationChanges() {
-    String location = _locationController.text;
+  Future<void> _updateLocation() async {
+    final newLocation = _locationController.text.trim();
 
-    PhotosService photosService = PhotosService();
-
-    photosService.updateLocation(widget.photoData.uploadId, location).then((_) {
+    if (newLocation.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Localização atualizada com sucesso')),
+        const SnackBar(content: Text('Por favor, insira uma localização.')),
       );
+      return;
+    }
 
-      Navigator.of(context).pop(true); // Notifica que houve uma atualização
-    }).catchError((error) {
+    try {
+      await FirebaseFirestore.instance
+          .collection('photos')
+          .doc(widget.photoData.uploadId)
+          .update({'location': newLocation});
+
+      if (!mounted) return;
+      Navigator.pop(context, newLocation);
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Falha ao atualizar a localização: $error')),
+        SnackBar(content: Text('Erro ao atualizar localização: $e')),
       );
-    });
+    }
   }
 
   void _clearFields() {
@@ -108,7 +114,7 @@ class _UpdatePhotosState extends State<UpdatePhotos> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _saveLocationChanges,
+                      onPressed: _updateLocation,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: buttonColor,
                         shape: const StadiumBorder(),

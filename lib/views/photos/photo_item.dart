@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:churchapp/views/photos/update_photos.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/data/model/photos_data.dart';
+import 'package:churchapp/views/photos/update_photos.dart';
 import 'package:churchapp/views/photos/photo_viwer.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
@@ -21,7 +21,6 @@ class PhotoItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDarkMode ? Colors.white : Colors.black;
     final overlayColor = isDarkMode
@@ -53,9 +52,7 @@ class PhotoItem extends StatelessWidget {
                   if (value == 'edit' && isAdmin) {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => UpdatePhotos(
-                          photoData: photo,
-                        ),
+                        builder: (context) => UpdatePhotos(photoData: photo),
                       ),
                     );
                   } else if (value == 'download') {
