@@ -9,23 +9,6 @@ class PermissionReq extends StatefulWidget {
   State<PermissionReq> createState() => _PermissionReqState();
 }
 
-Future<void> requestAllPermissionsAndroid() async {
-  // Solicite permissões básicas
-  await Permission.camera.request();
-  await Permission.storage.request();
-
-  // Solicite permissão de gerenciamento de armazenamento se necessário
-  if (await Permission.camera.isDenied || await Permission.storage.isDenied) {
-    await Permission.manageExternalStorage.request();
-  }
-}
-
-Future<void> requestAllPermissionsIOS() async {
-  // Solicite permissões de câmera e fotos
-  await Permission.camera.request();
-  await Permission.photos.request();
-}
-
 class _PermissionReqState extends State<PermissionReq> {
   bool _isPermissionGranted = false;
   String _permissionStatus = '';
@@ -37,66 +20,45 @@ class _PermissionReqState extends State<PermissionReq> {
   }
 
   Future<void> _checkAndRequestPermissions() async {
-    bool granted;
     try {
+      bool granted = false;
+
       if (Platform.isAndroid) {
-        await requestAllPermissionsAndroid();
+        await _requestAndroidPermissions();
         granted = await _areAllPermissionsGrantedAndroid();
       } else if (Platform.isIOS) {
-        await requestAllPermissionsIOS();
+        await _requestIOSPermissions();
         granted = await _areAllPermissionsGrantedIOS();
-      } else {
-        granted = false;
       }
 
-      setState(() {
-        _isPermissionGranted = granted;
-        _permissionStatus =
-            granted ? 'Permissions granted!' : 'Permissions denied.';
-      });
+      _updatePermissionStatus(granted);
     } catch (e) {
-      setState(() {
-        _isPermissionGranted = false;
-        _permissionStatus = 'Failed to check permissions: ${e.toString()}';
-      });
+      _updatePermissionStatus(false, errorMessage: e.toString());
     }
   }
 
-  Future<void> _ensurePermissions() async {
-    bool granted = false;
-    try {
-      while (!granted) {
-        if (Platform.isAndroid) {
-          await requestAllPermissionsAndroid();
-          granted = await _areAllPermissionsGrantedAndroid();
-        } else if (Platform.isIOS) {
-          await requestAllPermissionsIOS();
-          granted = await _areAllPermissionsGrantedIOS();
-        } else {
-          granted = false;
-        }
+  Future<void> _requestAndroidPermissions() async {
+    await Permission.camera.request();
+    await Permission.storage.request();
 
-        if (granted) {
-          setState(() {
-            _isPermissionGranted = true;
-            _permissionStatus = 'Permissions granted!';
-          });
-          return;
-        } else {
-          setState(() {
-            _isPermissionGranted = false;
-            _permissionStatus = 'Permissions denied. Please try again.';
-          });
-          await Future.delayed(
-              const Duration(seconds: 2)); // Delay before retry
-        }
-      }
-    } catch (e) {
-      setState(() {
-        _isPermissionGranted = false;
-        _permissionStatus = 'Failed to ensure permissions: ${e.toString()}';
-      });
+    if (await Permission.camera.isDenied || await Permission.storage.isDenied) {
+      await Permission.manageExternalStorage.request();
     }
+  }
+
+  Future<void> _requestIOSPermissions() async {
+    await Permission.camera.request();
+    await Permission.photos.request();
+  }
+
+  Future<void> _updatePermissionStatus(bool granted,
+      {String? errorMessage}) async {
+    setState(() {
+      _isPermissionGranted = granted;
+      _permissionStatus = granted
+          ? 'Permissions granted!'
+          : errorMessage ?? 'Permissions denied.';
+    });
   }
 
   Future<bool> _areAllPermissionsGrantedAndroid() async {
@@ -118,9 +80,13 @@ class _PermissionReqState extends State<PermissionReq> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-              onPressed: _checkAndRequestPermissions,
-              child: const Text('Check Permissions'),
+            Tooltip(
+              message:
+                  'Precisamos de acesso à câmera e armazenamento para salvar suas fotos.',
+              child: ElevatedButton(
+                onPressed: _checkAndRequestPermissions,
+                child: const Text('Check Permissions'),
+              ),
             ),
             const SizedBox(height: 20),
             Text(
@@ -132,8 +98,12 @@ class _PermissionReqState extends State<PermissionReq> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _ensurePermissions,
-              child: const Text('Ensure Permissions'),
+              onPressed: _isPermissionGranted
+                  ? null
+                  : () {
+                      openAppSettings();
+                    },
+              child: const Text('Open App Settings'),
             ),
           ],
         ),

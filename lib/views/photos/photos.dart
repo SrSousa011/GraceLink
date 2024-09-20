@@ -3,12 +3,14 @@ import 'dart:typed_data';
 import 'package:churchapp/data/model/photos_data.dart';
 import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
+import 'package:churchapp/views/notifications/notification_photo.dart';
 import 'package:churchapp/views/photos/image_source.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'photo_item.dart';
@@ -29,6 +31,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   final List<XFile> _pickedFiles = [];
   XFile? _selectedImage;
   final TextEditingController _locationController = TextEditingController();
+  final NotificationService _notificationService = NotificationService();
 
   bool _isAdmin = false;
   bool _isSearching = false;
@@ -150,6 +153,8 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
       return;
     }
 
+    final formattedTime = DateFormat('HH:mm').format(DateTime.now());
+
     try {
       final uploadId = DateTime.now().millisecondsSinceEpoch.toString();
       final locationDocRef = _firestore.collection('photos').doc(uploadId);
@@ -176,12 +181,23 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
         'urls': imageUrls,
       });
 
+      if (_notificationService.notificationsEnabled) {
+        await _notificationService.sendNotification(
+          location: location,
+          formattedTime: formattedTime,
+          addedTime: formattedTime,
+        );
+      }
+
       setState(() {
         _pickedFiles.clear();
         _locationController.clear();
       });
     } catch (e) {
       // Error handling
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao adicionar foto: $e')),
+      );
     }
   }
 

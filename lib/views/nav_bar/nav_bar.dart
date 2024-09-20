@@ -223,12 +223,6 @@ class _NavBarState extends State<NavBar> {
             onTap: () => Navigator.pushNamed(context, '/become_member'),
           ),
           _buildListTile(
-            icon: Icons.notifications_outlined,
-            text: 'Notifications',
-            color: iconColor,
-            onTap: () => Navigator.pushNamed(context, '/notifications'),
-          ),
-          _buildListTile(
             icon: Icons.video_library_outlined,
             text: 'Videos',
             color: iconColor,
