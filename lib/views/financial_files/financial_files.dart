@@ -9,7 +9,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:churchapp/views/financial_files/expense/expenses.dart';
 import 'package:churchapp/views/financial_files/income/incomes.dart';
-import 'package:churchapp/views/financial_files/transaction_history.dart';
 import 'package:churchapp/views/financial_files/upcomingEvents/upcoming_event.dart';
 import 'package:churchapp/views/financial_files/financial_analytics.dart';
 
@@ -421,26 +420,6 @@ class _FinanceScreenState extends State<FinanceScreen> {
                             child: _buildFinanceSectionCard(
                               icon: Icons.event_note,
                               title: 'Próximos Lançamentos',
-                              value: '',
-                              backgroundColor: cardBackOutgroundColor,
-                              titleColor: cardTextColor,
-                              valueColor: cardTextColor,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const TransactionHistoryScreen(),
-                                ),
-                              );
-                            },
-                            child: _buildFinanceSectionCard(
-                              icon: Icons.history,
-                              title: 'Histórico de Transações',
                               value: '',
                               backgroundColor: cardBackOutgroundColor,
                               titleColor: cardTextColor,
