@@ -168,7 +168,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
 
     try {
       final uploadId = DateTime.now().millisecondsSinceEpoch.toString();
-      final locationDocRef = _firestore.collection('photos').doc(location);
+      final locationDocRef = _firestore.collection('photos').doc(uploadId);
       final List<String> imageUrls = [];
 
       for (final file in _pickedFiles) {
