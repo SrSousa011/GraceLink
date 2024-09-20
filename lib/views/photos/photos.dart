@@ -57,7 +57,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
         _isAdmin = userData.role == 'admin';
       });
     } catch (e) {
-      // Erro ao buscar dados do usuário
+      // Error handling
     }
   }
 
@@ -197,7 +197,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
         _locationController.clear();
       });
     } catch (e) {
-      // Erro ao carregar a imagem
+      // Error handling
     }
   }
 
@@ -287,66 +287,74 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: _isSearching
-            ? TextField(
-                autofocus: true,
-                onChanged: _updateSearchQuery,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: 'Pesquisar fotos...',
-                ),
-              )
-            : const Text('Galeria de Foto'),
-        actions: [
-          _isSearching
-              ? IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    setState(() {
-                      _isSearching = false;
-                      _searchQuery = '';
-                      _updateSearchQuery('');
-                    });
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title: _isSearching
+                ? TextField(
+                    autofocus: true,
+                    onChanged: _updateSearchQuery,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Pesquisar fotos...',
+                    ),
+                  )
+                : const Text('Galeria de Foto'),
+            floating: true,
+            pinned: true,
+            actions: [
+              _isSearching
+                  ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        setState(() {
+                          _isSearching = false;
+                          _searchQuery = '';
+                          _updateSearchQuery('');
+                        });
+                      },
+                    )
+                  : IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () {
+                        setState(() {
+                          _isSearching = true;
+                        });
+                      },
+                    ),
+            ],
+          ),
+          SliverFillRemaining(
+            child: FutureBuilder<void>(
+              future: _fetchPhotos(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text('Erro: ${snapshot.error}'));
+                }
+
+                if (_filteredPhotos.isEmpty) {
+                  return const Center(child: Text('Nenhuma foto encontrada.'));
+                }
+
+                return ListView.builder(
+                  itemCount: _filteredPhotos.length,
+                  itemBuilder: (context, index) {
+                    final photo = _filteredPhotos[index];
+                    return PhotoItem(
+                      photo: photo,
+                      isAdmin: _isAdmin,
+                      onDownload: _handleOpenUrl,
+                    );
                   },
-                )
-              : IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    setState(() {
-                      _isSearching = true;
-                    });
-                  },
-                ),
+                );
+              },
+            ),
+          ),
         ],
-      ),
-      body: FutureBuilder<void>(
-        future: _fetchPhotos(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text('Erro: ${snapshot.error}'));
-          }
-
-          if (_filteredPhotos.isEmpty) {
-            return const Center(child: Text('Nenhuma foto encontrada.'));
-          }
-
-          return ListView.builder(
-            itemCount: _filteredPhotos.length,
-            itemBuilder: (context, index) {
-              final photo = _filteredPhotos[index];
-              return PhotoItem(
-                photo: photo,
-                isAdmin: _isAdmin,
-                onDownload: _handleOpenUrl,
-              );
-            },
-          );
-        },
       ),
       floatingActionButton: _isAdmin
           ? FloatingActionButton(
