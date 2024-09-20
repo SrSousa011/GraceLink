@@ -1,17 +1,15 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:churchapp/data/model/photos_data.dart';
 import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/views/photos/image_source.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'photo_item.dart';
 import 'preview_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -31,18 +29,15 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   XFile? _selectedImage;
   final TextEditingController _locationController = TextEditingController();
 
-  final int _limit = 20;
-  DocumentSnapshot? _lastDocument;
-  bool _hasMorePhotos = true;
-  final List<PhotoData> _allPhotos = [];
-  List<PhotoData> _filteredPhotos = [];
-  final String _searchQuery = '';
   bool _isAdmin = false;
+  bool _isSearching = false;
+  String _searchQuery = '';
+  List<PhotoData> _allPhotos = [];
+  List<PhotoData> _filteredPhotos = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchPhotos();
     _fetchUserRole();
   }
 
@@ -62,51 +57,42 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
         _isAdmin = userData.role == 'admin';
       });
     } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao buscar dados do usuário: $e');
-      }
+      // Erro ao buscar dados do usuário
     }
   }
 
   Future<void> _fetchPhotos() async {
-    if (!_hasMorePhotos) return;
+    final snapshot = await _firestore
+        .collection('photos')
+        .orderBy('createdAt', descending: true)
+        .get();
+    _allPhotos = snapshot.docs.map((doc) {
+      final data = doc.data();
+      return PhotoData(
+        urls: List<String>.from(data['urls'] ?? []),
+        uploadId: data['uploadId'] ?? '',
+        location: data['location'] ?? '',
+        createdAt: data['createdAt'] as Timestamp,
+      );
+    }).toList();
+    _filteredPhotos = _filterPhotos(_searchQuery);
+  }
 
-    try {
-      Query query = _firestore
-          .collection('photos')
-          .orderBy('createdAt', descending: true)
-          .limit(_limit);
-
-      if (_lastDocument != null) {
-        query = query.startAfterDocument(_lastDocument!);
-      }
-
-      QuerySnapshot snapshot = await query.get();
-      final photosData = snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        return PhotoData(
-          urls: List<String>.from(data['urls'] ?? []),
-          uploadId: data['uploadId'] ?? '',
-          location: data['location'] ?? '',
-          createdAt: data['createdAt'] as Timestamp,
-        );
-      }).toList();
-
-      setState(() {
-        _allPhotos.addAll(photosData);
-        _filteredPhotos = _filterPhotos(_searchQuery);
-
-        if (snapshot.docs.length < _limit) {
-          _hasMorePhotos = false;
-        } else {
-          _lastDocument = snapshot.docs.last;
-        }
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao buscar fotos: $e');
-      }
+  List<PhotoData> _filterPhotos(String query) {
+    if (query.isEmpty) {
+      return _allPhotos;
     }
+    final lowercasedQuery = query.toLowerCase();
+    return _allPhotos.where((photo) {
+      return photo.location.toLowerCase().contains(lowercasedQuery);
+    }).toList();
+  }
+
+  void _updateSearchQuery(String query) {
+    setState(() {
+      _searchQuery = query;
+      _filteredPhotos = _filterPhotos(_searchQuery);
+    });
   }
 
   Future<void> _showImageSourceSelection() async {
@@ -211,44 +197,45 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
         _locationController.clear();
       });
     } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao carregar a imagem: $e');
-      }
+      // Erro ao carregar a imagem
     }
   }
 
-  void _handleOpenUrl(String uploadId) async {
+  Future<void> _handleOpenUrl(String uploadId) async {
     try {
       final photoDoc =
           await _firestore.collection('photos').doc(uploadId).get();
       if (!photoDoc.exists) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Arquivo não encontrado!')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Arquivo não encontrado!')),
+          );
+        }
         return;
       }
 
       final data = photoDoc.data();
       final imageUrls = List<String>.from(data!['urls'] ?? []);
-
       String imageUrl = imageUrls.isNotEmpty ? imageUrls.first : '';
-
       String location = data['location'] ?? 'default_location';
 
       if (imageUrl.isNotEmpty) {
         await _downloadImage(imageUrl, location);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('URL da imagem não disponível.')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('URL da imagem não disponível.')),
+          );
+        }
       }
     } catch (e) {
-      print('Erro ao abrir a imagem: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao abrir a imagem: $e'),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao abrir a imagem: $e'),
+          ),
+        );
+      }
     }
   }
 
@@ -257,40 +244,41 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
       Directory? directory;
 
       if (Platform.isAndroid) {
-        directory = await getExternalStorageDirectory();
+        directory = Directory('/storage/emulated/0/Download');
       } else if (Platform.isIOS) {
-        directory =
-            await getApplicationDocumentsDirectory(); // Usar Documents para iOS
+        directory = await getApplicationDocumentsDirectory();
       } else {
         throw UnsupportedError('Plataforma não suportada');
       }
 
-      if (directory != null && !await directory.exists()) {
+      if (!await directory.exists()) {
         await directory.create(recursive: true);
       }
 
-      final filePath = '${directory!.path}/$location.jpg';
-
+      final filePath = '${directory.path}/$location.jpg';
       final response = await Dio().download(url, filePath);
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Download concluído!')),
-        );
-
-        print('Imagem salva em: $filePath');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Download concluído!')),
+          );
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erro no download.')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Erro no download.')),
+          );
+        }
       }
     } catch (e) {
-      print('Erro ao fazer download: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao fazer download: $e'),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao fazer download: $e'),
+          ),
+        );
+      }
     }
   }
 
@@ -298,27 +286,65 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Galeria de Foto',
-          style: TextStyle(fontSize: 20),
-        ),
+        title: _isSearching
+            ? TextField(
+                autofocus: true,
+                onChanged: _updateSearchQuery,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'Pesquisar fotos...',
+                ),
+              )
+            : const Text('Galeria de Foto'),
+        actions: [
+          _isSearching
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    setState(() {
+                      _isSearching = false;
+                      _searchQuery = '';
+                      _updateSearchQuery('');
+                    });
+                  },
+                )
+              : IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    setState(() {
+                      _isSearching = true;
+                    });
+                  },
+                ),
+        ],
       ),
-      body: NotificationListener<ScrollNotification>(
-        onNotification: (scrollInfo) {
-          if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-            _fetchPhotos();
+      body: FutureBuilder<void>(
+        future: _fetchPhotos(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
           }
-          return false;
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Erro: ${snapshot.error}'));
+          }
+
+          if (_filteredPhotos.isEmpty) {
+            return const Center(child: Text('Nenhuma foto encontrada.'));
+          }
+
+          return ListView.builder(
+            itemCount: _filteredPhotos.length,
+            itemBuilder: (context, index) {
+              final photo = _filteredPhotos[index];
+              return PhotoItem(
+                photo: photo,
+                isAdmin: _isAdmin,
+                onDownload: _handleOpenUrl,
+              );
+            },
+          );
         },
-        child: ListView(
-          children: _filteredPhotos
-              .map((photo) => PhotoItem(
-                    photo: photo,
-                    isAdmin: _isAdmin,
-                    onDownload: _handleOpenUrl, // Alterado para abrir a URL
-                  ))
-              .toList(),
-        ),
       ),
       floatingActionButton: _isAdmin
           ? FloatingActionButton(
@@ -327,16 +353,5 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
             )
           : null,
     );
-  }
-
-  List<PhotoData> _filterPhotos(String query) {
-    if (query.isEmpty) {
-      return _allPhotos;
-    } else {
-      return _allPhotos
-          .where((photo) =>
-              photo.location.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    }
   }
 }
