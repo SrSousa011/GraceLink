@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:churchapp/data/model/photos_data.dart';
 import 'package:churchapp/data/model/user_data.dart';
+import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/photos/image_source.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -34,11 +35,13 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   String _searchQuery = '';
   List<PhotoData> _allPhotos = [];
   List<PhotoData> _filteredPhotos = [];
+  Future<List<PhotoData>>? _photosFuture;
 
   @override
   void initState() {
     super.initState();
     _fetchUserRole();
+    _photosFuture = _fetchPhotos();
   }
 
   Future<void> _fetchUserRole() async {
@@ -61,13 +64,13 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
     }
   }
 
-  Future<void> _fetchPhotos() async {
-    final snapshot = await _firestore
-        .collection('photos')
-        .orderBy('createdAt', descending: true)
-        .get();
-    _allPhotos = snapshot.docs.map((doc) {
-      final data = doc.data();
+  Future<List<PhotoData>> _fetchPhotos() async {
+    CollectionReference photos =
+        FirebaseFirestore.instance.collection('photos');
+    var snapshot = await photos.orderBy('createdAt', descending: true).get();
+
+    final photosList = snapshot.docs.map((doc) {
+      final data = doc.data() as Map<String, dynamic>;
       return PhotoData(
         urls: List<String>.from(data['urls'] ?? []),
         uploadId: data['uploadId'] ?? '',
@@ -75,7 +78,13 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
         createdAt: data['createdAt'] as Timestamp,
       );
     }).toList();
-    _filteredPhotos = _filterPhotos(_searchQuery);
+
+    setState(() {
+      _allPhotos = photosList;
+      _filteredPhotos = _filterPhotos(_searchQuery);
+    });
+
+    return photosList;
   }
 
   List<PhotoData> _filterPhotos(String query) {
@@ -287,6 +296,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const NavBar(),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -324,32 +334,41 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
                     ),
             ],
           ),
-          SliverFillRemaining(
-            child: FutureBuilder<void>(
-              future: _fetchPhotos(),
+          SliverPadding(
+            padding: const EdgeInsets.all(0.0),
+            sliver: FutureBuilder<List<PhotoData>>(
+              future: _photosFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const SliverToBoxAdapter(
+                    child: Center(child: CircularProgressIndicator()),
+                  );
                 }
 
                 if (snapshot.hasError) {
-                  return Center(child: Text('Erro: ${snapshot.error}'));
+                  return SliverToBoxAdapter(
+                    child: Center(child: Text('Erro: ${snapshot.error}')),
+                  );
                 }
 
                 if (_filteredPhotos.isEmpty) {
-                  return const Center(child: Text('Nenhuma foto encontrada.'));
+                  return const SliverToBoxAdapter(
+                    child: Center(child: Text('Nenhuma foto encontrada.')),
+                  );
                 }
 
-                return ListView.builder(
-                  itemCount: _filteredPhotos.length,
-                  itemBuilder: (context, index) {
-                    final photo = _filteredPhotos[index];
-                    return PhotoItem(
-                      photo: photo,
-                      isAdmin: _isAdmin,
-                      onDownload: _handleOpenUrl,
-                    );
-                  },
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final photo = _filteredPhotos[index];
+                      return PhotoItem(
+                        photo: photo,
+                        isAdmin: _isAdmin,
+                        onDownload: _handleOpenUrl,
+                      );
+                    },
+                    childCount: _filteredPhotos.length,
+                  ),
                 );
               },
             ),
