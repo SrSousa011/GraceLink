@@ -5,6 +5,7 @@ import 'package:churchapp/data/model/photos_data.dart';
 import 'package:churchapp/views/photos/update_photos.dart';
 import 'package:churchapp/views/photos/photo_viwer.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class PhotosScreen extends StatelessWidget {
   final bool isAdmin;
@@ -46,9 +47,8 @@ class PhotosScreen extends StatelessWidget {
               return PhotoItem(
                 photo: photo,
                 isAdmin: isAdmin,
-                onDownload: (uploadId) {
-                  // Implement your download functionality here
-                },
+                onDownload: (uploadId) {},
+                onDelete: (uploadId) => _deletePhoto(context, uploadId),
               );
             }).toList(),
           );
@@ -56,19 +56,39 @@ class PhotosScreen extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _deletePhoto(BuildContext context, String uploadId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('photos')
+          .doc(uploadId)
+          .delete();
+
+      final storageRef =
+          FirebaseStorage.instance.ref().child('photos/$uploadId');
+      await storageRef.delete();
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao excluir a foto: $e')),
+      );
+    }
+  }
 }
 
 class PhotoItem extends StatelessWidget {
   final PhotoData photo;
   final bool isAdmin;
   final Function(String) onDownload;
+  final Function(String) onDelete;
 
   const PhotoItem({
-    Key? key,
+    super.key,
     required this.photo,
     required this.isAdmin,
     required this.onDownload,
-  }) : super(key: key);
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -110,6 +130,28 @@ class PhotoItem extends StatelessWidget {
                     );
                   } else if (value == 'download') {
                     onDownload(photo.uploadId);
+                  } else if (value == 'delete' && isAdmin) {
+                    showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Confirmar Exclusão'),
+                        content: const Text(
+                            'Você tem certeza que deseja excluir esta foto?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: const Text('Cancelar'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              onDelete(photo.uploadId);
+                              Navigator.of(context).pop(true);
+                            },
+                            child: const Text('Excluir'),
+                          ),
+                        ],
+                      ),
+                    );
                   }
                 },
                 itemBuilder: (BuildContext context) {
@@ -149,6 +191,22 @@ class PhotoItem extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (isAdmin)
+                      PopupMenuItem<String>(
+                        value: 'delete',
+                        child: ListTile(
+                          leading: Icon(
+                            LineAwesomeIcons.trash_alt,
+                            color: isDarkMode ? Colors.red : Colors.redAccent,
+                          ),
+                          title: Text(
+                            'Excluir',
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.red : Colors.redAccent,
+                            ),
+                          ),
+                        ),
+                      ),
                   ];
                 },
               ),

@@ -201,6 +201,30 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
     }
   }
 
+  Future<void> _handleDelete(String uploadId) async {
+    try {
+      // Deleta o documento no Firestore
+      await _firestore.collection('photos').doc(uploadId).delete();
+
+      // Deleta todas as imagens no Firebase Storage que têm o uploadId no caminho
+      final ListResult listResult = await _storage.ref('photos').listAll();
+
+      for (var item in listResult.items) {
+        if (item.fullPath.contains(uploadId)) {
+          await item.delete();
+        }
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Foto excluída com sucesso!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao excluir a foto: $e')),
+      );
+    }
+  }
+
   Future<void> _handleDowload(String uploadId) async {
     try {
       final photoDoc =
@@ -373,6 +397,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
                         photo: photo,
                         isAdmin: _isAdmin,
                         onDownload: _handleDowload,
+                        onDelete: _handleDelete,
                       );
                     },
                     childCount: _filteredPhotos.length,
