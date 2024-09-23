@@ -195,6 +195,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
       });
     } catch (e) {
       // Error handling
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro ao adicionar foto: $e')),
       );
@@ -203,10 +204,8 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
 
   Future<void> _handleDelete(String uploadId) async {
     try {
-      // Deleta o documento no Firestore
       await _firestore.collection('photos').doc(uploadId).delete();
 
-      // Deleta todas as imagens no Firebase Storage que têm o uploadId no caminho
       final ListResult listResult = await _storage.ref('photos').listAll();
 
       for (var item in listResult.items) {
@@ -215,6 +214,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
         }
       }
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Foto excluída com sucesso!')),
       );
