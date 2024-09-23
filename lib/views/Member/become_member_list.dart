@@ -19,8 +19,8 @@ class BecomeMemberList extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Lista de Membros'),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _getFilteredMembers(),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _getFilteredMembers(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
@@ -31,7 +31,7 @@ class BecomeMemberList extends StatelessWidget {
             );
           }
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
               child: Text(
                 'Nenhum membro encontrado',
@@ -40,15 +40,15 @@ class BecomeMemberList extends StatelessWidget {
             );
           }
 
-          final members = snapshot.data!.docs;
+          final members = snapshot.data!;
 
           return ListView.builder(
             itemCount: members.length,
             itemBuilder: (context, index) {
-              final memberDoc = members[index];
-              final member = memberDoc.data() as Map<String, dynamic>;
+              final member = members[index];
               final createdById = member['createdById'] as String?;
-              final memberId = memberDoc.id;
+              final memberId = member['id'] as String;
+
               if (createdById == null) {
                 return ListTile(
                   leading: const CircleAvatar(
@@ -61,9 +61,8 @@ class BecomeMemberList extends StatelessWidget {
                 );
               }
 
-              return StreamBuilder<DocumentSnapshot>(
-                stream:
-                    _firestore.collection('users').doc(createdById).snapshots(),
+              return FutureBuilder<DocumentSnapshot>(
+                future: _firestore.collection('users').doc(createdById).get(),
                 builder: (context, userSnapshot) {
                   if (userSnapshot.connectionState == ConnectionState.waiting) {
                     return ListTile(
@@ -149,36 +148,53 @@ class BecomeMemberList extends StatelessWidget {
     );
   }
 
-  Stream<QuerySnapshot> _getFilteredMembers() {
+  Future<List<Map<String, dynamic>>> _getFilteredMembers() async {
     final now = DateTime.now();
     final startOfMonth = DateTime(now.year, now.month, 1);
+    final List<Map<String, dynamic>> membersList = [];
+
+    QuerySnapshot querySnapshot;
 
     switch (filter) {
       case 'male':
-        return _firestore
+        querySnapshot = await _firestore
             .collection('members')
             .where('gender', isEqualTo: 'Masculino')
-            .snapshots();
+            .get();
+        break;
       case 'female':
-        return _firestore
+        querySnapshot = await _firestore
             .collection('members')
             .where('gender', isEqualTo: 'Feminino')
-            .snapshots();
+            .get();
+        break;
       case 'children':
-        return _firestore
+        querySnapshot = await _firestore
             .collection('members')
             .where('birthDate',
                 isGreaterThanOrEqualTo:
                     now.subtract(const Duration(days: 365 * 12)))
-            .snapshots();
+            .get();
+        break;
       case 'new':
-        return _firestore
+        querySnapshot = await _firestore
             .collection('members')
             .where('membershipDate', isGreaterThanOrEqualTo: startOfMonth)
-            .snapshots();
+            .get();
+        break;
       case 'all':
       default:
-        return _firestore.collection('members').snapshots();
+        querySnapshot = await _firestore.collection('members').get();
+        break;
     }
+
+    for (var doc in querySnapshot.docs) {
+      membersList.add({
+        'id': doc.id,
+        ...doc.data() as Map<String, dynamic>,
+      });
+    }
+
+    return membersList;
   }
 }
