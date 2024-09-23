@@ -29,6 +29,11 @@ class DonationsList extends StatelessWidget {
     }
   }
 
+  Future<List<Map<String, dynamic>>> _fetchDonations() async {
+    final snapshot = await _firestore.collection('donations').get();
+    return snapshot.docs.map((doc) => doc.data()).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -42,8 +47,8 @@ class DonationsList extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Lista de Doações'),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _firestore.collection('donations').snapshots(),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _fetchDonations(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
@@ -54,7 +59,16 @@ class DonationsList extends StatelessWidget {
             );
           }
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                'Erro ao carregar doações',
+                style: TextStyle(color: primaryTextColor),
+              ),
+            );
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
               child: Text(
                 'Nenhuma doação encontrada',
@@ -63,17 +77,16 @@ class DonationsList extends StatelessWidget {
             );
           }
 
-          final donations = snapshot.data!.docs;
+          final donations = snapshot.data!;
 
           return ListView.builder(
             itemCount: donations.length,
             itemBuilder: (context, index) {
-              final donation = donations[index].data() as Map<String, dynamic>;
+              final donation = donations[index];
               final fullName = donation['fullName'] ?? 'Desconhecido';
 
               final donationValue =
                   _parseDonationValue(donation['donationValue']);
-
               final donationType = donation['donationType'] ?? 'Sem tipo';
               final userId = donation['userId'];
               final paymentProofURL = donation['photoURL'] ?? '';
@@ -83,8 +96,8 @@ class DonationsList extends StatelessWidget {
                   ? DateFormat('dd/MM/yyyy').format(timestamp.toDate())
                   : 'Desconhecida';
 
-              return StreamBuilder<DocumentSnapshot>(
-                stream: _firestore.collection('users').doc(userId).snapshots(),
+              return FutureBuilder<DocumentSnapshot>(
+                future: _firestore.collection('users').doc(userId).get(),
                 builder: (context, userSnapshot) {
                   if (userSnapshot.connectionState == ConnectionState.waiting) {
                     return ListTile(
@@ -101,9 +114,21 @@ class DonationsList extends StatelessWidget {
                     );
                   }
 
-                  final userData = userSnapshot.data;
-                  final creatorName = userData?['fullName'] ?? fullName;
-                  final creatorImageUrl = userData?['imagePath'] ?? '';
+                  if (!userSnapshot.hasData) {
+                    return ListTile(
+                      leading: const CircleAvatar(
+                        child: Icon(Icons.person),
+                      ),
+                      title: Text(
+                        'Usuário não encontrado',
+                        style: TextStyle(color: primaryTextColor),
+                      ),
+                    );
+                  }
+
+                  final userData = userSnapshot.data!;
+                  final creatorName = userData['fullName'] ?? fullName;
+                  final creatorImageUrl = userData['imagePath'] ?? '';
 
                   return ListTile(
                     leading: creatorImageUrl.isNotEmpty
@@ -146,7 +171,7 @@ class DonationsList extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DonationReceipt(
+                          builder: (context) => Donation(
                             title: 'Detalhes da Doação',
                             from: creatorName,
                             date: date,

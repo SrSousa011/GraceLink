@@ -340,8 +340,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>
-                                                  DonationReceipt(
+                                              builder: (context) => Donation(
                                                 title: 'Detalhes da Doação',
                                                 from: fullName,
                                                 date: date,
@@ -405,8 +404,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                DonationReceipt(
+                                            builder: (context) => Donation(
                                               title: 'Detalhes da Doação',
                                               from: creatorName,
                                               date: date,
