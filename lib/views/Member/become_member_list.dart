@@ -151,7 +151,6 @@ class BecomeMemberList extends StatelessWidget {
 
   Stream<QuerySnapshot> _getFilteredMembers() {
     final now = DateTime.now();
-    final twelveYearsAgo = now.subtract(const Duration(days: 365 * 12));
     final startOfMonth = DateTime(now.year, now.month, 1);
 
     switch (filter) {
@@ -168,12 +167,14 @@ class BecomeMemberList extends StatelessWidget {
       case 'children':
         return _firestore
             .collection('members')
-            .where('birthDate', isGreaterThanOrEqualTo: twelveYearsAgo)
+            .where('birthDate',
+                isGreaterThanOrEqualTo:
+                    now.subtract(const Duration(days: 365 * 12)))
             .snapshots();
       case 'new':
         return _firestore
             .collection('members')
-            .where('createdAt', isGreaterThanOrEqualTo: startOfMonth)
+            .where('membershipDate', isGreaterThanOrEqualTo: startOfMonth)
             .snapshots();
       case 'all':
       default:
