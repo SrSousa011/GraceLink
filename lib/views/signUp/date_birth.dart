@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class DateOfBirthDropdowns extends StatelessWidget {
   const DateOfBirthDropdowns({
-    Key? key,
+    super.key,
     this.selectedDay,
     this.selectedMonth,
     this.selectedYear,
     required this.onChangedDay,
     required this.onChangedMonth,
     required this.onChangedYear,
-  }) : super(key: key);
+  });
 
   final int? selectedDay;
   final int? selectedMonth;

@@ -26,7 +26,6 @@ class _BecomeMemberState extends State<BecomeMember> {
   bool _hasPreviousChurchExperience = false;
   String selectedCivilStatus = 'Solteiro';
   String selectedGender = 'Masculino';
-  DateTime? _dateOfBirth;
   DateTime? _baptismDate;
   DateTime? _conversionDate;
 
@@ -83,8 +82,9 @@ class _BecomeMemberState extends State<BecomeMember> {
           'fullName': _fullNameController.text,
           'address': userData.address,
           'phoneNumber': userData.phoneNumber,
-          'dateOfBirth':
-              _dateOfBirth != null ? Timestamp.fromDate(_dateOfBirth!) : null,
+          'dateOfBirth': userData.dateOfBirth != null
+              ? Timestamp.fromDate(userData.dateOfBirth!)
+              : null,
           'lastVisitedChurch': _lastVisitedChurchController.text,
           'reasonForMembership': _reasonForMembershipController.text,
           'reference': _referenceController.text,
@@ -142,7 +142,6 @@ class _BecomeMemberState extends State<BecomeMember> {
     _conversionDate = null;
     selectedCivilStatus = 'Solteiro';
     selectedGender = 'Masculino';
-    _dateOfBirth = null;
     _hasPreviousChurchExperience = false;
   }
 
