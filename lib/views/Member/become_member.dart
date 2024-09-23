@@ -1,10 +1,9 @@
 import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/views/member/terms_and_condictions.dart';
-import 'package:churchapp/views/notifications/notification_become_member.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 
 class BecomeMember extends StatefulWidget {
   const BecomeMember({super.key});
@@ -21,17 +20,15 @@ class _BecomeMemberState extends State<BecomeMember> {
   late TextEditingController _reasonForMembershipController;
   late TextEditingController _referenceController;
   late TextEditingController _previousChurchController;
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  DateTime? _baptismDate;
-  DateTime? _conversionDate;
-  DateTime? _birthDate;
-
   bool _isLoading = false;
+  bool _hasPreviousChurchExperience = false;
   String selectedCivilStatus = 'Solteiro';
   String selectedGender = 'Masculino';
-  bool _hasPreviousChurchExperience = false;
-  final NotificationService _notificationService = NotificationService();
+  DateTime? _dateOfBirth;
+  DateTime? _baptismDate;
+  DateTime? _conversionDate;
 
   @override
   void initState() {
@@ -43,54 +40,6 @@ class _BecomeMemberState extends State<BecomeMember> {
     _reasonForMembershipController = TextEditingController();
     _referenceController = TextEditingController();
     _previousChurchController = TextEditingController();
-    _loadUserData();
-  }
-
-  Future<UserData?> _fetchUserData() async {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId == null) {
-      return null;
-    }
-    try {
-      final docSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
-      if (docSnapshot.exists) {
-        return UserData.fromDocument(docSnapshot);
-      }
-    } catch (e) {
-      // Handle error
-    }
-    return null;
-  }
-
-  Future<void> _loadUserData() async {
-    try {
-      final userData = await _fetchUserData();
-
-      if (userData != null) {
-        setState(() {
-          _birthDate = userData.birthDate;
-          _addressController.text = userData.address;
-          _phoneNumberController.text = userData.phoneNumber ?? '';
-        });
-      } else {
-        if (kDebugMode) {
-          print('No user data found.');
-        }
-      }
-    } catch (e) {
-      print('Error fetching user data: $e');
-    }
-  }
-
-  List<String> _getCivilStatusOptions() {
-    if (selectedGender == 'Feminino') {
-      return ['Solteira', 'Casada', 'Divorciada', 'Viúva'];
-    } else {
-      return ['Solteiro', 'Casado', 'Divorciado', 'Viúvo'];
-    }
   }
 
   Future<bool> _navigateToTermsAndConditions() async {
@@ -104,13 +53,12 @@ class _BecomeMemberState extends State<BecomeMember> {
         ),
       ),
     );
-
     return result == true;
   }
 
   Future<void> _validateAndSubmit() async {
     final form = _formKey.currentState;
-    if (form!.validate()) {
+    if (form != null && form.validate()) {
       setState(() {
         _isLoading = true;
       });
@@ -125,13 +73,18 @@ class _BecomeMemberState extends State<BecomeMember> {
       }
 
       try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .get();
+        UserData userData = UserData.fromDocument(userDoc);
+
         final memberData = {
           'fullName': _fullNameController.text,
-          'address': _addressController.text,
-          'phoneNumber': _phoneNumberController.text,
-          'birthDate': _birthDate != null
-              ? Timestamp.fromDate(_birthDate!)
-              : null, // Convert DateTime to Timestamp
+          'address': userData.address,
+          'phoneNumber': userData.phoneNumber,
+          'dateOfBirth':
+              _dateOfBirth != null ? Timestamp.fromDate(_dateOfBirth!) : null,
           'lastVisitedChurch': _lastVisitedChurchController.text,
           'reasonForMembership': _reasonForMembershipController.text,
           'reference': _referenceController.text,
@@ -140,18 +93,21 @@ class _BecomeMemberState extends State<BecomeMember> {
           'membershipDate': Timestamp.now(),
           'createdById': userId,
           'hasPreviousChurchExperience': _hasPreviousChurchExperience,
-          'previousChurch': _previousChurchController.text,
-          'baptismDate': _baptismDate != null
-              ? Timestamp.fromDate(_baptismDate!)
-              : null, // Convert DateTime to Timestamp
+          'previousChurch': _previousChurchController.text.isNotEmpty
+              ? _previousChurchController.text
+              : null,
+          'baptismDate':
+              _baptismDate != null ? Timestamp.fromDate(_baptismDate!) : null,
           'conversionDate': _conversionDate != null
               ? Timestamp.fromDate(_conversionDate!)
-              : null, // Convert DateTime to Timestamp
+              : null,
         };
 
         await FirebaseFirestore.instance.collection('members').add(memberData);
 
-        await _notifyAdmin(_fullNameController.text);
+        if (userData.role == 'admin') {
+          await _notifyAdmin(_fullNameController.text);
+        }
 
         _clearFields();
 
@@ -159,25 +115,7 @@ class _BecomeMemberState extends State<BecomeMember> {
           setState(() {
             _isLoading = false;
           });
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('Sucesso'),
-                content: const Text('Cadastro realizado com sucesso!'),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text('OK'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                          '/home', (Route<dynamic> route) => false);
-                    },
-                  ),
-                ],
-              );
-            },
-          );
+          _showSuccessDialog();
         }
       } catch (e) {
         if (mounted) {
@@ -190,9 +128,7 @@ class _BecomeMemberState extends State<BecomeMember> {
     }
   }
 
-  Future<void> _notifyAdmin(String memberName) async {
-    await _notificationService.sendAdminNotification(memberName);
-  }
+  Future<void> _notifyAdmin(String memberName) async {}
 
   void _clearFields() {
     _fullNameController.clear();
@@ -206,8 +142,24 @@ class _BecomeMemberState extends State<BecomeMember> {
     _conversionDate = null;
     selectedCivilStatus = 'Solteiro';
     selectedGender = 'Masculino';
-    _birthDate = null;
+    _dateOfBirth = null;
     _hasPreviousChurchExperience = false;
+  }
+
+  void _updateCivilStatus(String gender) {
+    setState(() {
+      if (gender == 'Feminino') {
+        if (!['Casada', 'Solteira', 'Divorciada', 'Viúva']
+            .contains(selectedCivilStatus)) {
+          selectedCivilStatus = 'Solteira';
+        }
+      } else {
+        if (!['Casado', 'Solteiro', 'Divorciado', 'Viúvo']
+            .contains(selectedCivilStatus)) {
+          selectedCivilStatus = 'Solteiro';
+        }
+      }
+    });
   }
 
   void _showErrorDialog(String title, String message) {
@@ -232,24 +184,26 @@ class _BecomeMemberState extends State<BecomeMember> {
     }
   }
 
-  @override
-  void dispose() {
-    _fullNameController.dispose();
-    _addressController.dispose();
-    _phoneNumberController.dispose();
-    _lastVisitedChurchController.dispose();
-    _reasonForMembershipController.dispose();
-    _referenceController.dispose();
-    _previousChurchController.dispose();
-    super.dispose();
-  }
-
-  String _formatDate(DateTime? dateTime) {
-    // Update to use DateTime
-    if (dateTime == null) {
-      return '';
-    }
-    return "${dateTime.day.toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Sucesso'),
+          content: const Text('Cadastro realizado com sucesso!'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/home', (Route<dynamic> route) => false);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -259,10 +213,10 @@ class _BecomeMemberState extends State<BecomeMember> {
         title: const Text('Tornar-se Membro'),
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
-          child: Form(
-            key: _formKey,
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -284,30 +238,59 @@ class _BecomeMemberState extends State<BecomeMember> {
                   });
                 }),
                 const SizedBox(height: 20.0),
-                _buildDateField('Data de Batismo', _baptismDate, (newDate) {
-                  setState(() {
-                    _baptismDate = newDate;
-                  });
+                _buildDropdownField(
+                    'Gênero', selectedGender, ['Masculino', 'Feminino'],
+                    (value) {
+                  if (value != null) {
+                    setState(() {
+                      selectedGender = value;
+                      _updateCivilStatus(selectedGender);
+                    });
+                  }
                 }),
                 const SizedBox(height: 20.0),
-                _buildDateField('Data de Conversão', _conversionDate,
-                    (newDate) {
-                  setState(() {
-                    _conversionDate = newDate;
-                  });
-                }),
-                const SizedBox(height: 20.0),
-                _buildDateField('Data de Nascimento', _birthDate, (newDate) {
-                  setState(() {
-                    _birthDate = newDate;
-                  });
-                }),
+                CheckboxListTile(
+                  title:
+                      const Text('Tem experiência anterior em outra igreja?'),
+                  value: _hasPreviousChurchExperience,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _hasPreviousChurchExperience = value ?? false;
+                    });
+                  },
+                ),
+                if (_hasPreviousChurchExperience) ...[
+                  _buildTextField(_previousChurchController, 'Igreja Anterior'),
+                  const SizedBox(height: 20.0),
+                  _buildDateField('Data do Batismo', _baptismDate, (date) {
+                    setState(() {
+                      _baptismDate = date;
+                    });
+                  }),
+                  const SizedBox(height: 20.0),
+                  _buildDateField('Data da Conversão', _conversionDate, (date) {
+                    setState(() {
+                      _conversionDate = date;
+                    });
+                  }),
+                ],
                 const SizedBox(height: 20.0),
                 ElevatedButton(
-                  onPressed: _isLoading ? null : _navigateToTermsAndConditions,
+                  onPressed: _isLoading
+                      ? null
+                      : () async {
+                          await _navigateToTermsAndConditions();
+                        },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: const Color.fromARGB(255, 90, 175, 249),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
                   child: _isLoading
                       ? const CircularProgressIndicator()
-                      : const Text('Cadastrar'),
+                      : const Text('Enviar'),
                 ),
               ],
             ),
@@ -322,65 +305,59 @@ class _BecomeMemberState extends State<BecomeMember> {
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
-        border: const OutlineInputBorder(),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Por favor, preencha este campo.';
+          return 'Este campo não pode estar vazio';
         }
         return null;
       },
     );
   }
 
-  Widget _buildDropdownField(
-    String label,
-    String currentValue,
-    List<String> options,
-    ValueChanged<String?> onChanged,
-  ) {
-    return DropdownButtonFormField<String>(
-      value: currentValue,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-      items: options.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-      onChanged: onChanged,
-    );
-  }
-
-  Widget _buildDateField(String label, DateTime? dateTime,
+  Widget _buildDateField(String label, DateTime? selectedDate,
       ValueChanged<DateTime?> onDateSelected) {
-    return InkWell(
+    return GestureDetector(
       onTap: () async {
         final DateTime? picked = await showDatePicker(
           context: context,
-          initialDate: dateTime ?? DateTime.now(),
+          initialDate: selectedDate ?? DateTime.now(),
           firstDate: DateTime(1900),
-          lastDate: DateTime(2100),
+          lastDate: DateTime.now(),
         );
         if (picked != null) {
           onDateSelected(picked);
         }
       },
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-        child: Text(
-          _formatDate(dateTime),
-          style: const TextStyle(
-            fontSize: 16.0,
+      child: AbsorbPointer(
+        child: TextFormField(
+          decoration: InputDecoration(
+            labelText: selectedDate != null
+                ? DateFormat('dd/MM/yyyy').format(selectedDate)
+                : label,
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildDropdownField(String label, String selectedValue,
+      List<String> items, ValueChanged<String?> onChanged) {
+    return DropdownButtonFormField<String>(
+      value: selectedValue,
+      onChanged: onChanged,
+      items: items
+          .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+          .toList(),
+      decoration: InputDecoration(
+        labelText: label,
+      ),
+    );
+  }
+
+  List<String> _getCivilStatusOptions() {
+    return selectedGender == 'Feminino'
+        ? ['Casada', 'Solteira', 'Divorciada', 'Viúva']
+        : ['Casado', 'Solteiro', 'Divorciado', 'Viúvo'];
   }
 }
