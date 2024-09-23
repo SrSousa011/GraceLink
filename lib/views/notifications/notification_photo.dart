@@ -114,7 +114,6 @@ class NotificationService {
       message.notification?.title ?? 'Nova Notificação',
       'Uma nova foto foi adicionada. Clique aqui para visualizá-la.',
       platformChannelSpecifics,
-      payload: message.data['url'],
     );
   }
 
