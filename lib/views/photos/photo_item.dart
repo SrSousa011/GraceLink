@@ -95,10 +95,24 @@ class PhotoItem extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     final textColor = isDarkMode ? Colors.white : Colors.black;
     final overlayColor = isDarkMode
         ? Colors.black.withOpacity(0.7)
         : Colors.white.withOpacity(0.7);
+    final editIconColor = isDarkMode
+        ? const Color.fromARGB(255, 255, 255, 255)
+        : const Color.fromARGB(255, 0, 255, 38);
+    final editTextColor =
+        isDarkMode ? Colors.white : const Color.fromARGB(255, 0, 0, 0);
+    final downloadIconColor = isDarkMode ? Colors.white : Colors.blue;
+    final downloadTextColor = isDarkMode ? Colors.white : Colors.black;
+    final deleteIconColor = isDarkMode
+        ? const Color.fromARGB(255, 255, 255, 255)
+        : Colors.redAccent;
+    final deleteTextColor = isDarkMode
+        ? const Color.fromARGB(255, 255, 255, 255)
+        : Colors.redAccent;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,16 +176,12 @@ class PhotoItem extends StatelessWidget {
                         child: ListTile(
                           leading: Icon(
                             LineAwesomeIcons.pencil_alt_solid,
-                            color: isDarkMode
-                                ? Colors.grey[300]
-                                : const Color.fromARGB(255, 0, 255, 38),
+                            color: editIconColor,
                           ),
                           title: Text(
                             'Editar',
                             style: TextStyle(
-                              color: isDarkMode
-                                  ? Colors.white
-                                  : const Color.fromARGB(255, 0, 0, 0),
+                              color: editTextColor,
                             ),
                           ),
                         ),
@@ -181,12 +191,12 @@ class PhotoItem extends StatelessWidget {
                       child: ListTile(
                         leading: Icon(
                           LineAwesomeIcons.cloud_download_alt_solid,
-                          color: isDarkMode ? Colors.white : Colors.blue,
+                          color: downloadIconColor,
                         ),
                         title: Text(
                           'Download',
                           style: TextStyle(
-                            color: isDarkMode ? Colors.white : Colors.black,
+                            color: downloadTextColor,
                           ),
                         ),
                       ),
@@ -197,12 +207,12 @@ class PhotoItem extends StatelessWidget {
                         child: ListTile(
                           leading: Icon(
                             LineAwesomeIcons.trash_alt,
-                            color: isDarkMode ? Colors.red : Colors.redAccent,
+                            color: deleteIconColor,
                           ),
                           title: Text(
                             'Excluir',
                             style: TextStyle(
-                              color: isDarkMode ? Colors.red : Colors.redAccent,
+                              color: deleteTextColor,
                             ),
                           ),
                         ),
