@@ -87,13 +87,18 @@ class MemberDetailsScreen extends StatelessWidget {
                     isDarkMode ? infoTitleColorDark : infoValueColorLight,
                     isDarkMode ? containerColorDark : containerColorLight),
                 _buildInfoContainer(
-                    'Telefone',
-                    memberData['phoneNumber'],
+                    'Idade',
+                    _calculateAge(memberData['dateOfBirth']),
                     isDarkMode ? infoTitleColorDark : infoValueColorLight,
                     isDarkMode ? containerColorDark : containerColorLight),
                 _buildInfoContainer(
                     'Endereço',
                     memberData['address'],
+                    isDarkMode ? infoTitleColorDark : infoValueColorLight,
+                    isDarkMode ? containerColorDark : containerColorLight),
+                _buildInfoContainer(
+                    'Telefone',
+                    memberData['phoneNumber'],
                     isDarkMode ? infoTitleColorDark : infoValueColorLight,
                     isDarkMode ? containerColorDark : containerColorLight),
                 const SizedBox(height: 16.0),
@@ -211,6 +216,33 @@ class MemberDetailsScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _calculateAge(dynamic dateOfBirth) {
+    if (dateOfBirth is Timestamp) {
+      final birthDate = dateOfBirth.toDate();
+      final now = DateTime.now();
+      final age = now.year - birthDate.year;
+      if (now.month < birthDate.month ||
+          (now.month == birthDate.month && now.day < birthDate.day)) {
+        return (age - 1).toString();
+      }
+      return age.toString();
+    } else if (dateOfBirth is String) {
+      try {
+        final birthDate = DateTime.parse(dateOfBirth);
+        final now = DateTime.now();
+        final age = now.year - birthDate.year;
+        if (now.month < birthDate.month ||
+            (now.month == birthDate.month && now.day < birthDate.day)) {
+          return (age - 1).toString();
+        }
+        return age.toString();
+      } catch (e) {
+        return 'Idade inválida';
+      }
+    }
+    return 'Idade não disponível';
   }
 
   String _formatDateFromField(dynamic field) {
