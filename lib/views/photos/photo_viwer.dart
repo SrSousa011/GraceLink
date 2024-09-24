@@ -18,12 +18,15 @@ class FullScreenPhotoPage extends StatefulWidget {
 class _FullScreenPhotoPageState extends State<FullScreenPhotoPage> {
   late PageController _pageController;
   late int _currentIndex;
+  List<Widget> _preloadedImages = [];
 
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
     _pageController = PageController(initialPage: _currentIndex);
+
+    _preloadImages();
   }
 
   @override
@@ -36,6 +39,18 @@ class _FullScreenPhotoPageState extends State<FullScreenPhotoPage> {
     setState(() {
       _currentIndex = index;
     });
+  }
+
+  void _preloadImages() {
+    _preloadedImages = widget.photoUrls.map((url) {
+      return CachedNetworkImage(
+        imageUrl: url,
+        fit: BoxFit.cover,
+        placeholder: (context, url) =>
+            const Center(child: CircularProgressIndicator()),
+        errorWidget: (context, url, error) => const Icon(Icons.error),
+      );
+    }).toList();
   }
 
   @override
@@ -52,12 +67,7 @@ class _FullScreenPhotoPageState extends State<FullScreenPhotoPage> {
                 child: SizedBox(
                   width: 600,
                   height: 600,
-                  child: CachedNetworkImage(
-                    imageUrl: widget.photoUrls[index],
-                    fit: BoxFit.cover,
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
-                  ),
+                  child: _preloadedImages[index],
                 ),
               );
             },
