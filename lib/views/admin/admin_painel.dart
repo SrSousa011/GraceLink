@@ -67,49 +67,58 @@ class _AdminPanelState extends State<AdminPanel> {
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDarkMode ? Colors.grey[850] : Colors.white;
+    final cardColor = isDarkMode ? Colors.grey[700] : Colors.grey[300];
+    final buttonDemoteColor = isDarkMode ? Colors.grey : Colors.red;
+    final buttonPromoteColor = isDarkMode ? Colors.grey : Colors.blue;
+    final buttonTextColor = isDarkMode ? Colors.white : const Color(0xFFFFFFFF);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Painel de Admins '),
+        title: const Text('Painel de Admins'),
       ),
+      backgroundColor: backgroundColor,
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
               itemCount: _users.length,
               itemBuilder: (context, index) {
                 final user = _users[index];
-                return ListTile(
-                  title: Text(user.fullName),
-                  subtitle: Text('Role: ${user.role ?? 'user'}'),
-                  trailing: user.role == 'admin'
-                      ? ElevatedButton(
-                          onPressed: () => _demoteFromAdmin(user.userId),
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                              isDarkMode ? Colors.grey : Colors.red,
+                return Card(
+                  color: cardColor,
+                  child: ListTile(
+                    title: Text(
+                      user.fullName,
+                      style: TextStyle(
+                          color: isDarkMode ? Colors.white : Colors.black),
+                    ),
+                    subtitle: Text(
+                      'Role: ${user.role ?? 'user'}',
+                      style: TextStyle(
+                          color: isDarkMode ? Colors.white70 : Colors.black54),
+                    ),
+                    trailing: user.role == 'admin'
+                        ? ElevatedButton(
+                            onPressed: () => _demoteFromAdmin(user.userId),
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  buttonDemoteColor),
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  buttonTextColor),
                             ),
-                            foregroundColor: MaterialStateProperty.all<Color>(
-                              isDarkMode
-                                  ? Colors.white
-                                  : const Color.fromARGB(255, 255, 255, 255),
+                            child: const Text('Demote'),
+                          )
+                        : ElevatedButton(
+                            onPressed: () => _promoteToAdmin(user.userId),
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  buttonPromoteColor),
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  buttonTextColor),
                             ),
+                            child: const Text('Promote'),
                           ),
-                          child: const Text('Demote'),
-                        )
-                      : ElevatedButton(
-                          onPressed: () => _promoteToAdmin(user.userId),
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                              isDarkMode ? Colors.grey : Colors.blue,
-                            ),
-                            foregroundColor: MaterialStateProperty.all<Color>(
-                              isDarkMode
-                                  ? Colors.white
-                                  : const Color.fromARGB(255, 255, 255, 255),
-                            ),
-                          ),
-                          child: const Text('Promote'),
-                        ),
+                  ),
                 );
               },
             ),
