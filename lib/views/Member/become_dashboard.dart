@@ -53,13 +53,13 @@ class _MembersDashboardState extends State<MembersDashboard> {
             .length;
 
         _totalChildren = members.where((doc) {
-          final birthDateTimestamp = doc.data()['birthDate'] as Timestamp?;
-          if (birthDateTimestamp == null) return false;
+          final dateOfBirthTimestamp = doc.data()['dateOfBirth'] as Timestamp?;
+          if (dateOfBirthTimestamp == null) return false;
 
-          final birthDate = birthDateTimestamp.toDate();
-          final age = now.year - birthDate.year;
-          final isBeforeBirthday = now.month < birthDate.month ||
-              (now.month == birthDate.month && now.day < birthDate.day);
+          final dateOfBirth = dateOfBirthTimestamp.toDate();
+          final age = now.year - dateOfBirth.year;
+          final isBeforeBirthday = now.month < dateOfBirth.month ||
+              (now.month == dateOfBirth.month && now.day < dateOfBirth.day);
           final isChild = age < 12 || (age == 12 && !isBeforeBirthday);
 
           return isChild;

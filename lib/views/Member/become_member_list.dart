@@ -171,7 +171,7 @@ class BecomeMemberList extends StatelessWidget {
       case 'children':
         querySnapshot = await _firestore
             .collection('members')
-            .where('birthDate',
+            .where('dateOfBirth',
                 isGreaterThanOrEqualTo:
                     now.subtract(const Duration(days: 365 * 12)))
             .get();
