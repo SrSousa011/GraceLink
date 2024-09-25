@@ -1,4 +1,5 @@
 import 'package:churchapp/data/model/user_data.dart';
+import 'package:churchapp/views/donations/donnation_service.dart';
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/currency_convert.dart';
 import 'package:churchapp/views/financial_files/expense/expenses_service.dart';
@@ -45,15 +46,8 @@ class _FinanceScreenState extends State<FinanceScreen> {
       throw Exception('User not authenticated');
     }
 
-    final donationStatsQuery = await _firestore
-        .collection('donations')
-        .where('userId', isEqualTo: user.uid)
-        .get();
-
-    final donationStats = DonationStats.fromDonations(donationStatsQuery.docs);
-
     try {
-      final revenues = await _revenueService.fetchAllRevenues(donationStats);
+      final revenues = await _revenueService.fetchAllRevenues();
 
       return {
         'totalReceita': revenues['totalReceita'] ?? 0.0,
@@ -103,12 +97,16 @@ class _FinanceScreenState extends State<FinanceScreen> {
           .where('userId', isEqualTo: user.uid)
           .get();
 
-      return DonationStats.fromDonations(querySnapshot.docs);
+      return DonationStats.fromDonations(querySnapshot.docs.cast<Donation>());
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching donation stats: $e');
       }
-      return DonationStats(totalDonation: 0.0, monthlyDonation: 0.0);
+      // Corrigido para retornar uma lista vazia de doações mensais
+      return DonationStats(
+          totalDonation: 0.0,
+          monthlyDonations:
+              List.filled(12, 0.0)); // Inicializa uma lista com 12 meses
     }
   }
 
