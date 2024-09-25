@@ -44,44 +44,28 @@ class MonthlyDonationsChart extends StatelessWidget {
                   color: DonationChartColors.dizimo,
                   radius: 60,
                   titleStyle: TextStyle(
-                    fontSize: 14,
-                    color: isDarkMode
-                        ? DonationChartColors.darkText
-                        : DonationChartColors.lightText,
-                  ),
+                      fontSize: 14, color: DonationChartColors.themeTextColor),
                 ),
                 PieChartSectionData(
                   value: safeMonthlyOferta,
                   color: DonationChartColors.oferta,
                   radius: 60,
                   titleStyle: TextStyle(
-                    fontSize: 14,
-                    color: isDarkMode
-                        ? DonationChartColors.darkText
-                        : DonationChartColors.lightText,
-                  ),
+                      fontSize: 14, color: DonationChartColors.themeTextColor),
                 ),
                 PieChartSectionData(
                   value: safeMonthlyProjetoDoarAAmar,
                   color: DonationChartColors.projetoDoarAAmar,
                   radius: 60,
                   titleStyle: TextStyle(
-                    fontSize: 14,
-                    color: isDarkMode
-                        ? DonationChartColors.darkText
-                        : DonationChartColors.lightText,
-                  ),
+                      fontSize: 14, color: DonationChartColors.themeTextColor),
                 ),
                 PieChartSectionData(
                   value: safeMonthlyMissaoAfrica,
                   color: DonationChartColors.missaoAfrica,
                   radius: 60,
                   titleStyle: TextStyle(
-                    fontSize: 14,
-                    color: isDarkMode
-                        ? DonationChartColors.darkText
-                        : DonationChartColors.lightText,
-                  ),
+                      fontSize: 14, color: DonationChartColors.themeTextColor),
                 ),
               ],
               borderData: FlBorderData(show: false),
@@ -135,11 +119,7 @@ class MonthlyDonationsChart extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           '$title: ${CurrencyConverter.format(value)}',
-          style: TextStyle(
-            color: isDarkMode
-                ? DonationChartColors.darkText
-                : DonationChartColors.lightText,
-          ),
+          style: TextStyle(color: DonationChartColors.themeTextColor),
         ),
       ],
     );

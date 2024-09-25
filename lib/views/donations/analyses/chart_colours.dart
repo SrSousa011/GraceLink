@@ -7,6 +7,9 @@ class DonationChartColors {
   static const Color missaoAfrica = Colors.red;
   static const Color total = Colors.black;
 
-  static const Color darkText = Colors.white;
-  static const Color lightText = Colors.black;
+  static const Color yearlyChart = Colors.green;
+
+  static bool isDarkMode = false;
+
+  static Color get themeTextColor => isDarkMode ? Colors.white : Colors.black;
 }
