@@ -72,7 +72,7 @@ class DonationReceipt extends StatelessWidget {
               ),
               const SizedBox(height: 12.0),
               Text(
-                'Total: ${_formatTotal(total)}', // Atualizado para usar double
+                'Total: ${_formatTotal(total)}',
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,

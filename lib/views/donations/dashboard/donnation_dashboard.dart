@@ -100,14 +100,6 @@ class DonationsDashboard extends StatelessWidget {
 
                 final donations = snapshot.data?.docs ?? [];
 
-                // Calcular o total de doações mensais
-                final monthlyIncome = donations.fold(0.0, (sum, doc) {
-                  final donationValue = doc['donationValue'] ??
-                      0; // Acessar o valor diretamente do documento
-                  return sum +
-                      (donationValue is num ? donationValue.toDouble() : 0);
-                });
-
                 final now = DateTime.now();
                 final startOfMonth = DateTime(now.year, now.month, 1);
                 final endOfMonth = DateTime(now.year, now.month + 1, 0);
@@ -118,7 +110,12 @@ class DonationsDashboard extends StatelessWidget {
                       timestamp.isBefore(endOfMonth);
                 }).toList();
 
-                final numberOfDonationsThisMonth = monthlyDonations.length;
+                final double monthlyIncome =
+                    monthlyDonations.fold(0.0, (sum, doc) {
+                  final donationValue = (doc['donationValue'] ?? 0);
+                  return sum +
+                      (donationValue is num ? donationValue.toDouble() : 0);
+                });
 
                 return Container(
                   padding: const EdgeInsets.all(16.0),
@@ -158,14 +155,13 @@ class DonationsDashboard extends StatelessWidget {
                         children: [
                           _buildSummaryBlueCard(
                             context,
-                            title: 'Doações do mês',
-                            value:
-                                '€ ${monthlyIncome.toStringAsFixed(2)}', // Usando o valor correto
+                            title: 'Renda Mensal',
+                            value: '€ ${monthlyIncome.toStringAsFixed(2)}',
                           ),
                           _buildSummaryBlueCard(
                             context,
                             title: 'Doadores mês',
-                            value: numberOfDonationsThisMonth.toString(),
+                            value: monthlyDonations.length.toString(),
                           ),
                         ],
                       ),
@@ -173,7 +169,7 @@ class DonationsDashboard extends StatelessWidget {
                   ),
                 );
               },
-            ),
+            )
           ],
         ),
       ),

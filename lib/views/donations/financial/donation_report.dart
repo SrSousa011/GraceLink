@@ -1,6 +1,7 @@
 import 'package:churchapp/views/donations/dashboard/donnation_receipt.dart';
 import 'package:churchapp/views/donations/dashboard/donnations_list.dart';
 import 'package:churchapp/views/donations/donnation_service.dart';
+
 import 'package:churchapp/views/donations/financial/donnation_incomes.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,9 +21,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
   Future<List<Donation>> _fetchDonations() async {
     CollectionReference donations = _firestore.collection('donations');
     var snapshot = await donations.orderBy('timestamp', descending: true).get();
-    final donationsList =
-        snapshot.docs.map((doc) => Donation.fromFirestore(doc)).toList();
-    return donationsList;
+    return snapshot.docs.map((doc) => Donation.fromFirestore(doc)).toList();
   }
 
   String _formatTotal(double value) {
@@ -41,7 +40,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor = isDarkMode ? Colors.black : Colors.white;
     final primaryTextColor = isDarkMode ? Colors.white : Colors.black;
-    final layoutTextColor = isDarkMode ? Colors.white : Colors.white;
+    final layoutTextColor = Colors.white; // Consistent color
     final cardBackgroundColor = isDarkMode ? Colors.grey[800]! : Colors.white;
     final cardTextColor = isDarkMode ? Colors.white : Colors.black;
     final cardShadowColor = isDarkMode
@@ -86,11 +85,25 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
               }
 
               final donations = donationsSnapshot.data ?? [];
-              final donationStats =
-                  DonationStats.fromDonations(donations.cast<Donation>());
-              final totalBalance = donationStats.totalDonation;
-              final monthlyIncome =
-                  donationStats.monthlyDonations.reduce((a, b) => a + b);
+
+              // Calculate total balance
+              final double totalBalance = donations.fold(0.0, (sum, donation) {
+                return sum + (donation.donationValue?.toDouble() ?? 0);
+              });
+
+              // Calculate monthly income
+              final now = DateTime.now();
+              final startOfMonth = DateTime(now.year, now.month, 1);
+              final endOfMonth = DateTime(now.year, now.month + 1, 0);
+
+              final monthlyIncome = donations.where((donation) {
+                final timestamp = donation.timestamp?.toDate();
+                return timestamp != null &&
+                    timestamp.isAfter(startOfMonth) &&
+                    timestamp.isBefore(endOfMonth);
+              }).fold(0.0, (sum, donation) {
+                return sum + (donation.donationValue?.toDouble() ?? 0);
+              });
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,7 +238,6 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                       ],
                     ),
                   ),
-// Modificação na parte de ListView.builder onde as doações são listadas
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(top: 0.0, left: 16.0),
@@ -241,108 +253,105 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
 
                                 return StreamBuilder<DocumentSnapshot>(
                                   stream: _firestore
-                                      .collection('users')
-                                      .doc(user.uid)
+                                      .collection('donations')
+                                      .doc(donation.userId)
                                       .snapshots(),
-                                  builder: (context, userSnapshot) {
-                                    if (userSnapshot.connectionState ==
+                                  builder: (context, donorSnapshot) {
+                                    if (donorSnapshot.connectionState ==
                                         ConnectionState.waiting) {
-                                      return ListTile(
-                                        leading: CircleAvatar(
-                                          child: CircularProgressIndicator(
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                                    isDarkMode
-                                                        ? Colors.white
-                                                        : Colors.black),
-                                          ),
-                                        ),
-                                        title: Text(
-                                          'Carregando...',
-                                          style: TextStyle(
-                                              color: primaryTextColor),
-                                        ),
-                                      );
+                                      return const Center(
+                                          child: CircularProgressIndicator());
                                     }
 
-                                    if (userSnapshot.hasError) {
-                                      return ListTile(
-                                        leading: const CircleAvatar(
-                                          backgroundColor: Colors.grey,
-                                        ),
-                                        title: Text(
-                                          'Erro ao carregar imagem do usuário',
-                                          style: TextStyle(
-                                              color: primaryTextColor),
-                                        ),
-                                      );
+                                    if (donorSnapshot.hasError) {
+                                      return Center(
+                                          child: Text(
+                                              'Error fetching donor: ${donorSnapshot.error}'));
                                     }
 
-                                    if (!userSnapshot.hasData ||
-                                        !userSnapshot.data!.exists) {
-                                      return ListTile(
-                                        leading: const CircleAvatar(
-                                          backgroundColor: Colors.grey,
-                                        ),
-                                        title: Text(
-                                          'Usuário não encontrado',
-                                          style: TextStyle(
-                                              color: primaryTextColor),
-                                        ),
-                                      );
+                                    if (!donorSnapshot.hasData ||
+                                        !donorSnapshot.data!.exists) {
+                                      return const SizedBox();
                                     }
 
-                                    final userData = userSnapshot.data!.data()
+                                    final donorData = donorSnapshot.data!.data()
                                         as Map<String, dynamic>;
                                     final userImagePath =
-                                        userData['imagePath'] ?? '';
+                                        donorData['imagePath'] ??
+                                            ''; // Assuming 'imagePath' exists
+                                    final paymentProofURL = donation.photoURL ??
+                                        ''; // Ensure this exists
+                                    final date = DateFormat('dd/MM/yyyy')
+                                        .format(donation.timestamp?.toDate() ??
+                                            DateTime.now());
 
-                                    return Card(
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 8.0, horizontal: 16.0),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      elevation: 4,
-                                      child: ListTile(
-                                        leading: CircleAvatar(
-                                          backgroundImage:
-                                              NetworkImage(userImagePath),
-                                          backgroundColor: Colors.grey,
+                                    return GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                DonationReceipt(
+                                              title: 'Detalhes da Doação',
+                                              from: fullName,
+                                              date: date,
+                                              total: donation.donationValue
+                                                      ?.toDouble() ??
+                                                  0.0,
+                                              paymentProofURL: paymentProofURL,
+                                              donorPhotoURL: userImagePath,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(16.0),
+                                        margin:
+                                            const EdgeInsets.only(bottom: 8.0),
+                                        decoration: BoxDecoration(
+                                          color: cardBackgroundColor,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: cardShadowColor,
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2)),
+                                          ],
                                         ),
-                                        title: Text(fullName),
-                                        subtitle: Text(donation.donationType),
-                                        trailing: Text(
-                                          _formatTotal(donation.donationValue
-                                              .toDouble()),
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: donationValueColor),
-                                        ),
-                                        onTap: () {
-                                          final date = DateFormat('dd/MM/yyyy')
-                                              .format(
-                                                  donation.timestamp.toDate());
-                                          final paymentProofURL =
-                                              donation.photoURL;
-
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  DonationReceipt(
-                                                title: 'Detalhes da Doação',
-                                                from: fullName,
-                                                date: date,
-                                                total: donation.donationValue
-                                                    .toDouble(),
-                                                paymentProofURL:
-                                                    paymentProofURL,
-                                                donorPhotoURL: userImagePath,
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.person,
+                                                color: accentColor),
+                                            const SizedBox(width: 16),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(fullName,
+                                                      style: TextStyle(
+                                                          color: cardTextColor,
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                  Text(date,
+                                                      style: TextStyle(
+                                                          color: cardTextColor,
+                                                          fontSize: 14)),
+                                                  Text(
+                                                      'Valor: ${_formatTotal(donation.donationValue?.toDouble() ?? 0)}',
+                                                      style: TextStyle(
+                                                          color:
+                                                              donationValueColor,
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                ],
                                               ),
                                             ),
-                                          );
-                                        },
+                                          ],
+                                        ),
                                       ),
                                     );
                                   },
@@ -365,25 +374,24 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
     required String title,
     required String value,
     required TextStyle valueStyle,
-    required bool withShadow,
-    required Color backgroundColor,
-    required TextStyle titleStyle,
+    bool withShadow = true,
+    Color? backgroundColor,
+    TextStyle? titleStyle,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.only(bottom: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(20),
+        color: backgroundColor ?? Colors.white,
+        borderRadius: BorderRadius.circular(12.0),
         boxShadow: withShadow
             ? [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 5,
-                  offset: const Offset(0, 3),
-                ),
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8.0,
+                    offset: const Offset(0, 4)),
               ]
-            : [],
+            : null,
       ),
       child: Row(
         children: [
@@ -401,31 +409,6 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class DonationStats {
-  final double totalDonation;
-  final List<double> monthlyDonations;
-
-  DonationStats({required this.totalDonation, required this.monthlyDonations});
-
-  static DonationStats fromDonations(List<Donation> donations) {
-    double totalDonation = 0;
-    List<double> monthlyDonations = List.filled(12, 0);
-
-    for (var donation in donations) {
-      totalDonation += donation.donationValue.toDouble();
-
-      final date = (donation.timestamp.toDate());
-      final month = date.month - 1; // Adjust for 0-indexing
-      monthlyDonations[month] += donation.donationValue.toDouble();
-    }
-
-    return DonationStats(
-      totalDonation: totalDonation,
-      monthlyDonations: monthlyDonations,
     );
   }
 }
