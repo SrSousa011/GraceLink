@@ -1,3 +1,4 @@
+import 'package:churchapp/views/donations/analyses/annual_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -36,6 +37,12 @@ class _DonationIncomesState extends State<DonationIncomes> {
   double monthlyProjetoDoarAAmar = 0.0;
   double monthlyMissaoAfrica = 0.0;
 
+  // New variables to store annual totals
+  double totalAnnualDizimo = 0.0;
+  double totalAnnualOferta = 0.0;
+  double totalAnnualProjetoDoarAAmar = 0.0;
+  double totalAnnualMissaoAfrica = 0.0;
+
   @override
   void initState() {
     super.initState();
@@ -49,6 +56,10 @@ class _DonationIncomesState extends State<DonationIncomes> {
     setState(() {
       totalIncome = 0.0;
       monthlyDonations.updateAll((key, value) => 0.0);
+      totalAnnualDizimo = 0.0;
+      totalAnnualOferta = 0.0;
+      totalAnnualProjetoDoarAAmar = 0.0;
+      totalAnnualMissaoAfrica = 0.0;
 
       for (var doc in snapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
@@ -66,22 +77,25 @@ class _DonationIncomesState extends State<DonationIncomes> {
         final month = DateFormat('MMMM', 'en_US').format(timestamp);
 
         totalIncome += donationValue;
-
         monthlyDonations[month] =
             (monthlyDonations[month] ?? 0) + donationValue;
 
         switch (data['donationType']) {
-          case 'Dizimo':
+          case 'Dízimo':
             monthlyDizimo += donationValue;
+            totalAnnualDizimo += donationValue;
             break;
           case 'Oferta':
             monthlyOferta += donationValue;
+            totalAnnualOferta += donationValue;
             break;
-          case 'Projeto Doar a Amar':
+          case 'Projeto doar e amar':
             monthlyProjetoDoarAAmar += donationValue;
+            totalAnnualProjetoDoarAAmar += donationValue;
             break;
           case 'Missão África':
             monthlyMissaoAfrica += donationValue;
+            totalAnnualMissaoAfrica += donationValue;
             break;
         }
       }
@@ -117,6 +131,24 @@ class _DonationIncomesState extends State<DonationIncomes> {
                 monthlyProjetoDoarAAmar: monthlyProjetoDoarAAmar,
                 monthlyMissaoAfrica: monthlyMissaoAfrica,
                 totalMonthlyDonations: totalIncome,
+                isDarkMode: isDarkMode,
+              ),
+              const SizedBox(height: 60),
+              Text(
+                'Doações Anuais',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+              const SizedBox(height: 16),
+              AnnualDonationsChart(
+                totalDizimo: totalAnnualDizimo,
+                totalOferta: totalAnnualOferta,
+                totalProjetoDoarAAmar: totalAnnualProjetoDoarAAmar,
+                totalMissaoAfrica: totalAnnualMissaoAfrica,
+                totalAnnualDonations: totalIncome,
                 isDarkMode: isDarkMode,
               ),
               const SizedBox(height: 60),
