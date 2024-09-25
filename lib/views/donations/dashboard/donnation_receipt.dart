@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class Donation extends StatelessWidget {
+class DonationReceipt extends StatelessWidget {
   final String title;
   final String from;
   final String date;
@@ -9,7 +9,7 @@ class Donation extends StatelessWidget {
   final String paymentProofURL;
   final String donorPhotoURL;
 
-  const Donation({
+  const DonationReceipt({
     super.key,
     required this.title,
     required this.from,

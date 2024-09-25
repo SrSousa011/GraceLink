@@ -1,4 +1,3 @@
-import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
@@ -100,9 +99,14 @@ class DonationsDashboard extends StatelessWidget {
                 }
 
                 final donations = snapshot.data?.docs ?? [];
-                final donationStats = DonationStats.fromDonations(donations);
 
-                final monthlyIncome = donationStats.monthlyDonation;
+                // Calcular o total de doações mensais
+                final monthlyIncome = donations.fold(0.0, (sum, doc) {
+                  final donationValue = doc['donationValue'] ??
+                      0; // Acessar o valor diretamente do documento
+                  return sum +
+                      (donationValue is num ? donationValue.toDouble() : 0);
+                });
 
                 final now = DateTime.now();
                 final startOfMonth = DateTime(now.year, now.month, 1);
@@ -155,7 +159,8 @@ class DonationsDashboard extends StatelessWidget {
                           _buildSummaryBlueCard(
                             context,
                             title: 'Doações do mês',
-                            value: '€ ${monthlyIncome.toStringAsFixed(2)}',
+                            value:
+                                '€ ${monthlyIncome.toStringAsFixed(2)}', // Usando o valor correto
                           ),
                           _buildSummaryBlueCard(
                             context,
@@ -263,11 +268,13 @@ class DonationsDashboard extends StatelessWidget {
             ),
             padding:
                 const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-            elevation: 4.0,
           ),
-          icon: Icon(icon, color: Colors.white),
-          label: Text(label, style: const TextStyle(color: Colors.white)),
           onPressed: onPressed,
+          icon: Icon(icon, color: Colors.white),
+          label: Text(
+            label,
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
       ),
     );

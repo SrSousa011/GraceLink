@@ -171,7 +171,7 @@ class DonationsList extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Donation(
+                          builder: (context) => DonationReceipt(
                             title: 'Detalhes da Doação',
                             from: creatorName,
                             date: date,

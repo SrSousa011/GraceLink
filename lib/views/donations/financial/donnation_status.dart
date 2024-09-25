@@ -1,37 +1,30 @@
+import 'package:churchapp/views/donations/donnation_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class DonationStats {
   final double totalDonation;
-  final double monthlyDonation;
+  final List<double> monthlyDonations; // Lista para armazenar doações mensais
 
   DonationStats({
     required this.totalDonation,
-    required this.monthlyDonation,
+    required this.monthlyDonations, // Adicionando o parâmetro
   });
+  static DonationStats fromDonations(List<Donation> donations) {
+    double totalDonation = 0;
+    List<double> monthlyDonations = List.filled(12, 0);
 
-  factory DonationStats.fromDonations(List<DocumentSnapshot> donations) {
-    double totalBalance = 0.0;
-    double monthlyIncome = 0.0;
-    DateTime now = DateTime.now();
-    DateTime startOfMonth = DateTime(now.year, now.month, 1);
+    for (var donation in donations) {
+      totalDonation += donation.donationValue.toDouble();
 
-    for (var doc in donations) {
-      final data = doc.data() as Map<String, dynamic>;
-
-      final donationValue = _parseDonationValue(data['donationValue']);
-      final timestamp = (data['timestamp'] as Timestamp?)?.toDate();
-
-      totalBalance += donationValue;
-
-      if (timestamp != null && timestamp.isAfter(startOfMonth)) {
-        monthlyIncome += donationValue;
-      }
+      final date = (donation.timestamp.toDate());
+      final month = date.month - 1; // Adjust for 0-indexing
+      monthlyDonations[month] += donation.donationValue.toDouble();
     }
 
     return DonationStats(
-      totalDonation: totalBalance,
-      monthlyDonation: monthlyIncome,
+      totalDonation: totalDonation,
+      monthlyDonations: monthlyDonations,
     );
   }
 
@@ -54,19 +47,27 @@ class DonationStats {
   factory DonationStats.fromMap(Map<String, dynamic> map) {
     return DonationStats(
       totalDonation: (map['totalDonation'] as num?)?.toDouble() ?? 0.0,
-      monthlyDonation: (map['monthlyDonation'] as num?)?.toDouble() ?? 0.0,
+      monthlyDonations: (map['monthlyDonations'] as List<dynamic>?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ??
+          List.filled(12, 0.0), // Garante que haja 12 meses
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'totalDonation': totalDonation,
-      'monthlyDonation': monthlyDonation,
+      'monthlyDonations': monthlyDonations, // Adiciona a lista ao mapa
     };
   }
 
   String formatCurrency(double value) {
     final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: '€');
     return formatter.format(value);
+  }
+
+  double get monthlyIncome {
+    // Calcular a renda mensal total a partir da lista de doações mensais
+    return monthlyDonations.reduce((a, b) => a + b);
   }
 }
