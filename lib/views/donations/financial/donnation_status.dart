@@ -1,15 +1,15 @@
 import 'package:churchapp/views/donations/donnation_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class DonationStats {
   final double totalDonation;
-  final List<double> monthlyDonations; // Lista para armazenar doações mensais
+  final List<double> monthlyDonations;
 
   DonationStats({
     required this.totalDonation,
-    required this.monthlyDonations, // Adicionando o parâmetro
+    required this.monthlyDonations,
   });
+
   static DonationStats fromDonations(List<Donation> donations) {
     double totalDonation = 0;
     List<double> monthlyDonations = List.filled(12, 0);
@@ -17,8 +17,9 @@ class DonationStats {
     for (var donation in donations) {
       totalDonation += donation.donationValue.toDouble();
 
-      final date = (donation.timestamp.toDate());
-      final month = date.month - 1; // Adjust for 0-indexing
+      final date = donation.timestamp.toDate();
+      final month = date.month - 1;
+
       monthlyDonations[month] += donation.donationValue.toDouble();
     }
 
@@ -28,21 +29,21 @@ class DonationStats {
     );
   }
 
-  static double _parseDonationValue(dynamic value) {
-    if (value is num) {
-      return value.toDouble();
-    } else if (value is String) {
-      final sanitizedValue = value
-          .replaceAll('€', '')
-          .replaceAll(' ', '')
-          .replaceAll(',', '.')
-          .trim();
+  // static double _parseDonationValue(dynamic value) {
+  //   if (value is num) {
+  //     return value.toDouble();
+  //   } else if (value is String) {
+  //     final sanitizedValue = value
+  //         .replaceAll('€', '')
+  //         .replaceAll(' ', '')
+  //         .replaceAll(',', '.')
+  //         .trim();
 
-      return double.tryParse(sanitizedValue) ?? 0.0;
-    } else {
-      return 0.0;
-    }
-  }
+  //     return double.tryParse(sanitizedValue) ?? 0.0;
+  //   } else {
+  //     return 0.0;
+  //   }
+  // }
 
   factory DonationStats.fromMap(Map<String, dynamic> map) {
     return DonationStats(
@@ -50,14 +51,14 @@ class DonationStats {
       monthlyDonations: (map['monthlyDonations'] as List<dynamic>?)
               ?.map((e) => (e as num).toDouble())
               .toList() ??
-          List.filled(12, 0.0), // Garante que haja 12 meses
+          List.filled(12, 0.0),
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'totalDonation': totalDonation,
-      'monthlyDonations': monthlyDonations, // Adiciona a lista ao mapa
+      'monthlyDonations': monthlyDonations,
     };
   }
 

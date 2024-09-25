@@ -1,6 +1,7 @@
 import 'package:churchapp/views/donations/dashboard/donnation_receipt.dart';
 import 'package:churchapp/views/donations/dashboard/donnations_list.dart';
 import 'package:churchapp/views/donations/donnation_service.dart';
+import 'package:churchapp/views/donations/financial/donnation_incomes.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -127,7 +128,13 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                   Transform.translate(
                     offset: const Offset(0.0, -100.0),
                     child: GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const DonationIncomes()),
+                        );
+                      },
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Center(

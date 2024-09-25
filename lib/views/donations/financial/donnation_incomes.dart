@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class DonationIncomes extends StatefulWidget {
   const DonationIncomes({super.key});
@@ -11,8 +12,26 @@ class DonationIncomes extends StatefulWidget {
 
 class _DonationIncomesState extends State<DonationIncomes> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Map<String, double> monthlyDonations = {
+    'January': 0.0,
+    'February': 0.0,
+    'March': 0.0,
+    'April': 0.0,
+    'May': 0.0,
+    'June': 0.0,
+    'July': 0.0,
+    'August': 0.0,
+    'September': 0.0,
+    'October': 0.0,
+    'November': 0.0,
+    'December': 0.0,
+  };
+
   double totalIncome = 0.0;
-  List<Map<String, dynamic>> donationsList = [];
+
+  // Adicionando uma propriedade para armazenar as doações mensais sem exibi-las
+  List<double> monthlyDonationsList = List.filled(12, 0.0);
 
   @override
   void initState() {
@@ -25,26 +44,45 @@ class _DonationIncomesState extends State<DonationIncomes> {
     var snapshot = await donations.get();
 
     setState(() {
-      donationsList = snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        return {
-          'fullName': data['fullName'] ?? 'Desconhecido',
-          'donationValue': (data['donationValue'] as num).toDouble(),
-          'donationType': data['donationType'] ?? 'Sem tipo',
-          'timestamp': data['timestamp'] as Timestamp,
-          'photoURL': data['photoURL'] ?? '',
-        };
-      }).toList();
+      totalIncome = 0.0;
+      monthlyDonations.updateAll((key, value) => 0.0);
 
-      // Calculate total income
-      totalIncome = donationsList.fold(
-          0, (sum, donation) => sum + donation['donationValue']);
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final donationValue = (data['donationValue'] as num).toDouble();
+        final timestamp = (data['timestamp'] as Timestamp).toDate();
+
+        final month = DateFormat('MMMM', 'en_US').format(timestamp);
+        totalIncome += donationValue;
+
+        monthlyDonations[month] =
+            (monthlyDonations[month] ?? 0) + donationValue;
+
+        monthlyDonationsList[DateTime.parse(timestamp.toString()).month - 1] +=
+            donationValue;
+      }
     });
   }
 
   String _formatTotal(double value) {
     final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: '€');
     return formatter.format(value);
+  }
+
+  List<BarChartGroupData> _createChartData() {
+    return monthlyDonations.entries.map((entry) {
+      return BarChartGroupData(
+        x: monthlyDonations.keys.toList().indexOf(entry.key),
+        barRods: [
+          BarChartRodData(
+            toY: entry.value,
+            color: Colors.blue,
+            width: 20,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+          ),
+        ],
+      );
+    }).toList();
   }
 
   @override
@@ -78,41 +116,44 @@ class _DonationIncomesState extends State<DonationIncomes> {
               ),
             ),
             const SizedBox(height: 16),
-            Expanded(
-              child: donationsList.isEmpty
-                  ? const Center(child: Text('Nenhuma doação encontrada.'))
-                  : ListView.builder(
-                      itemCount: donationsList.length,
-                      itemBuilder: (context, index) {
-                        final donation = donationsList[index];
-                        final fullName = donation['fullName'];
-                        final donationValue = donation['donationValue'];
-                        final donationType = donation['donationType'];
-                        final timestamp = donation['timestamp'];
-
-                        return Card(
-                          margin: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundImage:
-                                  NetworkImage(donation['photoURL']),
-                              backgroundColor: Colors.grey,
-                            ),
-                            title: Text(fullName),
-                            subtitle: Text(donationType),
-                            trailing: Text(
-                              _formatTotal(donationValue),
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            onTap: () {
-                              // Optionally navigate to a detailed donation view
-                            },
-                          ),
-                        );
-                      },
-                    ),
+            Text(
+              'Doações por Mês',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
             ),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 300,
+              child: BarChart(
+                BarChartData(
+                  barGroups: _createChartData(),
+                  titlesData: FlTitlesData(
+                    leftTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: true),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 38,
+                        getTitlesWidget: (value, meta) {
+                          return Text((value.toInt() + 1).toString());
+                        },
+                      ),
+                    ),
+                  ),
+                  gridData: const FlGridData(show: false),
+                  borderData: FlBorderData(show: false),
+                  backgroundColor: Colors.white.withOpacity(0.5),
+                  barTouchData: BarTouchData(
+                    touchTooltipData: BarTouchTooltipData(),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),
