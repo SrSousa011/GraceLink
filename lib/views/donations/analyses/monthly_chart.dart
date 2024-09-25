@@ -1,6 +1,7 @@
+import 'package:churchapp/views/donations/analyses/chart_colours.dart';
+import 'package:flutter/material.dart';
 import 'package:churchapp/views/financial_files/currency_convert.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
 
 class MonthlyDonationsChart extends StatelessWidget {
   final double monthlyDizimo;
@@ -32,10 +33,6 @@ class MonthlyDonationsChart extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Doações Mensais',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
         const SizedBox(height: 8),
         SizedBox(
           height: 240,
@@ -44,40 +41,46 @@ class MonthlyDonationsChart extends StatelessWidget {
               sections: [
                 PieChartSectionData(
                   value: safeMonthlyDizimo,
-                  color: Colors.blue, // Replace with your color for Dizimo
+                  color: DonationChartColors.dizimo,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: isDarkMode
+                        ? DonationChartColors.darkText
+                        : DonationChartColors.lightText,
                   ),
                 ),
                 PieChartSectionData(
                   value: safeMonthlyOferta,
-                  color: Colors.green, // Replace with your color for Oferta
+                  color: DonationChartColors.oferta,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: isDarkMode
+                        ? DonationChartColors.darkText
+                        : DonationChartColors.lightText,
                   ),
                 ),
                 PieChartSectionData(
                   value: safeMonthlyProjetoDoarAAmar,
-                  color: Colors
-                      .orange, // Replace with your color for Projeto Doar a Amar
+                  color: DonationChartColors.projetoDoarAAmar,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: isDarkMode
+                        ? DonationChartColors.darkText
+                        : DonationChartColors.lightText,
                   ),
                 ),
                 PieChartSectionData(
                   value: safeMonthlyMissaoAfrica,
-                  color:
-                      Colors.red, // Replace with your color for Missão África
+                  color: DonationChartColors.missaoAfrica,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: isDarkMode
+                        ? DonationChartColors.darkText
+                        : DonationChartColors.lightText,
                   ),
                 ),
               ],
@@ -95,16 +98,19 @@ class MonthlyDonationsChart extends StatelessWidget {
               spacing: 16.0,
               runSpacing: 8.0,
               children: [
+                _buildLegendItem('Dizimo', safeMonthlyDizimo,
+                    DonationChartColors.dizimo, isDarkMode),
+                _buildLegendItem('Oferta', safeMonthlyOferta,
+                    DonationChartColors.oferta, isDarkMode),
                 _buildLegendItem(
-                    'Dizimo', safeMonthlyDizimo, Colors.blue, isDarkMode),
-                _buildLegendItem(
-                    'Oferta', safeMonthlyOferta, Colors.green, isDarkMode),
-                _buildLegendItem('Projeto Doar a Amar',
-                    safeMonthlyProjetoDoarAAmar, Colors.orange, isDarkMode),
+                    'Projeto Doar a Amar',
+                    safeMonthlyProjetoDoarAAmar,
+                    DonationChartColors.projetoDoarAAmar,
+                    isDarkMode),
                 _buildLegendItem('Missão África', safeMonthlyMissaoAfrica,
-                    Colors.red, isDarkMode),
-                _buildLegendItem(
-                    'Total', totalMonthlyDonations, Colors.black, isDarkMode),
+                    DonationChartColors.missaoAfrica, isDarkMode),
+                _buildLegendItem('Total', totalMonthlyDonations,
+                    DonationChartColors.total, isDarkMode),
               ],
             ),
           ],
@@ -130,7 +136,9 @@ class MonthlyDonationsChart extends StatelessWidget {
         Text(
           '$title: ${CurrencyConverter.format(value)}',
           style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: isDarkMode
+                ? DonationChartColors.darkText
+                : DonationChartColors.lightText,
           ),
         ),
       ],

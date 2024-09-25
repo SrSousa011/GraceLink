@@ -88,11 +88,6 @@ class _DonationIncomesState extends State<DonationIncomes> {
     });
   }
 
-  String _formatTotal(double value) {
-    final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: '€');
-    return formatter.format(value);
-  }
-
   List<BarChartGroupData> _createChartData() {
     return monthlyDonations.entries.map((entry) {
       return BarChartGroupData(
@@ -123,6 +118,14 @@ class _DonationIncomesState extends State<DonationIncomes> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                'Doações Mensais',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
               const SizedBox(height: 16),
               MonthlyDonationsChart(
                 monthlyDizimo: monthlyDizimo,
