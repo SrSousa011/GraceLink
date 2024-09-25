@@ -123,23 +123,6 @@ class _DonationIncomesState extends State<DonationIncomes> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Total de Renda',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                _formatTotal(totalIncome),
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.greenAccent : Colors.green,
-                ),
-              ),
               const SizedBox(height: 16),
               MonthlyDonationsChart(
                 monthlyDizimo: monthlyDizimo,
