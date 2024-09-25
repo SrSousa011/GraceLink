@@ -31,13 +31,18 @@ class _DonationIncomesState extends State<DonationIncomes> {
   };
 
   double totalIncome = 0.0;
+  double currentotalIncome = 0.0;
+
+  double currentDizimo = 0.0;
+  double currentOferta = 0.0;
+  double currentProjetoDoarAAmar = 0.0;
+  double currentMissaoAfrica = 0.0;
 
   double monthlyDizimo = 0.0;
   double monthlyOferta = 0.0;
   double monthlyProjetoDoarAAmar = 0.0;
   double monthlyMissaoAfrica = 0.0;
 
-  // New variables to store annual totals
   double totalAnnualDizimo = 0.0;
   double totalAnnualOferta = 0.0;
   double totalAnnualProjetoDoarAAmar = 0.0;
@@ -47,6 +52,64 @@ class _DonationIncomesState extends State<DonationIncomes> {
   void initState() {
     super.initState();
     _fetchDonations();
+    _fetchCurrentMonthDonations();
+  }
+
+  Future<void> _fetchCurrentMonthDonations() async {
+    CollectionReference donations = _firestore.collection('donations');
+    var snapshot = await donations.get();
+
+    setState(() {
+      currentotalIncome = 0.0;
+      currentDizimo = 0.0;
+      currentOferta = 0.0;
+      currentProjetoDoarAAmar = 0.0;
+      currentMissaoAfrica = 0.0;
+      monthlyDonations.clear();
+
+      final now = DateTime.now();
+      final startOfMonth = DateTime(now.year, now.month, 1);
+      final endOfMonth = DateTime(now.year, now.month + 1, 0);
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+
+        double donationValue;
+        if (data['donationValue'] is num) {
+          donationValue = (data['donationValue'] as num).toDouble();
+        } else if (data['donationValue'] is String) {
+          donationValue = double.tryParse(data['donationValue']) ?? 0.0;
+        } else {
+          donationValue = 0.0;
+        }
+
+        final timestamp = (data['timestamp'] as Timestamp).toDate();
+
+        if (timestamp.isAfter(startOfMonth.subtract(const Duration(days: 1))) &&
+            timestamp.isBefore(endOfMonth.add(const Duration(days: 1)))) {
+          currentotalIncome += donationValue;
+
+          String currentMonth = DateFormat('MMMM', 'en_US').format(timestamp);
+          monthlyDonations[currentMonth] =
+              (monthlyDonations[currentMonth] ?? 0) + donationValue;
+
+          switch (data['donationType']) {
+            case 'Dízimo':
+              currentDizimo += donationValue;
+              break;
+            case 'Oferta':
+              currentOferta += donationValue;
+              break;
+            case 'Projeto doar e amar':
+              currentProjetoDoarAAmar += donationValue;
+              break;
+            case 'Missão África':
+              currentMissaoAfrica += donationValue;
+              break;
+          }
+        }
+      }
+    });
   }
 
   Future<void> _fetchDonations() async {
@@ -126,11 +189,11 @@ class _DonationIncomesState extends State<DonationIncomes> {
               ),
               const SizedBox(height: 16),
               MonthlyDonationsChart(
-                monthlyDizimo: monthlyDizimo,
-                monthlyOferta: monthlyOferta,
-                monthlyProjetoDoarAAmar: monthlyProjetoDoarAAmar,
-                monthlyMissaoAfrica: monthlyMissaoAfrica,
-                totalMonthlyDonations: totalIncome,
+                currentDizimo: currentDizimo,
+                currentOferta: currentOferta,
+                currentProjetoDoarAAmar: currentProjetoDoarAAmar,
+                currentMissaoAfrica: currentMissaoAfrica,
+                currentotalIncome: currentotalIncome,
                 isDarkMode: isDarkMode,
               ),
               const SizedBox(height: 60),

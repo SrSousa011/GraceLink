@@ -4,31 +4,31 @@ import 'package:churchapp/views/financial_files/currency_convert.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class MonthlyDonationsChart extends StatelessWidget {
-  final double monthlyDizimo;
-  final double monthlyOferta;
-  final double monthlyProjetoDoarAAmar;
-  final double monthlyMissaoAfrica;
-  final double totalMonthlyDonations;
+  final double currentDizimo;
+  final double currentOferta;
+  final double currentProjetoDoarAAmar;
+  final double currentMissaoAfrica;
+  final double currentotalIncome;
   final bool isDarkMode;
 
   const MonthlyDonationsChart({
     super.key,
-    required this.monthlyDizimo,
-    required this.monthlyOferta,
-    required this.monthlyProjetoDoarAAmar,
-    required this.monthlyMissaoAfrica,
-    required this.totalMonthlyDonations,
+    required this.currentDizimo,
+    required this.currentOferta,
+    required this.currentProjetoDoarAAmar,
+    required this.currentMissaoAfrica,
+    required this.currentotalIncome,
     required this.isDarkMode,
   });
 
   @override
   Widget build(BuildContext context) {
-    final safeMonthlyDizimo = monthlyDizimo.isFinite ? monthlyDizimo : 0.0;
-    final safeMonthlyOferta = monthlyOferta.isFinite ? monthlyOferta : 0.0;
+    final safeMonthlyDizimo = currentDizimo.isFinite ? currentDizimo : 0.0;
+    final safeMonthlyOferta = currentOferta.isFinite ? currentOferta : 0.0;
     final safeMonthlyProjetoDoarAAmar =
-        monthlyProjetoDoarAAmar.isFinite ? monthlyProjetoDoarAAmar : 0.0;
+        currentProjetoDoarAAmar.isFinite ? currentProjetoDoarAAmar : 0.0;
     final safeMonthlyMissaoAfrica =
-        monthlyMissaoAfrica.isFinite ? monthlyMissaoAfrica : 0.0;
+        currentMissaoAfrica.isFinite ? currentMissaoAfrica : 0.0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,7 +93,7 @@ class MonthlyDonationsChart extends StatelessWidget {
                     isDarkMode),
                 _buildLegendItem('Missão África', safeMonthlyMissaoAfrica,
                     DonationChartColors.missaoAfrica, isDarkMode),
-                _buildLegendItem('Total', totalMonthlyDonations,
+                _buildLegendItem('Total', currentotalIncome,
                     DonationChartColors.total, isDarkMode),
               ],
             ),
