@@ -47,7 +47,7 @@ class YearlyDonationsChart extends StatelessWidget {
                   return Padding(
                     padding: const EdgeInsets.only(top: 10.0),
                     child: Text(
-                      monthlyDonations.keys.elementAt(value.toInt()),
+                      (value.toInt() + 1).toString(),
                       style: TextStyle(
                         fontSize: 12,
                         color: isDarkMode ? Colors.white : Colors.black,
