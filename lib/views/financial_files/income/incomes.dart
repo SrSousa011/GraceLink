@@ -109,24 +109,24 @@ class IncomesScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
-                      height: 410,
-                      child: AnnualIncomeChart(
-                        totalReceita: totalReceitas,
-                        totalDonations: totalBalance,
-                        totalCourseRevenue: totalOverallCourseRevenue,
-                        totallIncome: totalOverallSum,
-                        isDarkMode:
-                            Theme.of(context).brightness == Brightness.dark,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
                       height: 400,
                       child: MonthlyIncomeChart(
                         totalMonthlyReceita: totalMensalReceitas,
                         totalMonthlyIncome: totalOverallSum,
                         totalMonthlyCourseRevenue: totalMonthlyCourseRevenue,
                         totalMonthlyDonations: totalMonthlyDonations,
+                        isDarkMode:
+                            Theme.of(context).brightness == Brightness.dark,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 410,
+                      child: AnnualIncomeChart(
+                        totalReceita: totalReceitas,
+                        totalDonations: totalBalance,
+                        totalCourseRevenue: totalOverallCourseRevenue,
+                        totallIncome: totalOverallSum,
                         isDarkMode:
                             Theme.of(context).brightness == Brightness.dark,
                       ),

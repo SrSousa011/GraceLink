@@ -46,7 +46,7 @@ class AnnualExpenseChart extends StatelessWidget {
       children: [
         const SizedBox(height: 8),
         Text(
-          'Despesas Anuais',
+          'Despesas Totais',
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: 8),
