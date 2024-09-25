@@ -1,4 +1,4 @@
-import 'package:churchapp/views/donations/analyses/chart_colours.dart';
+import 'package:churchapp/views/donations/analyses/chart_colors.dart';
 import 'package:churchapp/views/financial_files/currency_convert.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -44,35 +44,28 @@ class AnnualDonationsChart extends StatelessWidget {
                   color: DonationChartColors.dizimo,
                   radius: 60,
                   titleStyle: TextStyle(
-                    fontSize: 14,
-                    color: DonationChartColors.themeTextColor
-                  ),
+                      fontSize: 14, color: DonationChartColors.themeTextColor),
                 ),
                 PieChartSectionData(
                   value: safeTotalOferta,
                   color: DonationChartColors.oferta,
                   radius: 60,
                   titleStyle: TextStyle(
-                    fontSize: 14,
-                    color: DonationChartColors.themeTextColor
-                  ),
+                      fontSize: 14, color: DonationChartColors.themeTextColor),
                 ),
                 PieChartSectionData(
                   value: safeTotalProjetoDoarAAmar,
                   color: DonationChartColors.projetoDoarAAmar,
                   radius: 60,
                   titleStyle: TextStyle(
-                    fontSize: 14,
-                    color: DonationChartColors.themeTextColor
-                  ),
+                      fontSize: 14, color: DonationChartColors.themeTextColor),
                 ),
                 PieChartSectionData(
                   value: safeTotalMissaoAfrica,
                   color: DonationChartColors.missaoAfrica,
                   radius: 60,
                   titleStyle: TextStyle(
-                      fontSize: 14,
-                      color: DonationChartColors.themeTextColor),
+                      fontSize: 14, color: DonationChartColors.themeTextColor),
                 ),
               ],
               borderData: FlBorderData(show: false),
@@ -122,9 +115,7 @@ class AnnualDonationsChart extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           '$title: ${CurrencyConverter.format(value)}',
-          style: TextStyle(
-                    color: DonationChartColors.themeTextColor
-          ),
+          style: TextStyle(color: DonationChartColors.themeTextColor),
         ),
       ],
     );

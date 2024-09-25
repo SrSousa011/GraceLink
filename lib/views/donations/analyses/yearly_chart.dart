@@ -1,4 +1,4 @@
-import 'package:churchapp/views/donations/analyses/chart_colours.dart';
+import 'package:churchapp/views/donations/analyses/chart_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 

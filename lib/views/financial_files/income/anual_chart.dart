@@ -1,5 +1,5 @@
 import 'package:churchapp/views/financial_files/currency_convert.dart';
-import 'package:churchapp/views/financial_files/income/incomes.dart';
+import 'package:churchapp/views/financial_files/income/chart_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -43,7 +43,7 @@ class AnnualIncomeChart extends StatelessWidget {
               sections: [
                 PieChartSectionData(
                   value: safeTotalDonations,
-                  color: kDonationColor,
+                  color: IncomeChartColors.kDonationColor,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
@@ -52,7 +52,7 @@ class AnnualIncomeChart extends StatelessWidget {
                 ),
                 PieChartSectionData(
                   value: safeTotalCourseRevenue,
-                  color: kCourseColor,
+                  color: IncomeChartColors.kCourseColor,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
@@ -61,7 +61,7 @@ class AnnualIncomeChart extends StatelessWidget {
                 ),
                 PieChartSectionData(
                   value: safeTotalIncome,
-                  color: kIncomeColor,
+                  color: IncomeChartColors.kIncomeColor,
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
@@ -83,14 +83,14 @@ class AnnualIncomeChart extends StatelessWidget {
               spacing: 16.0,
               runSpacing: 8.0,
               children: [
-                _buildLegendItem(
-                    'Doações', safeTotalDonations, kDonationColor, isDarkMode),
-                _buildLegendItem(
-                    'Cursos', safeTotalCourseRevenue, kCourseColor, isDarkMode),
-                _buildLegendItem(
-                    'Outros', safeTotalIncome, kIncomeColor, isDarkMode),
-                _buildLegendItem(
-                    'Total', safeTotalReceita, kTotalColor, isDarkMode),
+                _buildLegendItem('Doações', safeTotalDonations,
+                    IncomeChartColors.kDonationColor, isDarkMode),
+                _buildLegendItem('Cursos', safeTotalCourseRevenue,
+                    IncomeChartColors.kCourseColor, isDarkMode),
+                _buildLegendItem('Outros', safeTotalIncome,
+                    IncomeChartColors.kIncomeColor, isDarkMode),
+                _buildLegendItem('Total', safeTotalReceita,
+                    IncomeChartColors.kTotalColor, isDarkMode),
               ],
             ),
           ],

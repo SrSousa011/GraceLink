@@ -1,23 +1,10 @@
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/income/anual_chart.dart';
+import 'package:churchapp/views/financial_files/income/chart_colors.dart';
 import 'package:churchapp/views/financial_files/income/monthly_chart.dart';
 import 'package:churchapp/views/financial_files/revenue_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-const Color kDonationColor = Color(0xFF4CAF50);
-const Color kCourseColor = Color(0xFF2196F3);
-const Color kIncomeColor = Color(0xFFFF9800);
-const Color kTotalColor = Color(0xFF9C27B0);
-const Color kCourseRevenueColor = Color(0xFF40C4FF);
-const Color kOtherIncomeColor = Color(0xFFFFC107);
-const Color kTotalIncomeColor = Color(0xFFD500F9);
-const Color kBackgroundColor = Color(0xFFF5F5F5);
-const Color kDarkGrayColor = Color(0xFF616161);
-const Color kDarkBlueColor = Color(0xFF304FFE);
-const Color kDarkGreenColor = Color(0xFF00C853);
-const Color kDarkOrangeColor = Color(0xFFFF6D00);
-const Color kDarkPurpleColor = Color(0xFFAA00FF);
 
 class IncomesScreen extends StatelessWidget {
   final DonationStats donationStats;
@@ -79,7 +66,7 @@ class IncomesScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Receitas'),
-        backgroundColor: kDonationColor,
+        backgroundColor: IncomeChartColors.kDonationColor,
       ),
       body: FutureBuilder<Map<String, double>>(
         future: _fetchAllRevenues(),
