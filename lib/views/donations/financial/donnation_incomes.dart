@@ -49,7 +49,17 @@ class _DonationIncomesState extends State<DonationIncomes> {
 
       for (var doc in snapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
-        final donationValue = (data['donationValue'] as num).toDouble();
+
+        double donationValue;
+        if (data['donationValue'] is num) {
+          donationValue = (data['donationValue'] as num).toDouble();
+        } else if (data['donationValue'] is String) {
+          // Try to parse the string to a double
+          donationValue = double.tryParse(data['donationValue']) ?? 0.0;
+        } else {
+          donationValue = 0.0; // or throw an error
+        }
+
         final timestamp = (data['timestamp'] as Timestamp).toDate();
 
         final month = DateFormat('MMMM', 'en_US').format(timestamp);
