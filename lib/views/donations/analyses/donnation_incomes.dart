@@ -65,7 +65,6 @@ class _DonationIncomesState extends State<DonationIncomes> {
       currentOferta = 0.0;
       currentProjetoDoarAAmar = 0.0;
       currentMissaoAfrica = 0.0;
-      monthlyDonations.clear();
 
       final now = DateTime.now();
       final startOfMonth = DateTime(now.year, now.month, 1);
@@ -88,10 +87,6 @@ class _DonationIncomesState extends State<DonationIncomes> {
         if (timestamp.isAfter(startOfMonth.subtract(const Duration(days: 1))) &&
             timestamp.isBefore(endOfMonth.add(const Duration(days: 1)))) {
           currentotalIncome += donationValue;
-
-          String currentMonth = DateFormat('MMMM', 'en_US').format(timestamp);
-          monthlyDonations[currentMonth] =
-              (monthlyDonations[currentMonth] ?? 0) + donationValue;
 
           switch (data['donationType']) {
             case 'Dízimo':
