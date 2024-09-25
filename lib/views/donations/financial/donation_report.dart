@@ -1,7 +1,6 @@
 import 'package:churchapp/views/donations/dashboard/donnation_receipt.dart';
 import 'package:churchapp/views/donations/dashboard/donnations_list.dart';
 import 'package:churchapp/views/donations/donnation_service.dart';
-
 import 'package:churchapp/views/donations/analyses/donnation_incomes.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -87,7 +86,6 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
               final donations = donationsSnapshot.data ?? [];
 
               // Calculate total balance
-              // ignore: avoid_types_as_parameter_names
               final double totalBalance = donations.fold(0.0, (sum, donation) {
                 return sum + (donation.donationValue.toDouble());
               });
@@ -100,7 +98,6 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                 final timestamp = donation.timestamp.toDate();
                 return timestamp.isAfter(startOfMonth) &&
                     timestamp.isBefore(endOfMonth);
-                // ignore: avoid_types_as_parameter_names
               }).fold(0.0, (sum, donation) {
                 return sum + (donation.donationValue.toDouble());
               });
@@ -238,7 +235,6 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                       ],
                     ),
                   ),
-// Modificação na parte de ListView.builder onde as doações são listadas
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(top: 0.0, left: 16.0),
@@ -252,10 +248,12 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                     ? donation.fullName
                                     : 'Anonymous';
 
+                                // Fetch user data for the donation
                                 return StreamBuilder<DocumentSnapshot>(
                                   stream: _firestore
                                       .collection('users')
-                                      .doc(user.uid)
+                                      .doc(donation
+                                          .userId) // Use donation.userId to get the user's image
                                       .snapshots(),
                                   builder: (context, userSnapshot) {
                                     if (userSnapshot.connectionState ==
@@ -319,8 +317,10 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                       elevation: 4,
                                       child: ListTile(
                                         leading: CircleAvatar(
-                                          backgroundImage:
-                                              NetworkImage(userImagePath),
+                                          backgroundImage: NetworkImage(
+                                              userImagePath.isNotEmpty
+                                                  ? userImagePath
+                                                  : 'https://example.com/default_avatar.png'), // Fallback image if no path
                                           backgroundColor: Colors.grey,
                                         ),
                                         title: Text(fullName),
