@@ -85,7 +85,6 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
 
               final donations = donationsSnapshot.data ?? [];
 
-              // Calculate total balance
               final double totalBalance = donations.fold(0.0, (sum, donation) {
                 return sum + (donation.donationValue.toDouble());
               });
@@ -248,12 +247,10 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                     ? donation.fullName
                                     : 'Anonymous';
 
-                                // Fetch user data for the donation
                                 return StreamBuilder<DocumentSnapshot>(
                                   stream: _firestore
                                       .collection('users')
-                                      .doc(donation
-                                          .userId) // Use donation.userId to get the user's image
+                                      .doc(donation.userId)
                                       .snapshots(),
                                   builder: (context, userSnapshot) {
                                     if (userSnapshot.connectionState ==
@@ -320,7 +317,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                           backgroundImage: NetworkImage(
                                               userImagePath.isNotEmpty
                                                   ? userImagePath
-                                                  : 'https://example.com/default_avatar.png'), // Fallback image if no path
+                                                  : 'https://example.com/default_avatar.png'),
                                           backgroundColor: Colors.grey,
                                         ),
                                         title: Text(fullName),
