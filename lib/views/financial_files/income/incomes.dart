@@ -69,7 +69,7 @@ class IncomesScreen extends StatelessWidget {
         backgroundColor: IncomeChartColors.kDonationColor,
       ),
       body: FutureBuilder<Map<String, double>>(
-        future: _fetchAllRevenues(),
+        future: _fetchAllRevenues(), // Assegurando que o tipo está correto
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
