@@ -34,7 +34,6 @@ class RevenueService {
         'totalIncome': incomeData['totalIncome'] ?? 0.0,
       };
 
-      // Cache the data
       await _setCacheData('allRevenues', allRevenues);
 
       return allRevenues;
@@ -55,7 +54,6 @@ class RevenueService {
     try {
       final cacheData = await _getCacheData('monthlyRevenues');
       if (cacheData != null) {
-        // Ensure the cache data is of the correct type
         return _castCacheData(cacheData);
       }
 
