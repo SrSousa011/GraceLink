@@ -5,15 +5,15 @@ import 'package:flutter/material.dart';
 
 class AnnualIncomeChart extends StatelessWidget {
   final double totalReceita;
-  final double totallIncome;
-  final double totalCourseRevenue;
+  final double totalOthers;
+  final double totalCourses;
   final double totalDonations;
   final bool isDarkMode;
 
   const AnnualIncomeChart({
     super.key,
-    required this.totallIncome,
-    required this.totalCourseRevenue,
+    required this.totalOthers,
+    required this.totalCourses,
     required this.totalDonations,
     required this.isDarkMode,
     required this.totalReceita,
@@ -23,8 +23,8 @@ class AnnualIncomeChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final safeTotalIncome = safeValue(totallIncome);
-    final safeTotalCourseRevenue = safeValue(totalCourseRevenue);
+    final safeTotalIncome = safeValue(totalOthers);
+    final safeTotalCourseRevenue = safeValue(totalCourses);
     final safeTotalDonations = safeValue(totalDonations);
     final safeTotalReceita = safeValue(totalReceita);
 

@@ -1,134 +1,132 @@
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/income/anual_chart.dart';
-import 'package:churchapp/views/financial_files/income/chart_colors.dart';
 import 'package:churchapp/views/financial_files/income/monthly_chart.dart';
 import 'package:churchapp/views/financial_files/revenue_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class IncomesScreen extends StatelessWidget {
+class IncomesScreen extends StatefulWidget {
   final DonationStats donationStats;
+
+  const IncomesScreen({super.key, required this.donationStats});
+
+  @override
+  State<IncomesScreen> createState() => _IncomesScreenState();
+}
+
+class _IncomesScreenState extends State<IncomesScreen> {
   final RevenueService _revenueService = RevenueService();
 
-  IncomesScreen({super.key, required this.donationStats});
+  double totalDonations = 0.0;
+  double totalCourseRevenue = 0.0;
+  double totalOthers = 0.0;
+  double totalReceita = 0.0;
 
-  Future<Map<String, double>> _fetchAllRevenues() async {
+  double totalMonthlyReceitas = 0.0;
+  double totalMonthlyDonations = 0.0;
+  double totalMonthlyCourses = 0.0;
+  double totalMonthlyOthers = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAllRevenues();
+  }
+
+  Future<void> _fetchAllRevenues() async {
     try {
       final revenues = await _revenueService.fetchAllRevenues();
+      setState(() {
+        totalDonations = revenues['totalDonations'] ?? 0.0;
+        totalCourseRevenue = revenues['totalCourseRevenue'] ?? 0.0;
+        totalOthers = revenues['totalIncome'] ?? 0.0;
 
-      final totalCourseRevenue =
-          (revenues['courseRevenues']['totalCourseRevenue'] ?? 0.0) as double;
-      final totalOtherIncome =
-          (revenues['income']['totalIncome'] ?? 0.0) as double;
-      final totalDonations =
-          (revenues['donations']['totalDonation'] ?? 0.0) as double;
+        totalReceita = totalDonations + totalCourseRevenue + totalOthers;
+      });
 
-      final totalMonthlyCourseRevenue =
-          (revenues['courseRevenues']['monthlyCourseRevenue'] ?? 0.0) as double;
-      final totalMonthlyOtherIncome =
-          (revenues['income']['monthlyIncome'] ?? 0.0) as double;
-      final totalMonthlyDonations =
-          (revenues['donations']['monthlyDonations'] ?? 0.0) as double;
+      final currentMonth = DateTime.now().month;
+      final monthName = _getMonthName(currentMonth);
 
-      final result = {
-        'totalReceitas': totalCourseRevenue + totalOtherIncome + totalDonations,
-        'totalMensalReceitas': totalMonthlyCourseRevenue +
-            totalMonthlyOtherIncome +
-            totalMonthlyDonations,
-        'totalBalance': totalDonations,
-        'totalMonthlyDonations': totalMonthlyDonations,
-        'totalOverallSum': totalOtherIncome,
-        'monthlyOtherIncome': totalMonthlyOtherIncome,
-        'totalOverallCourseRevenue': totalCourseRevenue,
-        'totalMonthlyCourseRevenue': totalMonthlyCourseRevenue,
-      };
+      final monthlyRevenues =
+          await _revenueService.fetchMonthlyRevenues(widget.donationStats);
+      final monthlyData = monthlyRevenues[monthName] ??
+          {
+            'totalReceitas': 0.0,
+            'totalDonations': 0.0,
+            'monthlyDonations': 0.0,
+            'totalCourseRevenue': 0.0,
+            'totalIncome': 0.0,
+          };
 
-      return result;
+      setState(() {
+        totalMonthlyReceitas = monthlyData['totalReceitas'] ?? 0.0;
+        totalMonthlyDonations = monthlyData['totalDonations'] ?? 0.0;
+        totalMonthlyCourses = monthlyData['totalCourseRevenue'] ?? 0.0;
+        totalMonthlyOthers = monthlyData['totalIncome'] ?? 0.0;
+      });
     } catch (e) {
       if (kDebugMode) {
-        print('Erro ao buscar receitas: $e');
+        print('Error fetching revenues: $e');
       }
-      return {
-        'totalReceitas': 0.0,
-        'totalMensalReceitas': 0.0,
-        'totalBalance': 0.0,
-        'totalMonthlyDonations': 0.0,
-        'totalOverallSum': 0.0,
-        'monthlyOtherIncome': 0.0,
-        'totalOverallCourseRevenue': 0.0,
-        'totalMonthlyCourseRevenue': 0.0,
-      };
     }
+  }
+
+  String _getMonthName(int month) {
+    const monthNames = [
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro'
+    ];
+    return monthNames[month - 1];
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Receitas'),
-        backgroundColor: IncomeChartColors.kDonationColor,
+        title: const Text('Incomes Overview'),
+        backgroundColor: Colors.blue,
       ),
-      body: FutureBuilder<Map<String, double>>(
-        future: _fetchAllRevenues(), // Assegurando que o tipo está correto
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text('Erro: ${snapshot.error}'));
-          }
-
-          if (!snapshot.hasData) {
-            return const Center(child: Text('Receitas não encontradas.'));
-          }
-
-          final data = snapshot.data!;
-
-          final totalReceitas = data['totalReceitas'] ?? 0.0;
-          final totalMensalReceitas = data['totalMensalReceitas'] ?? 0.0;
-          final totalBalance = data['totalBalance'] ?? 0.0;
-          final totalMonthlyDonations = data['totalMonthlyDonations'] ?? 0.0;
-          final totalOverallSum = data['totalOverallSum'] ?? 0.0;
-          final totalOverallCourseRevenue =
-              data['totalOverallCourseRevenue'] ?? 0.0;
-          final totalMonthlyCourseRevenue =
-              data['totalMonthlyCourseRevenue'] ?? 0.0;
-
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 400,
-                    child: MonthlyIncomeChart(
-                      totalMonthlyReceita: totalMensalReceitas,
-                      totalMonthlyIncome: totalOverallSum,
-                      totalMonthlyCourseRevenue: totalMonthlyCourseRevenue,
-                      totalMonthlyDonations: totalMonthlyDonations,
-                      isDarkMode:
-                          Theme.of(context).brightness == Brightness.dark,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    height: 410,
-                    child: AnnualIncomeChart(
-                      totalReceita: totalReceitas,
-                      totalDonations: totalBalance,
-                      totalCourseRevenue: totalOverallCourseRevenue,
-                      totallIncome: totalOverallSum,
-                      isDarkMode:
-                          Theme.of(context).brightness == Brightness.dark,
-                    ),
-                  ),
-                ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 400,
+                child: MonthlyIncomeChart(
+                  totalMonthlyOthers: totalMonthlyOthers,
+                  totalMonthlyCourses: totalMonthlyCourses,
+                  totalMonthlyDonations: totalMonthlyDonations,
+                  totalMonthlyReceita: totalMonthlyReceitas,
+                  isDarkMode: Theme.of(context).brightness == Brightness.dark,
+                ),
               ),
-            ),
-          );
-        },
+              const SizedBox(height: 40),
+              SizedBox(
+                height: 410,
+                child: AnnualIncomeChart(
+                  totalReceita: totalReceita,
+                  totalDonations: totalDonations,
+                  totalCourses: totalCourseRevenue,
+                  totalOthers: totalOthers,
+                  isDarkMode: Theme.of(context).brightness == Brightness.dark,
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
       ),
     );
   }
