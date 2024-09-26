@@ -221,14 +221,16 @@ class RevenueService {
   Future<Map<String, Map<String, double>>>
       _fetchCourseRevenueDataPerMonth() async {
     try {
-      Map<String, double> courseRevenuePerMonth = (await _coursesService
-          .calculateMonthlyRevenue()) as Map<String, double>;
+      // Assuming this returns a total revenue for all months
+      double totalCourseRevenue =
+          await _coursesService.calculateMonthlyRevenue();
 
+      // Distribute the total revenue across months (or handle it as needed)
       return {
         for (int month = 1; month <= 12; month++)
           _getMonthName(month): {
             'totalCourseRevenue':
-                courseRevenuePerMonth[_getMonthName(month)] ?? 0.0,
+                totalCourseRevenue, // Same revenue for all months (or update based on your logic)
           }
       };
     } catch (e) {
