@@ -55,7 +55,8 @@ class RevenueService {
     try {
       final cacheData = await _getCacheData('monthlyRevenues');
       if (cacheData != null) {
-        return Map<String, Map<String, double>>.from(cacheData);
+        // Ensure the cache data is of the correct type
+        return _castCacheData(cacheData);
       }
 
       final donationData = await _fetchDonationDataPerMonth(donationStats);
@@ -100,6 +101,23 @@ class RevenueService {
           }
       };
     }
+  }
+
+  Map<String, Map<String, double>> _castCacheData(
+      Map<String, dynamic> cacheData) {
+    return cacheData.map((key, value) {
+      if (value is Map<String, dynamic>) {
+        return MapEntry(key, Map<String, double>.from(value));
+      } else {
+        return MapEntry(key, {
+          'totalReceitas': 0.0,
+          'totalDonations': 0.0,
+          'monthlyDonations': 0.0,
+          'totalCourseRevenue': 0.0,
+          'totalIncome': 0.0,
+        });
+      }
+    });
   }
 
   Future<Map<String, dynamic>?> _getCacheData(String key) async {
