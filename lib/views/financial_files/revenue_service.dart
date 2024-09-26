@@ -8,8 +8,7 @@ import 'package:flutter/foundation.dart';
 class RevenueService {
   final CoursesService _coursesService = CoursesService();
 
-  /// Fetch all revenues (donations, course revenues, and income).
-  Future<Map<String, dynamic>> fetchAllRevenues() async {
+  Future<Map<String, double>> fetchAllRevenues() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
@@ -21,26 +20,22 @@ class RevenueService {
       final incomeData = await _fetchAllIncomeData();
 
       return {
-        'donations': donationStats,
-        'courseRevenues': courseRevenueData,
-        'income': incomeData,
+        'totalDonations': donationStats.totalDonation,
+        'totalCourseRevenue': courseRevenueData['totalCourseRevenue'] ?? 0.0,
+        'totalIncome': incomeData['totalIncome'] ?? 0.0,
       };
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching all revenues: $e');
       }
       return {
-        'donations': {
-          'totalDonation': 0.0,
-          'monthlyDonations': List.filled(12, 0.0)
-        },
-        'courseRevenues': {'totalCourseRevenue': 0.0},
-        'income': {'totalIncome': 0.0},
+        'totalDonations': 0.0,
+        'totalCourseRevenue': 0.0,
+        'totalIncome': 0.0,
       };
     }
   }
 
-  /// Fetch donation stats for the authenticated user.
   Future<DonationStats> _fetchDonationStats() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -53,7 +48,25 @@ class RevenueService {
           .where('userId', isEqualTo: user.uid)
           .get();
 
-      return DonationStats.fromDonations(querySnapshot.docs.cast<Donation>());
+      List<Donation> donations = querySnapshot.docs.map((doc) {
+        final data = doc.data();
+
+        double amount = 0.0;
+        if (data['donationValue'] is num) {
+          amount = (data['donationValue'] as num).toDouble();
+        } else if (data['donationValue'] is String) {
+          amount = double.tryParse(data['donationValue']) ?? 0.0;
+        } else {
+          if (kDebugMode) {
+            print(
+                'Unexpected type for amount: ${data['donationValue'].runtimeType}');
+          }
+        }
+
+        return Donation.fromMap({...data, 'donationValue': amount});
+      }).toList();
+
+      return DonationStats.fromDonations(donations);
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching donation stats: $e');
@@ -63,13 +76,10 @@ class RevenueService {
     }
   }
 
-  /// Fetch total course revenue data.
   Future<Map<String, double>> _fetchAllCourseRevenueData() async {
     try {
-      Map<String, double> courseRevenuePerMonth = (await _coursesService
-          .calculateMonthlyRevenue()) as Map<String, double>;
-      double totalCourseRevenue =
-          courseRevenuePerMonth.values.reduce((a, b) => a + b);
+      final totalCourseRevenue =
+          await _coursesService.calculateMonthlyRevenue();
 
       return {
         'totalCourseRevenue': totalCourseRevenue,
@@ -82,7 +92,6 @@ class RevenueService {
     }
   }
 
-  /// Fetch total income data for the authenticated user.
   Future<Map<String, double>> _fetchAllIncomeData() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -99,8 +108,7 @@ class RevenueService {
           .get();
 
       for (final doc in querySnapshot.docs) {
-        final data = doc.data();
-        final amount = (data['amount'] as num).toDouble();
+        final amount = (doc.data()['amount'] as num).toDouble();
         totalIncome += amount;
       }
 
@@ -113,7 +121,6 @@ class RevenueService {
     }
   }
 
-  /// Fetch monthly revenues for donations, courses, and income.
   Future<Map<String, Map<String, double>>> fetchMonthlyRevenues(
       DonationStats donationStats) async {
     try {
@@ -134,6 +141,7 @@ class RevenueService {
         monthlyRevenues[monthName] = {
           'totalReceitas': totalReceitas,
           'totalDonations': donationData[monthName]?['totalDonations'] ?? 0,
+          'monthlyDonations': donationData[monthName]?['monthlyDonations'] ?? 0,
           'totalCourseRevenue':
               courseRevenueData[monthName]?['totalCourseRevenue'] ?? 0,
           'totalIncome': incomeData[monthName]?['totalIncome'] ?? 0,
@@ -150,6 +158,7 @@ class RevenueService {
           _getMonthName(month): {
             'totalReceitas': 0.0,
             'totalDonations': 0.0,
+            'monthlyDonations': 0.0,
             'totalCourseRevenue': 0.0,
             'totalIncome': 0.0,
           }
@@ -157,7 +166,6 @@ class RevenueService {
     }
   }
 
-  /// Fetch income data per month for the authenticated user.
   Future<Map<String, Map<String, double>>> _fetchIncomeDataPerMonth() async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final user = FirebaseAuth.instance.currentUser;
@@ -182,9 +190,8 @@ class RevenueService {
           .get();
 
       for (final doc in querySnapshot.docs) {
-        final data = doc.data();
-        final amount = (data['amount'] as num).toDouble();
-        final createdAt = (data['createdAt'] as Timestamp).toDate();
+        final amount = (doc.data()['amount'] as num).toDouble();
+        final createdAt = (doc.data()['createdAt'] as Timestamp).toDate();
 
         if (createdAt.isAfter(startOfYear) && createdAt.isBefore(endOfYear)) {
           final monthName = _getMonthName(createdAt.month);
@@ -211,7 +218,6 @@ class RevenueService {
     }
   }
 
-  /// Fetch course revenue data per month.
   Future<Map<String, Map<String, double>>>
       _fetchCourseRevenueDataPerMonth() async {
     try {
@@ -238,16 +244,59 @@ class RevenueService {
     }
   }
 
-  /// Fetch donation data per month from DonationStats.
   Future<Map<String, Map<String, double>>> _fetchDonationDataPerMonth(
       DonationStats donationStats) async {
     try {
-      Map<String, Map<String, double>> donationDataPerMonth = {};
-      for (int month = 1; month <= 12; month++) {
-        donationDataPerMonth[_getMonthName(month)] = {
-          'totalDonations': donationStats.monthlyDonations[month - 1],
-        };
+      Map<String, Map<String, double>> donationDataPerMonth = {
+        for (int month = 1; month <= 12; month++)
+          _getMonthName(month): {
+            'totalDonations': 0.0,
+            'monthlyDonations': 0.0,
+          },
+      };
+
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        throw Exception('User not authenticated');
       }
+
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('donations')
+          .where('userId', isEqualTo: user.uid)
+          .get();
+
+      for (final doc in querySnapshot.docs) {
+        final data = doc.data();
+        if (data['timestamp'] != null && data['timestamp'] is Timestamp) {
+          final createdAt = (data['timestamp'] as Timestamp).toDate();
+          final month = createdAt.month;
+
+          double amount = 0.0;
+          if (data['donationValue'] is num) {
+            amount = (data['donationValue'] as num).toDouble();
+          } else if (data['donationValue'] is String) {
+            amount = double.tryParse(data['donationValue']) ?? 0.0;
+          }
+
+          donationDataPerMonth[_getMonthName(month)]!['totalDonations'] =
+              (donationDataPerMonth[_getMonthName(month)]!['totalDonations'] ??
+                      0.0) +
+                  amount;
+
+          donationDataPerMonth[_getMonthName(month)]!['monthlyDonations'] =
+              (donationDataPerMonth[_getMonthName(month)]![
+                          'monthlyDonations'] ??
+                      0.0) +
+                  amount;
+        } else {
+          if (kDebugMode) {
+            print(
+                'createdAt is either null or not a Timestamp: ${data['createdAt']}');
+          }
+        }
+      }
+
       return donationDataPerMonth;
     } catch (e) {
       if (kDebugMode) {
@@ -257,12 +306,12 @@ class RevenueService {
         for (int month = 1; month <= 12; month++)
           _getMonthName(month): {
             'totalDonations': 0.0,
+            'monthlyDonations': 0.0,
           }
       };
     }
   }
 
-  /// Get the name of the month based on the month number.
   String _getMonthName(int month) {
     const monthNames = [
       'Janeiro',
