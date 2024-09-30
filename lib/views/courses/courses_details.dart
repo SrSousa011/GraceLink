@@ -119,6 +119,7 @@ class _CoursesDetailsState extends State<CoursesDetails> {
                           status: false,
                           userName: fullName,
                           courseName: widget.course.courseName,
+                          price: widget.course.price,
                         );
 
                         if (mounted) {

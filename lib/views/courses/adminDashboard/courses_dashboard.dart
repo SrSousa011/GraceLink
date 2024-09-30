@@ -1,3 +1,4 @@
+import 'package:churchapp/views/courses/charts/courses_chart.dart';
 import 'package:churchapp/views/courses/courseLive/course_live.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -182,6 +183,20 @@ class CoursesDashboard extends StatelessWidget {
                     ));
                   },
                   child: const Text('Acesso à Videoaula'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: buttonBackgroundColor,
+                    shape: const StadiumBorder(),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const CoursesChartScreen(),
+                    ));
+                  },
+                  child: const Text('Graficos'),
                 ),
               ],
             );

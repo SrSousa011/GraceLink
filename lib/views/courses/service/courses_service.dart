@@ -1,3 +1,4 @@
+import 'package:churchapp/views/courses/charts/course__registration.dart';
 import 'package:churchapp/views/courses/service/courses_date.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -8,15 +9,13 @@ class CoursesService {
   final CollectionReference _coursesCollection =
       FirebaseFirestore.instance.collection('courses');
 
+  set registrations(List<CourseRegistration> registrations) {}
+
   Future<bool> isUserAlreadySubscribed({
     required String courseId,
     required String userId,
   }) async {
     try {
-      if (kDebugMode) {
-        print('Checking subscription for userId: $userId, courseId: $courseId');
-      }
-
       QuerySnapshot querySnapshot = await _registrationsCollection
           .where('courseId', isEqualTo: courseId)
           .where('userId', isEqualTo: userId)
@@ -107,6 +106,7 @@ class CoursesService {
     required String userId,
     required String userName,
     required bool status,
+    required double price,
   }) async {
     try {
       if (kDebugMode) {
@@ -121,6 +121,7 @@ class CoursesService {
         'status': status,
         'registrationDate': DateTime.now(),
         'createdAt': FieldValue.serverTimestamp(),
+        'price': price,
       });
     } catch (e) {
       if (kDebugMode) {
