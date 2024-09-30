@@ -46,6 +46,20 @@ class UserData {
     );
   }
 
+  factory UserData.fromMap(Map<String, dynamic> json) {
+    return UserData(
+      userId: json['userId'] ?? '',
+      fullName: json['fullName'] ?? '',
+      address: json['address'] ?? '',
+      photoUrl: json['imagePath'] ?? '',
+      role: json['role'] as String?,
+      phoneNumber: json['phoneNumber'] as String?,
+      dateOfBirth: json['dateOfBirth'] != null
+          ? (json['dateOfBirth'] as Timestamp).toDate()
+          : null,
+    );
+  }
+
   factory UserData.fromDocument(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>?;
 

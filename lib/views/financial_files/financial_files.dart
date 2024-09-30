@@ -1,12 +1,13 @@
-import 'package:churchapp/views/financial_files/currency_convert.dart';
+import 'package:churchapp/views/donations/financial/donnation_status.dart';
+import 'package:churchapp/views/financial_files/chart_colors.dart';
+import 'package:churchapp/views/financial_files/expense/expende_data.dart';
+import 'package:churchapp/views/financial_files/expense/expenses.dart';
 import 'package:churchapp/views/financial_files/expense/expenses_service.dart';
-import 'package:churchapp/views/financial_files/financialData.dart';
-import 'package:churchapp/views/financial_files/financial_card_widget.dart';
+import 'package:churchapp/views/financial_files/financial_card_widgets.dart';
+import 'package:churchapp/views/financial_files/revenue_data.dart';
 import 'package:churchapp/views/financial_files/revenue_service.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:churchapp/views/financial_files/expense/expenses.dart';
 import 'package:churchapp/views/financial_files/income/incomes.dart';
 import 'package:churchapp/views/financial_files/upcomingEvents/upcoming_event.dart';
 
@@ -18,253 +19,319 @@ class FinanceScreen extends StatefulWidget {
 }
 
 class _FinanceScreenState extends State<FinanceScreen> {
-  late Future<FinancialData> _financialData;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  late Future<RevenueData> _revenueData;
+  late Future<DonationStats> _donationStats;
+  late Future<Map<String, double>>
+      _annualExpensesData; // To fetch annual expenses
+  late Future<List<ExpenseData>> _expensesData; // To fetch all expenses
+  double totalAnnualExpenses = 0.0;
 
   @override
   void initState() {
     super.initState();
-    final auth = FirebaseAuth.instance;
-    final firestore = FirebaseFirestore.instance;
-    final revenueService = RevenueService();
-    final expensesService = ExpensesService();
+    RevenueService revenueService = RevenueService();
+    _revenueData = revenueService.fetchAllRevenues();
+    _donationStats = revenueService.fetchDonationStats();
 
-    final financialService = FinancialService(
-      auth: auth,
-      firestore: firestore,
-      revenueService: revenueService,
-      expensesService: expensesService,
-    );
+    // Set the date range for the annual expenses
+    DateTime now = DateTime.now();
+    DateTime startOfYear =
+        DateTime(now.year, 1, 1); // Start of the current year
+    DateTime endOfYear = DateTime(now.year, 12, 31); // End of the current year
 
-    _financialData = financialService.fetchAllFinancialData();
+    // Fetch the annual expenses and all expenses
+    _annualExpensesData =
+        ExpensesService().fetchAnnualExpenses(startOfYear, endOfYear);
+    _expensesData = ExpensesService().fetchAllExpenses(startOfYear, endOfYear);
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDarkMode ? Colors.black : Colors.white;
-    final containerBackground = isDarkMode ? Colors.grey[800]! : Colors.white;
-    final primaryTextColor = isDarkMode ? Colors.white : Colors.black;
-    final cardBackgroundColor = isDarkMode ? Colors.grey[800]! : Colors.white;
-    final cardBackOutgroundColor = isDarkMode
-        ? Colors.grey[800]!
-        : const Color.fromARGB(255, 239, 241, 242);
-    final cardTextColor = isDarkMode ? Colors.white : Colors.black;
-    final accentColor = isDarkMode ? Colors.blueGrey : Colors.blue;
-    final incomeColor =
-        isDarkMode ? Colors.lightGreenAccent : Colors.lightGreen;
-    final expenseColor = isDarkMode ? Colors.redAccent : Colors.red;
-
-    final cardShadowColor = isDarkMode
-        ? Colors.black.withOpacity(0.5)
-        : Colors.black.withOpacity(0.2);
-
     return Scaffold(
-      backgroundColor: backgroundColor,
-      body: FutureBuilder<FinancialData>(
-        future: _financialData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      backgroundColor: ChartColors.backgroundColor,
+      body: FutureBuilder<RevenueData>(
+        future: _revenueData,
+        builder: (context, revenueSnapshot) {
+          if (revenueSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+          if (revenueSnapshot.hasError) {
+            return Center(child: Text('Error: ${revenueSnapshot.error}'));
           }
 
-          if (!snapshot.hasData) {
-            return const Center(child: Text('Financial data not found.'));
+          if (!revenueSnapshot.hasData) {
+            return const Center(child: Text('Revenue data not found.'));
           }
 
-          final financialData = snapshot.data!;
-          final totalReceita = financialData.revenues['totalReceita'] ?? 0.0;
-          final totalAnnualExpenses =
-              financialData.annualExpenses['totalAnnualExpenses'] ?? 0.0;
-          final totalBalance = totalReceita - totalAnnualExpenses;
+          final revenueData = revenueSnapshot.data!;
+          final totalIncome = revenueData.totalRevenue;
 
-          final userName = financialData.userData?.fullName ?? 'User';
+          return FutureBuilder<Map<String, double>>(
+            future: _annualExpensesData,
+            builder: (context, expensesSnapshot) {
+              if (expensesSnapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                height: MediaQuery.of(context).size.height * 0.3,
-                decoration: BoxDecoration(
-                  color: accentColor,
-                  borderRadius: const BorderRadius.vertical(
-                    bottom: Radius.circular(60),
-                  ),
-                ),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 40.0, left: 24.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Bem-vindo',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: primaryTextColor,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          userName,
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: primaryTextColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Transform.translate(
-                offset: const Offset(0.0, -80.0),
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Center(
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 16.0, horizontal: 16.0),
-                          decoration: BoxDecoration(
-                            color: cardBackgroundColor,
-                            borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(40),
-                              bottom: Radius.circular(40),
+              if (expensesSnapshot.hasError) {
+                return Center(child: Text('Error: ${expensesSnapshot.error}'));
+              }
+
+              if (!expensesSnapshot.hasData) {
+                return const Center(
+                    child: Text('Annual expenses data not found.'));
+              }
+
+              final userFullName = _auth.currentUser?.displayName ?? 'User';
+              totalAnnualExpenses =
+                  expensesSnapshot.data!['totalAnnualExpenses'] ?? 0.0;
+
+              final totalBalance = totalIncome - totalAnnualExpenses;
+
+              return FutureBuilder<DonationStats>(
+                future: _donationStats,
+                builder: (context, donationSnapshot) {
+                  if (donationSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (donationSnapshot.hasError) {
+                    return Center(
+                        child: Text('Error: ${donationSnapshot.error}'));
+                  }
+
+                  if (!donationSnapshot.hasData) {
+                    return const Center(
+                        child: Text('Donation stats not found.'));
+                  }
+
+                  final donationStats = donationSnapshot.data!;
+
+                  return FutureBuilder<List<ExpenseData>>(
+                    future: _expensesData,
+                    builder: (context, expensesListSnapshot) {
+                      if (expensesListSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      if (expensesListSnapshot.hasError) {
+                        return Center(
+                            child:
+                                Text('Error: ${expensesListSnapshot.error}'));
+                      }
+
+                      if (!expensesListSnapshot.hasData) {
+                        return const Center(
+                            child: Text('No expenses data found.'));
+                      }
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: MediaQuery.of(context).size.height * 0.3,
+                            decoration: BoxDecoration(
+                              color: ChartColors.accentColor,
+                              borderRadius: const BorderRadius.vertical(
+                                bottom: Radius.circular(60),
+                              ),
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: cardShadowColor,
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 60.0, left: 16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Bom Dia',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: ChartColors.primaryTextColor,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      userFullName,
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: ChartColors.primaryTextColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
+                            ),
                           ),
-                          child: Column(
-                            children: [
-                              FinancialCardWidgets.buildFinancialCard(
-                                icon: Icons.account_balance,
-                                title: 'Saldo total',
-                                value: CurrencyConverter.format(totalBalance),
-                                valueStyle: TextStyle(
-                                  fontSize: 22,
-                                  color: totalBalance >= 0
-                                      ? incomeColor
-                                      : expenseColor,
-                                ),
-                                withShadow: false,
-                                backgroundColor: containerBackground,
-                                titleStyle: TextStyle(
-                                  fontSize: 22,
-                                  color: cardTextColor,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => IncomesScreen(
-                                              donationStats:
-                                                  financialData.donationStats,
+                          Transform.translate(
+                            offset: const Offset(0.0, -80.0),
+                            child: GestureDetector(
+                              onTap: () {},
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Center(
+                                  child: SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.8,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16.0, horizontal: 16.0),
+                                      decoration: BoxDecoration(
+                                        color: ChartColors.cardBackgroundColor,
+                                        borderRadius:
+                                            const BorderRadius.vertical(
+                                          top: Radius.circular(40),
+                                          bottom: Radius.circular(40),
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: ChartColors.cardShadowColor,
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          FinancialCardWidgets
+                                              .buildFinancialCard(
+                                            icon: Icons.account_balance,
+                                            title: 'Saldo total',
+                                            value:
+                                                '€ ${totalBalance.toStringAsFixed(2)}',
+                                            valueStyle: TextStyle(
+                                              fontSize: 22,
+                                              color: totalBalance >= 0
+                                                  ? ChartColors.incomeColor
+                                                  : ChartColors.expenseColor,
+                                            ),
+                                            withShadow: false,
+                                            backgroundColor: Colors.white,
+                                            titleStyle: TextStyle(
+                                              fontSize: 22,
+                                              color: ChartColors.cardTextColor,
                                             ),
                                           ),
-                                        );
-                                      },
-                                      child: FinancialCardWidgets
-                                          .buildFinancialCard(
-                                        icon: Icons.trending_up,
-                                        title: 'Renda',
-                                        value: CurrencyConverter.format(
-                                            totalReceita),
-                                        valueStyle: TextStyle(
-                                          fontSize: 14,
-                                          color: incomeColor,
-                                        ),
-                                        withShadow: false,
-                                        backgroundColor: containerBackground,
-                                        titleStyle: TextStyle(
-                                          fontSize: 15,
-                                          color: cardTextColor,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const ExpensesScreen(),
+                                          const SizedBox(height: 16),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            IncomesScreen(
+                                                                donationStats:
+                                                                    donationStats),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: FinancialCardWidgets
+                                                      .buildFinancialCard(
+                                                    icon: Icons.trending_up,
+                                                    title: 'Renda',
+                                                    value:
+                                                        '€ ${totalIncome.toStringAsFixed(2)}',
+                                                    valueStyle: TextStyle(
+                                                      fontSize: 14,
+                                                      color: ChartColors
+                                                          .incomeColor,
+                                                    ),
+                                                    withShadow: false,
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    titleStyle: TextStyle(
+                                                      fontSize: 15,
+                                                      color: ChartColors
+                                                          .cardTextColor,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 1),
+                                              Expanded(
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const ExpensesScreen(),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: FinancialCardWidgets
+                                                      .buildFinancialCard(
+                                                    icon: Icons.trending_down,
+                                                    title: 'Despesa',
+                                                    value:
+                                                        '€ ${totalAnnualExpenses.toStringAsFixed(2)}',
+                                                    valueStyle: TextStyle(
+                                                      fontSize: 14,
+                                                      color: ChartColors
+                                                          .expenseColor,
+                                                    ),
+                                                    withShadow: false,
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    titleStyle: TextStyle(
+                                                      fontSize: 15,
+                                                      color: ChartColors
+                                                          .cardTextColor,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        );
-                                      },
-                                      child: FinancialCardWidgets
-                                          .buildFinancialCard(
-                                        icon: Icons.trending_down,
-                                        title: 'Despesa',
-                                        value: CurrencyConverter.format(
-                                            totalAnnualExpenses),
-                                        valueStyle: TextStyle(
-                                          fontSize: 14,
-                                          color: expenseColor,
-                                        ),
-                                        withShadow: false,
-                                        backgroundColor: containerBackground,
-                                        titleStyle: TextStyle(
-                                          fontSize: 15,
-                                          color: cardTextColor,
-                                        ),
+                                        ],
                                       ),
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const UpcomingEventsScreen(),
-                    ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const UpcomingEventsScreen(),
+                                ),
+                              );
+                            },
+                            child: FinancialCardWidgets.buildFinanceSectionCard(
+                              icon: Icons.event_note,
+                              title: 'Próximos Lançamentos',
+                              value: '',
+                              backgroundColor:
+                                  ChartColors.cardBackOutgroundColor,
+                              titleColor: ChartColors.cardTextColor,
+                              valueColor: ChartColors.cardTextColor,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   );
                 },
-                child: FinancialCardWidgets.buildFinanceSectionCard(
-                  icon: Icons.event_note,
-                  title: 'Próximos Lançamentos',
-                  value: '',
-                  backgroundColor: cardBackOutgroundColor,
-                  titleColor: cardTextColor,
-                  valueColor: cardTextColor,
-                ),
-              ),
-            ],
+              );
+            },
           );
         },
       ),

@@ -1,6 +1,7 @@
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/income/anual_chart.dart';
 import 'package:churchapp/views/financial_files/income/monthly_chart.dart';
+import 'package:churchapp/views/financial_files/revenue_data.dart';
 import 'package:churchapp/views/financial_files/revenue_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -35,58 +36,32 @@ class _IncomesScreenState extends State<IncomesScreen> {
 
   Future<void> _fetchAllRevenues() async {
     try {
-      final revenues = await _revenueService.fetchAllRevenues();
-      setState(() {
-        totalDonations = revenues['totalDonations'] ?? 0.0;
-        totalCourseRevenue = revenues['totalCourseRevenue'] ?? 0.0;
-        totalOthers = revenues['totalIncome'] ?? 0.0;
+      final revenueData = await _revenueService.fetchData();
 
+      setState(() {
+        totalDonations = revenueData.totalDonations;
+        totalCourseRevenue = revenueData.totalCourseRevenue;
+        totalOthers = revenueData.totalOthers;
+
+        // Calculando a soma total das receitas
         totalReceita = totalDonations + totalCourseRevenue + totalOthers;
-      });
 
-      final currentMonth = DateTime.now().month;
-      final monthName = _getMonthName(currentMonth);
+        // Calculando os valores mensais
+        String currentMonth = RevenueData.getMonthName(DateTime.now().month);
 
-      final monthlyRevenues =
-          await _revenueService.fetchMonthlyRevenues(widget.donationStats);
-      final monthlyData = monthlyRevenues[monthName] ??
-          {
-            'totalReceitas': 0.0,
-            'totalDonations': 0.0,
-            'monthlyDonations': 0.0,
-            'totalCourseRevenue': 0.0,
-            'totalIncome': 0.0,
-          };
-
-      setState(() {
-        totalMonthlyReceitas = monthlyData['totalReceitas'] ?? 0.0;
-        totalMonthlyDonations = monthlyData['totalDonations'] ?? 0.0;
-        totalMonthlyCourses = monthlyData['totalCourseRevenue'] ?? 0.0;
-        totalMonthlyOthers = monthlyData['totalIncome'] ?? 0.0;
+        totalMonthlyDonations =
+            revenueData.donationsPerMonth[currentMonth] ?? 0.0;
+        totalMonthlyCourses =
+            revenueData.courseRevenuePerMonth[currentMonth] ?? 0.0;
+        totalMonthlyOthers = revenueData.incomePerMonth[currentMonth] ?? 0.0;
+        totalMonthlyReceitas =
+            totalMonthlyDonations + totalMonthlyCourses + totalMonthlyOthers;
       });
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching revenues: $e');
       }
     }
-  }
-
-  String _getMonthName(int month) {
-    const monthNames = [
-      'Janeiro',
-      'Fevereiro',
-      'Março',
-      'Abril',
-      'Maio',
-      'Junho',
-      'Julho',
-      'Agosto',
-      'Setembro',
-      'Outubro',
-      'Novembro',
-      'Dezembro'
-    ];
-    return monthNames[month - 1];
   }
 
   @override
