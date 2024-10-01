@@ -1,9 +1,11 @@
 import 'package:churchapp/views/courses/charts/annual_chart.dart';
 import 'package:churchapp/views/courses/charts/course_registration.dart';
 import 'package:churchapp/views/courses/charts/monthly_chart.dart';
+import 'package:churchapp/views/courses/charts/yearly_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class CoursesChartScreen extends StatefulWidget {
   const CoursesChartScreen({super.key});
@@ -13,8 +15,27 @@ class CoursesChartScreen extends StatefulWidget {
 }
 
 class _CoursesChartScreenState extends State<CoursesChartScreen> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Map<String, double> monthlyCourses = {
+    'January': 0.0,
+    'February': 0.0,
+    'March': 0.0,
+    'April': 0.0,
+    'May': 0.0,
+    'June': 0.0,
+    'July': 0.0,
+    'August': 0.0,
+    'September': 0.0,
+    'October': 0.0,
+    'November': 0.0,
+    'December': 0.0,
+  };
+
   List<CourseRegistration> registrations = [];
   bool isLoading = true;
+  double totalIncome = 0.0;
+  double currentTotalIncome = 0.0;
 
   double currentCasadosParaSempre = 0.0;
   double currentCursoDiscipulado = 0.0;
@@ -22,7 +43,6 @@ class _CoursesChartScreenState extends State<CoursesChartScreen> {
   double currentEstudoBiblico = 0.0;
   double currentHomenAoMaximo = 0.0;
   double currentMulherUnica = 0.0;
-  double currentTotalIncome = 0.0;
 
   double totalCasadosParaSempre = 0.0;
   double totalCursoDiscipulado = 0.0;
@@ -32,12 +52,36 @@ class _CoursesChartScreenState extends State<CoursesChartScreen> {
   double totalMulherUnica = 0.0;
   double totalTotalIncome = 0.0;
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   @override
   void initState() {
     super.initState();
     _fetchCourses();
+    _fetchCurrentCourses();
+  }
+
+  Future<void> _fetchCurrentCourses() async {
+    CollectionReference donations = _firestore.collection('courseRegistration');
+    var snapshot = await donations.get();
+
+    setState(() {
+      totalIncome = 0.0;
+      monthlyCourses.updateAll((key, value) => 0.0);
+      isLoading = true;
+    });
+
+    for (var doc in snapshot.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      double price = _parsePrice(data['price']);
+      final registrationDate = (data['registrationDate'] as Timestamp).toDate();
+      final month = DateFormat('MMMM', 'en_US').format(registrationDate);
+
+      totalIncome += price;
+      monthlyCourses[month] = (monthlyCourses[month] ?? 0.0) + price;
+    }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   Future<void> _fetchCourses() async {
@@ -146,7 +190,7 @@ class _CoursesChartScreenState extends State<CoursesChartScreen> {
 
   double _parsePrice(dynamic priceData) {
     if (priceData is num) {
-      return (priceData).toDouble();
+      return priceData.toDouble();
     } else if (priceData is String) {
       return double.tryParse(priceData) ?? 0.0;
     }
@@ -211,6 +255,20 @@ class _CoursesChartScreenState extends State<CoursesChartScreen> {
               annualHomenAoMaximo: totalHomenAoMaximo,
               annualMulherUnica: totalMulherUnica,
               annualTotalIncome: totalTotalIncome,
+              isDarkMode: isDarkMode,
+            ),
+            const SizedBox(height: 60),
+            Text(
+              'Rendimento das Doações ao Longo do Ano',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+            const SizedBox(height: 20),
+            YearlyCourses(
+              monthlyCourses: monthlyCourses,
               isDarkMode: isDarkMode,
             ),
           ],
