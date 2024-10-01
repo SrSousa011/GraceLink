@@ -1,5 +1,5 @@
 import 'package:churchapp/views/courses/charts/annual_chart.dart';
-import 'package:churchapp/views/courses/charts/course__registration.dart';
+import 'package:churchapp/views/courses/charts/course_registration.dart';
 import 'package:churchapp/views/courses/charts/monthly_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

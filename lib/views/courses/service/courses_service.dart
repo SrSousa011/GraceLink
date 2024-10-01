@@ -1,4 +1,4 @@
-import 'package:churchapp/views/courses/charts/course__registration.dart';
+import 'package:churchapp/views/courses/charts/course_registration.dart';
 import 'package:churchapp/views/courses/service/courses_date.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
