@@ -219,7 +219,7 @@ class _CoursesChartScreenState extends State<CoursesChartScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Venda de cursos por trimestre',
+              'Receita Mensal de Cursos',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -239,7 +239,7 @@ class _CoursesChartScreenState extends State<CoursesChartScreen> {
             ),
             const SizedBox(height: 60),
             Text(
-              'Cursos Anuais',
+              'Receita Anual de Cursos',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
