@@ -1,3 +1,4 @@
+import 'package:churchapp/views/courses/charts/course_status.dart';
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/revenue_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,24 +9,24 @@ class RevenueService {
 
   Future<RevenueData> fetchAllRevenues() async {
     try {
-      double totalIncome = await _getTotalIncome();
+      double totalOthers = await _getTotalOthers();
       double totalDonations = await _getTotalDonations();
-      double totalCourse = await _getTotalCourse();
+      double totalCourses = await _getTotalCourses();
 
-      double totalRevenue = totalIncome + totalDonations + totalCourse;
+      double totalIncomes = totalOthers + totalDonations + totalCourses;
 
       return RevenueData(
-        totalOthers: totalIncome,
+        totalOthers: totalOthers,
         totalDonations: totalDonations,
-        totalCourseRevenue: totalCourse,
-        totalRevenue: totalRevenue,
+        totalCourses: totalCourses,
+        totalIncomes: totalIncomes,
       );
     } catch (e) {
       throw Exception('Error fetching all revenues: $e');
     }
   }
 
-  Future<double> _getTotalIncome() async {
+  Future<double> _getTotalOthers() async {
     return await _getTotalFromCollection(
         'transactions', 'Rendimento', 'amount');
   }
@@ -34,8 +35,8 @@ class RevenueService {
     return await _getTotalFromCollection('donations', null, 'donationValue');
   }
 
-  Future<double> _getTotalCourse() async {
-    return await _getTotalFromCollection('courses', null, 'price');
+  Future<double> _getTotalCourses() async {
+    return await _getTotalFromCollection('courseRegistration', null, 'price');
   }
 
   Future<double> _getTotalFromCollection(
@@ -49,7 +50,7 @@ class RevenueService {
       return snapshot.docs.fold<double>(0.0, (total, doc) {
         double value =
             (doc[field] ?? 0.0) is num ? (doc[field] as num).toDouble() : 0.0;
-        return total + value; // Ensure adding double values
+        return total + value;
       });
     } catch (e) {
       throw Exception('Error fetching total from collection $collection: $e');
@@ -68,51 +69,68 @@ class RevenueService {
       totalDonations += donationValue;
 
       final date = (doc['timestamp'] as Timestamp).toDate();
-      final month = date.month - 1; // Index adjustment for the list
-      monthlyDonations[month] += donationValue; // Accumulate donations by month
+      final month = date.month - 1;
+      monthlyDonations[month] += donationValue;
     }
 
     return DonationStats(
         totalDonation: totalDonations, monthlyDonations: monthlyDonations);
   }
 
+  Future<CoursesStats> fetchCoursesStats() async {
+    final snapshot = await _firestore.collection('courseRegistration').get();
+    double totalCourses = 0.0;
+    List<double> monthlyCourses = List.filled(12, 0);
+
+    for (var doc in snapshot.docs) {
+      double price =
+          (doc['price'] ?? 0.0) is num ? (doc['price'] as num).toDouble() : 0.0;
+      totalCourses += price;
+
+      final date = (doc['registrationDate'] as Timestamp).toDate();
+      final month = date.month - 1;
+      monthlyCourses[month] += price;
+    }
+
+    return CoursesStats(
+        totalCourses: totalCourses, monthlyCourses: monthlyCourses);
+  }
+
   Future<RevenueData> fetchData() async {
-    // Buscar todas as receitas (doações totais, renda e cursos)
     final revenueData = await fetchAllRevenues();
 
-    // Buscar estatísticas de doação
     final donationStats = await fetchDonationStats();
+    final courseStats = await fetchCoursesStats();
 
-    // Buscar receitas mensais
     final monthlyData = await fetchMonthlyRevenues();
 
-    // Preencher o mapa incomePerMonth
     final monthName = RevenueData.getMonthName(DateTime.now().month);
 
-    revenueData.incomePerMonth[monthName] = (monthlyData['totalIncome'] ?? 0.0);
+    revenueData.othersPerMonth[monthName] =
+        (monthlyData['totalIncomes'] ?? 0.0);
     revenueData.donationsPerMonth[monthName] =
         (donationStats.monthlyDonations[DateTime.now().month - 1]);
-    revenueData.courseRevenuePerMonth[monthName] =
-        (monthlyData['totalCourseRevenue'] ?? 0.0);
+    revenueData.coursesPerMonth[monthName] =
+        (courseStats.monthlyCourses[DateTime.now().month - 1]);
 
     double totalMonthlyRevenue =
-        (revenueData.incomePerMonth[monthName] ?? 0.0) +
+        (revenueData.othersPerMonth[monthName] ?? 0.0) +
             (revenueData.donationsPerMonth[monthName] ?? 0.0) +
-            (revenueData.courseRevenuePerMonth[monthName] ?? 0.0);
+            (revenueData.coursesPerMonth[monthName] ?? 0.0);
 
-    // Logs de depuração detalhados
     if (kDebugMode) {
       print('Fetched revenue data: $revenueData');
       print('Total Income: ${revenueData.totalOthers}');
       print('Total Donations: ${revenueData.totalDonations}');
-      print('Total Course Revenue: ${revenueData.totalCourseRevenue}');
-      print('Total Monthly Income: ${monthlyData['totalIncome'] ?? 0.0}');
+      print('Total Course Revenue: ${revenueData.totalCourses}');
+
+      print(
+          'Total Monthly Donations: ${courseStats.monthlyCourses[DateTime.now().month - 1]}');
       print(
           'Total Monthly Donations: ${donationStats.monthlyDonations[DateTime.now().month - 1]}');
       print(
-          'Total Monthly Course Revenue: ${monthlyData['totalCourseRevenue'] ?? 0.0}');
-      print(
-          'Calculated Total Monthly Revenue: $totalMonthlyRevenue'); // Corrigido
+          'Total Monthly Donations: ${courseStats.monthlyCourses[DateTime.now().month - 1]}');
+      print('Calculated Total Monthly Revenue: $totalMonthlyRevenue');
     }
 
     return revenueData;
@@ -120,28 +138,22 @@ class RevenueService {
 
   Future<Map<String, dynamic>> fetchMonthlyRevenues() async {
     try {
-      // Chama as funções para obter dados mensais
       final incomeData = await _fetchIncomeDataPerMonth();
-      final donationData = await _fetchDonationDataPerMonth(
-          await fetchDonationStats()); // Chame fetchDonationStats
+      final donationData =
+          await _fetchDonationDataPerMonth(await fetchDonationStats());
       final courseRevenueData = await _fetchCourseRevenueDataPerMonth();
 
-      // Totaliza as receitas mensais
-      double totalIncome =
+      double totalOthers =
           incomeData.values.fold(0.0, (sum, item) => sum + item);
-      double totalDonations = donationData.values.fold(
-          0.0,
-          (sum, item) =>
-              sum + (item['totalDonations'] ?? 0.0)); // Corrigido aqui
-      double totalCourseRevenue = courseRevenueData.values.fold(
-          0.0,
-          (sum, item) =>
-              sum + (item['totalCourseRevenue'] ?? 0.0)); // Corrigido aqui
+      double totalDonations = donationData.values
+          .fold(0.0, (sum, item) => sum + (item['totalDonations'] ?? 0.0));
+      double totalCourses = courseRevenueData.values
+          .fold(0.0, (sum, item) => sum + (item['totalCourses'] ?? 0.0));
 
       return {
-        'totalIncome': totalIncome,
+        'totalOthers': totalOthers,
         'totalDonations': totalDonations,
-        'totalCourseRevenue': totalCourseRevenue,
+        'totalCourses': totalCourses,
       };
     } catch (e) {
       throw Exception('Erro ao buscar receitas mensais: $e');
@@ -168,29 +180,27 @@ class RevenueService {
 
     for (var doc in snapshot.docs) {
       if (doc.data().containsKey('time')) {
-        // Verifique se o campo existe
         final date = (doc['time'] as Timestamp).toDate();
-        final month = date.month; // Obter o mês (1 a 12)
+        final month = date.month;
         final coursePrice = (doc['price'] ?? 0.0) is num
             ? (doc['price'] as num).toDouble()
             : 0.0;
 
-        // Acumular receita por mês
         final monthName = _getMonthName(month);
         monthlyCourseRevenue[monthName] =
             (monthlyCourseRevenue[monthName] ?? 0.0) + coursePrice;
       } else {
-        print(
-            'Documento ignorado, campo "courseDate" não encontrado: ${doc.id}');
+        if (kDebugMode) {
+          print(
+              'Documento ignorado, campo "courseDate" não encontrado: ${doc.id}');
+        }
       }
     }
 
-    // Retornar o total de receita por mês
     return {
       for (int month = 1; month <= 12; month++)
         _getMonthName(month): {
-          'totalCourseRevenue':
-              monthlyCourseRevenue[_getMonthName(month)] ?? 0.0
+          'totalCourses': monthlyCourseRevenue[_getMonthName(month)] ?? 0.0
         }
     };
   }
@@ -202,7 +212,7 @@ class RevenueService {
     for (var doc in snapshot.docs) {
       if (doc.data().containsKey('transactionDate')) {
         final date = (doc['transactionDate'] as Timestamp).toDate();
-        final month = date.month; // O mês vai de 1 a 12
+        final month = date.month;
         final incomeAmount = (doc['amount'] ?? 0.0) is num
             ? (doc['amount'] as num).toDouble()
             : 0.0;
@@ -210,12 +220,14 @@ class RevenueService {
         monthlyIncomeData[_getMonthName(month)] =
             (monthlyIncomeData[_getMonthName(month)] ?? 0.0) + incomeAmount;
       } else {
-        print(
-            'Documento ignorado, campo "transactionDate" não encontrado: ${doc.id}');
+        if (kDebugMode) {
+          print(
+              'Documento ignorado, campo "transactionDate" não encontrado: ${doc.id}');
+        }
       }
     }
 
-    return monthlyIncomeData; // Deve retornar um Map
+    return monthlyIncomeData;
   }
 
   String _getMonthName(int month) {
@@ -233,6 +245,6 @@ class RevenueService {
       'Novembro',
       'Dezembro'
     ];
-    return monthNames[month - 1]; // Aqui, month é um int
+    return monthNames[month - 1];
   }
 }

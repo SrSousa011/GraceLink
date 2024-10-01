@@ -19,7 +19,7 @@ class _IncomesScreenState extends State<IncomesScreen> {
   final RevenueService _revenueService = RevenueService();
 
   double totalDonations = 0.0;
-  double totalCourseRevenue = 0.0;
+  double totalCourses = 0.0;
   double totalOthers = 0.0;
   double totalReceita = 0.0;
 
@@ -40,20 +40,17 @@ class _IncomesScreenState extends State<IncomesScreen> {
 
       setState(() {
         totalDonations = revenueData.totalDonations;
-        totalCourseRevenue = revenueData.totalCourseRevenue;
+        totalCourses = revenueData.totalCourses;
         totalOthers = revenueData.totalOthers;
 
-        // Calculando a soma total das receitas
-        totalReceita = totalDonations + totalCourseRevenue + totalOthers;
+        totalReceita = totalDonations + totalCourses + totalOthers;
 
-        // Calculando os valores mensais
         String currentMonth = RevenueData.getMonthName(DateTime.now().month);
 
         totalMonthlyDonations =
             revenueData.donationsPerMonth[currentMonth] ?? 0.0;
-        totalMonthlyCourses =
-            revenueData.courseRevenuePerMonth[currentMonth] ?? 0.0;
-        totalMonthlyOthers = revenueData.incomePerMonth[currentMonth] ?? 0.0;
+        totalMonthlyCourses = revenueData.coursesPerMonth[currentMonth] ?? 0.0;
+        totalMonthlyOthers = revenueData.othersPerMonth[currentMonth] ?? 0.0;
         totalMonthlyReceitas =
             totalMonthlyDonations + totalMonthlyCourses + totalMonthlyOthers;
       });
@@ -93,7 +90,7 @@ class _IncomesScreenState extends State<IncomesScreen> {
                 child: AnnualIncomeChart(
                   totalReceita: totalReceita,
                   totalDonations: totalDonations,
-                  totalCourses: totalCourseRevenue,
+                  totalCourses: totalCourses,
                   totalOthers: totalOthers,
                   isDarkMode: Theme.of(context).brightness == Brightness.dark,
                 ),

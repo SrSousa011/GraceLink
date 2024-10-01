@@ -67,7 +67,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
           }
 
           final revenueData = revenueSnapshot.data!;
-          final totalIncome = revenueData.totalRevenue;
+          final totalIncome = revenueData.totalIncomes;
 
           return FutureBuilder<Map<String, double>>(
             future: _annualExpensesData,

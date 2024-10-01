@@ -1,25 +1,24 @@
 class RevenueData {
   double totalDonations;
-  double totalCourseRevenue;
+  double totalCourses;
   double totalOthers;
-  double totalRevenue;
+  double totalIncomes;
 
   Map<String, double> donationsPerMonth;
-  Map<String, double> courseRevenuePerMonth;
-  Map<String, double> incomePerMonth;
+  Map<String, double> coursesPerMonth;
+  Map<String, double> othersPerMonth;
 
   RevenueData({
     this.totalDonations = 0.0,
-    this.totalCourseRevenue = 0.0,
+    this.totalCourses = 0.0,
     this.totalOthers = 0.0,
-    this.totalRevenue = 0.0,
+    this.totalIncomes = 0.0,
     Map<String, double>? donationsPerMonth,
     Map<String, double>? courseRevenuePerMonth,
-    Map<String, double>? incomePerMonth,
+    Map<String, double>? otherPerMonth,
   })  : donationsPerMonth = donationsPerMonth ?? _initializeMonthlyData(),
-        courseRevenuePerMonth =
-            courseRevenuePerMonth ?? _initializeMonthlyData(),
-        incomePerMonth = incomePerMonth ?? _initializeMonthlyData();
+        coursesPerMonth = courseRevenuePerMonth ?? _initializeMonthlyData(),
+        othersPerMonth = otherPerMonth ?? _initializeMonthlyData();
 
   static Map<String, double> _initializeMonthlyData() {
     return {
@@ -48,20 +47,8 @@ class RevenueData {
   factory RevenueData.fromMap(Map<String, dynamic> map) {
     return RevenueData(
       totalDonations: (map['totalDonations'] as num?)?.toDouble() ?? 0.0,
-      totalCourseRevenue:
-          (map['totalCourseRevenue'] as num?)?.toDouble() ?? 0.0,
-      totalOthers: (map['totalIncome'] as num?)?.toDouble() ?? 0.0,
-      totalRevenue: (map['totalRevenue'] as num?)?.toDouble() ?? 0.0,
-      donationsPerMonth: (map['donationsPerMonth'] as Map<String, dynamic>?)
-              ?.map((key, value) =>
-                  MapEntry(key, (value as num?)?.toDouble() ?? 0.0)) ??
-          {},
-      courseRevenuePerMonth:
-          (map['courseRevenuePerMonth'] as Map<String, dynamic>?)?.map(
-                  (key, value) =>
-                      MapEntry(key, (value as num?)?.toDouble() ?? 0.0)) ??
-              {},
-      incomePerMonth: (map['incomePerMonth'] as Map<String, dynamic>?)?.map(
+      totalCourses: (map['totalCourses'] as num?)?.toDouble() ?? 0.0,
+      otherPerMonth: (map['otherPerMonth'] as Map<String, dynamic>?)?.map(
               (key, value) =>
                   MapEntry(key, (value as num?)?.toDouble() ?? 0.0)) ??
           {},

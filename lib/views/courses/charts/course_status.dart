@@ -1,16 +1,17 @@
 import 'package:churchapp/views/courses/charts/course_registration.dart';
 import 'package:intl/intl.dart';
 
-class CourseStats {
+class CoursesStats {
   final double totalCourses;
   final List<double> monthlyCourses;
 
-  CourseStats({
+  CoursesStats({
     required this.totalCourses,
     required this.monthlyCourses,
   });
 
-  static CourseStats fromRegistrations(List<CourseRegistration> registrations) {
+  static CoursesStats fromRegistrations(
+      List<CourseRegistration> registrations) {
     double totalCourses = 0;
     List<double> monthlyCourses = List.filled(12, 0);
 
@@ -22,14 +23,14 @@ class CourseStats {
       monthlyCourses[month] += registration.price;
     }
 
-    return CourseStats(
+    return CoursesStats(
       totalCourses: totalCourses,
       monthlyCourses: monthlyCourses,
     );
   }
 
-  factory CourseStats.fromMap(Map<String, dynamic> map) {
-    return CourseStats(
+  factory CoursesStats.fromMap(Map<String, dynamic> map) {
+    return CoursesStats(
       totalCourses: (map['totalCourses'] as num?)?.toDouble() ?? 0.0,
       monthlyCourses: (map['monthlyCourses'] as List<dynamic>?)
               ?.map((e) => (e as num).toDouble())
