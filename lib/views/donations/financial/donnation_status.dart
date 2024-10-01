@@ -29,22 +29,6 @@ class DonationStats {
     );
   }
 
-  // static double _parseDonationValue(dynamic value) {
-  //   if (value is num) {
-  //     return value.toDouble();
-  //   } else if (value is String) {
-  //     final sanitizedValue = value
-  //         .replaceAll('€', '')
-  //         .replaceAll(' ', '')
-  //         .replaceAll(',', '.')
-  //         .trim();
-
-  //     return double.tryParse(sanitizedValue) ?? 0.0;
-  //   } else {
-  //     return 0.0;
-  //   }
-  // }
-
   factory DonationStats.fromMap(Map<String, dynamic> map) {
     return DonationStats(
       totalDonation: (map['totalDonation'] as num?)?.toDouble() ?? 0.0,
@@ -68,7 +52,6 @@ class DonationStats {
   }
 
   double get monthlyIncome {
-    // Calcular a renda mensal total a partir da lista de doações mensais
     return monthlyDonations.reduce((a, b) => a + b);
   }
 }
