@@ -1,27 +1,28 @@
-import 'package:churchapp/views/financial_files/expense/expende_data.dart';
+import 'package:churchapp/views/financial_files/expense/expense_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class ExpensesService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  /// Fetches annual expenses based on the specified date range and user.
+  Future<ExpenseData> fetchData(
+      DateTime startOfYear, DateTime endOfYear) async {
+    final annualData = await fetchAnnualExpenses(startOfYear, endOfYear);
+    final monthlyData = await fetchMonthlyExpenses(startOfYear, endOfYear);
+
+    return ExpenseData(
+      totalExpenses: annualData['totalAnnualExpenses'] ?? 0.0,
+      expensesPerMonth: monthlyData,
+    );
+  }
+
   Future<Map<String, double>> fetchAnnualExpenses(
       DateTime startOfYear, DateTime endOfYear) async {
-    final user = _auth.currentUser;
-    if (user == null) {
-      throw Exception('Usuário não autenticado');
-    }
-
     try {
       final querySnapshot = await _firestore
           .collection('transactions')
-          .where('createdBy', isEqualTo: user.uid)
           .where('type', isEqualTo: 'Despesa')
-          .where('createdAt', isGreaterThanOrEqualTo: startOfYear)
-          .where('createdAt',
-              isLessThan: endOfYear) // Exclude the last day of the year
+          .where('transactionDate', isGreaterThanOrEqualTo: startOfYear)
+          .where('transactionDate', isLessThan: endOfYear)
           .get();
 
       double annualGeneralExpenses = 0.0;
@@ -29,24 +30,34 @@ class ExpensesService {
       double annualMaintenance = 0.0;
       double annualServices = 0.0;
 
+      List<double> monthlyGeneralExpenses = List.filled(12, 0.0);
+      List<double> monthlySalaries = List.filled(12, 0.0);
+      List<double> monthlyMaintenance = List.filled(12, 0.0);
+      List<double> monthlyServices = List.filled(12, 0.0);
+
       for (var doc in querySnapshot.docs) {
         final data = doc.data();
         final amount = (data['amount'] as num?)?.toDouble() ?? 0.0;
         final category = data['category'] as String? ?? 'Desconhecido';
+        final timestamp = (data['transactionDate'] as Timestamp).toDate();
+        final month = timestamp.month - 1;
 
-        // Categorize expenses
         switch (category) {
           case 'Despesas Gerais':
             annualGeneralExpenses += amount;
+            monthlyGeneralExpenses[month] += amount;
             break;
           case 'Salários':
             annualSalaries += amount;
+            monthlySalaries[month] += amount;
             break;
           case 'Manutenção':
             annualMaintenance += amount;
+            monthlyMaintenance[month] += amount;
             break;
           case 'Serviços':
             annualServices += amount;
+            monthlyServices[month] += amount;
             break;
           default:
             break;
@@ -66,53 +77,40 @@ class ExpensesService {
         'totalAnnualExpenses': totalAnnualExpenses,
       };
     } catch (e) {
-      throw Exception('Erro ao buscar despesas: $e');
+      throw Exception('Error fetching annual expenses: $e');
     }
   }
 
-  /// Fetches all expenses for the authenticated user within the specified date range.
-  Future<List<ExpenseData>> fetchAllExpenses(
-      DateTime startDate, DateTime endDate) async {
-    final user = _auth.currentUser;
-    if (user == null) {
-      throw Exception('Usuário não autenticado');
-    }
+  Future<double> fetchAllExpenses() async {
+    return await _getTotalFromCollection('transactions', 'Despesa', 'amount');
+  }
 
+  Future<double> _getTotalFromCollection(
+      String collection, String? type, String field) async {
     try {
-      final querySnapshot = await _firestore
-          .collection('transactions')
-          .where('createdBy', isEqualTo: user.uid)
-          .where('type', isEqualTo: 'Despesa')
-          .where('createdAt', isGreaterThanOrEqualTo: startDate)
-          .where('createdAt',
-              isLessThanOrEqualTo: endDate) // Include the last day
-          .get();
+      final query = _firestore.collection(collection);
+      final snapshot = type != null
+          ? await query.where('type', isEqualTo: type).get()
+          : await query.get();
 
-      // Convert QuerySnapshot to a List of ExpenseData
-      return querySnapshot.docs.map((doc) {
-        final data = doc.data(); // Cast to Map<String, dynamic>
-        final id = doc.id; // Get the document ID
-        return ExpenseData.fromFirestore(data, id); // Pass the data map and ID
-      }).toList();
+      return snapshot.docs.fold<double>(0.0, (total, doc) {
+        double value =
+            (doc[field] ?? 0.0) is num ? (doc[field] as num).toDouble() : 0.0;
+        return total + value;
+      });
     } catch (e) {
-      throw Exception('Erro ao buscar todas as despesas: $e');
+      throw Exception('Error fetching total from collection $collection: $e');
     }
   }
 
   Future<Map<String, double>> fetchMonthlyExpenses(
       DateTime startOfMonth, DateTime endOfMonth) async {
-    final user = _auth.currentUser;
-    if (user == null) {
-      throw Exception('Usuário não autenticado');
-    }
-
     try {
       final querySnapshot = await _firestore
           .collection('transactions')
-          .where('createdBy', isEqualTo: user.uid)
           .where('type', isEqualTo: 'Despesa')
-          .where('createdAt', isGreaterThanOrEqualTo: startOfMonth)
-          .where('createdAt', isLessThanOrEqualTo: endOfMonth)
+          .where('transactionDate', isGreaterThanOrEqualTo: startOfMonth)
+          .where('transactionDate', isLessThanOrEqualTo: endOfMonth)
           .get();
 
       double monthlyGeneralExpenses = 0.0;
@@ -156,7 +154,7 @@ class ExpensesService {
         'totalMonthlyExpenses': totalMonthlyExpenses,
       };
     } catch (e) {
-      throw Exception('Erro ao buscar despesas mensais: $e');
+      throw Exception('Error fetching monthly expenses: $e');
     }
   }
 }

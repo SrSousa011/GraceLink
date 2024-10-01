@@ -1,5 +1,7 @@
-import 'package:churchapp/views/financial_files/expense/expenses_service.dart';
+import 'package:churchapp/views/financial_files/expense/expense_data.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:churchapp/views/financial_files/expense/expenses_service.dart';
 import 'package:churchapp/views/financial_files/expense/anual_chart.dart';
 import 'package:churchapp/views/financial_files/expense/monthly_chart.dart';
 
@@ -18,25 +20,42 @@ class ExpensesScreen extends StatefulWidget {
 }
 
 class _ExpensesScreenState extends State<ExpensesScreen> {
-  late Future<List<Map<String, double>>> _expensesAndAnnualExpensesFuture;
   final ExpensesService _expensesService = ExpensesService();
+  ExpenseData? _expenseData;
+  bool _isLoading = true;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    final now = DateTime.now();
+    fetchExpenseData();
+  }
 
-    final startOfMonth = DateTime(now.year, now.month, 1);
-    final endOfMonth =
-        DateTime(now.year, now.month + 1, 1).subtract(const Duration(days: 1));
-    final startOfYear = DateTime(now.year, 1, 1);
-    final endOfYear =
-        DateTime(now.year + 1, 1, 1).subtract(const Duration(days: 1));
+  Future<void> fetchExpenseData() async {
+    try {
+      final now = DateTime.now();
+      final startOfYear = DateTime(now.year, 1, 1);
+      final endOfYear =
+          DateTime(now.year + 1, 1, 1).subtract(const Duration(days: 1));
 
-    _expensesAndAnnualExpensesFuture = Future.wait([
-      _expensesService.fetchMonthlyExpenses(startOfMonth, endOfMonth),
-      _expensesService.fetchAnnualExpenses(startOfYear, endOfYear),
-    ]);
+      _expenseData = await _expensesService.fetchData(startOfYear, endOfYear);
+      if (kDebugMode) {
+        print(
+            'Total de Despesas: €${_expenseData!.totalExpenses.toStringAsFixed(2)}');
+      }
+      if (kDebugMode) {
+        print('Despesas Mensais: ${_expenseData!.expensesPerMonth}');
+      }
+    } catch (error) {
+      _errorMessage = error.toString();
+      if (kDebugMode) {
+        print('Erro ao buscar dados de despesas: $_errorMessage');
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -45,73 +64,59 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Despesas'),
+        title: const Text('Despesas Overview'),
         backgroundColor: expensesColor,
       ),
-      body: FutureBuilder<List<Map<String, double>>>(
-        future: _expensesAndAnnualExpensesFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text('Erro: ${snapshot.error}'));
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Nenhuma despesa encontrada.'));
-          }
-
-          // Retrieve monthly and annual expenses from snapshot
-          final monthlyExpenses = snapshot.data![0];
-          final annualExpenses = snapshot.data![1];
-
-          final monthlyGeneralExpenses =
-              monthlyExpenses['totalGeneralExpenses'] ?? 0.0;
-          final monthlySalaries = monthlyExpenses['totalSalaries'] ?? 0.0;
-          final monthlyMaintenance = monthlyExpenses['totalMaintenance'] ?? 0.0;
-          final monthlyServices = monthlyExpenses['totalServices'] ?? 0.0;
-          final totalMonthlyExpenses =
-              monthlyExpenses['totalMonthlyExpenses'] ?? 0.0;
-
-          final annualGeneralExpenses =
-              annualExpenses['totalGeneralExpenses'] ?? 0.0;
-          final annualSalaries = annualExpenses['totalSalaries'] ?? 0.0;
-          final annualMaintenance = annualExpenses['totalMaintenance'] ?? 0.0;
-          final annualServices = annualExpenses['totalServices'] ?? 0.0;
-          final totalAnnualExpenses =
-              annualExpenses['totalAnnualExpenses'] ?? 0.0;
-
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  MonthlyExpensesChart(
-                    monthlyGeneralExpenses: monthlyGeneralExpenses,
-                    monthlySalaries: monthlySalaries,
-                    monthlyMaintenance: monthlyMaintenance,
-                    monthlyServices: monthlyServices,
-                    totalMonthlyExpenses: totalMonthlyExpenses,
-                    isDarkMode: isDarkMode,
-                  ),
-                  const SizedBox(height: 40),
-                  AnnualExpenseChart(
-                    annualUtilities: annualGeneralExpenses,
-                    totalAnnualSalaries: annualSalaries,
-                    totalAnnualMaintenance: annualMaintenance,
-                    annualOtherExpenses: annualServices,
-                    totalAnnualExpenses: totalAnnualExpenses,
-                    isDarkMode: isDarkMode,
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _errorMessage != null
+              ? Center(child: Text('Erro: $_errorMessage'))
+              : _expenseData == null
+                  ? const Center(child: Text('Nenhuma despesa encontrada.'))
+                  : SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            MonthlyExpensesChart(
+                              monthlyGeneralExpenses:
+                                  _expenseData!.expensesPerMonth[
+                                          'totalGeneralExpenses'] ??
+                                      0.0,
+                              monthlySalaries: _expenseData!
+                                      .expensesPerMonth['totalSalaries'] ??
+                                  0.0,
+                              monthlyMaintenance: _expenseData!
+                                      .expensesPerMonth['totalMaintenance'] ??
+                                  0.0,
+                              monthlyServices: _expenseData!
+                                      .expensesPerMonth['totalServices'] ??
+                                  0.0,
+                              totalMonthlyExpenses: _expenseData!.totalExpenses,
+                              isDarkMode: isDarkMode,
+                            ),
+                            const SizedBox(height: 40),
+                            AnnualExpenseChart(
+                              annualUtilities: _expenseData!
+                                  .expensesPerMonth.values
+                                  .reduce((a, b) => a + b),
+                              totalAnnualSalaries: _expenseData!
+                                      .expensesPerMonth['totalSalaries'] ??
+                                  0.0,
+                              totalAnnualMaintenance: _expenseData!
+                                      .expensesPerMonth['totalMaintenance'] ??
+                                  0.0,
+                              annualOtherExpenses: _expenseData!
+                                      .expensesPerMonth['totalServices'] ??
+                                  0.0,
+                              totalAnnualExpenses: _expenseData!.totalExpenses,
+                              isDarkMode: isDarkMode,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
     );
   }
 }

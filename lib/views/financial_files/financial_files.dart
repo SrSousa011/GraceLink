@@ -1,6 +1,6 @@
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/chart_colors.dart';
-import 'package:churchapp/views/financial_files/expense/expende_data.dart';
+import 'package:churchapp/views/financial_files/expense/expense_data.dart';
 import 'package:churchapp/views/financial_files/expense/expenses.dart';
 import 'package:churchapp/views/financial_files/expense/expenses_service.dart';
 import 'package:churchapp/views/financial_files/financial_card_widgets.dart';
@@ -23,28 +23,27 @@ class _FinanceScreenState extends State<FinanceScreen> {
 
   late Future<RevenueData> _revenueData;
   late Future<DonationStats> _donationStats;
-  late Future<Map<String, double>>
-      _annualExpensesData; // To fetch annual expenses
-  late Future<List<ExpenseData>> _expensesData; // To fetch all expenses
+  late Future<Map<String, double>> _annualExpensesData;
+  late Future<ExpenseData> _expensesData;
   double totalAnnualExpenses = 0.0;
+  final ExpensesService _expensesService = ExpensesService();
 
   @override
   void initState() {
     super.initState();
     RevenueService revenueService = RevenueService();
+
     _revenueData = revenueService.fetchAllRevenues();
     _donationStats = revenueService.fetchDonationStats();
 
-    // Set the date range for the annual expenses
-    DateTime now = DateTime.now();
-    DateTime startOfYear =
-        DateTime(now.year, 1, 1); // Start of the current year
-    DateTime endOfYear = DateTime(now.year, 12, 31); // End of the current year
+    final now = DateTime.now();
+    final startOfYear = DateTime(now.year, 1, 1);
+    final endOfYear =
+        DateTime(now.year + 1, 1, 1).subtract(const Duration(days: 1));
 
-    // Fetch the annual expenses and all expenses
     _annualExpensesData =
-        ExpensesService().fetchAnnualExpenses(startOfYear, endOfYear);
-    _expensesData = ExpensesService().fetchAllExpenses(startOfYear, endOfYear);
+        _expensesService.fetchAnnualExpenses(startOfYear, endOfYear);
+    _expensesData = _expensesService.fetchData(startOfYear, endOfYear);
   }
 
   @override
@@ -111,24 +110,26 @@ class _FinanceScreenState extends State<FinanceScreen> {
 
                   final donationStats = donationSnapshot.data!;
 
-                  return FutureBuilder<List<ExpenseData>>(
+                  return FutureBuilder<ExpenseData>(
+                    // Alterado para ExpenseData
                     future: _expensesData,
-                    builder: (context, expensesListSnapshot) {
-                      if (expensesListSnapshot.connectionState ==
+                    builder: (context, expensesSnapshot) {
+                      if (expensesSnapshot.connectionState ==
                           ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       }
 
-                      if (expensesListSnapshot.hasError) {
+                      if (expensesSnapshot.hasError) {
                         return Center(
-                            child:
-                                Text('Error: ${expensesListSnapshot.error}'));
+                            child: Text('Error: ${expensesSnapshot.error}'));
                       }
 
-                      if (!expensesListSnapshot.hasData) {
+                      if (!expensesSnapshot.hasData) {
                         return const Center(
                             child: Text('No expenses data found.'));
                       }
+
+// Obtendo os dados
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

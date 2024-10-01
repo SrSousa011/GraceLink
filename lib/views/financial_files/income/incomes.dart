@@ -65,7 +65,7 @@ class _IncomesScreenState extends State<IncomesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Incomes Overview'),
+        title: const Text('Rendas Overview'),
         backgroundColor: Colors.blue,
       ),
       body: SingleChildScrollView(
