@@ -1,11 +1,13 @@
+import 'package:churchapp/views/financial_files/expense/expenses.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/chart_colors.dart';
-import 'package:churchapp/views/financial_files/expense/expense_data.dart';
-import 'package:churchapp/views/financial_files/expense/expenses.dart';
 import 'package:churchapp/views/financial_files/expense/expenses_service.dart';
 import 'package:churchapp/views/financial_files/financial_card_widgets.dart';
 import 'package:churchapp/views/financial_files/revenue_data.dart';
 import 'package:churchapp/views/financial_files/revenue_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:churchapp/views/financial_files/income/incomes.dart';
@@ -20,17 +22,30 @@ class FinanceScreen extends StatefulWidget {
 
 class _FinanceScreenState extends State<FinanceScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   late Future<RevenueData> _revenueData;
   late Future<DonationStats> _donationStats;
   late Future<Map<String, double>> _annualExpensesData;
-  late Future<ExpenseData> _expensesData;
+  late Future<UserData> _userData;
+
   double totalAnnualExpenses = 0.0;
   final ExpensesService _expensesService = ExpensesService();
+  double totalGeneralExpenses = 0.0;
+  double totalSalaries = 0.0;
+  double totalMaintenance = 0.0;
+  double totalServices = 0.0;
+
+  double monthlyGeneralExpenses = 0.0;
+  double monthlySalaries = 0.0;
+  double monthlyMaintenance = 0.0;
+  double monthlyServices = 0.0;
+  double totalMonthlyExpenses = 0.0;
 
   @override
   void initState() {
     super.initState();
+    _fetchAllExpenses();
     RevenueService revenueService = RevenueService();
 
     _revenueData = revenueService.fetchAllRevenues();
@@ -43,7 +58,59 @@ class _FinanceScreenState extends State<FinanceScreen> {
 
     _annualExpensesData =
         _expensesService.fetchAnnualExpenses(startOfYear, endOfYear);
-    _expensesData = _expensesService.fetchData(startOfYear, endOfYear);
+    _userData = fetchUserData();
+  }
+
+  Future<UserData> fetchUserData() async {
+    String uid = _auth.currentUser!.uid;
+    DocumentSnapshot doc = await _firestore.collection('users').doc(uid).get();
+    return UserData.fromDocument(doc);
+  }
+
+  Future<void> _fetchAllExpenses() async {
+    try {
+      final currentDate = DateTime.now();
+
+      final annualExpensesData = await _expensesService.fetchAnnualExpenses(
+        DateTime(currentDate.year, 1, 1),
+        DateTime(currentDate.year + 1, 1, 1),
+      );
+
+      setState(() {
+        totalGeneralExpenses =
+            annualExpensesData['totalGeneralExpenses'] ?? 0.0;
+        totalSalaries = annualExpensesData['totalSalaries'] ?? 0.0;
+        totalMaintenance = annualExpensesData['totalMaintenance'] ?? 0.0;
+        totalServices = annualExpensesData['totalServices'] ?? 0.0;
+
+        totalAnnualExpenses = totalGeneralExpenses +
+            totalSalaries +
+            totalMaintenance +
+            totalServices;
+      });
+
+      final monthlyExpensesData = await _expensesService.fetchMonthlyExpenses(
+        DateTime(currentDate.year, currentDate.month, 1),
+        DateTime(currentDate.year, currentDate.month + 1, 1),
+      );
+
+      setState(() {
+        monthlyGeneralExpenses =
+            monthlyExpensesData['totalGeneralExpenses'] ?? 0.0;
+        monthlySalaries = monthlyExpensesData['totalSalaries'] ?? 0.0;
+        monthlyMaintenance = monthlyExpensesData['totalMaintenance'] ?? 0.0;
+        monthlyServices = monthlyExpensesData['totalServices'] ?? 0.0;
+
+        totalMonthlyExpenses = monthlyGeneralExpenses +
+            monthlySalaries +
+            monthlyMaintenance +
+            monthlyServices;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching expenses: $e');
+      }
+    }
   }
 
   @override
@@ -84,10 +151,6 @@ class _FinanceScreenState extends State<FinanceScreen> {
                     child: Text('Annual expenses data not found.'));
               }
 
-              final userFullName = _auth.currentUser?.displayName ?? 'User';
-              totalAnnualExpenses =
-                  expensesSnapshot.data!['totalAnnualExpenses'] ?? 0.0;
-
               final totalBalance = totalIncome - totalAnnualExpenses;
 
               return FutureBuilder<DonationStats>(
@@ -110,26 +173,25 @@ class _FinanceScreenState extends State<FinanceScreen> {
 
                   final donationStats = donationSnapshot.data!;
 
-                  return FutureBuilder<ExpenseData>(
-                    // Alterado para ExpenseData
-                    future: _expensesData,
-                    builder: (context, expensesSnapshot) {
-                      if (expensesSnapshot.connectionState ==
+                  return FutureBuilder<UserData>(
+                    future: _userData,
+                    builder: (context, userSnapshot) {
+                      if (userSnapshot.connectionState ==
                           ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       }
 
-                      if (expensesSnapshot.hasError) {
+                      if (userSnapshot.hasError) {
                         return Center(
-                            child: Text('Error: ${expensesSnapshot.error}'));
+                            child: Text('Error: ${userSnapshot.error}'));
                       }
 
-                      if (!expensesSnapshot.hasData) {
+                      if (!userSnapshot.hasData) {
                         return const Center(
-                            child: Text('No expenses data found.'));
+                            child: Text('User data not found.'));
                       }
 
-// Obtendo os dados
+                      final userData = userSnapshot.data!;
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,7 +222,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      userFullName,
+                                      userData.fullName,
                                       style: TextStyle(
                                         fontSize: 24,
                                         fontWeight: FontWeight.bold,
