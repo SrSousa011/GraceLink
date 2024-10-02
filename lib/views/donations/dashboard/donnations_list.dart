@@ -12,7 +12,7 @@ class DonationsList extends StatefulWidget {
 
 class _DonationsListState extends State<DonationsList> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  bool showAllDonations = false;
+  bool showAllDonations = true;
   String sortOption = 'A-Z';
   bool ascendingOrder = true;
 
@@ -61,7 +61,6 @@ class _DonationsListState extends State<DonationsList> {
 
   List<Map<String, dynamic>> _sortDonations(
       List<Map<String, dynamic>> donations) {
-    // Ordena de acordo com a opção e a ordem selecionada
     if (sortOption == 'A-Z') {
       donations
           .sort((a, b) => (a['fullName'] ?? '').compareTo(b['fullName'] ?? ''));
@@ -73,7 +72,6 @@ class _DonationsListState extends State<DonationsList> {
           (a['timestamp'] as Timestamp).compareTo(b['timestamp'] as Timestamp));
     }
 
-    // Inverte a lista se a ordem for decrescente
     if (!ascendingOrder) {
       donations = donations.reversed.toList();
     }
@@ -83,12 +81,11 @@ class _DonationsListState extends State<DonationsList> {
 
   void _updateSortOption(String option) {
     setState(() {
-      // Verifica se a opção atual é a mesma da selecionada
       if (sortOption == option) {
-        ascendingOrder = !ascendingOrder; // Inverte a ordem
+        ascendingOrder = !ascendingOrder;
       } else {
-        sortOption = option; // Atualiza a opção
-        ascendingOrder = true; // Reseta a ordem para crescente
+        sortOption = option;
+        ascendingOrder = true;
       }
     });
   }
@@ -107,8 +104,7 @@ class _DonationsListState extends State<DonationsList> {
         title: const Text('Lista de Doações'),
         actions: [
           PopupMenuButton<String>(
-            icon: const Icon(Icons.sort,
-                color: Colors.blueAccent), // Cor do ícone
+            icon: const Icon(Icons.sort, color: Colors.blueAccent),
             onSelected: (String value) {
               _updateSortOption(value);
             },
@@ -118,14 +114,12 @@ class _DonationsListState extends State<DonationsList> {
                   value: 'A-Z',
                   child: Row(
                     children: [
-                      Icon(Icons.sort_by_alpha,
-                          color: Colors.blueAccent), // Ícone para A-Z
-                      SizedBox(width: 8), // Espaço entre o ícone e o texto
+                      Icon(Icons.sort_by_alpha, color: Colors.blueAccent),
+                      SizedBox(width: 8),
                       Text(
                         'Ordenar A-Z',
                         style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold), // Estilo do texto
+                            color: Colors.black, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -134,8 +128,7 @@ class _DonationsListState extends State<DonationsList> {
                   value: 'Valor',
                   child: Row(
                     children: [
-                      Icon(Icons.attach_money,
-                          color: Colors.green), // Ícone para Valor
+                      Icon(Icons.attach_money, color: Colors.green),
                       SizedBox(width: 8),
                       Text(
                         'Ordenar por Valor',
@@ -167,12 +160,11 @@ class _DonationsListState extends State<DonationsList> {
               side: BorderSide(color: Colors.grey.shade300),
             ),
             elevation: 4,
-          )
+          ),
         ],
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future:
-            showAllDonations ? _fetchAllDonations() : _fetchMonthlyDonations(),
+        future: _fetchAllDonations(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
