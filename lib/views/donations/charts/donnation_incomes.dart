@@ -60,26 +60,20 @@ class _DonationIncomesState extends State<DonationIncomes> {
     var snapshot = await donations.get();
 
     setState(() {
-      // Zera os valores acumulados
       currentotalIncome = 0.0;
       currentDizimo = 0.0;
       currentOferta = 0.0;
       currentProjetoDoarAAmar = 0.0;
       currentMissaoAfrica = 0.0;
 
-      // Obter a data atual
       final now = DateTime.now();
-      // Calcular o início do mês atual
       final startOfMonth = DateTime(now.year, now.month, 1);
-      // Calcular o fim do mês atual (pegando o último dia do mês)
       final endOfMonth = DateTime(now.year, now.month + 1, 1)
           .subtract(const Duration(days: 1));
 
-      // Iterar sobre cada documento da coleção de doações
       for (var doc in snapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
 
-        // Converter o valor da doação para double
         double donationValue;
         if (data['donationValue'] is num) {
           donationValue = (data['donationValue'] as num).toDouble();
@@ -89,17 +83,13 @@ class _DonationIncomesState extends State<DonationIncomes> {
           donationValue = 0.0;
         }
 
-        // Converter o timestamp para a data
         final timestamp = (data['timestamp'] as Timestamp).toDate();
 
-        // Verifica se a doação foi feita dentro do mês vigente
         if (timestamp
                 .isAfter(startOfMonth.subtract(const Duration(seconds: 1))) &&
             timestamp.isBefore(endOfMonth.add(const Duration(days: 1)))) {
-          // Incrementa o total geral de doações do mês
           currentotalIncome += donationValue;
 
-          // Verifica o tipo de doação e incrementa o valor correspondente
           switch (data['donationType']) {
             case 'Dízimo':
               currentDizimo += donationValue;
