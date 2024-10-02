@@ -5,7 +5,7 @@ class DonationReceipt extends StatelessWidget {
   final String title;
   final String from;
   final String date;
-  final double total; // Certifique-se de que este valor seja um double
+  final double total;
   final String paymentProofURL;
   final String donorPhotoURL;
 
@@ -20,7 +20,6 @@ class DonationReceipt extends StatelessWidget {
   });
 
   String _formatTotal(double value) {
-    // Função para formatar valores monetários
     final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: '€');
     return formatter.format(value);
   }

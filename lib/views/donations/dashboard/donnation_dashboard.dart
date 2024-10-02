@@ -263,34 +263,4 @@ class DonationsDashboard extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildActionButton(BuildContext context,
-      {required IconData icon,
-      required String label,
-      required VoidCallback onPressed}) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
-
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-        child: ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            padding:
-                const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-          ),
-          onPressed: onPressed,
-          icon: Icon(icon, color: Colors.white),
-          label: Text(
-            label,
-            style: const TextStyle(color: Colors.white),
-          ),
-        ),
-      ),
-    );
-  }
 }

@@ -3,10 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
-class DonationsList extends StatelessWidget {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+class DonationsList extends StatefulWidget {
+  const DonationsList({super.key});
 
-  DonationsList({super.key});
+  @override
+  State<DonationsList> createState() => _DonationsListState();
+}
+
+class _DonationsListState extends State<DonationsList> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  bool showAllDonations = false;
+  String sortOption = 'A-Z';
+  bool ascendingOrder = true;
 
   String _formatTotal(double value) {
     final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: '€');
@@ -22,14 +30,18 @@ class DonationsList extends StatelessWidget {
           .replaceAll(' ', '')
           .replaceAll(',', '.')
           .trim();
-
       return double.tryParse(sanitizedValue) ?? 0.0;
     } else {
       return 0.0;
     }
   }
 
-  Future<List<Map<String, dynamic>>> _fetchDonations() async {
+  Future<List<Map<String, dynamic>>> _fetchAllDonations() async {
+    final snapshot = await _firestore.collection('donations').get();
+    return snapshot.docs.map((doc) => doc.data()).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchMonthlyDonations() async {
     final now = DateTime.now();
     final startOfMonth = DateTime(now.year, now.month, 1);
     final endOfMonth =
@@ -47,6 +59,40 @@ class DonationsList extends StatelessWidget {
     return snapshot.docs.map((doc) => doc.data()).toList();
   }
 
+  List<Map<String, dynamic>> _sortDonations(
+      List<Map<String, dynamic>> donations) {
+    // Ordena de acordo com a opção e a ordem selecionada
+    if (sortOption == 'A-Z') {
+      donations
+          .sort((a, b) => (a['fullName'] ?? '').compareTo(b['fullName'] ?? ''));
+    } else if (sortOption == 'Valor') {
+      donations.sort((a, b) => _parseDonationValue(a['donationValue'])
+          .compareTo(_parseDonationValue(b['donationValue'])));
+    } else if (sortOption == 'Data') {
+      donations.sort((a, b) =>
+          (a['timestamp'] as Timestamp).compareTo(b['timestamp'] as Timestamp));
+    }
+
+    // Inverte a lista se a ordem for decrescente
+    if (!ascendingOrder) {
+      donations = donations.reversed.toList();
+    }
+
+    return donations;
+  }
+
+  void _updateSortOption(String option) {
+    setState(() {
+      // Verifica se a opção atual é a mesma da selecionada
+      if (sortOption == option) {
+        ascendingOrder = !ascendingOrder; // Inverte a ordem
+      } else {
+        sortOption = option; // Atualiza a opção
+        ascendingOrder = true; // Reseta a ordem para crescente
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -59,9 +105,74 @@ class DonationsList extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lista de Doações'),
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.sort,
+                color: Colors.blueAccent), // Cor do ícone
+            onSelected: (String value) {
+              _updateSortOption(value);
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                const PopupMenuItem<String>(
+                  value: 'A-Z',
+                  child: Row(
+                    children: [
+                      Icon(Icons.sort_by_alpha,
+                          color: Colors.blueAccent), // Ícone para A-Z
+                      SizedBox(width: 8), // Espaço entre o ícone e o texto
+                      Text(
+                        'Ordenar A-Z',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold), // Estilo do texto
+                      ),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'Valor',
+                  child: Row(
+                    children: [
+                      Icon(Icons.attach_money,
+                          color: Colors.green), // Ícone para Valor
+                      SizedBox(width: 8),
+                      Text(
+                        'Ordenar por Valor',
+                        style: TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'Data',
+                  child: Row(
+                    children: [
+                      Icon(Icons.date_range, color: Colors.orange),
+                      SizedBox(width: 8),
+                      Text(
+                        'Ordenar por Data',
+                        style: TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ];
+            },
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              side: BorderSide(color: Colors.grey.shade300),
+            ),
+            elevation: 4,
+          )
+        ],
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _fetchDonations(),
+        future:
+            showAllDonations ? _fetchAllDonations() : _fetchMonthlyDonations(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
@@ -91,19 +202,18 @@ class DonationsList extends StatelessWidget {
           }
 
           final donations = snapshot.data!;
+          final sortedDonations = _sortDonations(donations);
 
           return ListView.builder(
-            itemCount: donations.length,
+            itemCount: sortedDonations.length,
             itemBuilder: (context, index) {
-              final donation = donations[index];
+              final donation = sortedDonations[index];
               final fullName = donation['fullName'] ?? 'Desconhecido';
-
               final donationValue =
                   _parseDonationValue(donation['donationValue']);
               final donationType = donation['donationType'] ?? 'Sem tipo';
               final userId = donation['userId'];
               final paymentProofURL = donation['photoURL'] ?? '';
-
               final timestamp = donation['timestamp'] as Timestamp?;
               final date = timestamp != null
                   ? DateFormat('dd/MM/yyyy').format(timestamp.toDate())
