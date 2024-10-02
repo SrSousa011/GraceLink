@@ -101,79 +101,83 @@ class _StoragePageState extends State<StoragePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Detalhes da doação'),
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.upload),
-            onPressed: _uploadedImageUrl != null ? null : _uploadImage,
-          ),
-        ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            if (_uploadedImageUrl != null)
-              Card(
-                margin: const EdgeInsets.all(16.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                elevation: 5,
-                child: Column(
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(10.0)),
-                      child: Image.network(
-                        _uploadedImageUrl!,
-                        width: double.infinity,
-                        height: 300,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          ElevatedButton(
-                            onPressed: _confirmAndNavigateBack,
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.green,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
-                            child: const Text('Confirmar'),
-                          ),
-                          ElevatedButton(
-                            onPressed: _removeImage,
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.red,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
-                            child: const Text('Cancelar'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            if (_uploadedImageUrl == null)
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text('Por favor, carregue uma imagem.'),
-              ),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {},
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Detalhes da doação'),
+          elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.upload),
+              onPressed: _uploadedImageUrl != null ? null : _uploadImage,
+            ),
           ],
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              if (_uploadedImageUrl != null)
+                Card(
+                  margin: const EdgeInsets.all(16.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  elevation: 5,
+                  child: Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(10.0)),
+                        child: Image.network(
+                          _uploadedImageUrl!,
+                          width: double.infinity,
+                          height: 300,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            ElevatedButton(
+                              onPressed: _confirmAndNavigateBack,
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: Colors.green,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              child: const Text('Confirmar'),
+                            ),
+                            ElevatedButton(
+                              onPressed: _removeImage,
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: Colors.red,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              child: const Text('Cancelar'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (_uploadedImageUrl == null)
+                const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text('Por favor, carregue o comprovante.'),
+                ),
+            ],
+          ),
         ),
       ),
     );
