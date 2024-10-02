@@ -9,8 +9,18 @@ class ExpensesService {
     final annualData = await fetchAnnualExpenses(startOfYear, endOfYear);
     final monthlyData = await fetchMonthlyExpenses(startOfYear, endOfYear);
 
+    double annualGeneralExpenses = annualData['totalGeneralExpenses'] ?? 0.0;
+    double annualSalaries = annualData['totalSalaries'] ?? 0.0;
+    double annualMaintenance = annualData['totalMaintenance'] ?? 0.0;
+    double annualServices = annualData['totalServices'] ?? 0.0;
+
+    double totalAnnualExpenses = annualGeneralExpenses +
+        annualSalaries +
+        annualMaintenance +
+        annualServices;
+
     return ExpenseData(
-      totalExpenses: annualData['totalAnnualExpenses'] ?? 0.0,
+      totalExpenses: totalAnnualExpenses,
       expensesPerMonth: monthlyData,
     );
   }
@@ -29,46 +39,30 @@ class ExpensesService {
       double annualSalaries = 0.0;
       double annualMaintenance = 0.0;
       double annualServices = 0.0;
-
-      List<double> monthlyGeneralExpenses = List.filled(12, 0.0);
-      List<double> monthlySalaries = List.filled(12, 0.0);
-      List<double> monthlyMaintenance = List.filled(12, 0.0);
-      List<double> monthlyServices = List.filled(12, 0.0);
+      double totalAnnualExpenses = 0.0;
 
       for (var doc in querySnapshot.docs) {
         final data = doc.data();
         final amount = (data['amount'] as num?)?.toDouble() ?? 0.0;
         final category = data['category'] as String? ?? 'Desconhecido';
-        final timestamp = (data['transactionDate'] as Timestamp).toDate();
-        final month = timestamp.month - 1;
 
         switch (category) {
           case 'Despesas Gerais':
             annualGeneralExpenses += amount;
-            monthlyGeneralExpenses[month] += amount;
             break;
           case 'Salários':
             annualSalaries += amount;
-            monthlySalaries[month] += amount;
             break;
           case 'Manutenção':
             annualMaintenance += amount;
-            monthlyMaintenance[month] += amount;
             break;
           case 'Serviços':
             annualServices += amount;
-            monthlyServices[month] += amount;
             break;
           default:
             break;
         }
       }
-
-      final totalAnnualExpenses = annualGeneralExpenses +
-          annualSalaries +
-          annualMaintenance +
-          annualServices;
-
       return {
         'totalGeneralExpenses': annualGeneralExpenses,
         'totalSalaries': annualSalaries,
@@ -81,28 +75,6 @@ class ExpensesService {
     }
   }
 
-  Future<double> fetchAllExpenses() async {
-    return await _getTotalFromCollection('transactions', 'Despesa', 'amount');
-  }
-
-  Future<double> _getTotalFromCollection(
-      String collection, String? type, String field) async {
-    try {
-      final query = _firestore.collection(collection);
-      final snapshot = type != null
-          ? await query.where('type', isEqualTo: type).get()
-          : await query.get();
-
-      return snapshot.docs.fold<double>(0.0, (total, doc) {
-        double value =
-            (doc[field] ?? 0.0) is num ? (doc[field] as num).toDouble() : 0.0;
-        return total + value;
-      });
-    } catch (e) {
-      throw Exception('Error fetching total from collection $collection: $e');
-    }
-  }
-
   Future<Map<String, double>> fetchMonthlyExpenses(
       DateTime startOfMonth, DateTime endOfMonth) async {
     try {
@@ -110,7 +82,7 @@ class ExpensesService {
           .collection('transactions')
           .where('type', isEqualTo: 'Despesa')
           .where('transactionDate', isGreaterThanOrEqualTo: startOfMonth)
-          .where('transactionDate', isLessThanOrEqualTo: endOfMonth)
+          .where('transactionDate', isLessThan: endOfMonth)
           .get();
 
       double monthlyGeneralExpenses = 0.0;
@@ -141,17 +113,15 @@ class ExpensesService {
         }
       }
 
-      final totalMonthlyExpenses = monthlyGeneralExpenses +
-          monthlySalaries +
-          monthlyMaintenance +
-          monthlyServices;
-
       return {
         'totalGeneralExpenses': monthlyGeneralExpenses,
         'totalSalaries': monthlySalaries,
         'totalMaintenance': monthlyMaintenance,
         'totalServices': monthlyServices,
-        'totalMonthlyExpenses': totalMonthlyExpenses,
+        'totalMonthlyExpenses': monthlyGeneralExpenses +
+            monthlySalaries +
+            monthlyMaintenance +
+            monthlyServices,
       };
     } catch (e) {
       throw Exception('Error fetching monthly expenses: $e');

@@ -14,19 +14,19 @@ const Color annualMaintenanceColor = Colors.orange;
 const Color annualServicesExpensesColor = Colors.green;
 
 class AnnualExpenseChart extends StatelessWidget {
-  final double annualUtilities;
-  final double totalAnnualSalaries;
-  final double totalAnnualMaintenance;
-  final double annualOtherExpenses;
+  final double annualGeneralExpenses;
+  final double annualSalaries;
+  final double annualMaintenance;
+  final double annualServices;
   final double totalAnnualExpenses;
   final bool isDarkMode;
 
   const AnnualExpenseChart({
     super.key,
-    required this.annualUtilities,
-    required this.totalAnnualSalaries,
-    required this.totalAnnualMaintenance,
-    required this.annualOtherExpenses,
+    required this.annualGeneralExpenses,
+    required this.annualSalaries,
+    required this.annualMaintenance,
+    required this.annualServices,
     required this.totalAnnualExpenses,
     required this.isDarkMode,
   });
@@ -35,10 +35,10 @@ class AnnualExpenseChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final safeAnnualUtilities = safeValue(annualUtilities);
-    final safeAnnualSalaries = safeValue(totalAnnualSalaries);
-    final safeAnnualMaintenance = safeValue(totalAnnualMaintenance);
-    final safeAnnualOtherExpenses = safeValue(annualOtherExpenses);
+    final safeAnnualUtilities = safeValue(annualGeneralExpenses);
+    final safeAnnualSalaries = safeValue(annualSalaries);
+    final safeAnnualMaintenance = safeValue(annualMaintenance);
+    final safeAnnualServices = safeValue(annualServices);
     final safeTotalAnnualExpenses = safeValue(totalAnnualExpenses);
 
     return Column(
@@ -83,7 +83,7 @@ class AnnualExpenseChart extends StatelessWidget {
                   ),
                 ),
                 PieChartSectionData(
-                  value: safeAnnualOtherExpenses,
+                  value: safeAnnualServices,
                   color: annualServicesExpensesColor,
                   radius: 60,
                   titleStyle: TextStyle(
@@ -112,7 +112,7 @@ class AnnualExpenseChart extends StatelessWidget {
                     annualSalariesColor, isDarkMode),
                 _buildLegendItem('Manutenção', safeAnnualMaintenance,
                     annualMaintenanceColor, isDarkMode),
-                _buildLegendItem('Serviços', safeAnnualOtherExpenses,
+                _buildLegendItem('Serviços', safeAnnualServices,
                     annualServicesExpensesColor, isDarkMode),
                 _buildLegendItem(
                     'Total', safeTotalAnnualExpenses, totalColor, isDarkMode),
