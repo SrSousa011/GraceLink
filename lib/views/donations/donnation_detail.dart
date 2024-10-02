@@ -28,6 +28,7 @@ class DonationDetails extends StatefulWidget {
 class _DonationDetailsState extends State<DonationDetails> {
   String? uploadStatus;
   String? uploadedFileURL;
+  bool paymentClicked = false;
 
   void _navigateAndUploadPhoto() async {
     final result = await Navigator.push(
@@ -89,6 +90,9 @@ class _DonationDetailsState extends State<DonationDetails> {
     const url = 'https://pay.sumup.com/b2c/QV9E8TAZ';
     try {
       await launchUrlString(url, mode: LaunchMode.externalApplication);
+      setState(() {
+        paymentClicked = true;
+      });
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -149,18 +153,18 @@ class _DonationDetailsState extends State<DonationDetails> {
               const SizedBox(height: 10.0),
               const Text('Após pagamento enviar comprovante'),
               const SizedBox(height: 30.0),
-              if (uploadStatus == null) ...[
-                ElevatedButton(
-                  onPressed: _navigateAndUploadPhoto,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        isDarkMode ? const Color(0xFF333333) : Colors.blue,
-                    shape: const StadiumBorder(),
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('Comprovante'),
+              ElevatedButton(
+                onPressed: paymentClicked ? _navigateAndUploadPhoto : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: paymentClicked
+                      ? (isDarkMode ? const Color(0xFF333333) : Colors.blue)
+                      : Colors.grey,
+                  shape: const StadiumBorder(),
+                  foregroundColor: Colors.white,
                 ),
-              ] else if (uploadStatus == 'success') ...[
+                child: const Text('Comprovante'),
+              ),
+              if (uploadStatus == 'success') ...[
                 const Text(
                   'Photo uploaded successfully!',
                   style: TextStyle(
@@ -175,7 +179,7 @@ class _DonationDetailsState extends State<DonationDetails> {
                     foregroundColor: Colors.white,
                     backgroundColor: const Color(0xFF5AAFf9),
                   ),
-                  child: const Text('Confirm Donation'),
+                  child: const Text('Confirmar Doação'),
                 ),
               ] else if (uploadStatus == 'error') ...[
                 const Text(
