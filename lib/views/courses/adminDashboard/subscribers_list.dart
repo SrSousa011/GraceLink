@@ -6,7 +6,9 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
 class SubscribersList extends StatefulWidget {
-  const SubscribersList({super.key});
+  final List<QueryDocumentSnapshot<Map<String, dynamic>>>? enrolledDocuments;
+
+  const SubscribersList({super.key, this.enrolledDocuments});
 
   @override
   State<SubscribersList> createState() => _SubscribersListState();
@@ -20,8 +22,54 @@ class _SubscribersListState extends State<SubscribersList> {
   @override
   void initState() {
     super.initState();
-    _fetchRegistrations();
+    if (widget.enrolledDocuments != null) {
+      _processEnrolledDocuments(widget.enrolledDocuments!);
+    } else {
+      _fetchRegistrations();
+    }
     initializeDateFormatting();
+  }
+
+  void _processEnrolledDocuments(
+      List<QueryDocumentSnapshot<Map<String, dynamic>>> documents) async {
+    setState(() => _loading = true);
+
+    try {
+      final registrations = await Future.wait(
+        documents.map((doc) async {
+          final data = doc.data();
+          final courseId = data['courseId'] ?? '';
+          final status = data['status'] ?? false;
+          final courseName = courseId.isNotEmpty
+              ? await _fetchCourseName(courseId)
+              : 'Unknown';
+
+          final userId = data['userId'] ?? 'Unknown';
+          final userData = await _fetchUserData(userId);
+
+          return {
+            'userId': userId,
+            'userName': data['userName'] ?? 'Unknown',
+            'registrationDate':
+                (data['registrationDate'] as Timestamp?)?.toDate() ??
+                    DateTime.now(),
+            'courseName': courseName,
+            'status': status,
+            'imagePath': userData['imagePath'] ?? '',
+          };
+        }).toList(),
+      );
+
+      setState(() {
+        _registrations = registrations;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error processing enrolled documents: $e');
+      }
+    } finally {
+      setState(() => _loading = false);
+    }
   }
 
   Future<void> _fetchRegistrations() async {
@@ -52,7 +100,7 @@ class _SubscribersListState extends State<SubscribersList> {
             'status': status,
             'imagePath': userData['imagePath'] ?? '',
           };
-        }),
+        }).toList(),
       );
 
       setState(() {
@@ -100,10 +148,8 @@ class _SubscribersListState extends State<SubscribersList> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de Cadastrados'),
-        backgroundColor: isDarkMode
-            ? Colors.grey[850]
-            : const Color.fromARGB(255, 255, 255, 255),
+        title: const Text('Lista de Matriculados'),
+        backgroundColor: isDarkMode ? Colors.grey[850] : Colors.white,
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())

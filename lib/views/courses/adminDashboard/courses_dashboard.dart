@@ -133,11 +133,24 @@ class CoursesDashboard extends StatelessWidget {
                             title: 'Novos Matrículados',
                             value: newEnrolled.toString(),
                             onTap: () {
+                              final newEnrolledDocuments =
+                                  documents.where((doc) {
+                                final data = doc.data();
+                                final registrationDate =
+                                    data['registrationDate'] as Timestamp?;
+                                if (registrationDate == null) return false;
+                                final date = registrationDate.toDate();
+                                return date.isAfter(startOfMonth) &&
+                                    date.isBefore(endOfMonth);
+                              }).toList();
+
                               Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => const SubscribersList(),
+                                builder: (context) => SubscribersList(
+                                  enrolledDocuments: newEnrolledDocuments,
+                                ),
                               ));
                             },
-                          ),
+                          )
                         ],
                       ),
                     ],
