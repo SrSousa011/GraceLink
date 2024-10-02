@@ -99,23 +99,33 @@ class DonationsDashboard extends StatelessWidget {
                 }
 
                 final donations = snapshot.data?.docs ?? [];
-
                 final now = DateTime.now();
                 final startOfMonth = DateTime(now.year, now.month, 1);
-                final endOfMonth = DateTime(now.year, now.month + 1, 0);
+                final endOfMonth =
+                    DateTime(now.year, now.month + 1, 0, 23, 59, 59);
 
                 final monthlyDonations = donations.where((doc) {
                   final timestamp = (doc['timestamp'] as Timestamp).toDate();
                   return timestamp.isAfter(startOfMonth) &&
-                      timestamp.isBefore(endOfMonth);
+                      timestamp
+                          .isBefore(endOfMonth.add(const Duration(days: 1)));
                 }).toList();
 
                 final double monthlyIncome =
+                    // ignore: avoid_types_as_parameter_names
                     monthlyDonations.fold(0.0, (sum, doc) {
                   final donationValue = (doc['donationValue'] ?? 0);
                   return sum +
                       (donationValue is num ? donationValue.toDouble() : 0);
                 });
+
+                final List<String> currentMonthDonors = [];
+                for (var doc in monthlyDonations) {
+                  final donorId = doc['userId'];
+                  if (!currentMonthDonors.contains(donorId)) {
+                    currentMonthDonors.add(donorId);
+                  }
+                }
 
                 return Container(
                   padding: const EdgeInsets.all(16.0),
@@ -157,11 +167,19 @@ class DonationsDashboard extends StatelessWidget {
                             context,
                             title: 'Renda Mensal',
                             value: '€ ${monthlyIncome.toStringAsFixed(2)}',
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pushNamed('/donations_income');
+                            },
                           ),
                           _buildSummaryBlueCard(
                             context,
                             title: 'Doadores mês',
-                            value: monthlyDonations.length.toString(),
+                            value: currentMonthDonors.length.toString(),
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pushNamed('/donations_list');
+                            },
                           ),
                         ],
                       ),

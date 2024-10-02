@@ -30,7 +30,20 @@ class DonationsList extends StatelessWidget {
   }
 
   Future<List<Map<String, dynamic>>> _fetchDonations() async {
-    final snapshot = await _firestore.collection('donations').get();
+    final now = DateTime.now();
+    final startOfMonth = DateTime(now.year, now.month, 1);
+    final endOfMonth =
+        DateTime(now.year, now.month + 1, 1).subtract(const Duration(days: 1));
+
+    final snapshot = await _firestore
+        .collection('donations')
+        .where('timestamp',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
+        .where('timestamp',
+            isLessThanOrEqualTo:
+                Timestamp.fromDate(endOfMonth.add(const Duration(days: 1))))
+        .get();
+
     return snapshot.docs.map((doc) => doc.data()).toList();
   }
 
