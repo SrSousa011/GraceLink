@@ -7,7 +7,6 @@ import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/materials/file_list.dart';
-import 'package:churchapp/views/materials/upload_button.dart';
 
 class CourseMaterialsPage extends StatefulWidget {
   const CourseMaterialsPage({super.key});
@@ -193,10 +192,8 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   Future<void> _deleteFile(
       String courseId, String fileId, String fileUrl) async {
     try {
-      // Delete from Firebase Storage
       final ref = FirebaseStorage.instance.refFromURL(fileUrl);
       await ref.delete();
-      // Delete from Firestore
       await _firestore
           .collection('courses/$courseId/materials')
           .doc(fileId)
@@ -217,7 +214,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Materiais do curs',
+          'Materiais do curso',
           style: TextStyle(fontSize: 18),
         ),
       ),
@@ -231,169 +228,177 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
               if (_isFetchingCourses)
                 const Center(child: CircularProgressIndicator()),
               if (!_isFetchingCourses && _courses.isNotEmpty)
-                DropdownButton<String>(
-                  value: _selectedCourseId,
-                  hint: const Text('Selecione um curso'),
-                  items: _courses.map((course) {
-                    return DropdownMenuItem<String>(
-                      value: course['id'],
-                      child: Text(course['courseName'] ?? 'Unknown Course'),
-                    );
-                  }).toList(),
-                  onChanged: (value) async {
-                    if (value != null) {
-                      await _handleCourseSelection(value);
-                    }
-                  },
-                ),
+                _buildCourseDropdown(),
               if (_userRole == 'admin' && !_isFetchingCourses)
-                Center(
-                  child: Column(
-                    children: [
-                      UploadButton(
-                        isUploading: false,
-                        onPressed: _uploadFile,
-                      ),
-                    ],
-                  ),
-                ),
+                _buildUploadButton(),
               const SizedBox(height: 16.0),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: _selectedCourseImageUrl != null
-                    ? Container(
-                        key: ValueKey<String>(_selectedCourseImageUrl!),
-                        padding: const EdgeInsets.all(16.0),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          gradient: isDarkMode
-                              ? const LinearGradient(
-                                  colors: [
-                                    Color(0xFF3C3C3C),
-                                    Color(0xFF5A5A5A)
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                )
-                              : const LinearGradient(
-                                  colors: [
-                                    Color(0xFFFFD59C),
-                                    Color(0xFF62CFF7)
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                          borderRadius: BorderRadius.circular(16.0),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 120.0,
-                              height: 160.0,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(_selectedCourseImageUrl!),
-                                  fit: BoxFit.cover,
-                                ),
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
-                            const SizedBox(width: 16.0),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (_selectedCourseTitle != null)
-                                    Text(
-                                      _selectedCourseTitle!,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge
-                                          ?.copyWith(
-                                              fontWeight: FontWeight.bold),
-                                    ),
-                                  if (_selectedInstructorName != null)
-                                    Text(
-                                      _selectedInstructorName!,
-                                      style:
-                                          Theme.of(context).textTheme.bodyLarge,
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-              ),
-              if (_errorMessage != null)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    _errorMessage!,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ),
+              _buildCourseHeader(isDarkMode),
+              if (_errorMessage != null) _buildErrorMessage(),
               Expanded(
                 child: _selectedCourseId == null
                     ? const Center(
                         child: Text(
                             'Selecione um curso para visualizar os materiais'),
                       )
-                    : StreamBuilder<QuerySnapshot>(
-                        stream: _firestore
-                            .collection('courses/$_selectedCourseId/materials')
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          }
-
-                          if (snapshot.hasError) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Error loading files: ${snapshot.error}',
-                                style: const TextStyle(color: Colors.red),
-                              ),
-                            );
-                          }
-
-                          if (!snapshot.hasData ||
-                              snapshot.data?.docs.isEmpty == true) {
-                            return const Center(
-                                child: Text('No files available.'));
-                          }
-
-                          final fileDocs = snapshot.data!.docs.map((doc) {
-                            final data = doc.data() as Map<String, dynamic>;
-                            return {
-                              'id': doc.id,
-                              'url': data['url'] as String?,
-                              'name': data['name'] as String?,
-                              'courseId': _selectedCourseId!,
-                              'visibility':
-                                  data['visibility'] as String? ?? 'public',
-                            };
-                          }).toList();
-
-                          return CourseFileList(
-                            fileDocs: fileDocs,
-                            isDarkMode: isDarkMode,
-                            userRole: _userRole ?? 'user',
-                            onFileDeleted: _deleteFile,
-                            selectedCourseId: _selectedCourseId!,
-                          );
-                        },
-                      ),
+                    : _buildFileList(),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  DropdownButton<String> _buildCourseDropdown() {
+    return DropdownButton<String>(
+      value: _selectedCourseId,
+      hint: const Text('Selecione um curso'),
+      items: _courses.map((course) {
+        return DropdownMenuItem<String>(
+          value: course['id'],
+          child: Text(course['courseName'] ?? 'Unknown Course'),
+        );
+      }).toList(),
+      onChanged: (value) async {
+        if (value != null) {
+          await _handleCourseSelection(value);
+        }
+      },
+    );
+  }
+
+  Row _buildUploadButton() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.upload_file),
+          onPressed: _uploadFile,
+          tooltip: 'Enviar Arquivo',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCourseHeader(bool isDarkMode) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: _selectedCourseImageUrl != null
+          ? Container(
+              key: ValueKey<String>(_selectedCourseImageUrl!),
+              padding: const EdgeInsets.all(16.0),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: isDarkMode
+                    ? const LinearGradient(
+                        colors: [Color(0xFF3C3C3C), Color(0xFF5A5A5A)],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      )
+                    : const LinearGradient(
+                        colors: [Color(0xFFFFD59C), Color(0xFF62CFF7)],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ),
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 120.0,
+                    height: 160.0,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: NetworkImage(_selectedCourseImageUrl!),
+                        fit: BoxFit.cover,
+                      ),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  const SizedBox(width: 16.0),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (_selectedCourseTitle != null)
+                          Text(
+                            _selectedCourseTitle!,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        if (_selectedInstructorName != null)
+                          Text(
+                            _selectedInstructorName!,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : const SizedBox.shrink(),
+    );
+  }
+
+  Padding _buildErrorMessage() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        _errorMessage!,
+        style: const TextStyle(color: Colors.red),
+      ),
+    );
+  }
+
+  StreamBuilder<QuerySnapshot> _buildFileList() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final bool isDarkMode = themeProvider.isDarkMode;
+    return StreamBuilder<QuerySnapshot>(
+      stream: _firestore
+          .collection('courses/$_selectedCourseId/materials')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Error loading files: ${snapshot.error}',
+              style: const TextStyle(color: Colors.red),
+            ),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data?.docs.isEmpty == true) {
+          return const Center(child: Text('No files available.'));
+        }
+
+        final fileDocs = snapshot.data!.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          return {
+            'id': doc.id,
+            'url': data['url'] as String?,
+            'name': data['name'] as String?,
+            'courseId': _selectedCourseId!,
+            'visibility': data['visibility'] as String? ?? 'public',
+          };
+        }).toList();
+
+        return CourseFileList(
+          fileDocs: fileDocs,
+          isDarkMode: isDarkMode,
+          userRole: _userRole ?? 'user',
+          onFileDeleted: _deleteFile,
+          selectedCourseId: _selectedCourseId!,
+        );
+      },
     );
   }
 }
