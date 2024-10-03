@@ -25,6 +25,21 @@ class CoursesDashboard extends StatelessWidget {
     }
   }
 
+  List<QueryDocumentSnapshot<Map<String, dynamic>>> _filterNewRegistrations(
+      List<QueryDocumentSnapshot<Map<String, dynamic>>> registrations) {
+    final now = DateTime.now();
+    final startOfMonth = DateTime(now.year, now.month, 1);
+    final endOfMonth = DateTime(now.year, now.month + 1, 0);
+
+    return registrations.where((doc) {
+      final data = doc.data();
+      final registrationDate = data['registrationDate'] as Timestamp?;
+      if (registrationDate == null) return false;
+      final date = registrationDate.toDate();
+      return date.isAfter(startOfMonth) && date.isBefore(endOfMonth);
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -130,19 +145,11 @@ class CoursesDashboard extends StatelessWidget {
                           ),
                           _buildSummaryCard(
                             context,
-                            title: 'Novos Matrículados',
+                            title: 'Novos Matriculados',
                             value: newEnrolled.toString(),
                             onTap: () {
                               final newEnrolledDocuments =
-                                  documents.where((doc) {
-                                final data = doc.data();
-                                final registrationDate =
-                                    data['registrationDate'] as Timestamp?;
-                                if (registrationDate == null) return false;
-                                final date = registrationDate.toDate();
-                                return date.isAfter(startOfMonth) &&
-                                    date.isBefore(endOfMonth);
-                              }).toList();
+                                  _filterNewRegistrations(documents);
 
                               Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => SubscribersList(
