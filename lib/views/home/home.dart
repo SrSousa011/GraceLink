@@ -261,20 +261,23 @@ class _HomeState extends State<Home> {
               );
             }),
             const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    isDarkMode ? const Color(0xFF333333) : Colors.blue,
-                shape: const StadiumBorder(),
-                foregroundColor: Colors.white,
+            Center(
+              // Centraliza o botão
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      isDarkMode ? const Color(0xFF333333) : Colors.blue,
+                  shape: const StadiumBorder(),
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Events()),
+                  );
+                },
+                child: const Text('Todos os Eventos'),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Events()),
-                );
-              },
-              child: const Text('Todos os Eventos'),
             ),
           ],
         );
@@ -307,45 +310,49 @@ class _HomeState extends State<Home> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            GestureDetector(
-              onTap: _launchInstagram,
-              child: Image.asset(
-                tInsta,
-                width: 50,
-                height: 50,
-              ),
-            ),
-            const SizedBox(width: 10),
-            GestureDetector(
-              onTap: _launchFacebook,
-              child: Image.asset(
-                tFace,
-                width: 50,
-                height: 50,
-              ),
-            ),
-            const SizedBox(width: 10),
-            GestureDetector(
-              onTap: _launchDonationPage,
-              child: Image.asset(
-                trLogo,
-                width: 50,
-                height: 50,
-              ),
-            ),
-            const SizedBox(width: 10),
-            GestureDetector(
-              onTap: _launchYouTube,
-              child: Image.asset(
-                tYoutube,
-                width: 50,
-                height: 50,
-              ),
-            ),
-          ],
+        _buildSocialMediaIcons(),
+      ],
+    );
+  }
+
+  Widget _buildSocialMediaIcons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onTap: _launchInstagram,
+          child: Image.asset(
+            tInsta,
+            width: 50,
+            height: 50,
+          ),
+        ),
+        const SizedBox(width: 10),
+        GestureDetector(
+          onTap: _launchFacebook,
+          child: Image.asset(
+            tFace,
+            width: 50,
+            height: 50,
+          ),
+        ),
+        const SizedBox(width: 10),
+        GestureDetector(
+          onTap: _launchDonationPage,
+          child: Image.asset(
+            trLogo,
+            width: 50,
+            height: 50,
+          ),
+        ),
+        const SizedBox(width: 10),
+        GestureDetector(
+          onTap: _launchYouTube,
+          child: Image.asset(
+            tYoutube,
+            width: 50,
+            height: 50,
+          ),
         ),
       ],
     );
