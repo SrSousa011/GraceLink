@@ -1,4 +1,5 @@
 import 'package:churchapp/views/courses/adminDashboard/subscriber_info.dart';
+import 'package:churchapp/views/courses/adminDashboard/subscribers_title.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,45 +19,46 @@ class _SubscribersListState extends State<SubscribersList> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<Map<String, dynamic>> _registrations = [];
   bool _loading = true;
+  String? _selectedCourseId;
+  final List<String> _courses = [];
+  final Map<String, String> _courseIds = {};
 
   @override
   void initState() {
     super.initState();
+    initializeDateFormatting();
+    _fetchCourses();
     if (widget.enrolledDocuments != null) {
       _processEnrolledDocuments(widget.enrolledDocuments!);
     } else {
       _fetchRegistrations();
     }
-    initializeDateFormatting();
+  }
+
+  Future<void> _fetchCourses() async {
+    try {
+      final courseSnapshot = await _firestore.collection('courses').get();
+      _courses.add("Todos");
+      for (var doc in courseSnapshot.docs) {
+        final courseName = doc.data()['courseName'] ?? 'Unknown';
+        _courses.add(courseName);
+        _courseIds[courseName] = doc.id;
+      }
+      setState(() {});
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching courses: $e');
+      }
+    }
   }
 
   void _processEnrolledDocuments(
       List<QueryDocumentSnapshot<Map<String, dynamic>>> documents) async {
     setState(() => _loading = true);
-
     try {
       final registrations = await Future.wait(
         documents.map((doc) async {
-          final data = doc.data();
-          final courseId = data['courseId'] ?? '';
-          final status = data['status'] ?? false;
-          final courseName = courseId.isNotEmpty
-              ? await _fetchCourseName(courseId)
-              : 'Unknown';
-
-          final userId = data['userId'] ?? 'Unknown';
-          final userData = await _fetchUserData(userId);
-
-          return {
-            'userId': userId,
-            'userName': data['userName'] ?? 'Unknown',
-            'registrationDate':
-                (data['registrationDate'] as Timestamp?)?.toDate() ??
-                    DateTime.now(),
-            'courseName': courseName,
-            'status': status,
-            'imagePath': userData['imagePath'] ?? '',
-          };
+          return await _processRegistrationData(doc);
         }).toList(),
       );
 
@@ -74,32 +76,12 @@ class _SubscribersListState extends State<SubscribersList> {
 
   Future<void> _fetchRegistrations() async {
     setState(() => _loading = true);
-
     try {
       final registrationsSnapshot =
           await _firestore.collection('courseRegistration').get();
       final registrations = await Future.wait(
         registrationsSnapshot.docs.map((doc) async {
-          final data = doc.data();
-          final courseId = data['courseId'] ?? '';
-          final status = data['status'] ?? false;
-          final courseName = courseId.isNotEmpty
-              ? await _fetchCourseName(courseId)
-              : 'Unknown';
-
-          final userId = data['userId'] ?? 'Unknown';
-          final userData = await _fetchUserData(userId);
-
-          return {
-            'userId': userId,
-            'userName': data['userName'] ?? 'Unknown',
-            'registrationDate':
-                (data['registrationDate'] as Timestamp?)?.toDate() ??
-                    DateTime.now(),
-            'courseName': courseName,
-            'status': status,
-            'imagePath': userData['imagePath'] ?? '',
-          };
+          return await _processRegistrationData(doc);
         }).toList(),
       );
 
@@ -113,6 +95,27 @@ class _SubscribersListState extends State<SubscribersList> {
     } finally {
       setState(() => _loading = false);
     }
+  }
+
+  Future<Map<String, dynamic>> _processRegistrationData(
+      QueryDocumentSnapshot<Map<String, dynamic>> doc) async {
+    final data = doc.data();
+    final courseId = data['courseId'] ?? '';
+    final status = data['status'] ?? false;
+    final courseName =
+        courseId.isNotEmpty ? await _fetchCourseName(courseId) : 'Unknown';
+    final userId = data['userId'] ?? 'Unknown';
+    final userData = await _fetchUserData(userId);
+
+    return {
+      'userId': userId,
+      'userName': data['userName'] ?? 'Unknown',
+      'registrationDate':
+          (data['registrationDate'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      'courseName': courseName,
+      'status': status,
+      'imagePath': userData['imagePath'] ?? '',
+    };
   }
 
   Future<String> _fetchCourseName(String courseId) async {
@@ -141,6 +144,43 @@ class _SubscribersListState extends State<SubscribersList> {
     }
   }
 
+  List<Map<String, dynamic>> getFilteredRegistrations() {
+    if (_selectedCourseId == null || _selectedCourseId == "Todos") {
+      return _registrations;
+    }
+    return _registrations
+        .where(
+            (registration) => registration['courseName'] == _selectedCourseId)
+        .toList();
+  }
+
+  void _showCourseBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: ListView(
+            children: _courses.map((courseName) {
+              return ListTile(
+                title: Text(courseName),
+                onTap: () {
+                  Navigator.of(context).pop(courseName);
+                },
+              );
+            }).toList(),
+          ),
+        );
+      },
+    ).then((dynamic newValue) {
+      if (newValue != null) {
+        setState(() {
+          _selectedCourseId = newValue;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -148,48 +188,29 @@ class _SubscribersListState extends State<SubscribersList> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de Matriculados'),
+        title: const Text(
+          'Lista de Matriculados',
+          style: TextStyle(fontSize: 17),
+        ),
         backgroundColor: isDarkMode ? Colors.grey[850] : Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list, size: 17),
+            onPressed: () {
+              _showCourseBottomSheet(context);
+            },
+          ),
+        ],
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
-              itemCount: _registrations.length,
+              itemCount: getFilteredRegistrations().length,
               itemBuilder: (context, index) {
-                final registration = _registrations[index];
-                final registrationDate =
-                    registration['registrationDate'] as DateTime;
-                final formattedDate =
-                    DateFormat('d MMMM yyyy', 'pt_BR').format(registrationDate);
-
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: registration['imagePath'] != ''
-                        ? NetworkImage(registration['imagePath'])
-                        : null,
-                    backgroundColor:
-                        isDarkMode ? Colors.grey[700] : Colors.grey[300],
-                    child: registration['imagePath'] == ''
-                        ? Icon(
-                            Icons.person,
-                            color: isDarkMode ? Colors.white : Colors.black,
-                          )
-                        : null,
-                  ),
-                  title: Text(
-                    registration['userName'],
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black,
-                    ),
-                  ),
-                  subtitle: Text(
-                    'Curso: ${registration['courseName']} \nData de inscrição: $formattedDate',
-                    style: TextStyle(
-                      color: isDarkMode ? Colors.grey[300] : Colors.black54,
-                    ),
-                  ),
-                  tileColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                final registration = getFilteredRegistrations()[index];
+                return SubscriberTile(
+                  registration: registration,
+                  isDarkMode: isDarkMode,
                   onTap: () {
                     Navigator.push(
                       context,
