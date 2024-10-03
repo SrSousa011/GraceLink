@@ -36,24 +36,15 @@ class _NavBarState extends State<NavBar> {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Drawer(
-            backgroundColor: tileColor,
-            child: const Center(child: CircularProgressIndicator()),
-          );
+          return _buildLoadingDrawer(tileColor);
         }
 
         if (snapshot.hasError) {
-          return Drawer(
-            backgroundColor: tileColor,
-            child: const Center(child: Text('Error loading user data')),
-          );
+          return _buildErrorDrawer(tileColor, 'Error loading user data');
         }
 
         if (!snapshot.hasData || !snapshot.data!.exists) {
-          return Drawer(
-            backgroundColor: tileColor,
-            child: const Center(child: Text('User not found')),
-          );
+          return _buildErrorDrawer(tileColor, 'User not found');
         }
 
         final userDoc = snapshot.data!;
@@ -66,128 +57,141 @@ class _NavBarState extends State<NavBar> {
               .snapshots(),
           builder: (context, courseSnapshot) {
             if (courseSnapshot.connectionState == ConnectionState.waiting) {
-              return Drawer(
-                backgroundColor: tileColor,
-                child: const Center(child: CircularProgressIndicator()),
-              );
+              return _buildLoadingDrawer(tileColor);
             }
 
             if (courseSnapshot.hasError) {
-              return Drawer(
-                backgroundColor: tileColor,
-                child: const Center(child: Text('Error loading courses')),
-              );
+              return _buildErrorDrawer(tileColor, 'Error loading courses');
             }
 
             final isEnrolledInCourse =
                 courseSnapshot.data?.docs.isNotEmpty ?? false;
 
-            return Drawer(
-              backgroundColor: tileColor,
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: <Widget>[
-                  const DrawerHeaderWidget(),
-                  _buildListTile(
-                    icon: Icons.home_outlined,
-                    text: 'Home',
-                    color: iconColor,
-                    onTap: () => Navigator.pushNamed(context, '/home'),
-                  ),
-                  _buildListTile(
-                    icon: Icons.event,
-                    text: 'Eventos',
-                    color: iconColor,
-                    onTap: () => Navigator.pushNamed(context, '/event_page'),
-                  ),
-                  _buildListTile(
-                    icon: Icons.volunteer_activism_outlined,
-                    text: 'Doações',
-                    color: iconColor,
-                    onTap: () {
-                      final route = userData.role == 'admin'
-                          ? '/donations_dashboard'
-                          : '/donations';
-                      Navigator.pushNamed(context, route);
-                    },
-                  ),
-                  _buildListTile(
-                    icon: Icons.school_outlined,
-                    text: 'Cursos',
-                    color: iconColor,
-                    onTap: () {
-                      final route = userData.role == 'admin'
-                          ? '/courses_dashboard'
-                          : (isEnrolledInCourse
-                              ? '/courses_user_dashboard'
-                              : '/courses');
-                      Navigator.pushNamed(context, route);
-                    },
-                  ),
-                  if (userData.role == 'admin' || isEnrolledInCourse)
-                    _buildListTile(
-                      icon: Icons.upload_file_outlined,
-                      text: 'Materiais de cursos',
-                      color: iconColor,
-                      onTap: () => Navigator.pushNamed(
-                          context, '/manage_course_materials'),
-                    ),
-                  _buildListTile(
-                    icon: Icons.group_add_outlined,
-                    text: 'Torne-se Membro',
-                    color: iconColor,
-                    onTap: () {
-                      final route = userData.role == 'admin'
-                          ? '/members_dashboard'
-                          : '/become_member';
-                      Navigator.pushNamed(context, route);
-                    },
-                  ),
-                  _buildListTile(
-                    icon: Icons.photo_size_select_actual_outlined,
-                    text: 'Fotos',
-                    color: iconColor,
-                    onTap: () => Navigator.pushNamed(context, '/photos'),
-                  ),
-                  _buildListTile(
-                    icon: Icons.video_library_outlined,
-                    text: 'Vídeos',
-                    color: iconColor,
-                    onTap: () => Navigator.pushNamed(context, '/videos'),
-                  ),
-                  _buildListTile(
-                    icon: Icons.info_outlined,
-                    text: 'Sobre nós',
-                    color: iconColor,
-                    onTap: () => Navigator.pushNamed(context, '/about_us'),
-                  ),
-                  if (userData.role == 'admin')
-                    _buildListTile(
-                      icon: Icons.attach_money,
-                      text: 'Arquivos Financeiros',
-                      color: iconColor,
-                      onTap: () =>
-                          Navigator.pushNamed(context, '/financial_files'),
-                    ),
-                  if (userData.role == 'admin')
-                    _buildListTile(
-                      icon: Icons.admin_panel_settings,
-                      text: 'Admin Painel',
-                      color: iconColor,
-                      onTap: () => Navigator.pushNamed(context, '/admin_panel'),
-                    ),
-                  _buildListTile(
-                    icon: Icons.logout,
-                    text: 'Logout',
-                    color: Colors.red,
-                    onTap: () => _logout(),
-                  ),
-                ],
-              ),
-            );
+            return _buildLoggedInDrawer(
+                tileColor, iconColor, userData, isEnrolledInCourse);
           },
         );
       },
+    );
+  }
+
+  Drawer _buildLoadingDrawer(Color tileColor) {
+    return Drawer(
+      backgroundColor: tileColor,
+      child: const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  Drawer _buildErrorDrawer(Color tileColor, String errorMessage) {
+    return Drawer(
+      backgroundColor: tileColor,
+      child: Center(child: Text(errorMessage)),
+    );
+  }
+
+  Drawer _buildLoggedInDrawer(Color tileColor, Color iconColor,
+      UserData userData, bool isEnrolledInCourse) {
+    return Drawer(
+      backgroundColor: tileColor,
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          const DrawerHeaderWidget(),
+          _buildListTile(
+            icon: Icons.home_outlined,
+            text: 'Home',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/home'),
+          ),
+          _buildListTile(
+            icon: Icons.event,
+            text: 'Eventos',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/event_page'),
+          ),
+          _buildListTile(
+            icon: Icons.volunteer_activism_outlined,
+            text: 'Doações',
+            color: iconColor,
+            onTap: () {
+              final route = userData.role == 'admin'
+                  ? '/donations_dashboard'
+                  : '/donations';
+              Navigator.pushNamed(context, route);
+            },
+          ),
+          _buildListTile(
+            icon: Icons.school_outlined,
+            text: 'Cursos',
+            color: iconColor,
+            onTap: () {
+              final route = userData.role == 'admin'
+                  ? '/courses_dashboard'
+                  : (isEnrolledInCourse
+                      ? '/courses_user_dashboard'
+                      : '/courses');
+              Navigator.pushNamed(context, route);
+            },
+          ),
+          if (userData.role == 'admin' || isEnrolledInCourse)
+            _buildListTile(
+              icon: Icons.upload_file_outlined,
+              text: 'Materiais de cursos',
+              color: iconColor,
+              onTap: () =>
+                  Navigator.pushNamed(context, '/manage_course_materials'),
+            ),
+          _buildListTile(
+            icon: Icons.group_add_outlined,
+            text: 'Torne-se Membro',
+            color: iconColor,
+            onTap: () {
+              final route = userData.role == 'admin'
+                  ? '/members_dashboard'
+                  : '/become_member';
+              Navigator.pushNamed(context, route);
+            },
+          ),
+          _buildListTile(
+            icon: Icons.photo_size_select_actual_outlined,
+            text: 'Fotos',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/photos'),
+          ),
+          _buildListTile(
+            icon: Icons.video_library_outlined,
+            text: 'Vídeos',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/videos'),
+          ),
+          _buildListTile(
+            icon: Icons.info_outlined,
+            text: 'Sobre nós',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/about_us'),
+          ),
+          if (userData.role == 'admin')
+            _buildListTile(
+              icon: Icons.attach_money,
+              text: 'Arquivos Financeiros',
+              color: iconColor,
+              onTap: () => Navigator.pushNamed(context, '/financial_files'),
+            ),
+          if (userData.role == 'admin')
+            _buildListTile(
+              icon: Icons.admin_panel_settings,
+              text: 'Admin Painel',
+              color: iconColor,
+              onTap: () => Navigator.pushNamed(context, '/admin_panel'),
+            ),
+          _buildListTile(
+            icon: Icons.logout,
+            text: 'Logout',
+            color: Colors.red,
+            onTap: () => _logout(),
+          ),
+        ],
+      ),
     );
   }
 
