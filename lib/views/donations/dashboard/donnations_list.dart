@@ -36,9 +36,19 @@ class _DonationsListState extends State<DonationsList> {
     }
   }
 
-  Future<List<Map<String, dynamic>>> _fetchAllDonations() async {
-    final snapshot = await _firestore.collection('donations').get();
-    return snapshot.docs.map((doc) => doc.data()).toList();
+  Future<List<Map<String, dynamic>>> _fetchDonations() async {
+    Query query = _firestore.collection('donations');
+
+    if (!showAllDonations) {
+      final now = DateTime.now();
+      final firstDayOfMonth = DateTime(now.year, now.month, 1);
+      query = query.where('timestamp', isGreaterThanOrEqualTo: firstDayOfMonth);
+    }
+
+    final snapshot = await query.get();
+    return snapshot.docs
+        .map((doc) => doc.data() as Map<String, dynamic>)
+        .toList();
   }
 
   List<Map<String, dynamic>> _sortDonations(
@@ -72,6 +82,12 @@ class _DonationsListState extends State<DonationsList> {
     });
   }
 
+  void _toggleDonationFilter() {
+    setState(() {
+      showAllDonations = !showAllDonations;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -85,6 +101,13 @@ class _DonationsListState extends State<DonationsList> {
       appBar: AppBar(
         title: const Text('Lista de Doações'),
         actions: [
+          IconButton(
+            icon: Icon(
+              showAllDonations ? Icons.filter_list : Icons.filter_list_off,
+              color: Colors.blueAccent,
+            ),
+            onPressed: _toggleDonationFilter,
+          ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.sort, color: Colors.blueAccent),
             onSelected: (String value) {
@@ -146,7 +169,7 @@ class _DonationsListState extends State<DonationsList> {
         ],
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _fetchAllDonations(),
+        future: _fetchDonations(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
