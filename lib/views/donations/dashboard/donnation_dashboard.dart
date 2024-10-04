@@ -110,12 +110,10 @@ class DonationsDashboard extends StatelessWidget {
                       timestamp
                           .isBefore(endOfMonth.add(const Duration(days: 1)));
                 }).toList();
-
                 final double monthlyIncome =
-                    // ignore: avoid_types_as_parameter_names
-                    monthlyDonations.fold(0.0, (sum, doc) {
+                    monthlyDonations.fold(0.0, (acc, doc) {
                   final donationValue = (doc['donationValue'] ?? 0);
-                  return sum +
+                  return acc +
                       (donationValue is num ? donationValue.toDouble() : 0);
                 });
 
@@ -174,7 +172,7 @@ class DonationsDashboard extends StatelessWidget {
                           ),
                           _buildSummaryBlueCard(
                             context,
-                            title: 'Doadores mês',
+                            title: 'Doadores do mês',
                             value: currentMonthDonors.length.toString(),
                             onPressed: () {
                               Navigator.of(context)
@@ -250,12 +248,14 @@ class DonationsDashboard extends StatelessWidget {
             ),
             if (value != null) ...[
               const SizedBox(height: 8.0),
-              Text(
-                value,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: summaryCardTextColor,
-                      fontWeight: FontWeight.bold,
-                    ),
+              Center(
+                child: Text(
+                  value,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: summaryCardTextColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
               ),
             ],
           ],
