@@ -164,12 +164,6 @@ class _NavBarState extends State<NavBar> {
             color: iconColor,
             onTap: () => Navigator.pushNamed(context, '/videos'),
           ),
-          _buildListTile(
-            icon: Icons.info_outlined,
-            text: 'Sobre nós',
-            color: iconColor,
-            onTap: () => Navigator.pushNamed(context, '/about_us'),
-          ),
           if (userData.role == 'admin')
             _buildListTile(
               icon: Icons.attach_money,
@@ -184,6 +178,12 @@ class _NavBarState extends State<NavBar> {
               color: iconColor,
               onTap: () => Navigator.pushNamed(context, '/admin_panel'),
             ),
+          _buildListTile(
+            icon: Icons.info_outlined,
+            text: 'Sobre nós',
+            color: iconColor,
+            onTap: () => Navigator.pushNamed(context, '/about_us'),
+          ),
           _buildListTile(
             icon: Icons.logout,
             text: 'Logout',
