@@ -1,5 +1,6 @@
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/financial_files/expense/expenses.dart';
+import 'package:churchapp/views/financial_files/monthly_chart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
@@ -29,6 +30,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
   late Future<DonationStats> _donationStats;
   late Future<Map<String, double>> _annualExpensesData;
   late Future<UserData> _userData;
+  final RevenueService _revenueService = RevenueService();
 
   double totalAnnualExpenses = 0.0;
   final ExpensesService _expensesService = ExpensesService();
@@ -43,10 +45,16 @@ class _FinanceScreenState extends State<FinanceScreen> {
   double monthlyServices = 0.0;
   double totalMonthlyExpenses = 0.0;
 
+  double totalMonthlyReceitas = 0.0;
+  double totalMonthlyDonations = 0.0;
+  double totalMonthlyCourses = 0.0;
+  double totalMonthlyOthers = 0.0;
+
   @override
   void initState() {
     super.initState();
     _fetchAllExpenses();
+    _fetchAllRevenues();
     RevenueService revenueService = RevenueService();
 
     _revenueData = revenueService.fetchAllRevenues();
@@ -66,6 +74,27 @@ class _FinanceScreenState extends State<FinanceScreen> {
     String uid = _auth.currentUser!.uid;
     DocumentSnapshot doc = await _firestore.collection('users').doc(uid).get();
     return UserData.fromDocument(doc);
+  }
+
+  Future<void> _fetchAllRevenues() async {
+    try {
+      final revenueData = await _revenueService.fetchData();
+
+      setState(() {
+        String currentMonth = RevenueData.getMonthName(DateTime.now().month);
+
+        totalMonthlyDonations =
+            revenueData.donationsPerMonth[currentMonth] ?? 0.0;
+        totalMonthlyCourses = revenueData.coursesPerMonth[currentMonth] ?? 0.0;
+        totalMonthlyOthers = revenueData.othersPerMonth[currentMonth] ?? 0.0;
+        totalMonthlyReceitas =
+            totalMonthlyDonations + totalMonthlyCourses + totalMonthlyOthers;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching revenues: $e');
+      }
+    }
   }
 
   Future<void> _fetchAllExpenses() async {
@@ -204,201 +233,236 @@ class _FinanceScreenState extends State<FinanceScreen> {
 
                       final userData = userSnapshot.data!;
 
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            height: MediaQuery.of(context).size.height * 0.3,
-                            decoration: BoxDecoration(
-                              color: accentColor,
-                              borderRadius: const BorderRadius.vertical(
-                                  bottom: Radius.circular(60)),
-                            ),
-                            child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 60.0, left: 16.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Bom Dia',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: cardTextColor,
+                      return SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              height: MediaQuery.of(context).size.height * 0.3,
+                              decoration: BoxDecoration(
+                                color: accentColor,
+                                borderRadius: const BorderRadius.vertical(
+                                    bottom: Radius.circular(60)),
+                              ),
+                              child: Align(
+                                alignment: Alignment.topLeft,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 60.0, left: 16.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Bom Dia',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: cardTextColor,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      userData.fullName,
-                                      style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: cardTextColor,
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        userData.fullName,
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: cardTextColor,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          Transform.translate(
-                            offset: const Offset(0.0, -80.0),
-                            child: GestureDetector(
-                              onTap: () {},
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                child: Center(
-                                  child: SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.8,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 16.0, horizontal: 16.0),
-                                      decoration: BoxDecoration(
-                                        color: cardBackgroundColor,
-                                        borderRadius:
-                                            const BorderRadius.vertical(
-                                                top: Radius.circular(40),
-                                                bottom: Radius.circular(40)),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: isDarkMode
-                                                ? Colors.black54
-                                                : Colors.grey.withOpacity(0.5),
-                                            blurRadius: 8.0,
-                                            spreadRadius: 2.0,
-                                            offset: const Offset(0.0, 2.0),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          FinancialCardWidgets
-                                              .buildFinancialCard(
-                                            icon: Icons.account_balance,
-                                            title: 'Balanço Anual',
-                                            value:
-                                                '€ ${totalBalance.toStringAsFixed(2)}',
-                                            valueStyle: TextStyle(
-                                              fontSize: 22,
-                                              color: totalBalance >= 0
-                                                  ? incomeColor
-                                                  : expenseColor,
+                            Transform.translate(
+                              offset: const Offset(0.0, -80.0),
+                              child: GestureDetector(
+                                onTap: () {},
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Center(
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.8,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 16.0, horizontal: 16.0),
+                                        decoration: BoxDecoration(
+                                          color: cardBackgroundColor,
+                                          borderRadius:
+                                              const BorderRadius.vertical(
+                                                  top: Radius.circular(40),
+                                                  bottom: Radius.circular(40)),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: isDarkMode
+                                                  ? Colors.black54
+                                                  : Colors.grey
+                                                      .withOpacity(0.5),
+                                              blurRadius: 8.0,
+                                              spreadRadius: 2.0,
+                                              offset: const Offset(0.0, 2.0),
                                             ),
-                                            withShadow: false,
-                                            backgroundColor:
-                                                cardBackgroundColor,
-                                            titleStyle: TextStyle(
-                                              fontSize: 22,
-                                              color: cardTextColor,
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            FinancialCardWidgets
+                                                .buildFinancialCard(
+                                              icon: Icons.account_balance,
+                                              title: 'Balanço Anual',
+                                              value:
+                                                  '€ ${totalBalance.toStringAsFixed(2)}',
+                                              valueStyle: TextStyle(
+                                                fontSize: 22,
+                                                color: totalBalance >= 0
+                                                    ? incomeColor
+                                                    : expenseColor,
+                                              ),
+                                              withShadow: false,
+                                              backgroundColor:
+                                                  cardBackgroundColor,
+                                              titleStyle: TextStyle(
+                                                fontSize: 22,
+                                                color: cardTextColor,
+                                              ),
                                             ),
-                                          ),
-                                          const SizedBox(height: 16),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: GestureDetector(
-                                                  onTap: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            IncomesScreen(
-                                                                donationStats:
-                                                                    donationStats),
+                                            const SizedBox(height: 16),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              IncomesScreen(
+                                                                  donationStats:
+                                                                      donationStats),
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: FinancialCardWidgets
+                                                        .buildFinancialCard(
+                                                      icon: Icons.trending_up,
+                                                      title: 'Renda',
+                                                      value:
+                                                          '€ ${totalIncome.toStringAsFixed(2)}',
+                                                      valueStyle: TextStyle(
+                                                        fontSize: 14,
+                                                        color: incomeColor,
                                                       ),
-                                                    );
-                                                  },
-                                                  child: FinancialCardWidgets
-                                                      .buildFinancialCard(
-                                                    icon: Icons.trending_up,
-                                                    title: 'Renda',
-                                                    value:
-                                                        '€ ${totalIncome.toStringAsFixed(2)}',
-                                                    valueStyle: TextStyle(
-                                                      fontSize: 14,
-                                                      color: incomeColor,
-                                                    ),
-                                                    withShadow: false,
-                                                    backgroundColor:
-                                                        cardBackgroundColor,
-                                                    titleStyle: TextStyle(
-                                                      fontSize: 15,
-                                                      color: cardTextColor,
+                                                      withShadow: false,
+                                                      backgroundColor:
+                                                          cardBackgroundColor,
+                                                      titleStyle: TextStyle(
+                                                        fontSize: 15,
+                                                        color: cardTextColor,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                              const SizedBox(width: 1),
-                                              Expanded(
-                                                child: GestureDetector(
-                                                  onTap: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const ExpensesScreen(),
+                                                const SizedBox(width: 1),
+                                                Expanded(
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              const ExpensesScreen(),
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: FinancialCardWidgets
+                                                        .buildFinancialCard(
+                                                      icon: Icons.trending_down,
+                                                      title: 'Despesa',
+                                                      value:
+                                                          '€ ${totalAnnualExpenses.toStringAsFixed(2)}',
+                                                      valueStyle: TextStyle(
+                                                        fontSize: 14,
+                                                        color: expenseColor,
                                                       ),
-                                                    );
-                                                  },
-                                                  child: FinancialCardWidgets
-                                                      .buildFinancialCard(
-                                                    icon: Icons.trending_down,
-                                                    title: 'Despesa',
-                                                    value:
-                                                        '€ ${totalAnnualExpenses.toStringAsFixed(2)}',
-                                                    valueStyle: TextStyle(
-                                                      fontSize: 14,
-                                                      color: expenseColor,
-                                                    ),
-                                                    withShadow: false,
-                                                    backgroundColor:
-                                                        cardBackgroundColor,
-                                                    titleStyle: TextStyle(
-                                                      fontSize: 15,
-                                                      color: cardTextColor,
+                                                      withShadow: false,
+                                                      backgroundColor:
+                                                          cardBackgroundColor,
+                                                      titleStyle: TextStyle(
+                                                        fontSize: 15,
+                                                        color: cardTextColor,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const UpcomingEventsScreen(),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const UpcomingEventsScreen(),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: cardBackgroundColor.withOpacity(0.9),
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: isDarkMode
+                                          ? Colors.black54
+                                          : Colors.grey.withOpacity(0.5),
+                                      blurRadius: 8.0,
+                                      spreadRadius: 2.0,
+                                      offset: const Offset(0.0, 2.0),
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                            child: FinancialCardWidgets.buildFinanceSectionCard(
-                              icon: Icons.event_note,
-                              title: 'Próximos Lançamentos',
-                              value: '',
-                              backgroundColor: cardBackgroundColor,
-                              titleColor: cardTextColor,
-                              valueColor: cardTextColor,
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.event_note,
+                                        color: cardTextColor),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      'Próximos Lançamentos',
+                                      style: TextStyle(
+                                        color: cardTextColor,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 16),
+                            MonthlyFinancialChart(
+                              totalMonthlyExpenses: totalMonthlyExpenses,
+                              totalMonthlyIncome: totalMonthlyReceitas,
+                              isDarkMode: isDarkMode,
+                            ),
+                          ],
+                        ),
                       );
                     },
                   );
