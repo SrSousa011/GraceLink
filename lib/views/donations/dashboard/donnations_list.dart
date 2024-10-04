@@ -99,7 +99,12 @@ class _DonationsListState extends State<DonationsList> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de Doações'),
+        title: const Text(
+          'Lista de Doações',
+          style: TextStyle(
+            fontSize: 17,
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(
