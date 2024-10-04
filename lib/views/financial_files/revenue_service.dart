@@ -113,26 +113,6 @@ class RevenueService {
     revenueData.coursesPerMonth[monthName] =
         (courseStats.monthlyCourses[DateTime.now().month - 1]);
 
-    double totalMonthlyRevenue =
-        (revenueData.othersPerMonth[monthName] ?? 0.0) +
-            (revenueData.donationsPerMonth[monthName] ?? 0.0) +
-            (revenueData.coursesPerMonth[monthName] ?? 0.0);
-
-    if (kDebugMode) {
-      print('Fetched revenue data: $revenueData');
-      print('Total Income: ${revenueData.totalOthers}');
-      print('Total Donations: ${revenueData.totalDonations}');
-      print('Total Course Revenue: ${revenueData.totalCourses}');
-
-      print(
-          'Total Monthly Donations: ${courseStats.monthlyCourses[DateTime.now().month - 1]}');
-      print(
-          'Total Monthly Donations: ${donationStats.monthlyDonations[DateTime.now().month - 1]}');
-      print(
-          'Total Monthly Donations: ${courseStats.monthlyCourses[DateTime.now().month - 1]}');
-      print('Calculated Total Monthly Revenue: $totalMonthlyRevenue');
-    }
-
     return revenueData;
   }
 
@@ -143,12 +123,20 @@ class RevenueService {
           await _fetchDonationDataPerMonth(await fetchDonationStats());
       final courseRevenueData = await _fetchCourseRevenueDataPerMonth();
 
-      double totalOthers =
-          incomeData.values.fold(0.0, (sum, item) => sum + item);
-      double totalDonations = donationData.values
-          .fold(0.0, (sum, item) => sum + (item['totalDonations'] ?? 0.0));
-      double totalCourses = courseRevenueData.values
-          .fold(0.0, (sum, item) => sum + (item['totalCourses'] ?? 0.0));
+      double totalOthers = incomeData.values.fold(
+        0.0,
+        (accumulator, item) => accumulator + item,
+      );
+
+      double totalDonations = donationData.values.fold(
+        0.0,
+        (accumulator, item) => accumulator + (item['totalDonations'] ?? 0.0),
+      );
+
+      double totalCourses = courseRevenueData.values.fold(
+        0.0,
+        (accumulator, item) => accumulator + (item['totalCourses'] ?? 0.0),
+      );
 
       return {
         'totalOthers': totalOthers,
