@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/views/events/event_detail/event_details_screen.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/theme/theme_provider.dart';
+import 'package:churchapp/theme/chart_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -173,7 +174,7 @@ class _HomeState extends State<Home> {
             child: Text(
               'Bem-vindo à Igreja',
               style: TextStyle(
-                color: Colors.white,
+                color: ChartColors.headerTextColor,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 shadows: [
@@ -231,7 +232,9 @@ class _HomeState extends State<Home> {
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.bold,
-                            color: isDarkMode ? Colors.white : Colors.black,
+                            color: isDarkMode
+                                ? ChartColors.eventTextColorDark
+                                : ChartColors.eventTextColorLight,
                           ),
                         ),
                       ),
@@ -242,8 +245,9 @@ class _HomeState extends State<Home> {
                             event.location,
                             style: TextStyle(
                               fontSize: 14.0,
-                              color:
-                                  isDarkMode ? Colors.white70 : Colors.black54,
+                              color: isDarkMode
+                                  ? ChartColors.eventTextColorDark
+                                  : Colors.black54,
                             ),
                           ),
                         ),
@@ -269,8 +273,9 @@ class _HomeState extends State<Home> {
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      isDarkMode ? const Color(0xFF333333) : Colors.blue,
+                  backgroundColor: isDarkMode
+                      ? ChartColors.eventButtonColorDark
+                      : ChartColors.eventButtonColorLight,
                   shape: const StadiumBorder(),
                   foregroundColor: Colors.white,
                 ),

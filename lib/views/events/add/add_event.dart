@@ -8,6 +8,7 @@ import 'package:churchapp/views/events/events.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/notifications/notification_event.dart';
+import 'package:churchapp/theme/chart_colors.dart';
 
 class AddEventForm extends StatefulWidget {
   const AddEventForm({super.key});
@@ -93,6 +94,7 @@ class _AddEventFormState extends State<AddEventForm> {
           _imageUrl = downloadUrl;
         });
       } catch (e) {
+        if (!mounted) return;
         _showErrorDialog(context, 'Erro ao selecionar imagem',
             'Ocorreu um erro ao tentar selecionar a imagem: ${e.toString()}');
       }
@@ -190,6 +192,7 @@ class _AddEventFormState extends State<AddEventForm> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Novo Evento'),
+        backgroundColor: ChartColors.secondaryColor,
       ),
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -223,7 +226,7 @@ class _AddEventFormState extends State<AddEventForm> {
                       fit: BoxFit.cover,
                     ),
                   ),
-                const SizedBox(height: 100.0), // Espaço suficiente para o botão
+                const SizedBox(height: 100.0),
               ],
             ),
           ),
@@ -232,15 +235,16 @@ class _AddEventFormState extends State<AddEventForm> {
             right: 16.0,
             child: FloatingActionButton(
               onPressed: _pickImage,
-              backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
-              child: Icon(Icons.add_a_photo,
-                  color: isDarkMode ? Colors.black : Colors.white),
+              backgroundColor: isDarkMode
+                  ? ChartColors.eventButtonColorDark
+                  : ChartColors.eventButtonColorLight,
+              child: Icon(Icons.add_a_photo, color: ChartColors.whiteToDark),
             ),
           ),
           Positioned(
             bottom: 16.0,
             left: 16.0,
-            child: _buildSaveButton(isDarkMode: isDarkMode), // Botão fixo
+            child: _buildSaveButton(isDarkMode: isDarkMode),
           ),
         ],
       ),
@@ -254,7 +258,10 @@ class _AddEventFormState extends State<AddEventForm> {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
-        icon: Icon(icon, color: isDarkMode ? Colors.white : Colors.blue),
+        icon: Icon(icon,
+            color: isDarkMode
+                ? ChartColors.eventTextColorDark
+                : ChartColors.eventTextColorLight),
       ),
     );
   }
@@ -268,7 +275,9 @@ class _AddEventFormState extends State<AddEventForm> {
             ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
             : 'Selecionar Data',
         icon: Icon(Icons.calendar_today,
-            color: isDarkMode ? Colors.white : Colors.blue),
+            color: isDarkMode
+                ? ChartColors.eventTextColorDark
+                : ChartColors.eventTextColorLight),
       ),
     );
   }
@@ -282,7 +291,9 @@ class _AddEventFormState extends State<AddEventForm> {
             ? _selectedTime!.format(context)
             : 'Selecionar Hora',
         icon: Icon(Icons.access_time,
-            color: isDarkMode ? Colors.white : Colors.blue),
+            color: isDarkMode
+                ? ChartColors.eventTextColorDark
+                : ChartColors.eventTextColorLight),
       ),
     );
   }
@@ -298,7 +309,9 @@ class _AddEventFormState extends State<AddEventForm> {
       decoration: InputDecoration(
         labelText: 'Localização do Evento',
         icon: Icon(Icons.location_on,
-            color: isDarkMode ? Colors.white : Colors.blue),
+            color: isDarkMode
+                ? ChartColors.eventTextColorDark
+                : ChartColors.eventTextColorLight),
       ),
     );
   }
@@ -307,7 +320,9 @@ class _AddEventFormState extends State<AddEventForm> {
     return ElevatedButton(
       onPressed: () => _saveEvent(context),
       style: ElevatedButton.styleFrom(
-        backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
+        backgroundColor: isDarkMode
+            ? ChartColors.eventButtonColorDark
+            : ChartColors.eventButtonColorLight,
         minimumSize: const Size(100, 40),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
@@ -316,7 +331,7 @@ class _AddEventFormState extends State<AddEventForm> {
       child: Text(
         'Salvar',
         style: TextStyle(
-          color: isDarkMode ? Colors.black : Colors.white,
+          color: ChartColors.whiteToDark,
           fontSize: 14,
         ),
       ),

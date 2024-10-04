@@ -1,4 +1,4 @@
-import 'package:churchapp/views/courses/charts/chart_colors.dart';
+import 'package:churchapp/theme/chart_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/financial_files/currency_convert.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -51,45 +51,45 @@ class AnnualCoursesChart extends StatelessWidget {
               sections: [
                 PieChartSectionData(
                   value: safeMonthlyCasadosParaSempre,
-                  color: CoursesChartColors.casadosParaSempre,
+                  color: ChartColors.casadosParaSempre,
                   radius: 60,
                   titleStyle: TextStyle(
-                      fontSize: 14, color: CoursesChartColors.themeTextColor),
+                      fontSize: 14, color: ChartColors.themeTextColor),
                 ),
                 PieChartSectionData(
                   value: safeMonthlyCursoDiscipulado,
-                  color: CoursesChartColors.cursoDiscipulado,
+                  color: ChartColors.cursoDiscipulado,
                   radius: 60,
                   titleStyle: TextStyle(
-                      fontSize: 14, color: CoursesChartColors.themeTextColor),
+                      fontSize: 14, color: ChartColors.themeTextColor),
                 ),
                 PieChartSectionData(
                   value: safeMonthlyCursosParaNoivos,
-                  color: CoursesChartColors.cursosParaNoivos,
+                  color: ChartColors.cursosParaNoivos,
                   radius: 60,
                   titleStyle: TextStyle(
-                      fontSize: 14, color: CoursesChartColors.themeTextColor),
+                      fontSize: 14, color: ChartColors.themeTextColor),
                 ),
                 PieChartSectionData(
                   value: safeMonthlyEstudoBiblico,
-                  color: CoursesChartColors.estudoBiblico,
+                  color: ChartColors.estudoBiblico,
                   radius: 60,
                   titleStyle: TextStyle(
-                      fontSize: 14, color: CoursesChartColors.themeTextColor),
+                      fontSize: 14, color: ChartColors.themeTextColor),
                 ),
                 PieChartSectionData(
                   value: safeMonthlyHomenAoMaximo,
-                  color: CoursesChartColors.homenAoMaximo,
+                  color: ChartColors.homenAoMaximo,
                   radius: 60,
                   titleStyle: TextStyle(
-                      fontSize: 14, color: CoursesChartColors.themeTextColor),
+                      fontSize: 14, color: ChartColors.themeTextColor),
                 ),
                 PieChartSectionData(
                   value: safeMonthlyMulherUnica,
-                  color: CoursesChartColors.mulherUnica,
+                  color: ChartColors.mulherUnica,
                   radius: 60,
                   titleStyle: TextStyle(
-                      fontSize: 14, color: CoursesChartColors.themeTextColor),
+                      fontSize: 14, color: ChartColors.themeTextColor),
                 ),
               ],
               borderData: FlBorderData(show: false),
@@ -109,23 +109,23 @@ class AnnualCoursesChart extends StatelessWidget {
                 _buildLegendItem(
                     'Casados para Sempre',
                     safeMonthlyCasadosParaSempre,
-                    CoursesChartColors.casadosParaSempre,
+                    ChartColors.casadosParaSempre,
                     isDarkMode),
                 _buildLegendItem('Discipulado', safeMonthlyCursoDiscipulado,
-                    CoursesChartColors.cursoDiscipulado, isDarkMode),
+                    ChartColors.cursoDiscipulado, isDarkMode),
                 _buildLegendItem(
                     'Cursos para Noivos',
                     safeMonthlyCursosParaNoivos,
-                    CoursesChartColors.cursosParaNoivos,
+                    ChartColors.cursosParaNoivos,
                     isDarkMode),
                 _buildLegendItem('Estudo Bíblico', safeMonthlyEstudoBiblico,
-                    CoursesChartColors.estudoBiblico, isDarkMode),
+                    ChartColors.estudoBiblico, isDarkMode),
                 _buildLegendItem('Homem ao Máximo', safeMonthlyHomenAoMaximo,
-                    CoursesChartColors.homenAoMaximo, isDarkMode),
+                    ChartColors.homenAoMaximo, isDarkMode),
                 _buildLegendItem('Mulher Única', safeMonthlyMulherUnica,
-                    CoursesChartColors.mulherUnica, isDarkMode),
-                _buildLegendItem('Total', annualTotalIncome,
-                    CoursesChartColors.total, isDarkMode),
+                    ChartColors.mulherUnica, isDarkMode),
+                _buildLegendItem(
+                    'Total', annualTotalIncome, ChartColors.total, isDarkMode),
               ],
             ),
           ],
@@ -150,7 +150,7 @@ class AnnualCoursesChart extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           '$title: ${CurrencyConverter.format(value)}',
-          style: TextStyle(color: CoursesChartColors.themeTextColor),
+          style: TextStyle(color: ChartColors.themeTextColor),
         ),
       ],
     );

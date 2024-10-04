@@ -1,4 +1,4 @@
-import 'package:churchapp/views/courses/charts/chart_colors.dart';
+import 'package:churchapp/theme/chart_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +19,7 @@ class YearlyCourses extends StatelessWidget {
         barRods: [
           BarChartRodData(
             toY: entry.value,
-            color: CoursesChartColors.yearlyChart,
+            color: ChartColors.yearlyChart,
             width: 20,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
           ),
