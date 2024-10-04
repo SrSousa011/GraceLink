@@ -1,8 +1,8 @@
+import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/financial_files/expense/expenses.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
-import 'package:churchapp/views/financial_files/chart_colors.dart';
 import 'package:churchapp/views/financial_files/expense/expenses_service.dart';
 import 'package:churchapp/views/financial_files/financial_card_widgets.dart';
 import 'package:churchapp/views/financial_files/revenue_data.dart';
@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:churchapp/views/financial_files/income/incomes.dart';
 import 'package:churchapp/views/financial_files/upcomingEvents/upcoming_event.dart';
+import 'package:provider/provider.dart';
 
 class FinanceScreen extends StatefulWidget {
   const FinanceScreen({super.key});
@@ -115,8 +116,18 @@ class _FinanceScreenState extends State<FinanceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+
+    Color backgroundColor = isDarkMode ? Colors.black : Colors.white;
+    Color accentColor = isDarkMode ? Colors.grey[850]! : Colors.blue;
+    Color cardBackgroundColor = isDarkMode ? Colors.grey[800]! : Colors.white;
+    Color cardTextColor = isDarkMode ? Colors.white : Colors.black;
+    Color incomeColor = isDarkMode ? Colors.white : Colors.green;
+    Color expenseColor = isDarkMode ? Colors.white : Colors.red;
+
     return Scaffold(
-      backgroundColor: ChartColors.backgroundColor,
+      backgroundColor: backgroundColor,
       body: FutureBuilder<RevenueData>(
         future: _revenueData,
         builder: (context, revenueSnapshot) {
@@ -199,10 +210,9 @@ class _FinanceScreenState extends State<FinanceScreen> {
                           Container(
                             height: MediaQuery.of(context).size.height * 0.3,
                             decoration: BoxDecoration(
-                              color: ChartColors.accentColor,
+                              color: accentColor,
                               borderRadius: const BorderRadius.vertical(
-                                bottom: Radius.circular(60),
-                              ),
+                                  bottom: Radius.circular(60)),
                             ),
                             child: Align(
                               alignment: Alignment.topLeft,
@@ -217,7 +227,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
-                                        color: ChartColors.primaryTextColor,
+                                        color: cardTextColor,
                                       ),
                                     ),
                                     const SizedBox(height: 8),
@@ -226,7 +236,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                                       style: TextStyle(
                                         fontSize: 24,
                                         fontWeight: FontWeight.bold,
-                                        color: ChartColors.primaryTextColor,
+                                        color: cardTextColor,
                                       ),
                                     ),
                                   ],
@@ -249,39 +259,44 @@ class _FinanceScreenState extends State<FinanceScreen> {
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 16.0, horizontal: 16.0),
                                       decoration: BoxDecoration(
-                                        color: ChartColors.cardBackgroundColor,
+                                        color: cardBackgroundColor,
                                         borderRadius:
                                             const BorderRadius.vertical(
-                                          top: Radius.circular(40),
-                                          bottom: Radius.circular(40),
-                                        ),
+                                                top: Radius.circular(40),
+                                                bottom: Radius.circular(40)),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: ChartColors.cardShadowColor,
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 4),
+                                            color: isDarkMode
+                                                ? Colors.black54
+                                                : Colors.grey.withOpacity(0.5),
+                                            blurRadius: 8.0,
+                                            spreadRadius: 2.0,
+                                            offset: const Offset(0.0, 2.0),
                                           ),
                                         ],
                                       ),
                                       child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           FinancialCardWidgets
                                               .buildFinancialCard(
                                             icon: Icons.account_balance,
-                                            title: 'Saldo total',
+                                            title: 'Balanço Anual',
                                             value:
                                                 '€ ${totalBalance.toStringAsFixed(2)}',
                                             valueStyle: TextStyle(
                                               fontSize: 22,
                                               color: totalBalance >= 0
-                                                  ? ChartColors.incomeColor
-                                                  : ChartColors.expenseColor,
+                                                  ? incomeColor
+                                                  : expenseColor,
                                             ),
                                             withShadow: false,
-                                            backgroundColor: Colors.white,
+                                            backgroundColor:
+                                                cardBackgroundColor,
                                             titleStyle: TextStyle(
                                               fontSize: 22,
-                                              color: ChartColors.cardTextColor,
+                                              color: cardTextColor,
                                             ),
                                           ),
                                           const SizedBox(height: 16),
@@ -310,16 +325,14 @@ class _FinanceScreenState extends State<FinanceScreen> {
                                                         '€ ${totalIncome.toStringAsFixed(2)}',
                                                     valueStyle: TextStyle(
                                                       fontSize: 14,
-                                                      color: ChartColors
-                                                          .incomeColor,
+                                                      color: incomeColor,
                                                     ),
                                                     withShadow: false,
                                                     backgroundColor:
-                                                        Colors.white,
+                                                        cardBackgroundColor,
                                                     titleStyle: TextStyle(
                                                       fontSize: 15,
-                                                      color: ChartColors
-                                                          .cardTextColor,
+                                                      color: cardTextColor,
                                                     ),
                                                   ),
                                                 ),
@@ -344,16 +357,14 @@ class _FinanceScreenState extends State<FinanceScreen> {
                                                         '€ ${totalAnnualExpenses.toStringAsFixed(2)}',
                                                     valueStyle: TextStyle(
                                                       fontSize: 14,
-                                                      color: ChartColors
-                                                          .expenseColor,
+                                                      color: expenseColor,
                                                     ),
                                                     withShadow: false,
                                                     backgroundColor:
-                                                        Colors.white,
+                                                        cardBackgroundColor,
                                                     titleStyle: TextStyle(
                                                       fontSize: 15,
-                                                      color: ChartColors
-                                                          .cardTextColor,
+                                                      color: cardTextColor,
                                                     ),
                                                   ),
                                                 ),
@@ -382,10 +393,9 @@ class _FinanceScreenState extends State<FinanceScreen> {
                               icon: Icons.event_note,
                               title: 'Próximos Lançamentos',
                               value: '',
-                              backgroundColor:
-                                  ChartColors.cardBackOutgroundColor,
-                              titleColor: ChartColors.cardTextColor,
-                              valueColor: ChartColors.cardTextColor,
+                              backgroundColor: cardBackgroundColor,
+                              titleColor: cardTextColor,
+                              valueColor: cardTextColor,
                             ),
                           ),
                         ],
