@@ -167,14 +167,14 @@ class _BecomeMemberState extends State<BecomeMember> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text(title),
-            content: Text(message),
+            title: Text(title, style: const TextStyle(fontSize: 15)),
+            content: Text(message, style: const TextStyle(fontSize: 15)),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text('OK'),
+                child: const Text('OK', style: TextStyle(fontSize: 15)),
               ),
             ],
           );
@@ -188,11 +188,14 @@ class _BecomeMemberState extends State<BecomeMember> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Sucesso'),
-          content: const Text('Cadastro realizado com sucesso!'),
+          title: const Text('Sucesso',
+              style: TextStyle(fontSize: 17)), // Ajuste aqui
+          content: const Text('Cadastro realizado com sucesso!',
+              style: TextStyle(fontSize: 17)), // Ajuste aqui
           actions: <Widget>[
             TextButton(
-              child: const Text('OK'),
+              child: const Text('OK',
+                  style: TextStyle(fontSize: 17)), // Ajuste aqui
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pushNamedAndRemoveUntil(
@@ -209,7 +212,12 @@ class _BecomeMemberState extends State<BecomeMember> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tornar-se Membro'),
+        title: const Text(
+          'Tornar-se Membro',
+          style: TextStyle(
+            fontSize: 17,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Form(
@@ -249,8 +257,8 @@ class _BecomeMemberState extends State<BecomeMember> {
                 }),
                 const SizedBox(height: 20.0),
                 CheckboxListTile(
-                  title:
-                      const Text('Tem experiência anterior em outra igreja?'),
+                  title: const Text('Tem experiência anterior em outra igreja?',
+                      style: TextStyle(fontSize: 15)),
                   value: _hasPreviousChurchExperience,
                   onChanged: (bool? value) {
                     setState(() {
@@ -289,7 +297,7 @@ class _BecomeMemberState extends State<BecomeMember> {
                   ),
                   child: _isLoading
                       ? const CircularProgressIndicator()
-                      : const Text('Enviar'),
+                      : const Text('Enviar', style: TextStyle(fontSize: 15)),
                 ),
               ],
             ),
@@ -304,7 +312,9 @@ class _BecomeMemberState extends State<BecomeMember> {
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: const TextStyle(fontSize: 15),
       ),
+      style: const TextStyle(fontSize: 15),
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Este campo não pode estar vazio';
@@ -334,6 +344,7 @@ class _BecomeMemberState extends State<BecomeMember> {
             labelText: selectedDate != null
                 ? DateFormat('dd/MM/yyyy').format(selectedDate)
                 : label,
+            labelStyle: const TextStyle(fontSize: 15),
           ),
         ),
       ),
@@ -346,10 +357,13 @@ class _BecomeMemberState extends State<BecomeMember> {
       value: selectedValue,
       onChanged: onChanged,
       items: items
-          .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+          .map((item) => DropdownMenuItem(
+              value: item,
+              child: Text(item, style: const TextStyle(fontSize: 15))))
           .toList(),
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: const TextStyle(fontSize: 15),
       ),
     );
   }

@@ -116,7 +116,12 @@ class _HomeState extends State<Home> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            title: const Text('Home'),
+            title: const Text(
+              'Home',
+              style: TextStyle(
+                fontSize: 18,
+              ),
+            ),
             floating: true,
             pinned: false,
             snap: true,
@@ -205,7 +210,7 @@ class _HomeState extends State<Home> {
               padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
                 'Próximos Eventos:',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 10),
@@ -262,7 +267,6 @@ class _HomeState extends State<Home> {
             }),
             const SizedBox(height: 20),
             Center(
-              // Centraliza o botão
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
@@ -276,7 +280,12 @@ class _HomeState extends State<Home> {
                     MaterialPageRoute(builder: (context) => const Events()),
                   );
                 },
-                child: const Text('Todos os Eventos'),
+                child: const Text(
+                  'Todos os Eventos',
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                ),
               ),
             ),
           ],
@@ -291,14 +300,14 @@ class _HomeState extends State<Home> {
       children: [
         const Text(
           'Informações Importantes:',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 10),
         const Text(
           'Endereço:\n'
-          'RBM Rue de Rodange 67B, 6791 Aubange, Bélgica',
-          style: TextStyle(fontSize: 16),
+          'Rue de Rodange 67B, 6791 Aubange, Bélgica',
+          style: TextStyle(fontSize: 14),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 10),
@@ -306,7 +315,7 @@ class _HomeState extends State<Home> {
           'Cultos:\n'
           'Domingos 10h da manhã\n'
           'Segundas 19h30',
-          style: TextStyle(fontSize: 16),
+          style: TextStyle(fontSize: 14),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 20),

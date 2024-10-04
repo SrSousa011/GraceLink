@@ -324,7 +324,12 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
                       hintText: 'Pesquisar fotos...',
                     ),
                   )
-                : const Text('Galeria de Foto'),
+                : const Text(
+                    'Galeria de Foto',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
             floating: true,
             pinned: true,
             actions: [

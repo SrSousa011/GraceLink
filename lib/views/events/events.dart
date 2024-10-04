@@ -104,7 +104,12 @@ class _EventsState extends State<Events> {
                       hintText: 'Pesquisar eventos...',
                     ),
                   )
-                : const Text('Eventos'),
+                : const Text(
+                    'Eventos',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
             floating: true,
             pinned: false,
             snap: true,

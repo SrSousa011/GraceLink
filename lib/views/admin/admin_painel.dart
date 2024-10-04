@@ -135,7 +135,12 @@ class _AdminPanelState extends State<AdminPanel> {
                         hintText: 'Pesquisar por nomes...',
                       ),
                     )
-                  : const Text('Painel de Admins'),
+                  : const Text(
+                      'Painel de Admins',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
             ),
             IconButton(
               icon: Icon(_isSearching ? Icons.cancel : Icons.search),

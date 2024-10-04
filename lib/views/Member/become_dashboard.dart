@@ -276,33 +276,42 @@ class _MembersDashboardState extends State<MembersDashboard> {
       children: [
         Container(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _buttonColor,
-              shape: const StadiumBorder(),
-              foregroundColor: Colors.white,
+          child: Center(
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _buttonColor,
+                shape: const StadiumBorder(),
+                foregroundColor: Colors.white,
+              ),
+              icon: const Icon(Icons.person_add),
+              label: const Text(
+                'Tornar-se um Membro',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pushNamed('/become_member');
+              },
             ),
-            icon: const Icon(Icons.person_add),
-            label: const Text('Tornar-se um Membro'),
-            onPressed: () {
-              Navigator.of(context).pushNamed('/become_member');
-            },
           ),
         ),
         const SizedBox(height: 20),
         Container(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _buttonColor,
-              shape: const StadiumBorder(),
-              foregroundColor: Colors.white,
+          child: Center(
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _buttonColor,
+                shape: const StadiumBorder(),
+                foregroundColor: Colors.white,
+              ),
+              icon: const Icon(Icons.search),
+              label: const Text('Ver Lista de Membros'),
+              onPressed: () {
+                Navigator.of(context).pushNamed('/member_list');
+              },
             ),
-            icon: const Icon(Icons.search),
-            label: const Text('Ver Lista de Membros'),
-            onPressed: () {
-              Navigator.of(context).pushNamed('/member_list');
-            },
           ),
         ),
       ],
