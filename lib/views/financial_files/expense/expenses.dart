@@ -27,6 +27,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   double monthlyServices = 0.0;
   double totalMonthlyExpenses = 0.0;
 
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -36,6 +38,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   Future<void> _fetchAllExpenses() async {
     try {
       final currentDate = DateTime.now();
+
+      setState(() {
+        isLoading = true;
+      });
 
       final annualExpensesData = await _expenseService.fetchAnnualExpenses(
         DateTime(currentDate.year, 1, 1),
@@ -76,6 +82,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       if (kDebugMode) {
         print('Error fetching expenses: $e');
       }
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -93,28 +103,32 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              MonthlyExpensesChart(
-                monthlyGeneralExpenses: monthlyGeneralExpenses,
-                monthlySalaries: monthlySalaries,
-                monthlyMaintenance: monthlyMaintenance,
-                monthlyServices: monthlyServices,
-                totalMonthlyExpenses: totalMonthlyExpenses,
-                isDarkMode: isDarkMode,
-              ),
-              const SizedBox(height: 40),
-              AnnualExpenseChart(
-                annualGeneralExpenses: totalGeneralExpenses,
-                annualSalaries: totalSalaries,
-                annualMaintenance: totalMaintenance,
-                annualServices: totalServices,
-                totalAnnualExpenses: totalAnnualExpenses,
-                isDarkMode: isDarkMode,
-              ),
-            ],
-          ),
+          child: isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    MonthlyExpensesChart(
+                      monthlyGeneralExpenses: monthlyGeneralExpenses,
+                      monthlySalaries: monthlySalaries,
+                      monthlyMaintenance: monthlyMaintenance,
+                      monthlyServices: monthlyServices,
+                      totalMonthlyExpenses: totalMonthlyExpenses,
+                      isDarkMode: isDarkMode,
+                    ),
+                    const SizedBox(height: 40),
+                    AnnualExpenseChart(
+                      annualGeneralExpenses: totalGeneralExpenses,
+                      annualSalaries: totalSalaries,
+                      annualMaintenance: totalMaintenance,
+                      annualServices: totalServices,
+                      totalAnnualExpenses: totalAnnualExpenses,
+                      isDarkMode: isDarkMode,
+                    ),
+                  ],
+                ),
         ),
       ),
     );
