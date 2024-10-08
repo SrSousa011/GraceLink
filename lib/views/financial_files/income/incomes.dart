@@ -3,7 +3,6 @@ import 'package:churchapp/views/financial_files/income/anual_chart.dart';
 import 'package:churchapp/views/financial_files/income/monthly_chart.dart';
 import 'package:churchapp/views/financial_files/dashboard/revenue_data.dart';
 import 'package:churchapp/views/financial_files/dashboard/revenue_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class IncomesScreen extends StatefulWidget {
@@ -16,48 +15,21 @@ class IncomesScreen extends StatefulWidget {
 }
 
 class _IncomesScreenState extends State<IncomesScreen> {
+  RevenueData? revenueData; // Make revenueData nullable
   final RevenueService _revenueService = RevenueService();
-
-  double totalDonations = 0.0;
-  double totalCourses = 0.0;
-  double totalOthers = 0.0;
-  double totalReceita = 0.0;
-
-  double totalMonthlyReceitas = 0.0;
-  double totalMonthlyDonations = 0.0;
-  double totalMonthlyCourses = 0.0;
-  double totalMonthlyOthers = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _fetchAllRevenues();
+    _fetchRevenueData();
   }
 
-  Future<void> _fetchAllRevenues() async {
+  Future<void> _fetchRevenueData() async {
     try {
-      final revenueData = await _revenueService.fetchData();
-
-      setState(() {
-        totalDonations = revenueData.totalDonations;
-        totalCourses = revenueData.totalCourses;
-        totalOthers = revenueData.totalOthers;
-
-        totalReceita = totalDonations + totalCourses + totalOthers;
-
-        String currentMonth = RevenueData.getMonthName(DateTime.now().month);
-
-        totalMonthlyDonations =
-            revenueData.donationsPerMonth[currentMonth] ?? 0.0;
-        totalMonthlyCourses = revenueData.coursesPerMonth[currentMonth] ?? 0.0;
-        totalMonthlyOthers = revenueData.othersPerMonth[currentMonth] ?? 0.0;
-        totalMonthlyReceitas =
-            totalMonthlyDonations + totalMonthlyCourses + totalMonthlyOthers;
-      });
+      revenueData = await _revenueService.fetchAllRevenues();
+      setState(() {});
     } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching revenues: $e');
-      }
+      print('Error fetching revenue data: $e');
     }
   }
 
@@ -74,27 +46,33 @@ class _IncomesScreenState extends State<IncomesScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 400,
-                child: MonthlyIncomeChart(
-                  totalMonthlyOthers: totalMonthlyOthers,
-                  totalMonthlyCourses: totalMonthlyCourses,
-                  totalMonthlyDonations: totalMonthlyDonations,
-                  totalMonthlyReceita: totalMonthlyReceitas,
-                  isDarkMode: Theme.of(context).brightness == Brightness.dark,
-                ),
-              ),
+              revenueData != null
+                  ? SizedBox(
+                      height: 400,
+                      child: MonthlyIncomeChart(
+                        totalMonthlyOthers: revenueData!.monthlyOthers,
+                        totalMonthlyCourses: revenueData!.monthlyCourses,
+                        totalMonthlyDonations: revenueData!.monthlyDonations,
+                        totalMonthlyReceita: revenueData!.monthlyIncomes,
+                        isDarkMode:
+                            Theme.of(context).brightness == Brightness.dark,
+                      ),
+                    )
+                  : const Center(child: CircularProgressIndicator()),
               const SizedBox(height: 40),
-              SizedBox(
-                height: 410,
-                child: AnnualIncomeChart(
-                  totalReceita: totalReceita,
-                  totalDonations: totalDonations,
-                  totalCourses: totalCourses,
-                  totalOthers: totalOthers,
-                  isDarkMode: Theme.of(context).brightness == Brightness.dark,
-                ),
-              ),
+              revenueData != null
+                  ? SizedBox(
+                      height: 410,
+                      child: AnnualIncomeChart(
+                        totalReceita: revenueData!.totalIncomes,
+                        totalDonations: revenueData!.totalDonations,
+                        totalCourses: revenueData!.totalCourses,
+                        totalOthers: revenueData!.totalOthers,
+                        isDarkMode:
+                            Theme.of(context).brightness == Brightness.dark,
+                      ),
+                    )
+                  : const Center(child: CircularProgressIndicator()),
               const SizedBox(height: 16),
             ],
           ),

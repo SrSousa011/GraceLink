@@ -1,4 +1,5 @@
 import 'package:churchapp/theme/theme_provider.dart';
+import 'package:churchapp/views/financial_files/dashboard/revenue_service.dart';
 import 'package:churchapp/views/financial_files/expense/expenses.dart';
 import 'package:churchapp/views/financial_files/dashboard/monthly_chart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,7 +8,6 @@ import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/expense/expenses_service.dart';
 import 'package:churchapp/views/financial_files/dashboard/financial_card_widgets.dart';
 import 'package:churchapp/views/financial_files/dashboard/revenue_data.dart';
-import 'package:churchapp/views/financial_files/dashboard/revenue_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,7 +30,6 @@ class _FinanceScreenState extends State<FinanceScreen> {
   late Future<DonationStats> _donationStats;
   late Future<Map<String, double>> _annualExpensesData;
   late Future<UserData> _userData;
-  final RevenueService _revenueService = RevenueService();
 
   double totalAnnualExpenses = 0.0;
   final ExpensesService _expensesService = ExpensesService();
@@ -45,16 +44,10 @@ class _FinanceScreenState extends State<FinanceScreen> {
   double monthlyServices = 0.0;
   double totalMonthlyExpenses = 0.0;
 
-  double totalMonthlyReceitas = 0.0;
-  double totalMonthlyDonations = 0.0;
-  double totalMonthlyCourses = 0.0;
-  double totalMonthlyOthers = 0.0;
-
   @override
   void initState() {
     super.initState();
     _fetchAllExpenses();
-    _fetchAllRevenues();
     RevenueService revenueService = RevenueService();
 
     _revenueData = revenueService.fetchAllRevenues();
@@ -74,27 +67,6 @@ class _FinanceScreenState extends State<FinanceScreen> {
     String uid = _auth.currentUser!.uid;
     DocumentSnapshot doc = await _firestore.collection('users').doc(uid).get();
     return UserData.fromDocument(doc);
-  }
-
-  Future<void> _fetchAllRevenues() async {
-    try {
-      final revenueData = await _revenueService.fetchData();
-
-      setState(() {
-        String currentMonth = RevenueData.getMonthName(DateTime.now().month);
-
-        totalMonthlyDonations =
-            revenueData.donationsPerMonth[currentMonth] ?? 0.0;
-        totalMonthlyCourses = revenueData.coursesPerMonth[currentMonth] ?? 0.0;
-        totalMonthlyOthers = revenueData.othersPerMonth[currentMonth] ?? 0.0;
-        totalMonthlyReceitas =
-            totalMonthlyDonations + totalMonthlyCourses + totalMonthlyOthers;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching revenues: $e');
-      }
-    }
   }
 
   Future<void> _fetchAllExpenses() async {
@@ -458,7 +430,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                             const SizedBox(height: 16),
                             MonthlyFinancialChart(
                               totalMonthlyExpenses: totalMonthlyExpenses,
-                              totalMonthlyIncome: totalMonthlyReceitas,
+                              totalMonthlyIncome: revenueData.monthlyIncomes,
                               isDarkMode: isDarkMode,
                             ),
                           ],

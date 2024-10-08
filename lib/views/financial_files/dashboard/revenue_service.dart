@@ -2,7 +2,6 @@ import 'package:churchapp/views/courses/charts/course_status.dart';
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/dashboard/revenue_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 
 class RevenueService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -10,16 +9,33 @@ class RevenueService {
   Future<RevenueData> fetchAllRevenues() async {
     try {
       double totalOthers = await _getTotalOthers();
+
       double totalDonations = await _getTotalDonations();
+
       double totalCourses = await _getTotalCourses();
 
+      double monthlyOthers =
+          await _getMonthlyTotal('transactions', 'amount', 'timestamp');
+
+      double monthlyDonations =
+          await _getMonthlyTotal('donations', 'donationValue', 'timestamp');
+
+      double monthlyCourses = await _getMonthlyTotal(
+          'courseRegistration', 'price', 'registrationDate');
+
       double totalIncomes = totalOthers + totalDonations + totalCourses;
+
+      double monthlyIncomes = monthlyOthers + monthlyDonations + monthlyCourses;
 
       return RevenueData(
         totalOthers: totalOthers,
         totalDonations: totalDonations,
         totalCourses: totalCourses,
         totalIncomes: totalIncomes,
+        monthlyOthers: monthlyOthers,
+        monthlyDonations: monthlyDonations,
+        monthlyCourses: monthlyCourses,
+        monthlyIncomes: monthlyIncomes,
       );
     } catch (e) {
       throw Exception('Error fetching all revenues: $e');
@@ -54,6 +70,35 @@ class RevenueService {
       });
     } catch (e) {
       throw Exception('Error fetching total from collection $collection: $e');
+    }
+  }
+
+  Future<double> _getMonthlyTotal(
+      String collection, String field, String dateField) async {
+    try {
+      DateTime now = DateTime.now();
+      int currentMonth = now.month;
+      int currentYear = now.year;
+
+      final query = _firestore
+          .collection(collection)
+          .where(dateField,
+              isGreaterThanOrEqualTo:
+                  Timestamp.fromDate(DateTime(currentYear, currentMonth, 1)))
+          .where(dateField,
+              isLessThan: Timestamp.fromDate(
+                  DateTime(currentYear, currentMonth + 1, 1)));
+
+      final snapshot = await query.get();
+
+      return snapshot.docs.fold<double>(0.0, (total, doc) {
+        double value =
+            (doc[field] ?? 0.0) is num ? (doc[field] as num).toDouble() : 0.0;
+        return total + value;
+      });
+    } catch (e) {
+      throw Exception(
+          'Error fetching monthly total from collection $collection: $e');
     }
   }
 
@@ -94,145 +139,5 @@ class RevenueService {
 
     return CoursesStats(
         totalCourses: totalCourses, monthlyCourses: monthlyCourses);
-  }
-
-  Future<RevenueData> fetchData() async {
-    final revenueData = await fetchAllRevenues();
-
-    final donationStats = await fetchDonationStats();
-    final courseStats = await fetchCoursesStats();
-
-    final monthlyData = await fetchMonthlyRevenues();
-
-    final monthName = RevenueData.getMonthName(DateTime.now().month);
-
-    revenueData.othersPerMonth[monthName] =
-        (monthlyData['totalIncomes'] ?? 0.0);
-    revenueData.donationsPerMonth[monthName] =
-        (donationStats.monthlyDonations[DateTime.now().month - 1]);
-    revenueData.coursesPerMonth[monthName] =
-        (courseStats.monthlyCourses[DateTime.now().month - 1]);
-
-    return revenueData;
-  }
-
-  Future<Map<String, dynamic>> fetchMonthlyRevenues() async {
-    try {
-      final incomeData = await _fetchIncomeDataPerMonth();
-      final donationData =
-          await _fetchDonationDataPerMonth(await fetchDonationStats());
-      final courseRevenueData = await _fetchCourseRevenueDataPerMonth();
-
-      double totalOthers = incomeData.values.fold(
-        0.0,
-        (accumulator, item) => accumulator + item,
-      );
-
-      double totalDonations = donationData.values.fold(
-        0.0,
-        (accumulator, item) => accumulator + (item['totalDonations'] ?? 0.0),
-      );
-
-      double totalCourses = courseRevenueData.values.fold(
-        0.0,
-        (accumulator, item) => accumulator + (item['totalCourses'] ?? 0.0),
-      );
-
-      return {
-        'totalOthers': totalOthers,
-        'totalDonations': totalDonations,
-        'totalCourses': totalCourses,
-      };
-    } catch (e) {
-      throw Exception('Erro ao buscar receitas mensais: $e');
-    }
-  }
-
-  Future<Map<String, dynamic>> _fetchDonationDataPerMonth(
-      DonationStats donationStats) async {
-    Map<String, dynamic> monthlyData = {};
-
-    for (int month = 1; month <= 12; month++) {
-      monthlyData[_getMonthName(month)] = {
-        'totalDonations': donationStats.monthlyDonations[month - 1],
-        'monthlyDonations': donationStats.monthlyDonations[month - 1]
-      };
-    }
-
-    return monthlyData;
-  }
-
-  Future<Map<String, dynamic>> _fetchCourseRevenueDataPerMonth() async {
-    final snapshot = await _firestore.collection('courses').get();
-    Map<String, double> monthlyCourseRevenue = {};
-
-    for (var doc in snapshot.docs) {
-      if (doc.data().containsKey('time')) {
-        final date = (doc['time'] as Timestamp).toDate();
-        final month = date.month;
-        final coursePrice = (doc['price'] ?? 0.0) is num
-            ? (doc['price'] as num).toDouble()
-            : 0.0;
-
-        final monthName = _getMonthName(month);
-        monthlyCourseRevenue[monthName] =
-            (monthlyCourseRevenue[monthName] ?? 0.0) + coursePrice;
-      } else {
-        if (kDebugMode) {
-          print(
-              'Documento ignorado, campo "courseDate" não encontrado: ${doc.id}');
-        }
-      }
-    }
-
-    return {
-      for (int month = 1; month <= 12; month++)
-        _getMonthName(month): {
-          'totalCourses': monthlyCourseRevenue[_getMonthName(month)] ?? 0.0
-        }
-    };
-  }
-
-  Future<Map<String, double>> _fetchIncomeDataPerMonth() async {
-    final snapshot = await _firestore.collection('transactions').get();
-    Map<String, double> monthlyIncomeData = {};
-
-    for (var doc in snapshot.docs) {
-      if (doc.data().containsKey('transactionDate')) {
-        final date = (doc['transactionDate'] as Timestamp).toDate();
-        final month = date.month;
-        final incomeAmount = (doc['amount'] ?? 0.0) is num
-            ? (doc['amount'] as num).toDouble()
-            : 0.0;
-
-        monthlyIncomeData[_getMonthName(month)] =
-            (monthlyIncomeData[_getMonthName(month)] ?? 0.0) + incomeAmount;
-      } else {
-        if (kDebugMode) {
-          print(
-              'Documento ignorado, campo "transactionDate" não encontrado: ${doc.id}');
-        }
-      }
-    }
-
-    return monthlyIncomeData;
-  }
-
-  String _getMonthName(int month) {
-    const monthNames = [
-      'Janeiro',
-      'Fevereiro',
-      'Março',
-      'Abril',
-      'Maio',
-      'Junho',
-      'Julho',
-      'Agosto',
-      'Setembro',
-      'Outubro',
-      'Novembro',
-      'Dezembro'
-    ];
-    return monthNames[month - 1];
   }
 }
