@@ -58,7 +58,7 @@ class TransactionDetailsScreen extends StatelessWidget {
               containerShadowColor,
             ),
             _buildInfoContainer(
-              'Fonte:',
+              'Título:',
               transaction['source'] ?? 'N/A',
               infoValueColor,
               containerColor,
