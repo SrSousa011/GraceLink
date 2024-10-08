@@ -11,5 +11,5 @@ class DonationChartColors {
 
   static bool isDarkMode = false;
 
-  static Color get themeTextColor => isDarkMode ? Colors.white : Colors.black;
+  static Color get themeTextColor => isDarkMode ? Colors.black : Colors.white;
 }

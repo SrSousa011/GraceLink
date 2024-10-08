@@ -132,7 +132,7 @@ class MonthlyExpensesChart extends StatelessWidget {
         Text(
           '$title: ${CurrencyConverter.format(value)}',
           style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: ExpenseChartColors.themeTextColor,
           ),
         ),
       ],

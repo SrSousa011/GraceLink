@@ -222,7 +222,8 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => DonationsList()),
+                                      builder: (context) =>
+                                          const DonationsList()),
                                 );
                               },
                               child: Text('Ver Todos',

@@ -1,4 +1,5 @@
 import 'package:churchapp/views/donations/charts/annual_chart.dart';
+import 'package:churchapp/views/donations/charts/chart_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -181,7 +182,7 @@ class _DonationIncomesState extends State<DonationIncomes> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: DonationChartColors.themeTextColor,
                 ),
               ),
               const SizedBox(height: 16),
@@ -199,7 +200,7 @@ class _DonationIncomesState extends State<DonationIncomes> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: DonationChartColors.themeTextColor,
                 ),
               ),
               const SizedBox(height: 16),
@@ -217,7 +218,7 @@ class _DonationIncomesState extends State<DonationIncomes> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: DonationChartColors.themeTextColor,
                 ),
               ),
               const SizedBox(height: 20),
