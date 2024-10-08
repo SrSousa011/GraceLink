@@ -1,5 +1,6 @@
 import 'package:churchapp/views/financial_files/currency_convert.dart';
 import 'package:churchapp/views/financial_files/expense/anual_chart.dart';
+import 'package:churchapp/views/financial_files/expense/chart_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -51,7 +52,7 @@ class MonthlyExpensesChart extends StatelessWidget {
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: ExpenseChartColors.themeTextColor,
                   ),
                 ),
                 PieChartSectionData(
@@ -60,7 +61,7 @@ class MonthlyExpensesChart extends StatelessWidget {
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: ExpenseChartColors.themeTextColor,
                   ),
                 ),
                 PieChartSectionData(
@@ -69,7 +70,7 @@ class MonthlyExpensesChart extends StatelessWidget {
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: ExpenseChartColors.themeTextColor,
                   ),
                 ),
                 PieChartSectionData(
@@ -78,7 +79,7 @@ class MonthlyExpensesChart extends StatelessWidget {
                   radius: 60,
                   titleStyle: TextStyle(
                     fontSize: 14,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: ExpenseChartColors.themeTextColor,
                   ),
                 ),
               ],
