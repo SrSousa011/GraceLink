@@ -1,13 +1,13 @@
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/financial_files/expense/expenses.dart';
-import 'package:churchapp/views/financial_files/monthly_chart.dart';
+import 'package:churchapp/views/financial_files/dashboard/monthly_chart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/expense/expenses_service.dart';
-import 'package:churchapp/views/financial_files/financial_card_widgets.dart';
-import 'package:churchapp/views/financial_files/revenue_data.dart';
-import 'package:churchapp/views/financial_files/revenue_service.dart';
+import 'package:churchapp/views/financial_files/dashboard/financial_card_widgets.dart';
+import 'package:churchapp/views/financial_files/dashboard/revenue_data.dart';
+import 'package:churchapp/views/financial_files/dashboard/revenue_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';

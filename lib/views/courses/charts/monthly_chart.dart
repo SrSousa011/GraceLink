@@ -1,6 +1,6 @@
 import 'package:churchapp/theme/chart_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:churchapp/views/financial_files/currency_convert.dart';
+import 'package:churchapp/views/financial_files/dashboard/currency_convert.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class MonthlyCoursesChart extends StatelessWidget {

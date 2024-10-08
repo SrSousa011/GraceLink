@@ -1,8 +1,8 @@
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
 import 'package:churchapp/views/financial_files/income/anual_chart.dart';
 import 'package:churchapp/views/financial_files/income/monthly_chart.dart';
-import 'package:churchapp/views/financial_files/revenue_data.dart';
-import 'package:churchapp/views/financial_files/revenue_service.dart';
+import 'package:churchapp/views/financial_files/dashboard/revenue_data.dart';
+import 'package:churchapp/views/financial_files/dashboard/revenue_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 

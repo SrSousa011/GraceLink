@@ -1,6 +1,6 @@
 import 'package:churchapp/views/courses/charts/course_status.dart';
 import 'package:churchapp/views/donations/financial/donnation_status.dart';
-import 'package:churchapp/views/financial_files/revenue_data.dart';
+import 'package:churchapp/views/financial_files/dashboard/revenue_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 

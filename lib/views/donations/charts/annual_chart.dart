@@ -1,5 +1,5 @@
 import 'package:churchapp/views/donations/charts/chart_colors.dart';
-import 'package:churchapp/views/financial_files/currency_convert.dart';
+import 'package:churchapp/views/financial_files/dashboard/currency_convert.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
