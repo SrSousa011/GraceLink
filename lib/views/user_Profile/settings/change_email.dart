@@ -61,7 +61,12 @@ class ChangeEmailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Alterar Email'),
+        title: const Text(
+          'Alterar Email',
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
         leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(LineAwesomeIcons.angle_left_solid),

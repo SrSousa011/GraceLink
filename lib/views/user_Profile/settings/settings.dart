@@ -19,7 +19,12 @@ class SettingsScreen extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(LineAwesomeIcons.angle_left_solid),
         ),
-        title: const Text('Configurações'),
+        title: const Text(
+          'Configurações',
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -28,7 +33,12 @@ class SettingsScreen extends StatelessWidget {
           children: [
             ListTile(
               leading: const Icon(LineAwesomeIcons.envelope),
-              title: const Text('Alterar E-mail'),
+              title: const Text(
+                'Alterar E-mail',
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
               onTap: () {
                 Navigator.push(
                   context,
@@ -40,7 +50,12 @@ class SettingsScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(LineAwesomeIcons.lock_solid),
-              title: const Text('Alterar Senha'),
+              title: const Text(
+                'Alterar Senha',
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
               onTap: () {
                 Navigator.push(
                   context,
@@ -52,7 +67,12 @@ class SettingsScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(LineAwesomeIcons.phone_alt_solid),
-              title: const Text('Alterar Telefone'),
+              title: const Text(
+                'Alterar Telefone',
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
               onTap: () {
                 Navigator.push(
                   context,
@@ -64,7 +84,12 @@ class SettingsScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(LineAwesomeIcons.envelope),
-              title: const Text('Enviar E-mail de Redefinição de Senha'),
+              title: const Text(
+                'Enviar E-mail de Redefinição de Senha',
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
               onTap: () async {
                 final authService = AuthenticationService();
                 String? email = await authService.getCurrentUserEmail();

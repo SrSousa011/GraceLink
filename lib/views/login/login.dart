@@ -95,7 +95,12 @@ class _LoginState extends State<Login> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text(
+          'Login',
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
       ),
       backgroundColor: backgroundColor,
       resizeToAvoidBottomInset: false,
