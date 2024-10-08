@@ -28,8 +28,12 @@ class DonationReceipt extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -56,7 +60,7 @@ class DonationReceipt extends StatelessWidget {
               Text(
                 'De: $from',
                 style: const TextStyle(
-                  fontSize: 22.0,
+                  fontSize: 16.0,
                   fontWeight: FontWeight.bold,
                   color: Colors.blueAccent,
                 ),
@@ -65,7 +69,7 @@ class DonationReceipt extends StatelessWidget {
               Text(
                 'Data: $date',
                 style: TextStyle(
-                  fontSize: 18.0,
+                  fontSize: 16.0,
                   color: Colors.grey[700],
                 ),
               ),
@@ -73,7 +77,7 @@ class DonationReceipt extends StatelessWidget {
               Text(
                 'Total: ${_formatTotal(total)}',
                 style: TextStyle(
-                  fontSize: 20.0,
+                  fontSize: 16.0,
                   fontWeight: FontWeight.bold,
                   color: Colors.green[700],
                 ),

@@ -107,7 +107,12 @@ class _DonationDetailsState extends State<DonationDetails> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detalhes da doação'),
+        title: const Text(
+          'Detalhes da doação',
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -118,17 +123,17 @@ class _DonationDetailsState extends State<DonationDetails> {
             children: <Widget>[
               Text(
                 'Nome: ${widget.fullName}',
-                style: const TextStyle(fontSize: 18.0),
+                style: const TextStyle(fontSize: 16.0),
               ),
               const SizedBox(height: 10.0),
               Text(
                 'Doação para: ${widget.donationType}',
-                style: const TextStyle(fontSize: 18.0),
+                style: const TextStyle(fontSize: 16.0),
               ),
               const SizedBox(height: 10.0),
               Text(
                 'Valor: ${widget.donationValue.toStringAsFixed(2)}',
-                style: const TextStyle(fontSize: 18.0),
+                style: const TextStyle(fontSize: 16.0),
               ),
               const SizedBox(height: 10.0),
               GestureDetector(
@@ -138,7 +143,7 @@ class _DonationDetailsState extends State<DonationDetails> {
                     const Text(
                       'Pagar',
                       style: TextStyle(
-                        fontSize: 18.0,
+                        fontSize: 16.0,
                       ),
                     ),
                     const SizedBox(width: 10.0),

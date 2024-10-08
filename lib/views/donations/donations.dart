@@ -115,7 +115,12 @@ class _DonationsState extends State<Donations> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Doações'),
+        title: const Text(
+          'Doações',
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
       ),
       drawer: const NavBar(),
       body: SingleChildScrollView(

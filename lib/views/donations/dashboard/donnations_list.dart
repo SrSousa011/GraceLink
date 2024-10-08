@@ -102,7 +102,7 @@ class _DonationsListState extends State<DonationsList> {
         title: const Text(
           'Lista de Doações',
           style: TextStyle(
-            fontSize: 17,
+            fontSize: 18,
           ),
         ),
         actions: [
