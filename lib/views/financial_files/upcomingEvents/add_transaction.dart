@@ -275,7 +275,7 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
             foregroundColor: Colors.white,
             backgroundColor: isDarkMode ? Colors.blueGrey[700]! : Colors.blue,
           ),
-          child: const Text('Selecionar Arquivo'),
+          child: const Text('Arquivo'),
         ),
       ],
     );
@@ -302,7 +302,7 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
         child: ListView(
           children: [
             _buildTextField(
-                'Fonte', _sourceController, Icons.account_balance_wallet,
+                'Título', _sourceController, Icons.account_balance_wallet,
                 isDarkMode: isDarkMode),
             const SizedBox(height: 16.0),
             _buildDropdownField(
