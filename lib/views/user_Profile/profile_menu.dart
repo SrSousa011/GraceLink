@@ -13,6 +13,7 @@ class ProfileMenuWidget extends StatelessWidget {
     this.endIcon = true,
     this.textColor,
     required this.iconColor,
+    required TextStyle titleStyle,
   });
 
   final String title;

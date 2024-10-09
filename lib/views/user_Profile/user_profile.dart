@@ -195,6 +195,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       title: 'Configurações',
                       icon: LineAwesomeIcons.cog_solid,
                       iconColor: iconColor,
+                      titleStyle: const TextStyle(
+                        fontSize: 18,
+                      ),
                       onPress: () {
                         Navigator.push(
                           context,
@@ -208,6 +211,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       title: 'Gerenciamento de usuários',
                       icon: LineAwesomeIcons.user_check_solid,
                       iconColor: iconColor,
+                      titleStyle: const TextStyle(
+                        fontSize: 18,
+                      ),
                       onPress: () {
                         Navigator.push(
                           context,
@@ -221,6 +227,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       title: 'Info',
                       icon: LineAwesomeIcons.info_solid,
                       iconColor: iconColor,
+                      titleStyle: const TextStyle(
+                        fontSize: 18,
+                      ),
                       onPress: () {
                         Navigator.push(
                           context,
