@@ -72,29 +72,36 @@ class _InfoScreenState extends State<InfoScreen> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
+    final Color titleColor = isDarkMode ? Colors.white : Colors.black;
+    final Color appBarColor = isDarkMode ? Colors.grey[900]! : Colors.white;
+    final Color bodyTextColor = isDarkMode ? Colors.grey : Colors.grey[800]!;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'Informações',
           style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: titleColor,
+            fontSize: 18,
           ),
         ),
-        backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
+        backgroundColor: appBarColor,
         iconTheme: IconThemeData(
-          color: isDarkMode ? Colors.white : Colors.black,
+          color: titleColor,
         ),
       ),
       body: Container(
-        color: isDarkMode ? Colors.grey[900] : Colors.white,
+        color: appBarColor,
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
             ListTile(
               title: Text(
                 'Política de Privacidade',
-                style:
-                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                style: TextStyle(
+                  color: titleColor,
+                  fontSize: 18,
+                ),
               ),
               onTap: () {
                 Navigator.push(
@@ -108,8 +115,10 @@ class _InfoScreenState extends State<InfoScreen> {
             ListTile(
               title: Text(
                 'Termos de Serviço',
-                style:
-                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                style: TextStyle(
+                  color: titleColor,
+                  fontSize: 18,
+                ),
               ),
               onTap: () {
                 Navigator.push(
@@ -123,8 +132,10 @@ class _InfoScreenState extends State<InfoScreen> {
             ListTile(
               title: Text(
                 'Contatar Suporte',
-                style:
-                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                style: TextStyle(
+                  color: titleColor,
+                  fontSize: 18,
+                ),
               ),
               onTap: () {
                 Navigator.push(
@@ -138,8 +149,10 @@ class _InfoScreenState extends State<InfoScreen> {
             ListTile(
               title: Text(
                 'Perguntas Frequentes',
-                style:
-                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                style: TextStyle(
+                  color: titleColor,
+                  fontSize: 18,
+                ),
               ),
               onTap: () {
                 Navigator.push(
@@ -153,8 +166,10 @@ class _InfoScreenState extends State<InfoScreen> {
             ListTile(
               title: Text(
                 'Sobre Nós',
-                style:
-                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                style: TextStyle(
+                  color: titleColor,
+                  fontSize: 18,
+                ),
               ),
               onTap: () {
                 Navigator.push(
@@ -171,7 +186,7 @@ class _InfoScreenState extends State<InfoScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black,
+                color: titleColor,
               ),
               textAlign: TextAlign.center,
             ),
@@ -179,30 +194,33 @@ class _InfoScreenState extends State<InfoScreen> {
             ListTile(
               title: Text(
                 'Endereço:\nRBM Rue de Rodange 67B, 6791 Aubange, Bélgica',
-                style:
-                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                style: TextStyle(
+                  color: titleColor,
+                  fontSize: 16,
+                ),
               ),
-              leading: Icon(Icons.location_on,
-                  color: isDarkMode ? Colors.white : Colors.black),
+              leading: Icon(Icons.location_on, color: titleColor),
             ),
             ListTile(
               title: Text(
                 'info@resplandecendonacoes.org',
-                style:
-                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                style: TextStyle(
+                  color: titleColor,
+                  fontSize: 16,
+                ),
               ),
-              leading: Icon(Icons.email,
-                  color: isDarkMode ? Colors.white : Colors.black),
+              leading: Icon(Icons.email, color: titleColor),
               onTap: _launchEmail,
             ),
             ListTile(
               title: Text(
                 '+352 691 240 908',
-                style:
-                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                style: TextStyle(
+                  color: titleColor,
+                  fontSize: 16,
+                ),
               ),
-              leading: Icon(Icons.phone,
-                  color: isDarkMode ? Colors.white : Colors.black),
+              leading: Icon(Icons.phone, color: titleColor),
               onTap: () {
                 _openWhatsApp('+352691240908');
               },
@@ -211,15 +229,13 @@ class _InfoScreenState extends State<InfoScreen> {
             Text(
               'Última atualização: Julho de 2024',
               textAlign: TextAlign.center,
-              style:
-                  TextStyle(color: isDarkMode ? Colors.grey : Colors.grey[800]),
+              style: TextStyle(color: bodyTextColor),
             ),
             const SizedBox(height: 10),
             Text(
               'Copyright © 2024 Resplandecendo Nações. Todos os direitos reservados.',
               textAlign: TextAlign.center,
-              style:
-                  TextStyle(color: isDarkMode ? Colors.grey : Colors.grey[800]),
+              style: TextStyle(color: bodyTextColor),
             ),
           ],
         ),
