@@ -79,43 +79,90 @@ class _BecomeMemberState extends State<BecomeMember> {
             .get();
         UserData userData = UserData.fromDocument(userDoc);
 
-        final memberData = {
-          'fullName': _fullNameController.text,
-          'address': userData.address,
-          'phoneNumber': userData.phoneNumber,
-          'dateOfBirth': userData.dateOfBirth != null
-              ? Timestamp.fromDate(userData.dateOfBirth!)
-              : null,
-          'lastVisitedChurch': _lastVisitedChurchController.text,
-          'reasonForMembership': _reasonForMembershipController.text,
-          'reference': _referenceController.text,
-          'civilStatus': selectedCivilStatus,
-          'gender': selectedGender,
-          'membershipDate': Timestamp.now(),
-          'createdById': userId,
-          'hasPreviousChurchExperience': _hasPreviousChurchExperience,
-          'previousChurch': _previousChurchController.text.isNotEmpty
-              ? _previousChurchController.text
-              : null,
-          'baptismDate':
-              _baptismDate != null ? Timestamp.fromDate(_baptismDate!) : null,
-          'conversionDate': _conversionDate != null
-              ? Timestamp.fromDate(_conversionDate!)
-              : null,
-        };
+        if (userData.role == 'admin') {
+          final memberData = {
+            'fullName': _fullNameController.text,
+            'address': userData.address,
+            'phoneNumber': userData.phoneNumber,
+            'dateOfBirth': userData.dateOfBirth != null
+                ? Timestamp.fromDate(userData.dateOfBirth!)
+                : null,
+            'lastVisitedChurch': _lastVisitedChurchController.text,
+            'reasonForMembership': _reasonForMembershipController.text,
+            'reference': _referenceController.text,
+            'civilStatus': selectedCivilStatus,
+            'gender': selectedGender,
+            'membershipDate': Timestamp.now(),
+            'createdById': userId,
+            'hasPreviousChurchExperience': _hasPreviousChurchExperience,
+            'previousChurch': _previousChurchController.text.isNotEmpty
+                ? _previousChurchController.text
+                : null,
+            'baptismDate':
+                _baptismDate != null ? Timestamp.fromDate(_baptismDate!) : null,
+            'conversionDate': _conversionDate != null
+                ? Timestamp.fromDate(_conversionDate!)
+                : null,
+          };
 
-        await FirebaseFirestore.instance.collection('members').add(memberData);
+          await FirebaseFirestore.instance
+              .collection('members')
+              .add(memberData);
 
-        // Notificar todos os administradores
-        await _notifyAdmins(_fullNameController.text);
+          String memberName = _fullNameController.text;
 
-        _clearFields();
+          await NotificationBecomeMember().showNotification(
+            "Novo Membro",
+            "$memberName se tornou um novo membro da comunidade.",
+            "Detalhes do membro",
+          );
 
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-          _showSuccessDialog();
+          _clearFields();
+
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+            });
+            _showSuccessDialog();
+          }
+        } else {
+          final memberData = {
+            'fullName': _fullNameController.text,
+            'address': userData.address,
+            'phoneNumber': userData.phoneNumber,
+            'dateOfBirth': userData.dateOfBirth != null
+                ? Timestamp.fromDate(userData.dateOfBirth!)
+                : null,
+            'lastVisitedChurch': _lastVisitedChurchController.text,
+            'reasonForMembership': _reasonForMembershipController.text,
+            'reference': _referenceController.text,
+            'civilStatus': selectedCivilStatus,
+            'gender': selectedGender,
+            'membershipDate': Timestamp.now(),
+            'createdById': userId,
+            'hasPreviousChurchExperience': _hasPreviousChurchExperience,
+            'previousChurch': _previousChurchController.text.isNotEmpty
+                ? _previousChurchController.text
+                : null,
+            'baptismDate':
+                _baptismDate != null ? Timestamp.fromDate(_baptismDate!) : null,
+            'conversionDate': _conversionDate != null
+                ? Timestamp.fromDate(_conversionDate!)
+                : null,
+          };
+
+          await FirebaseFirestore.instance
+              .collection('members')
+              .add(memberData);
+
+          _clearFields();
+
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+            });
+            _showSuccessDialog();
+          }
         }
       } catch (e) {
         if (mounted) {
@@ -124,29 +171,6 @@ class _BecomeMemberState extends State<BecomeMember> {
           });
           _showErrorDialog('Erro', 'Falha ao cadastrar membro: $e');
         }
-      }
-    }
-  }
-
-  Future<void> _notifyAdmins(String memberName) async {
-    try {
-      QuerySnapshot adminDocs = await FirebaseFirestore.instance
-          .collection('users')
-          .where('role', isEqualTo: 'admin')
-          .get();
-
-      for (var doc in adminDocs.docs) {
-        String adminId = doc.id;
-        await NotificationBecomeMember().showNotification(
-          "Novo Membro",
-          "$memberName se tornou um novo membro da comunidade.",
-          "Detalhes do membro",
-          memberId: adminId,
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        _showErrorDialog('Erro', 'Falha ao notificar administradores: $e');
       }
     }
   }
@@ -209,14 +233,12 @@ class _BecomeMemberState extends State<BecomeMember> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Sucesso',
-              style: TextStyle(fontSize: 17)), // Ajuste aqui
+          title: const Text('Sucesso', style: TextStyle(fontSize: 17)),
           content: const Text('Cadastro realizado com sucesso!',
-              style: TextStyle(fontSize: 17)), // Ajuste aqui
+              style: TextStyle(fontSize: 17)),
           actions: <Widget>[
             TextButton(
-              child: const Text('OK',
-                  style: TextStyle(fontSize: 17)), // Ajuste aqui
+              child: const Text('OK', style: TextStyle(fontSize: 17)),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pushNamedAndRemoveUntil(

@@ -1,4 +1,5 @@
 import 'package:churchapp/route/root.dart';
+import 'package:churchapp/views/notifications/notification_become_member.dart';
 import 'package:churchapp/views/notifications/notification_event.dart';
 import 'package:churchapp/views/notifications/notification_photo.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
 
     NotificationPhotos().init(navigatorKey);
     NotificationEvents().init(navigatorKey);
+    NotificationBecomeMember().init(navigatorKey);
 
     return MaterialApp(
       title: 'Grace Link',

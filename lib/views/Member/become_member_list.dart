@@ -17,7 +17,10 @@ class BecomeMemberList extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de Membros'),
+        title: const Text(
+          'Lista de Membros',
+          style: TextStyle(fontSize: 18),
+        ),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _getFilteredMembers(),
@@ -35,7 +38,7 @@ class BecomeMemberList extends StatelessWidget {
             return Center(
               child: Text(
                 'Nenhum membro encontrado',
-                style: TextStyle(color: primaryTextColor),
+                style: TextStyle(color: primaryTextColor, fontSize: 18),
               ),
             );
           }
@@ -56,7 +59,7 @@ class BecomeMemberList extends StatelessWidget {
                   ),
                   title: Text(
                     'Usuário não encontrado',
-                    style: TextStyle(color: primaryTextColor),
+                    style: TextStyle(color: primaryTextColor, fontSize: 16),
                   ),
                 );
               }
@@ -72,10 +75,9 @@ class BecomeMemberList extends StatelessWidget {
                               isDarkMode ? Colors.white : Colors.black),
                         ),
                       ),
-                      title: Text(
-                        'Carregando...',
-                        style: TextStyle(color: primaryTextColor),
-                      ),
+                      title: Text('Carregando...',
+                          style:
+                              TextStyle(color: primaryTextColor, fontSize: 16)),
                     );
                   }
 
@@ -86,7 +88,7 @@ class BecomeMemberList extends StatelessWidget {
                       ),
                       title: Text(
                         'Usuário não encontrado',
-                        style: TextStyle(color: primaryTextColor),
+                        style: TextStyle(color: primaryTextColor, fontSize: 16),
                       ),
                     );
                   }
@@ -111,7 +113,7 @@ class BecomeMemberList extends StatelessWidget {
                     title: Text(
                       creatorName,
                       style: TextStyle(
-                        fontSize: 16.0,
+                        fontSize: 18.0,
                         fontWeight: FontWeight.bold,
                         color: primaryTextColor,
                       ),

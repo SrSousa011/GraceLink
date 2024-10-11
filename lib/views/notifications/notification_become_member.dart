@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,6 @@ class NotificationBecomeMember {
 
   Future<void> init(GlobalKey<NavigatorState> navigatorKey) async {
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@drawable/app_icon');
 
@@ -28,28 +28,41 @@ class NotificationBecomeMember {
 
     const InitializationSettings initializationSettings =
         InitializationSettings(
-            android: initializationSettingsAndroid,
-            iOS: initializationSettingsIOS);
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
+    );
 
     await _flutterLocalNotificationsPlugin?.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) async {
         if (response.payload != null && navigatorKey.currentState != null) {
-          navigatorKey.currentState!
-              .pushNamed('/member_list', arguments: response.payload);
+          try {
+            final Map<String, dynamic> payloadData =
+                json.decode(response.payload!) as Map<String, dynamic>;
+            String filter = payloadData['filter'] ?? 'all';
+            navigatorKey.currentState!.pushNamed(
+              '/member_list',
+              arguments: filter,
+            );
+          } catch (e) {
+            if (kDebugMode) {
+              print('Error decoding payload: $e');
+            }
+            navigatorKey.currentState!.pushNamed('/member_list',
+                arguments: {'payload': response.payload});
+          }
         }
       },
     );
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (message.notification != null) {
-        String memberId = message.data['memberId'] ?? '';
-        String memberName = message.data['memberName'] ?? 'um novo membro';
+        String memberName = message.data['fullName'] ?? 'um novo membro';
+
         showNotification(
           message.notification!.title ?? "Novo Membro",
           "$memberName se tornou um novo membro.",
           message.data['url'] ?? '',
-          memberId: memberId,
         );
       }
     });
@@ -59,11 +72,13 @@ class NotificationBecomeMember {
 
   static Future<void> _firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
-    print("Handling a background message: ${message.messageId}");
+    if (kDebugMode) {
+      print("Handling a background message: ${message.messageId}");
+    }
   }
 
   Future<void> requestNotificationPermission() async {
-    if (Theme.of(navigatorKey.currentContext!).platform == TargetPlatform.iOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       NotificationSettings settings =
           await FirebaseMessaging.instance.requestPermission(
         alert: true,
@@ -88,8 +103,11 @@ class NotificationBecomeMember {
     }
   }
 
-  Future<void> showNotification(String title, String body, String payload,
-      {required String memberId}) async {
+  Future<void> showNotification(
+    String title,
+    String body,
+    String payload,
+  ) async {
     if (_flutterLocalNotificationsPlugin == null) {
       throw Exception("Notification plugin not initialized");
     }
@@ -118,13 +136,13 @@ class NotificationBecomeMember {
 
     int notificationId =
         DateTime.now().millisecondsSinceEpoch.remainder(100000);
-    String payloadWithId = '$payload|$memberId';
+
     await _flutterLocalNotificationsPlugin?.show(
       notificationId,
       title,
       body,
       platformChannelSpecifics,
-      payload: payloadWithId,
+      payload: payload,
     );
   }
 }
