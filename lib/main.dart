@@ -39,6 +39,8 @@ class MyApp extends StatelessWidget {
       title: 'Grace Link',
       navigatorKey: navigatorKey,
       themeMode: themeProvider.themeMode,
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
       home: SplashScreen(
         root: Root(auth: AuthenticationService()),
         drawer: const NavBar(),
