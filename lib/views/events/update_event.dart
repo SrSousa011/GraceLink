@@ -1,4 +1,3 @@
-import 'package:churchapp/views/notifications/notification_event.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +19,6 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
   late TextEditingController _locationController;
   late DateTime _selectedDate;
   late TimeOfDay _selectedTime;
-  final NotificationService _notificationService = NotificationService();
 
   @override
   void initState() {
@@ -31,8 +29,6 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
     _locationController = TextEditingController(text: widget.event.location);
     _selectedDate = widget.event.date;
     _selectedTime = widget.event.time;
-    _notificationService.initialize();
-    _notificationService.requestNotificationPermission();
   }
 
   @override
