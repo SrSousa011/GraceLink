@@ -1,124 +1,127 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class NotificationService {
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+class NotificationEvents {
+  static final NotificationEvents _instance = NotificationEvents._internal();
+  factory NotificationEvents() => _instance;
 
-  bool notificationsEnabled = true;
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  FlutterLocalNotificationsPlugin? _flutterLocalNotificationsPlugin;
 
-  Future<void> initialize() async {
-    await _initializeLocalNotifications();
-    await requestNotificationPermission();
-    await loadNotificationSettings();
-    FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+  NotificationEvents._internal();
+
+  Future<void> init(GlobalKey<NavigatorState> navigatorKey) async {
+    _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@drawable/app_icon');
+
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+            android: initializationSettingsAndroid,
+            iOS: initializationSettingsIOS);
+
+    await _flutterLocalNotificationsPlugin?.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {
+        if (response.payload != null && navigatorKey.currentState != null) {
+          navigatorKey.currentState!
+              .pushNamed('/events_page', arguments: response.payload);
+        }
+      },
+    );
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (message.notification != null) {
+        String eventId = message.data['eventId'] ?? '';
+        showNotification(
+          message.notification!.title ?? "Novo Evento",
+          message.notification!.body ?? "Você tem um novo evento.",
+          message.data['url'] ?? '',
+          eventId: eventId, // Adicionando eventId
+        );
+      }
+    });
+
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 
-  Future<void> loadNotificationSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    notificationsEnabled = prefs.getBool('notificationsEnabled') ?? true;
-  }
-
-  Future<void> _saveNotificationSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('notificationsEnabled', notificationsEnabled);
+  static Future<void> _firebaseMessagingBackgroundHandler(
+      RemoteMessage message) async {
+    print("Handling a background message: ${message.messageId}");
   }
 
   Future<void> requestNotificationPermission() async {
-    NotificationSettings settings =
-        await FirebaseMessaging.instance.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    if (Theme.of(navigatorKey.currentContext!).platform == TargetPlatform.iOS) {
+      NotificationSettings settings =
+          await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
 
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      if (kDebugMode) {
-        print('User granted permission');
-      }
-    } else if (settings.authorizationStatus ==
-        AuthorizationStatus.provisional) {
-      if (kDebugMode) {
-        print('User granted provisional permission');
-      }
-    } else {
-      if (kDebugMode) {
-        print('User denied permission');
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        if (kDebugMode) {
+          print('User granted permission');
+        }
+      } else if (settings.authorizationStatus ==
+          AuthorizationStatus.provisional) {
+        if (kDebugMode) {
+          print('User granted provisional permission');
+        }
+      } else {
+        if (kDebugMode) {
+          print('User denied permission');
+        }
       }
     }
   }
 
-  Future<void> _initializeLocalNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@drawable/app_icon');
-
-    const InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
-
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  }
-
-  Future<void> _handleForegroundMessage(RemoteMessage message) async {
-    if (!notificationsEnabled) return;
+  Future<void> showNotification(String title, String body, String payload,
+      {required String eventId}) async {
+    if (_flutterLocalNotificationsPlugin == null) {
+      throw Exception("Notification plugin not initialized");
+    }
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'update_channel_id',
-      'Update Notifications',
+      'event_channel_id',
+      'Event Notifications',
       channelDescription: 'Notifications for event updates',
       importance: Importance.max,
       priority: Priority.high,
       showWhen: false,
-    );
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await _flutterLocalNotificationsPlugin.show(
-      0,
-      message.notification?.title,
-      message.notification?.body,
-      platformChannelSpecifics,
-      payload: message.data['url'],
-    );
-  }
-
-  Future<void> sendNotification({
-    required String title,
-    required String location,
-    required String formattedTime,
-    required String addedTime,
-  }) async {
-    if (!notificationsEnabled) return;
-
-    final String body = '$location\n $formattedTime\n';
-
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'update_channel_id',
-      'Update Notifications',
-      channelDescription: 'Notifications for event updates',
-      importance: Importance.max,
-      priority: Priority.high,
-      showWhen: true,
+      icon: '@drawable/app_icon',
     );
 
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
+    const DarwinNotificationDetails iosPlatformChannelSpecifics =
+        DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
 
-    await _flutterLocalNotificationsPlugin.show(
-      0,
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iosPlatformChannelSpecifics);
+
+    int notificationId =
+        DateTime.now().millisecondsSinceEpoch.remainder(100000);
+    await _flutterLocalNotificationsPlugin?.show(
+      notificationId,
       title,
       body,
       platformChannelSpecifics,
+      payload: payload,
     );
-  }
-
-  void setNotificationsEnabled(bool enabled) {
-    notificationsEnabled = enabled;
-    _saveNotificationSettings();
   }
 }

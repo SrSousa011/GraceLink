@@ -28,7 +28,7 @@ class _AddEventFormState extends State<AddEventForm> {
   final ImagePicker _picker = ImagePicker();
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final NotificationService _notificationService = NotificationService();
+  final NotificationEvents _notificationService = NotificationEvents();
   late AuthenticationService _authenticationService;
 
   @override
@@ -39,7 +39,6 @@ class _AddEventFormState extends State<AddEventForm> {
     _locationController = TextEditingController();
     _selectedDate = DateTime.now();
     _selectedTime = TimeOfDay.now();
-    _notificationService.initialize();
     _notificationService.requestNotificationPermission();
     _authenticationService = AuthenticationService();
   }
@@ -120,8 +119,7 @@ class _AddEventFormState extends State<AddEventForm> {
       if (!context.mounted) return;
       DateFormat('dd/MM/yyyy').format(_selectedDate!);
       final formattedTime = _selectedTime!.format(context);
-      final formattedCreatedTime =
-          DateFormat('dd/MM/yyyy HH:mm:ss').format(createdDateTime);
+      DateFormat('dd/MM/yyyy HH:mm:ss').format(createdDateTime);
 
       final newEvent = {
         'id': eventId,
@@ -136,15 +134,12 @@ class _AddEventFormState extends State<AddEventForm> {
 
       try {
         await _firestore.collection('events').doc(eventId).set(newEvent);
-
-        if (_notificationService.notificationsEnabled) {
-          await _notificationService.sendNotification(
-            title: _titleController.text,
-            location: _locationController.text,
-            formattedTime: formattedTime,
-            addedTime: formattedCreatedTime,
-          );
-        }
+        await _notificationService.showNotification(
+          _titleController.text,
+          _locationController.text,
+          formattedTime,
+          eventId: eventId,
+        );
 
         if (!context.mounted) return;
         Navigator.pushReplacement(
