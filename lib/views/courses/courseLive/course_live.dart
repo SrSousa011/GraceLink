@@ -2,7 +2,6 @@ import 'package:churchapp/views/courses/courseLive/course_live_list.dart';
 import 'package:churchapp/views/courses/courseLive/update_schedule.dart';
 import 'package:churchapp/views/courses/service/courses_date.dart';
 import 'package:churchapp/views/courses/service/courses_service.dart';
-import 'package:churchapp/views/notifications/notification_course.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,7 +17,6 @@ class CourseLive extends StatefulWidget {
 class _CourseLiveState extends State<CourseLive> {
   late Future<List<Course>> _coursesFuture;
   late CoursesService _coursesService;
-  late NotificationService _notificationService;
   bool _loading = false;
   bool _isAdmin = false;
 
@@ -26,8 +24,6 @@ class _CourseLiveState extends State<CourseLive> {
   void initState() {
     super.initState();
     _coursesService = CoursesService();
-    _notificationService = NotificationService();
-    _notificationService.initialize();
     _fetchUserRole();
     _coursesFuture = _fetchCourses();
   }
