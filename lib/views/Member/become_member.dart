@@ -1,5 +1,6 @@
 import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/views/member/terms_and_condictions.dart';
+import 'package:churchapp/views/notifications/notification_become_member.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -105,9 +106,8 @@ class _BecomeMemberState extends State<BecomeMember> {
 
         await FirebaseFirestore.instance.collection('members').add(memberData);
 
-        if (userData.role == 'admin') {
-          await _notifyAdmin(_fullNameController.text);
-        }
+        // Notificar todos os administradores
+        await _notifyAdmins(_fullNameController.text);
 
         _clearFields();
 
@@ -128,7 +128,28 @@ class _BecomeMemberState extends State<BecomeMember> {
     }
   }
 
-  Future<void> _notifyAdmin(String memberName) async {}
+  Future<void> _notifyAdmins(String memberName) async {
+    try {
+      QuerySnapshot adminDocs = await FirebaseFirestore.instance
+          .collection('users')
+          .where('role', isEqualTo: 'admin')
+          .get();
+
+      for (var doc in adminDocs.docs) {
+        String adminId = doc.id;
+        await NotificationBecomeMember().showNotification(
+          "Novo Membro",
+          "$memberName se tornou um novo membro da comunidade.",
+          "Detalhes do membro",
+          memberId: adminId,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        _showErrorDialog('Erro', 'Falha ao notificar administradores: $e');
+      }
+    }
+  }
 
   void _clearFields() {
     _fullNameController.clear();
