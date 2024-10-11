@@ -24,15 +24,38 @@ class Event {
   });
 
   factory Event.fromFirestore(String id, Map<String, dynamic> data) {
+    DateTime eventDate;
+
+    if (data['date'] is Timestamp) {
+      eventDate = (data['date'] as Timestamp).toDate();
+    } else if (data['date'] is String) {
+      final parts = data['date'].split('/');
+      eventDate = DateTime(
+        int.parse(parts[2]), // Year
+        int.parse(parts[1]), // Month
+        int.parse(parts[0]), // Day
+      );
+    } else {
+      throw Exception('Invalid date format');
+    }
+
+    TimeOfDay eventTime;
+    if (data['time'] is String) {
+      final parts = data['time'].split(':');
+      eventTime = TimeOfDay(
+        hour: int.parse(parts[0]),
+        minute: int.parse(parts[1]),
+      );
+    } else {
+      throw Exception('Invalid time format');
+    }
+
     return Event(
       id: id,
       title: data['title'] ?? '',
       description: data['description'] ?? '',
-      date: (data['date'] as Timestamp).toDate(),
-      time: TimeOfDay(
-        hour: int.parse(data['time'].split(':')[0]),
-        minute: int.parse(data['time'].split(':')[1]),
-      ),
+      date: eventDate,
+      time: eventTime,
       location: data['location'] ?? '',
       createdBy: data['createdBy'] ?? '',
       imageUrl: data['imageUrl'],
@@ -41,53 +64,19 @@ class Event {
 
   factory Event.fromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
-    return Event(
-      id: snapshot.id,
-      title: data['title'] ?? '',
-      description: data['description'] ?? '',
-      date: (data['date'] as Timestamp).toDate(),
-      time: TimeOfDay(
-        hour: int.parse(data['time'].split(':')[0]),
-        minute: int.parse(data['time'].split(':')[1]),
-      ),
-      location: data['location'] ?? '',
-      createdBy: data['createdBy'] ?? '',
-      imageUrl: data['imageUrl'],
-    );
+    return Event.fromFirestore(snapshot.id, data);
   }
 
   Map<String, dynamic> toMap() {
     return {
       'title': title,
       'description': description,
-      'date': date,
+      'date': Timestamp.fromDate(date),
       'time': '${time.hour}:${time.minute}',
       'location': location,
       'createdBy': createdBy,
       'imageUrl': imageUrl,
     };
-  }
-
-  Event copyWith({
-    String? id,
-    String? title,
-    String? description,
-    DateTime? date,
-    TimeOfDay? time,
-    String? location,
-    String? createdBy,
-    String? imageUrl,
-  }) {
-    return Event(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      description: description ?? this.description,
-      date: date ?? this.date,
-      time: time ?? this.time,
-      location: location ?? this.location,
-      createdBy: createdBy ?? this.createdBy,
-      imageUrl: imageUrl ?? this.imageUrl,
-    );
   }
 }
 
@@ -95,15 +84,7 @@ Future<void> addEvent(Event event) async {
   try {
     CollectionReference events =
         FirebaseFirestore.instance.collection('events');
-    await events.add({
-      'title': event.title,
-      'description': event.description,
-      'date': Timestamp.fromDate(event.date),
-      'time': '${event.time.hour}:${event.time.minute}',
-      'location': event.location,
-      'createdBy': event.createdBy,
-      'imageUrl': event.imageUrl,
-    });
+    await events.add(event.toMap());
   } catch (e) {
     if (kDebugMode) {
       print('Error adding event: $e');
@@ -116,15 +97,7 @@ Future<void> updateEvent(Event event, String eventId) async {
   try {
     CollectionReference events =
         FirebaseFirestore.instance.collection('events');
-    await events.doc(eventId).update({
-      'title': event.title,
-      'description': event.description,
-      'date': Timestamp.fromDate(event.date),
-      'time': '${event.time.hour}:${event.time.minute}',
-      'location': event.location,
-      'createdBy': event.createdBy,
-      'imageUrl': event.imageUrl,
-    });
+    await events.doc(eventId).update(event.toMap());
   } catch (e) {
     if (kDebugMode) {
       print('Error updating event: $e');
