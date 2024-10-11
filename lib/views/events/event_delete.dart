@@ -36,12 +36,6 @@ class EventDelete {
     await _deleteEvent(context, eventId);
 
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Evento excluído com sucesso!'),
-        ),
-      );
-
       Navigator.pushReplacementNamed(context, '/event_page');
     }
   }

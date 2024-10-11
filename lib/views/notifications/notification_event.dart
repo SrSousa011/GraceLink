@@ -35,7 +35,7 @@ class NotificationEvents {
       onDidReceiveNotificationResponse: (NotificationResponse response) async {
         if (response.payload != null && navigatorKey.currentState != null) {
           navigatorKey.currentState!
-              .pushNamed('/events_page', arguments: response.payload);
+              .pushNamed('/event_page', arguments: response.payload);
         }
       },
     );
@@ -43,11 +43,12 @@ class NotificationEvents {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (message.notification != null) {
         String eventId = message.data['eventId'] ?? '';
+        String eventTitle = message.data['eventTitle'] ?? 'Evento Adicionado';
         showNotification(
-          message.notification!.title ?? "Novo Evento",
-          message.notification!.body ?? "Você tem um novo evento.",
+          "Novo Evento Adicionado",
+          "O evento '$eventTitle' foi adicionado.",
           message.data['url'] ?? '',
-          eventId: eventId, // Adicionando eventId
+          eventId: eventId,
         );
       }
     });
@@ -57,7 +58,9 @@ class NotificationEvents {
 
   static Future<void> _firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
-    print("Handling a background message: ${message.messageId}");
+    if (kDebugMode) {
+      print("Handling a background message: ${message.messageId}");
+    }
   }
 
   Future<void> requestNotificationPermission() async {
@@ -116,12 +119,13 @@ class NotificationEvents {
 
     int notificationId =
         DateTime.now().millisecondsSinceEpoch.remainder(100000);
+    String payloadWithId = '$payload|$eventId';
     await _flutterLocalNotificationsPlugin?.show(
       notificationId,
       title,
       body,
       platformChannelSpecifics,
-      payload: payload,
+      payload: payloadWithId,
     );
   }
 }
