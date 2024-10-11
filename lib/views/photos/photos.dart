@@ -208,9 +208,6 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
       }
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Foto excluída com sucesso!')),
-      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro ao excluir a foto: $e')),
