@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'photo_item.dart';
@@ -31,7 +30,6 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   final List<XFile> _pickedFiles = [];
   XFile? _selectedImage;
   final TextEditingController _locationController = TextEditingController();
-  final NotificationService _notificationService = NotificationService();
 
   bool _isAdmin = false;
   bool _isSearching = false;
@@ -153,8 +151,6 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
       return;
     }
 
-    final formattedTime = DateFormat('HH:mm').format(DateTime.now());
-
     try {
       final uploadId = DateTime.now().millisecondsSinceEpoch.toString();
       final locationDocRef = _firestore.collection('photos').doc(uploadId);
@@ -181,20 +177,17 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
         'urls': imageUrls,
       });
 
-      if (_notificationService.notificationsEnabled) {
-        await _notificationService.sendNotification(
-          location: location,
-          formattedTime: formattedTime,
-          addedTime: formattedTime,
-        );
-      }
+      await NotificationService().showNotification(
+        'Nova Foto Adicionada',
+        'Uma nova foto foi adicionada na localização: $location.',
+        'fotos_payload',
+      );
 
       setState(() {
         _pickedFiles.clear();
         _locationController.clear();
       });
     } catch (e) {
-      // Error handling
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro ao adicionar foto: $e')),
