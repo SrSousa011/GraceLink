@@ -1,4 +1,5 @@
 import 'package:churchapp/route/root.dart';
+import 'package:churchapp/views/notifications/notification_event.dart';
 import 'package:churchapp/views/notifications/notification_photo.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -33,7 +34,8 @@ class MyApp extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-    NotificationService().init(navigatorKey);
+    NotificationPhotos().init(navigatorKey);
+    NotificationEvents().init(navigatorKey);
 
     return MaterialApp(
       title: 'Grace Link',

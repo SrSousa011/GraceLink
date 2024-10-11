@@ -177,7 +177,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
         'urls': imageUrls,
       });
 
-      await NotificationService().showNotification(
+      await NotificationPhotos().showNotification(
         'Nova Foto Adicionada',
         'Uma nova foto foi adicionada na localização: $location.',
         'fotos_payload',
