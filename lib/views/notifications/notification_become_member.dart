@@ -36,7 +36,7 @@ class NotificationBecomeMember {
       onDidReceiveNotificationResponse: (NotificationResponse response) async {
         if (response.payload != null && navigatorKey.currentState != null) {
           navigatorKey.currentState!
-              .pushNamed('/subscribers_list', arguments: response.payload);
+              .pushNamed('/member_list', arguments: response.payload);
         }
       },
     );

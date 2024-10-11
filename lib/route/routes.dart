@@ -71,7 +71,6 @@ class AppRoutes {
     '/donation_report': (context) => const DonationReportScreen(),
   };
 
-  // Gera a rota baseada no nome
   static Route<dynamic>? generateRoute(RouteSettings settings) {
     final routeBuilder = routes[settings.name];
     if (routeBuilder != null) {
