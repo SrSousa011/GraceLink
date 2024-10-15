@@ -45,10 +45,13 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final Color themeColor = isDarkMode ? Colors.white : Colors.black;
+    final Color buttonBackgroundColor =
+        isDarkMode ? Colors.blueGrey : Colors.blue;
 
     final buttonStyle = ElevatedButton.styleFrom(
       foregroundColor: Colors.white,
-      backgroundColor: isDarkMode ? Colors.blueGrey : Colors.blue,
+      backgroundColor: buttonBackgroundColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
       ),
@@ -58,13 +61,17 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Informações do Assinante'),
+        title: const Text(
+          'Informações do Assinante',
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
         backgroundColor: isDarkMode
             ? Colors.grey[850]
             : const Color.fromARGB(255, 255, 255, 255),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back,
-              color: isDarkMode ? Colors.white : Colors.black),
+          icon: Icon(Icons.arrow_back, color: themeColor),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -94,7 +101,7 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
                       child: widget.imagePath.isEmpty
                           ? Icon(
                               Icons.person,
-                              color: isDarkMode ? Colors.white : Colors.black,
+                              color: themeColor,
                               size: 32,
                             )
                           : null,
@@ -109,7 +116,7 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: isDarkMode ? Colors.white : Colors.black,
+                              color: themeColor,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -138,7 +145,7 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: isDarkMode ? Colors.white : Colors.black,
+                              color: themeColor,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -147,8 +154,12 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
                                 vertical: 8.0, horizontal: 16.0),
                             decoration: BoxDecoration(
                               color: widget.status
-                                  ? Colors.green[700]
-                                  : Colors.red[700],
+                                  ? (isDarkMode
+                                      ? Colors.grey[800]
+                                      : Colors.green)
+                                  : (isDarkMode
+                                      ? Colors.grey[800]
+                                      : Colors.red),
                               borderRadius: BorderRadius.circular(20.0),
                             ),
                             child: Text(
@@ -172,16 +183,21 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
                 ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(),
                   style: buttonStyle,
-                  child: const Text(
-                    'Voltar',
-                  ),
+                  child: const Text('Voltar'),
                 ),
                 ElevatedButton(
                   onPressed: () => _updateStatus(!widget.status),
-                  style: buttonStyle.copyWith(
-                    backgroundColor: MaterialStateProperty.all(
-                      widget.status ? Colors.red : Colors.green,
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: widget.status
+                        ? (isDarkMode ? Colors.grey[800] : Colors.red)
+                        : (isDarkMode ? Colors.grey : Colors.green),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
                     ),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12.0, horizontal: 24.0),
+                    side: BorderSide.none,
                   ),
                   child: Text(
                     widget.status ? 'Não Pago' : 'Pago',
