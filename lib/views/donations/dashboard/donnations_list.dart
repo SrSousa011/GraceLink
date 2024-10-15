@@ -59,9 +59,6 @@ class _DonationsListState extends State<DonationsList> {
     } else if (sortOption == 'Valor') {
       donations.sort((a, b) => _parseDonationValue(a['donationValue'])
           .compareTo(_parseDonationValue(b['donationValue'])));
-    } else if (sortOption == 'Data') {
-      donations.sort((a, b) =>
-          (a['timestamp'] as Timestamp).compareTo(b['timestamp'] as Timestamp));
     }
 
     if (!ascendingOrder) {
@@ -96,9 +93,12 @@ class _DonationsListState extends State<DonationsList> {
         isDarkMode ? Colors.grey[300]! : Colors.grey;
     final Color donationValueColor =
         isDarkMode ? Colors.greenAccent : Colors.green;
+    final Color backgroundColor = isDarkMode ? Colors.grey[850]! : Colors.white;
+    final Color iconColor = isDarkMode ? Colors.grey : Colors.blueAccent;
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: isDarkMode ? Colors.black54 : null,
         title: const Text(
           'Lista de Doações',
           style: TextStyle(
@@ -108,211 +108,206 @@ class _DonationsListState extends State<DonationsList> {
         actions: [
           IconButton(
             icon: Icon(
-              showAllDonations ? Icons.filter_list : Icons.filter_list_off,
-              color: Colors.blueAccent,
+              showAllDonations ? Icons.date_range : Icons.date_range_outlined,
+              color: iconColor,
             ),
             onPressed: _toggleDonationFilter,
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.sort, color: Colors.blueAccent),
+            icon: Icon(Icons.sort, color: iconColor),
             onSelected: (String value) {
               _updateSortOption(value);
             },
             itemBuilder: (BuildContext context) {
               return [
-                const PopupMenuItem<String>(
+                PopupMenuItem<String>(
                   value: 'A-Z',
                   child: Row(
                     children: [
-                      Icon(Icons.sort_by_alpha, color: Colors.blueAccent),
-                      SizedBox(width: 8),
+                      Icon(Icons.sort_by_alpha,
+                          color: isDarkMode
+                              ? Colors.grey[300]
+                              : Colors.blueAccent),
+                      const SizedBox(width: 8),
                       Text(
                         'Ordenar A-Z',
                         style: TextStyle(
-                            color: Colors.black, fontWeight: FontWeight.bold),
+                            color: isDarkMode ? Colors.grey[300] : Colors.black,
+                            fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                 ),
-                const PopupMenuItem<String>(
+                PopupMenuItem<String>(
                   value: 'Valor',
                   child: Row(
                     children: [
-                      Icon(Icons.attach_money, color: Colors.green),
-                      SizedBox(width: 8),
+                      Icon(Icons.attach_money,
+                          color: isDarkMode ? Colors.grey[300] : Colors.green),
+                      const SizedBox(width: 8),
                       Text(
                         'Ordenar por Valor',
                         style: TextStyle(
-                            color: Colors.black, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'Data',
-                  child: Row(
-                    children: [
-                      Icon(Icons.date_range, color: Colors.orange),
-                      SizedBox(width: 8),
-                      Text(
-                        'Ordenar por Data',
-                        style: TextStyle(
-                            color: Colors.black, fontWeight: FontWeight.bold),
+                            color: isDarkMode ? Colors.grey[300] : Colors.black,
+                            fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                 ),
               ];
             },
-            color: Colors.white,
+            color: isDarkMode ? Colors.grey[850] : Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
-              side: BorderSide(color: Colors.grey.shade300),
             ),
             elevation: 4,
           ),
         ],
       ),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _fetchDonations(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                    isDarkMode ? Colors.white : Colors.black),
-              ),
-            );
-          }
+      body: Container(
+        color: backgroundColor,
+        child: FutureBuilder<List<Map<String, dynamic>>>(
+          future: _fetchDonations(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      isDarkMode ? Colors.white : Colors.black),
+                ),
+              );
+            }
 
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Erro ao carregar doações',
-                style: TextStyle(color: primaryTextColor),
-              ),
-            );
-          }
+            if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  'Erro ao carregar doações',
+                  style: TextStyle(color: primaryTextColor),
+                ),
+              );
+            }
 
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-              child: Text(
-                'Nenhuma doação encontrada',
-                style: TextStyle(color: primaryTextColor),
-              ),
-            );
-          }
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(
+                child: Text(
+                  'Nenhuma doação encontrada',
+                  style: TextStyle(color: primaryTextColor),
+                ),
+              );
+            }
 
-          final donations = snapshot.data!;
-          final sortedDonations = _sortDonations(donations);
+            final donations = snapshot.data!;
+            final sortedDonations = _sortDonations(donations);
 
-          return ListView.builder(
-            itemCount: sortedDonations.length,
-            itemBuilder: (context, index) {
-              final donation = sortedDonations[index];
-              final fullName = donation['fullName'] ?? 'Desconhecido';
-              final donationValue =
-                  _parseDonationValue(donation['donationValue']);
-              final donationType = donation['donationType'] ?? 'Sem tipo';
-              final userId = donation['userId'];
-              final paymentProofURL = donation['photoURL'] ?? '';
-              final timestamp = donation['timestamp'] as Timestamp?;
-              final date = timestamp != null
-                  ? DateFormat('dd/MM/yyyy').format(timestamp.toDate())
-                  : 'Desconhecida';
+            return ListView.builder(
+              itemCount: sortedDonations.length,
+              itemBuilder: (context, index) {
+                final donation = sortedDonations[index];
+                final fullName = donation['fullName'] ?? 'Desconhecido';
+                final donationValue =
+                    _parseDonationValue(donation['donationValue']);
+                final donationType = donation['donationType'] ?? 'Sem tipo';
+                final userId = donation['userId'];
+                final paymentProofURL = donation['photoURL'] ?? '';
+                final timestamp = donation['timestamp'] as Timestamp?;
+                final date = timestamp != null
+                    ? DateFormat('dd/MM/yyyy').format(timestamp.toDate())
+                    : 'Desconhecida';
 
-              return FutureBuilder<DocumentSnapshot>(
-                future: _firestore.collection('users').doc(userId).get(),
-                builder: (context, userSnapshot) {
-                  if (userSnapshot.connectionState == ConnectionState.waiting) {
-                    return ListTile(
-                      leading: CircleAvatar(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              isDarkMode ? Colors.white : Colors.black),
-                        ),
-                      ),
-                      title: Text(
-                        'Carregando...',
-                        style: TextStyle(color: primaryTextColor),
-                      ),
-                    );
-                  }
-
-                  if (!userSnapshot.hasData) {
-                    return ListTile(
-                      leading: const CircleAvatar(
-                        child: Icon(Icons.person),
-                      ),
-                      title: Text(
-                        'Usuário não encontrado',
-                        style: TextStyle(color: primaryTextColor),
-                      ),
-                    );
-                  }
-
-                  final userData = userSnapshot.data!;
-                  final creatorName = userData['fullName'] ?? fullName;
-                  final creatorImageUrl = userData['imagePath'] ?? '';
-
-                  return ListTile(
-                    leading: creatorImageUrl.isNotEmpty
-                        ? CircleAvatar(
-                            backgroundImage: NetworkImage(creatorImageUrl),
-                          )
-                        : const CircleAvatar(
-                            child: Icon(Icons.person),
-                          ),
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          creatorName,
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                            color: primaryTextColor,
+                return FutureBuilder<DocumentSnapshot>(
+                  future: _firestore.collection('users').doc(userId).get(),
+                  builder: (context, userSnapshot) {
+                    if (userSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return ListTile(
+                        leading: CircleAvatar(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                isDarkMode ? Colors.white : Colors.black),
                           ),
                         ),
-                        const SizedBox(height: 2.0),
-                        Text(
-                          donationType,
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            color: secondaryTextColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                    trailing: Text(
-                      _formatTotal(donationValue),
-                      style: TextStyle(
-                        color: donationValueColor,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DonationReceipt(
-                            title: 'Detalhes da Doação',
-                            from: creatorName,
-                            date: date,
-                            total: donationValue,
-                            paymentProofURL: paymentProofURL,
-                            donorPhotoURL: creatorImageUrl,
-                          ),
+                        title: Text(
+                          'Carregando...',
+                          style: TextStyle(color: primaryTextColor),
                         ),
                       );
-                    },
-                  );
-                },
-              );
-            },
-          );
-        },
+                    }
+
+                    if (!userSnapshot.hasData) {
+                      return ListTile(
+                        leading: const CircleAvatar(
+                          child: Icon(Icons.person),
+                        ),
+                        title: Text(
+                          'Usuário não encontrado',
+                          style: TextStyle(color: primaryTextColor),
+                        ),
+                      );
+                    }
+
+                    final userData = userSnapshot.data!;
+                    final creatorName = userData['fullName'] ?? fullName;
+                    final creatorImageUrl = userData['imagePath'] ?? '';
+
+                    return ListTile(
+                      leading: creatorImageUrl.isNotEmpty
+                          ? CircleAvatar(
+                              backgroundImage: NetworkImage(creatorImageUrl),
+                            )
+                          : const CircleAvatar(
+                              child: Icon(Icons.person),
+                            ),
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            creatorName,
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                              color: primaryTextColor,
+                            ),
+                          ),
+                          const SizedBox(height: 2.0),
+                          Text(
+                            donationType,
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      trailing: Text(
+                        _formatTotal(donationValue),
+                        style: TextStyle(
+                          color: donationValueColor,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DonationReceipt(
+                              title: 'Detalhes da Doação',
+                              from: creatorName,
+                              date: date,
+                              total: donationValue,
+                              paymentProofURL: paymentProofURL,
+                              donorPhotoURL: creatorImageUrl,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
