@@ -157,9 +157,16 @@ class _AdminPanelState extends State<AdminPanel> {
             IconButton(
               icon: const Icon(Icons.filter_list),
               onPressed: () {
+                final RenderBox button =
+                    context.findRenderObject() as RenderBox;
                 showMenu(
                   context: context,
-                  position: const RelativeRect.fromLTRB(100, 100, 100, 100),
+                  position: RelativeRect.fromLTRB(
+                    button.localToGlobal(Offset.zero).dx + button.size.width,
+                    button.localToGlobal(Offset.zero).dy,
+                    0,
+                    0,
+                  ),
                   items: [
                     const PopupMenuItem<String>(
                       value: 'all',
