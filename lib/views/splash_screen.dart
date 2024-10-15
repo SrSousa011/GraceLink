@@ -1,18 +1,11 @@
-import 'package:churchapp/route/root.dart';
-import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:churchapp/views/home/home.dart';
-import 'package:churchapp/views/welcome.dart';
 
 const String logoPath = 'assets/icons/logo.png';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key, required this.root, required this.drawer});
-
-  final NavBar drawer;
-  final Root root;
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -30,36 +23,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Timer(const Duration(seconds: 1), () {
       if (user != null) {
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 500),
-            pageBuilder: (_, __, ___) => const Home(),
-            transitionsBuilder: (_, animation, __, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-          ),
-        );
+        Navigator.pushReplacementNamed(context, '/home');
       } else {
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 500),
-            pageBuilder: (_, __, ___) => Welcome(
-              title: 'GraceLink',
-              onSignedIn: () {},
-            ),
-            transitionsBuilder: (_, animation, __, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-          ),
-        );
+        Navigator.pushReplacementNamed(context, '/welcome');
       }
     });
   }
@@ -83,9 +49,7 @@ class _SplashScreenState extends State<SplashScreen> {
           child: SizedBox(
             width: 450,
             height: 450,
-            child: Image.asset(
-              logoPath,
-            ),
+            child: Image.asset(logoPath),
           ),
         ),
       ),
