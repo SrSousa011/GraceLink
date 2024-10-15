@@ -6,7 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
-import 'package:churchapp/views/materials/file_list.dart';
+import 'package:churchapp/views/materials/file_list_widget.dart';
 
 class CourseMaterialsPage extends StatefulWidget {
   const CourseMaterialsPage({super.key});
@@ -19,13 +19,11 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
   List<Map<String, dynamic>> _courses = [];
   bool _isFetchingCourses = true;
   String? _selectedCourseId;
   String? _userRole;
-  String? _selectedCourseTitle;
-  String? _selectedCourseImageUrl;
-  String? _selectedInstructorName;
   String? _errorMessage;
 
   @override
@@ -78,7 +76,6 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
           );
           if (_courses.isNotEmpty) {
             _selectedCourseId = _courses.first['id'];
-            await _handleCourseSelection(_selectedCourseId!);
           } else {
             setState(() {
               _errorMessage = 'User not registered in any course.';
@@ -101,22 +98,10 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     }
   }
 
-  Future<String?> getTitleById(String courseId) async {
-    try {
-      final doc = await _firestore.collection('courses').doc(courseId).get();
-      return doc.data()?['courseName'] as String?;
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Error fetching course name: $e';
-      });
-      return null;
-    }
-  }
-
   Future<void> _uploadFile() async {
     if (_selectedCourseId == null) {
       setState(() {
-        _errorMessage = 'Selecione um curso primeiro.';
+        _errorMessage = 'Select a course first.';
       });
       return;
     }
@@ -170,25 +155,6 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     }
   }
 
-  Future<void> _handleCourseSelection(String courseId) async {
-    setState(() {
-      _selectedCourseId = courseId;
-      _errorMessage = null;
-    });
-
-    final title = await getTitleById(courseId);
-    setState(() {
-      _selectedCourseTitle = title ?? 'No Title';
-    });
-
-    final courseData =
-        await _firestore.collection('courses').doc(courseId).get();
-    setState(() {
-      _selectedCourseImageUrl = courseData.data()?['imageURL'];
-      _selectedInstructorName = courseData.data()?['instructor'];
-    });
-  }
-
   Future<void> _deleteFile(
       String courseId, String fileId, String fileUrl) async {
     try {
@@ -230,9 +196,8 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
               if (!_isFetchingCourses && _courses.isNotEmpty)
                 _buildCourseDropdown(),
               if (_userRole == 'admin' && !_isFetchingCourses)
-                _buildUploadButton(),
+                const UploadButton(),
               const SizedBox(height: 16.0),
-              _buildCourseHeader(isDarkMode),
               if (_errorMessage != null) _buildErrorMessage(),
               Expanded(
                 child: _selectedCourseId == null
@@ -240,7 +205,11 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
                         child: Text(
                             'Selecione um curso para visualizar os materiais'),
                       )
-                    : _buildFileList(),
+                    : FileListWidget(
+                        selectedCourseId: _selectedCourseId!,
+                        userRole: _userRole,
+                        onFileDeleted: _deleteFile,
+                      ),
               ),
             ],
           ),
@@ -259,88 +228,14 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
           child: Text(course['courseName'] ?? 'Unknown Course'),
         );
       }).toList(),
-      onChanged: (value) async {
+      onChanged: (value) {
         if (value != null) {
-          await _handleCourseSelection(value);
+          setState(() {
+            _selectedCourseId = value;
+            _errorMessage = null;
+          });
         }
       },
-    );
-  }
-
-  Row _buildUploadButton() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        IconButton(
-          icon: const Icon(Icons.upload_file),
-          onPressed: _uploadFile,
-          tooltip: 'Enviar Arquivo',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCourseHeader(bool isDarkMode) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      child: _selectedCourseImageUrl != null
-          ? Container(
-              key: ValueKey<String>(_selectedCourseImageUrl!),
-              padding: const EdgeInsets.all(16.0),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: isDarkMode
-                    ? const LinearGradient(
-                        colors: [Color(0xFF3C3C3C), Color(0xFF5A5A5A)],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      )
-                    : const LinearGradient(
-                        colors: [Color(0xFFFFD59C), Color(0xFF62CFF7)],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 120.0,
-                    height: 160.0,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(_selectedCourseImageUrl!),
-                        fit: BoxFit.cover,
-                      ),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  const SizedBox(width: 16.0),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (_selectedCourseTitle != null)
-                          Text(
-                            _selectedCourseTitle!,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                        if (_selectedInstructorName != null)
-                          Text(
-                            _selectedInstructorName!,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : const SizedBox.shrink(),
     );
   }
 
@@ -353,52 +248,24 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
       ),
     );
   }
+}
 
-  StreamBuilder<QuerySnapshot> _buildFileList() {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final bool isDarkMode = themeProvider.isDarkMode;
-    return StreamBuilder<QuerySnapshot>(
-      stream: _firestore
-          .collection('courses/$_selectedCourseId/materials')
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
+class UploadButton extends StatelessWidget {
+  const UploadButton({super.key});
 
-        if (snapshot.hasError) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Error loading files: ${snapshot.error}',
-              style: const TextStyle(color: Colors.red),
-            ),
-          );
-        }
-
-        if (!snapshot.hasData || snapshot.data?.docs.isEmpty == true) {
-          return const Center(child: Text('No files available.'));
-        }
-
-        final fileDocs = snapshot.data!.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          return {
-            'id': doc.id,
-            'url': data['url'] as String?,
-            'name': data['name'] as String?,
-            'courseId': _selectedCourseId!,
-            'visibility': data['visibility'] as String? ?? 'public',
-          };
-        }).toList();
-
-        return CourseFileList(
-          fileDocs: fileDocs,
-          isDarkMode: isDarkMode,
-          userRole: _userRole ?? 'user',
-          onFileDeleted: _deleteFile,
-          selectedCourseId: _selectedCourseId!,
-        );
-      },
+  @override
+  Widget build(BuildContext context) {
+    final courseMaterialsPageState =
+        context.findAncestorStateOfType<_CourseMaterialsPageState>();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.upload_file),
+          onPressed: courseMaterialsPageState?._uploadFile,
+          tooltip: 'Upload File',
+        ),
+      ],
     );
   }
 }
