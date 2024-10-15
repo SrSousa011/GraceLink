@@ -2,6 +2,7 @@ import 'package:churchapp/views/donations/charts/donnation_incomes.dart';
 import 'package:churchapp/views/donations/dashboard/donnation_dashboard.dart';
 import 'package:churchapp/views/materials/materials_courses.dart';
 import 'package:churchapp/views/member/become_dashboard.dart';
+import 'package:churchapp/views/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/views/welcome.dart';
 import 'package:churchapp/views/home/home.dart';
@@ -29,6 +30,7 @@ class AppRoutes {
       GlobalKey<NavigatorState>();
 
   static final Map<String, Widget Function(BuildContext)> routes = {
+    '/': (context) => const SplashScreen(),
     '/welcome': (context) => Welcome(title: '', onSignedIn: () {}),
     '/home': (context) => const Home(),
     '/photos': (context) => const PhotoGalleryPage(),
@@ -83,7 +85,6 @@ class AppRoutes {
     }
   }
 
-  // Tratamento de erro
   static Route<dynamic> _errorRoute(String message) {
     return MaterialPageRoute(
       builder: (_) => Scaffold(
