@@ -1,8 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:churchapp/auth/auth_service.dart';
 
 class UserManagementScreen extends StatefulWidget {
-  UserManagementScreen({super.key});
+  const UserManagementScreen({super.key});
 
   @override
   _UserManagementScreenState createState() => _UserManagementScreenState();
@@ -36,47 +37,34 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = MediaQuery.of(context).platformBrightness ==
+        Brightness.dark; // Verifica se o modo escuro está ativo
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gerenciamento de Usuário'),
+        title: const Text('Gerenciamento de Usuário',
+            style: TextStyle(fontSize: 18)),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          _buildEmailConfirmationTile(context),
-          _buildPhoneVerificationTile(context),
-          _buildDeactivateUserTile(context),
-          _buildDeleteUserTile(context),
+          _buildEmailConfirmationTile(context, isDarkMode),
+          _buildPhoneVerificationTile(context, isDarkMode),
+          _buildDeleteUserTile(context, isDarkMode),
         ],
       ),
     );
   }
 
-  Widget _buildDeactivateUserTile(BuildContext context) {
+  Widget _buildDeleteUserTile(BuildContext context, bool isDarkMode) {
     return ListTile(
-      title: const Text('Desativar Usuário',
-          style: TextStyle(color: Colors.orange)),
-      leading: const Icon(Icons.remove_circle, color: Colors.orange),
-      onTap: () {
-        _showConfirmationDialog(
-          context,
-          'Desativar Usuário',
-          'Tem certeza de que deseja desativar este usuário?',
-          () async {
-            await _authService.desactivateUser();
-            if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Usuário desativado com sucesso.')),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildDeleteUserTile(BuildContext context) {
-    return ListTile(
-      title: const Text('Excluir Usuário', style: TextStyle(color: Colors.red)),
+      title: Text(
+        'Excluir Usuário',
+        style: TextStyle(
+            color: isDarkMode
+                ? Colors.red[400]
+                : Colors.red), // Muda a cor dependendo do modo
+      ),
       leading: const Icon(Icons.delete, color: Colors.red),
       onTap: () {
         _showConfirmationDialog(
@@ -95,11 +83,15 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     );
   }
 
-  Widget _buildEmailConfirmationTile(BuildContext context) {
+  Widget _buildEmailConfirmationTile(BuildContext context, bool isDarkMode) {
     return ListTile(
       title: Text(
         _isEmailVerified ? 'E-mail Confirmado' : 'Confirmar E-mail',
-        style: TextStyle(color: _isEmailVerified ? Colors.green : Colors.black),
+        style: TextStyle(
+          color: _isEmailVerified
+              ? Colors.green
+              : (isDarkMode ? Colors.grey[400] : Colors.grey[800]),
+        ),
       ),
       leading: Icon(
         Icons.email,
@@ -109,23 +101,29 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         if (!_isEmailVerified) {
           String? email = await _authService.getCurrentUserEmail();
           if (email == null) {
+            if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                   content: Text('Não foi possível obter o e-mail do usuário.')),
             );
             return;
           }
+          if (!context.mounted) return;
           _showEmailDialog(context, email);
         }
       },
     );
   }
 
-  Widget _buildPhoneVerificationTile(BuildContext context) {
+  Widget _buildPhoneVerificationTile(BuildContext context, bool isDarkMode) {
     return ListTile(
       title: Text(
         _isPhoneVerified ? 'Telefone Confirmado' : 'Confirmar Telefone',
-        style: TextStyle(color: _isPhoneVerified ? Colors.green : Colors.black),
+        style: TextStyle(
+          color: _isPhoneVerified
+              ? Colors.green
+              : (isDarkMode ? Colors.grey[400] : Colors.grey[800]),
+        ),
       ),
       leading: Icon(
         Icons.phone,
@@ -134,6 +132,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       onTap: () async {
         String? phone = await _authService.getCurrentUserPhone();
         if (phone == null) {
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
                 content: Text(
@@ -141,7 +140,10 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
           );
           return;
         }
-        print('Número de telefone do usuário: $phone');
+        if (kDebugMode) {
+          print('Número de telefone do usuário: $phone');
+        }
+        if (!context.mounted) return;
         _showPhoneVerificationDialog(context, phone);
       },
     );
