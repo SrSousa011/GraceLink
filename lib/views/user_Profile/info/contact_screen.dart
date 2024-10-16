@@ -2,7 +2,7 @@ import 'package:churchapp/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-const String tWhatsApp = 'assets/icons/whatsapp.png';
+const String tWhatsApp = 'assets/icons/WhatsApp.jpg';
 
 class ContactScreen extends StatefulWidget {
   const ContactScreen({super.key});
@@ -87,7 +87,6 @@ class _ContactScreenState extends State<ContactScreen> {
                       tWhatsApp,
                       width: 40,
                       height: 40,
-                      color: isDarkMode ? Colors.white : Colors.black,
                     ),
                     title: Text(
                       contact['name']!,
