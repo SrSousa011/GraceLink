@@ -16,8 +16,6 @@ class _ContactScreenState extends State<ContactScreen> {
 
   final List<Map<String, String>> contacts = [
     {'name': 'Antonio Sousa', 'phoneNumber': '+352691240908'},
-    {'name': 'Carlos Silva', 'phoneNumber': '+352691240909'},
-    {'name': 'Maria Oliveira', 'phoneNumber': '+352691240910'},
   ];
 
   @override
@@ -68,7 +66,10 @@ class _ContactScreenState extends State<ContactScreen> {
         backgroundColor: appBarColor,
         title: Text(
           'Entrar em Contato',
-          style: TextStyle(color: iconColor),
+          style: TextStyle(
+            color: iconColor,
+            fontSize: 18,
+          ),
         ),
         iconTheme: IconThemeData(color: iconColor),
       ),
