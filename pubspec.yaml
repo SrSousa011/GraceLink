@@ -104,10 +104,7 @@ flutter:
       - assets/icons/insta.png
       - assets/icons/face.png
       - assets/icons/youtube.png
-      - assets/icons/sumup.png
-      - assets/icons/WhatsApp.jpg
       - assets/icons/whatsapp.png
-      - assets/icons/whatsapp2.png
 
       - assets/icons/linkedin.png
   
