@@ -63,7 +63,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
     final iconColor = isDarkMode ? Colors.white : Colors.blue;
-    final userNameColor = isDarkMode ? Colors.white : Colors.blue;
+    final themeColor = isDarkMode ? Colors.white : Colors.black;
 
     return PopScope(
       canPop: false,
@@ -78,7 +78,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             IconButton(
               icon: Icon(
                 isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                color: isDarkMode ? Colors.white : Colors.black,
+                color: themeColor,
               ),
               onPressed: () {
                 themeProvider.toggleTheme();
@@ -151,7 +151,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: userNameColor),
+                          color: iconColor),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8.0),
