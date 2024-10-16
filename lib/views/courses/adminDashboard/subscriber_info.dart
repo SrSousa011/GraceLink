@@ -210,18 +210,7 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
                 ),
                 ElevatedButton(
                   onPressed: () => _updateStatus(!_status),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: _status
-                        ? (isDarkMode ? Colors.grey[800] : Colors.red)
-                        : (isDarkMode ? Colors.grey : Colors.green),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12.0, horizontal: 24.0),
-                    side: BorderSide.none,
-                  ),
+                  style: buttonStyle,
                   child: Text(
                     _status ? 'Não Pago' : 'Pago',
                   ),
