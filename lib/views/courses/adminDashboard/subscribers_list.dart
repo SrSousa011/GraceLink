@@ -164,7 +164,7 @@ class _SubscribersListState extends State<SubscribersList> {
           child: ListView(
             children: _courses.map((courseName) {
               return ListTile(
-                title: Text(courseName),
+                title: Text(courseName, style: const TextStyle(fontSize: 16)),
                 onTap: () {
                   Navigator.of(context).pop(courseName);
                 },
@@ -191,7 +191,7 @@ class _SubscribersListState extends State<SubscribersList> {
       appBar: AppBar(
         title: const Text(
           'Lista de Matriculados',
-          style: TextStyle(fontSize: 17),
+          style: TextStyle(fontSize: 18),
         ),
         backgroundColor: isDarkMode ? Colors.grey[850] : Colors.white,
         actions: [
