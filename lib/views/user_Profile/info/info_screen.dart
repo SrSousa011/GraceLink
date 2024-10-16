@@ -100,7 +100,7 @@ class _InfoScreenState extends State<InfoScreen> {
                 'Política de Privacidade',
                 style: TextStyle(
                   color: titleColor,
-                  fontSize: 18,
+                  fontSize: 16,
                 ),
               ),
               onTap: () {
@@ -117,7 +117,7 @@ class _InfoScreenState extends State<InfoScreen> {
                 'Termos de Serviço',
                 style: TextStyle(
                   color: titleColor,
-                  fontSize: 18,
+                  fontSize: 16,
                 ),
               ),
               onTap: () {
@@ -134,7 +134,7 @@ class _InfoScreenState extends State<InfoScreen> {
                 'Contatar Suporte',
                 style: TextStyle(
                   color: titleColor,
-                  fontSize: 18,
+                  fontSize: 16,
                 ),
               ),
               onTap: () {
@@ -151,7 +151,7 @@ class _InfoScreenState extends State<InfoScreen> {
                 'Perguntas Frequentes',
                 style: TextStyle(
                   color: titleColor,
-                  fontSize: 18,
+                  fontSize: 16,
                 ),
               ),
               onTap: () {
@@ -168,7 +168,7 @@ class _InfoScreenState extends State<InfoScreen> {
                 'Sobre Nós',
                 style: TextStyle(
                   color: titleColor,
-                  fontSize: 18,
+                  fontSize: 16,
                 ),
               ),
               onTap: () {
@@ -184,7 +184,7 @@ class _InfoScreenState extends State<InfoScreen> {
             Text(
               'Entre em Contato',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: titleColor,
               ),
@@ -196,7 +196,7 @@ class _InfoScreenState extends State<InfoScreen> {
                 'Endereço:\nRBM Rue de Rodange 67B, 6791 Aubange, Bélgica',
                 style: TextStyle(
                   color: titleColor,
-                  fontSize: 16,
+                  fontSize: 14,
                 ),
               ),
               leading: Icon(Icons.location_on, color: titleColor),
@@ -206,7 +206,7 @@ class _InfoScreenState extends State<InfoScreen> {
                 'info@resplandecendonacoes.org',
                 style: TextStyle(
                   color: titleColor,
-                  fontSize: 16,
+                  fontSize: 14,
                 ),
               ),
               leading: Icon(Icons.email, color: titleColor),
@@ -217,7 +217,7 @@ class _InfoScreenState extends State<InfoScreen> {
                 '+352 691 240 908',
                 style: TextStyle(
                   color: titleColor,
-                  fontSize: 16,
+                  fontSize: 14,
                 ),
               ),
               leading: Icon(Icons.phone, color: titleColor),
