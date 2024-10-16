@@ -43,9 +43,11 @@ class _ContactScreenState extends State<ContactScreen> {
   Future<void> _openWhatsApp(String phoneNumber) async {
     if (userName == null) return;
 
-    final nativeUrl =
-        'whatsapp://send?phone=$phoneNumber&text=Olá, meu nome é $userName e estou entrando em contato através do aplicativo GraceLink. Gostaria de saber mais informações sobre [o assunto específico]. Agradeço desde já pela atenção!';
-    final webUrl = _createWhatsAppUrl(phoneNumber);
+    final String message =
+        'Olá, meu nome é $userName e estou entrando em contato através do aplicativo GraceLink. Gostaria de saber mais informações sobre [o assunto específico]. Agradeço desde já pela atenção!';
+    final String nativeUrl =
+        'whatsapp://send?phone=$phoneNumber&text=${Uri.encodeComponent(message)}';
+    final String webUrl = _createWhatsAppUrl(phoneNumber);
 
     try {
       await launchUrlString(nativeUrl, mode: LaunchMode.externalApplication);

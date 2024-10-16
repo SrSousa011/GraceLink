@@ -4,6 +4,7 @@ import 'package:churchapp/util/imagepicker.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/user_Profile/editProfile/manegement/user_management_screen.dart';
 import 'package:churchapp/views/user_Profile/editProfile/update_profile.dart';
+import 'package:churchapp/views/user_Profile/info/about_the_app.dart';
 import 'package:churchapp/views/user_Profile/info/info_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -235,6 +236,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => const InfoScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    ProfileMenuWidget(
+                      title: 'Sobre o Aplicativo',
+                      icon: LineAwesomeIcons.info_solid,
+                      iconColor: iconColor,
+                      titleStyle: const TextStyle(
+                        fontSize: 18,
+                      ),
+                      onPress: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AboutPage(),
                           ),
                         );
                       },
