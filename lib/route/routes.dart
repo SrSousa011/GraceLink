@@ -52,6 +52,7 @@ class AppRoutes {
       return SubscriberInfo(
         userId: args?['userId'] ?? '',
         userName: args?['userName'] ?? '',
+        courseId: args?['courseId'] ?? '',
         status: args?['status'] ?? false,
         registrationDate: args?['registrationDate'] ?? DateTime.now(),
         courseName: args?['courseName'] ?? '',

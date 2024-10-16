@@ -8,6 +8,7 @@ class SubscriberInfo extends StatefulWidget {
   final String userName;
   final DateTime registrationDate;
   final String courseName;
+  final String courseId;
   final String imagePath;
 
   const SubscriberInfo({
@@ -17,6 +18,7 @@ class SubscriberInfo extends StatefulWidget {
     required this.userName,
     required this.registrationDate,
     required this.courseName,
+    required this.courseId,
     required this.imagePath,
   });
 
@@ -26,14 +28,35 @@ class SubscriberInfo extends StatefulWidget {
 
 class _SubscriberInfoState extends State<SubscriberInfo> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  late bool _status;
+
+  @override
+  void initState() {
+    super.initState();
+    _status = widget.status;
+  }
 
   Future<void> _updateStatus(bool newStatus) async {
     try {
       await _firestore
           .collection('courseRegistration')
-          .doc(widget.userId)
-          .update({'status': newStatus});
-      setState(() {});
+          .where('userId', isEqualTo: widget.userId)
+          .where('courseId', isEqualTo: widget.courseId)
+          .get()
+          .then((querySnapshot) {
+        if (querySnapshot.docs.isNotEmpty) {
+          querySnapshot.docs.first.reference.update({'status': newStatus});
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('Curso não encontrado para este usuário.')),
+          );
+        }
+      });
+
+      setState(() {
+        _status = newStatus;
+      });
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -153,7 +176,7 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
                             padding: const EdgeInsets.symmetric(
                                 vertical: 8.0, horizontal: 16.0),
                             decoration: BoxDecoration(
-                              color: widget.status
+                              color: _status
                                   ? (isDarkMode
                                       ? Colors.grey[800]
                                       : Colors.green)
@@ -163,7 +186,7 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
                               borderRadius: BorderRadius.circular(20.0),
                             ),
                             child: Text(
-                              widget.status ? 'Pago' : 'Não Pago',
+                              _status ? 'Pago' : 'Não Pago',
                               style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold),
@@ -186,10 +209,10 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
                   child: const Text('Voltar'),
                 ),
                 ElevatedButton(
-                  onPressed: () => _updateStatus(!widget.status),
+                  onPressed: () => _updateStatus(!_status),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: widget.status
+                    backgroundColor: _status
                         ? (isDarkMode ? Colors.grey[800] : Colors.red)
                         : (isDarkMode ? Colors.grey : Colors.green),
                     shape: RoundedRectangleBorder(
@@ -200,7 +223,7 @@ class _SubscriberInfoState extends State<SubscriberInfo> {
                     side: BorderSide.none,
                   ),
                   child: Text(
-                    widget.status ? 'Não Pago' : 'Pago',
+                    _status ? 'Não Pago' : 'Pago',
                   ),
                 ),
               ],

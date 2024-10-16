@@ -113,6 +113,7 @@ class _SubscribersListState extends State<SubscribersList> {
       'registrationDate':
           (data['registrationDate'] as Timestamp?)?.toDate() ?? DateTime.now(),
       'courseName': courseName,
+      'courseId': courseId,
       'status': status,
       'imagePath': userData['imagePath'] ?? '',
     };
@@ -219,6 +220,7 @@ class _SubscribersListState extends State<SubscribersList> {
                           userId: registration['userId'],
                           status: registration['status'],
                           userName: registration['userName'],
+                          courseId: registration['courseId'],
                           registrationDate: registration['registrationDate'],
                           courseName: registration['courseName'],
                           imagePath: registration['imagePath'],
