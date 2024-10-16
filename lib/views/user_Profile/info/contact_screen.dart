@@ -85,8 +85,8 @@ class _ContactScreenState extends State<ContactScreen> {
                   return ListTile(
                     leading: Image.asset(
                       tWhatsApp,
-                      width: 40,
-                      height: 40,
+                      width: 50,
+                      height: 50,
                     ),
                     title: Text(
                       contact['name']!,

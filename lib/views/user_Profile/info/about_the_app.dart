@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-const String tLinkedin = 'assets/icons/linkedin.png';
+const String tLinkedin = 'assets/icons/whatsapp.png';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
