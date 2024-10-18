@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 const String tSumupLogo = 'assets/icons/sumup.png';
+const String tDigiCashLogo = 'assets/icons/digicash.jpg';
 
 class DonationDetails extends StatefulWidget {
   final String fullName;
@@ -86,13 +87,24 @@ class _DonationDetailsState extends State<DonationDetails> {
     }
   }
 
-  Future<void> _launchURL() async {
+  Future<void> _launchSumupURL() async {
     const url = 'https://pay.sumup.com/b2c/QV9E8TAZ';
     try {
       await launchUrlString(url, mode: LaunchMode.externalApplication);
       setState(() {
         paymentClicked = true;
       });
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+  }
+
+  Future<void> _launchDigiCashURL() async {
+    const url = 'https://www.digicash.lu';
+    try {
+      await launchUrlString(url, mode: LaunchMode.externalApplication);
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -136,24 +148,34 @@ class _DonationDetailsState extends State<DonationDetails> {
                 style: const TextStyle(fontSize: 16.0),
               ),
               const SizedBox(height: 10.0),
-              GestureDetector(
-                onTap: _launchURL,
-                child: Row(
-                  children: [
-                    const Text(
-                      'Pagar',
-                      style: TextStyle(
-                        fontSize: 16.0,
-                      ),
-                    ),
-                    const SizedBox(width: 10.0),
-                    Image.asset(
-                      tSumupLogo,
-                      width: 50,
-                      height: 50,
-                    ),
-                  ],
+              const Text(
+                'Método de pagamento',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
+              const SizedBox(height: 10.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                    onTap: _launchSumupURL,
+                    child: Image.asset(
+                      tSumupLogo,
+                      width: 150,
+                      height: 150,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: _launchDigiCashURL,
+                    child: Image.asset(
+                      tDigiCashLogo,
+                      width: 130,
+                      height: 130,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 10.0),
               const Text('Após pagamento enviar comprovante'),
