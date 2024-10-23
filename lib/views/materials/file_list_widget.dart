@@ -41,7 +41,7 @@ class FileListWidget extends StatelessWidget {
         }
 
         if (!snapshot.hasData || snapshot.data?.docs.isEmpty == true) {
-          return const Center(child: Text('No files available.'));
+          return const Center(child: Text('Nenhum arquivo adicionado ainda.'));
         }
 
         final fileDocs = snapshot.data!.docs.map((doc) {
