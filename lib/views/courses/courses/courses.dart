@@ -174,7 +174,9 @@ class _CoursesState extends State<Courses> {
                                     },
                                     style: ElevatedButton.styleFrom(
                                       foregroundColor: Colors.white,
-                                      backgroundColor: Colors.blue,
+                                      backgroundColor: isDarkMode
+                                          ? Colors.grey
+                                          : Colors.blue,
                                     ),
                                     child: const Text('Atualizar'),
                                   ),
