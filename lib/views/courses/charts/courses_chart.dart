@@ -203,7 +203,12 @@ class _CoursesChartScreenState extends State<CoursesChartScreen> {
     if (isLoading) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Venda de Cursos do Mês'),
+          title: const Text(
+            'Venda de Cursos do Mês',
+            style: TextStyle(
+              fontSize: 18,
+            ),
+          ),
         ),
         body: const Center(child: CircularProgressIndicator()),
       );
