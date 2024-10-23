@@ -78,12 +78,12 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
             _selectedCourseId = _courses.first['id'];
           } else {
             setState(() {
-              _errorMessage = 'User not registered in any course.';
+              _errorMessage = 'Usuário não registrado em nenhum curso.';
             });
           }
         } else {
           setState(() {
-            _errorMessage = 'User not registered in any course.';
+            _errorMessage = 'Usuário não registrado em nenhum curso.';
           });
         }
       }
@@ -101,7 +101,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
   Future<void> _uploadFile() async {
     if (_selectedCourseId == null) {
       setState(() {
-        _errorMessage = 'Select a course first.';
+        _errorMessage = 'Selecione um curso primeiro.';
       });
       return;
     }
@@ -145,12 +145,13 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
         });
       } catch (e) {
         setState(() {
-          _errorMessage = 'Error uploading file: $e';
+          _errorMessage = 'Erro ao carregar arquivo: $e';
         });
       }
     } else {
       setState(() {
-        _errorMessage = 'File selection canceled or invalid file type.';
+        _errorMessage =
+            'Seleção de arquivo cancelada ou tipo de arquivo inválido.';
       });
     }
   }
@@ -167,7 +168,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting file: $e')),
+        SnackBar(content: Text('Erro ao excluir arquivo: $e')),
       );
     }
   }
