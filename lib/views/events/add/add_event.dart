@@ -186,8 +186,12 @@ class _AddEventFormState extends State<AddEventForm> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Novo Evento'),
-        backgroundColor: ChartColors.secondaryColor,
+        title: const Text(
+          'Novo Evento',
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
       ),
       resizeToAvoidBottomInset: false,
       body: Stack(
