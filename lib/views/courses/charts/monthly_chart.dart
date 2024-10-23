@@ -40,6 +40,9 @@ class MonthlyCoursesChart extends StatelessWidget {
     final safeMonthlyMulherUnica =
         currentMulherUnica.isFinite ? currentMulherUnica : 0.0;
 
+    // Definir o estado do tema no ChartColors
+    ChartColors.isDarkMode = isDarkMode;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

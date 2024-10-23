@@ -200,6 +200,8 @@ class _CoursesChartScreenState extends State<CoursesChartScreen> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final Color subtitleColor = isDarkMode ? Colors.grey[300]! : Colors.black87;
+
     if (isLoading) {
       return Scaffold(
         appBar: AppBar(
@@ -268,7 +270,7 @@ class _CoursesChartScreenState extends State<CoursesChartScreen> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black,
+                color: subtitleColor, // Use the calculated subtitle color here
               ),
             ),
             const SizedBox(height: 20),
