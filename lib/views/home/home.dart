@@ -35,20 +35,16 @@ class _HomeState extends State<Home> {
   Future<List<Event>> _fetchEvents() async {
     CollectionReference events =
         FirebaseFirestore.instance.collection('events');
-
     DateTime now = DateTime.now();
     DateTime startOfMonth = DateTime(now.year, now.month, 1);
     DateTime endOfMonth = DateTime(now.year, now.month + 1, 0);
-
     Timestamp startTimestamp = Timestamp.fromDate(startOfMonth);
     Timestamp endTimestamp = Timestamp.fromDate(endOfMonth);
-
     var snapshot = await events
         .where('date', isGreaterThanOrEqualTo: startTimestamp)
         .where('date', isLessThanOrEqualTo: endTimestamp)
         .orderBy('date', descending: true)
         .get();
-
     return snapshot.docs
         .map((doc) =>
             Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
@@ -58,7 +54,6 @@ class _HomeState extends State<Home> {
   Future<void> _launchInstagram() async {
     const nativeUrl = "instagram://user?username=igrejaresplandecendoathus";
     const webUrl = "https://www.instagram.com/igrejaresplandecendoathus/";
-
     try {
       await launchUrlString(nativeUrl, mode: LaunchMode.externalApplication);
     } catch (e) {
@@ -72,7 +67,6 @@ class _HomeState extends State<Home> {
   Future<void> _launchFacebook() async {
     const nativeUrl = "fb://profile/10008d8490063123";
     const webUrl = "https://www.facebook.com/profile.php?id=100088490063123";
-
     try {
       await launchUrlString(nativeUrl, mode: LaunchMode.externalApplication);
     } catch (e) {
@@ -114,43 +108,50 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
       drawer: const NavBar(),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            title: const Text(
-              'Home',
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-            floating: true,
-            pinned: false,
-            snap: true,
-            actions: [
-              IconButton(
-                icon: Icon(
-                  isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                  color: isDarkMode ? Colors.white : Colors.black,
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                title: const Text(
+                  'Home',
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
                 ),
-                onPressed: () {
-                  themeProvider.toggleTheme();
-                },
+                floating: true,
+                pinned: false,
+                snap: true,
+                actions: [
+                  IconButton(
+                    icon: Icon(
+                      isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                    onPressed: () {
+                      themeProvider.toggleTheme();
+                    },
+                  ),
+                ],
+              ),
+              SliverPadding(
+                padding: EdgeInsets.zero,
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate(
+                    [
+                      _buildHeader(),
+                      const SizedBox(height: 20),
+                      _buildUpcomingEventsSection(isDarkMode),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
-          SliverPadding(
-            padding: EdgeInsets.zero,
-            sliver: SliverList(
-              delegate: SliverChildListDelegate(
-                [
-                  _buildHeader(),
-                  const SizedBox(height: 20),
-                  _buildUpcomingEventsSection(isDarkMode),
-                  const SizedBox(height: 20),
-                  _buildImportantInfoSection(),
-                ],
-              ),
-            ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: _buildFooter(),
           ),
         ],
       ),
@@ -200,75 +201,71 @@ class _HomeState extends State<Home> {
         if (snapshot.hasError) {
           return const Center(child: Text('Erro ao carregar eventos'));
         }
-        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('Nenhum evento encontrado'));
-        }
-        final events = snapshot.data!;
+        final events = snapshot.data ?? [];
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                'Próximos Eventos:',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-              ),
-            ),
             const SizedBox(height: 10),
-            ...events.map((event) {
-              return GestureDetector(
-                onTap: () {
-                  _navigateToEventDetailsScreen(context, event);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16.0, bottom: 4.0),
-                        child: Text(
-                          event.title,
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                            color: isDarkMode
-                                ? ChartColors.eventTextColorDark
-                                : ChartColors.eventTextColorLight,
-                          ),
-                        ),
-                      ),
-                      if (event.location.isNotEmpty)
+            if (events.isNotEmpty)
+              ...events.map((event) {
+                return GestureDetector(
+                  onTap: () {
+                    _navigateToEventDetailsScreen(context, event);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Padding(
-                          padding: const EdgeInsets.only(left: 16.0),
+                          padding:
+                              const EdgeInsets.only(left: 16.0, bottom: 4.0),
                           child: Text(
-                            event.location,
+                            event.title,
                             style: TextStyle(
-                              fontSize: 14.0,
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
                               color: isDarkMode
                                   ? ChartColors.eventTextColorDark
-                                  : Colors.black54,
+                                  : ChartColors.eventTextColorLight,
                             ),
                           ),
                         ),
-                      const SizedBox(height: 8.0),
-                      if (event.imageUrl != null && event.imageUrl!.isNotEmpty)
-                        Container(
-                          margin: EdgeInsets.zero,
-                          padding: EdgeInsets.zero,
-                          width: double.infinity,
-                          child: Image.network(
-                            event.imageUrl!,
-                            height: 250,
-                            fit: BoxFit.cover,
+                        if (event.location.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: Text(
+                              event.location,
+                              style: TextStyle(
+                                fontSize: 14.0,
+                                color: isDarkMode
+                                    ? ChartColors.eventTextColorDark
+                                    : Colors.black54,
+                              ),
+                            ),
                           ),
-                        ),
-                      const SizedBox(height: 10),
-                    ],
+                        const SizedBox(height: 8.0),
+                        if (event.imageUrl != null &&
+                            event.imageUrl!.isNotEmpty)
+                          Container(
+                            margin: EdgeInsets.zero,
+                            padding: EdgeInsets.zero,
+                            width: double.infinity,
+                            child: Image.network(
+                              event.imageUrl!,
+                              height: 250,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            }),
+                );
+              })
+            else
+              const Center(
+                  child: Text('Não há eventos agendados para este mês.')),
             const SizedBox(height: 20),
             Center(
               child: ElevatedButton(
@@ -299,37 +296,41 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildImportantInfoSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const Text(
-          'Informações Importantes:',
-          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 10),
-        const Text(
-          'Endereço:\n'
-          'Rue de Rodange 67B, 6791 Aubange, Bélgica',
-          style: TextStyle(fontSize: 14),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 10),
-        const Text(
-          'Cultos:\n'
-          'Domingos 10h da manhã\n'
-          'Segundas 19h30',
-          style: TextStyle(fontSize: 14),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 20),
-        _buildSocialMediaIcons(),
-      ],
+  Widget _buildFooter() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      color: Colors.white,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Informações Importantes',
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'Endereço:\n'
+            'Rue de Rodange 67B, 6791 Aubange, Bélgica',
+            style: TextStyle(fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'Cultos:\n'
+            'Domingos 10h da manhã\n'
+            'Segundas 19h30',
+            style: TextStyle(fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          _buildSocialMediaFooter(),
+        ],
+      ),
     );
   }
 
-  Widget _buildSocialMediaIcons() {
+  Widget _buildSocialMediaFooter() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -372,27 +373,12 @@ class _HomeState extends State<Home> {
     );
   }
 
-  void _navigateToEventDetailsScreen(BuildContext context, Event event) async {
-    await Navigator.push(
+  void _navigateToEventDetailsScreen(BuildContext context, Event event) {
+    Navigator.push(
       context,
-      _createPageRoute(EventDetailsScreen(event: event)),
-    );
-  }
-
-  PageRouteBuilder _createPageRoute(Widget page) {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0);
-        const end = Offset.zero;
-        const curve = Curves.easeInOut;
-
-        var tween = Tween(begin: begin, end: end);
-        var offsetAnimation =
-            animation.drive(tween.chain(CurveTween(curve: curve)));
-
-        return SlideTransition(position: offsetAnimation, child: child);
-      },
+      MaterialPageRoute(
+        builder: (context) => EventDetailsScreen(event: event),
+      ),
     );
   }
 }
