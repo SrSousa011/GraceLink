@@ -83,6 +83,8 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^3.0.1
   mockito: ^5.4.4
+  integration_test:
+    sdk: flutter
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -107,7 +109,7 @@ flutter:
       - assets/icons/youtube.png
       - assets/icons/whatsapp.png
       - assets/icons/sumup.png
-      - assets/icons/digicash.jpg
+      - assets/icons/digicash.png
 
       - assets/icons/linkedin.png
   
