@@ -107,8 +107,9 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
       drawer: const NavBar(),
-      backgroundColor:
-          isDarkMode ? ChartColors.backgroundDark : ChartColors.backgroundColor,
+      backgroundColor: isDarkMode
+          ? ChartColors.backgroundDark
+          : Colors.white, // Apply white background for light mode
       body: Stack(
         children: [
           CustomScrollView(
@@ -164,8 +165,9 @@ class _HomeState extends State<Home> {
       width: double.infinity,
       height: 200,
       decoration: BoxDecoration(
-        color:
-            isDarkMode ? ChartColors.backgroundDark : ChartColors.whiteToDark,
+        color: isDarkMode
+            ? ChartColors.backgroundDark
+            : Colors.white, // Background will be white in light mode
         image: const DecorationImage(
           image: AssetImage(tLogo),
           fit: BoxFit.contain,
@@ -230,7 +232,7 @@ class _HomeState extends State<Home> {
                               fontWeight: FontWeight.bold,
                               color: isDarkMode
                                   ? ChartColors.eventTextColorDark
-                                  : ChartColors.eventTextColorLight,
+                                  : Colors.black, // Text color
                             ),
                           ),
                         ),
@@ -243,7 +245,7 @@ class _HomeState extends State<Home> {
                                 fontSize: 14.0,
                                 color: isDarkMode
                                     ? ChartColors.eventTextColorDark
-                                    : Colors.black54,
+                                    : Colors.black54, // Location color
                               ),
                             ),
                           ),
@@ -301,7 +303,9 @@ class _HomeState extends State<Home> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
-      color: isDarkMode ? ChartColors.backgroundDark : ChartColors.whiteToDark,
+      color: isDarkMode
+          ? ChartColors.backgroundDark
+          : Colors.white, // White footer
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
