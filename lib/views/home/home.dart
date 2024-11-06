@@ -270,20 +270,24 @@ class _HomeState extends State<Home> {
               const Center(
                   child: Text('Não há eventos agendados para este mês.')),
             const SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isDarkMode
-                      ? ChartColors.eventButtonColorDark
-                      : ChartColors.eventButtonColorLight,
-                  shape: const StadiumBorder(),
-                ),
-                onPressed: () {
-                  _navigateToEventsScreen(context);
-                },
-                child: const Text(
-                  'Todos os Eventos',
-                  style: TextStyle(color: Colors.white),
+            Container(
+              color: isDarkMode ? ChartColors.backgroundDark : Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isDarkMode
+                        ? ChartColors.eventButtonColorDark
+                        : ChartColors.eventButtonColorLight,
+                    shape: const StadiumBorder(),
+                  ),
+                  onPressed: () {
+                    _navigateToEventsScreen(context);
+                  },
+                  child: const Text(
+                    'Todos os Eventos',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ),
