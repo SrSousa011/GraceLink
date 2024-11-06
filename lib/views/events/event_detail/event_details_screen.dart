@@ -158,14 +158,14 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                               onSelected: (value) {
                                 if (value == 'edit') {
                                   _navigateToUpdateEventScreen(context, _event);
+                                } else if (value == 'changeImage') {
+                                  _pickImage();
                                 } else if (value == 'delete') {
                                   EventDelete.confirmDeleteEvent(
                                     context,
                                     _event.id,
                                     _event.title,
                                   );
-                                } else if (value == 'changeImage') {
-                                  _pickImage();
                                 }
                               },
                               itemBuilder: (BuildContext context) =>
@@ -178,6 +178,20 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                             ? Colors.white
                                             : Colors.blue),
                                     title: Text('Editar',
+                                        style: TextStyle(
+                                            color: isDarkMode
+                                                ? Colors.white
+                                                : Colors.black)),
+                                  ),
+                                ),
+                                PopupMenuItem<String>(
+                                  value: 'changeImage',
+                                  child: ListTile(
+                                    leading: Icon(Icons.image,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.blue),
+                                    title: Text('Nova foto',
                                         style: TextStyle(
                                             color: isDarkMode
                                                 ? Colors.white
@@ -198,20 +212,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                                 : Colors.red)),
                                   ),
                                 ),
-                                PopupMenuItem<String>(
-                                  value: 'changeImage',
-                                  child: ListTile(
-                                    leading: Icon(Icons.image,
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.blue),
-                                    title: Text('Nova foto',
-                                        style: TextStyle(
-                                            color: isDarkMode
-                                                ? Colors.white
-                                                : Colors.black)),
-                                  ),
-                                ),
                               ],
                               icon: Icon(Icons.more_vert,
                                   color:
@@ -221,11 +221,11 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 12.0, top: 4.0),
+                      padding: const EdgeInsets.only(left: 22.0, top: 4.0),
                       child: Text(
                         updatedEvent.location,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           color:
                               isDarkMode ? Colors.grey[400] : Colors.grey[700],
                         ),
