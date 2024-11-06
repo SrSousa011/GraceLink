@@ -23,7 +23,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  Future<List<Event>>? _eventsFuture;
+  Future<List<EventService>>? _eventsFuture;
 
   @override
   void initState() {
@@ -31,7 +31,7 @@ class _HomeState extends State<Home> {
     _eventsFuture = _fetchEvents();
   }
 
-  Future<List<Event>> _fetchEvents() async {
+  Future<List<EventService>> _fetchEvents() async {
     CollectionReference events =
         FirebaseFirestore.instance.collection('events');
     DateTime now = DateTime.now();
@@ -45,8 +45,8 @@ class _HomeState extends State<Home> {
         .orderBy('date', descending: true)
         .get();
     return snapshot.docs
-        .map((doc) =>
-            Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
+        .map((doc) => EventService.fromFirestore(
+            doc.id, doc.data() as Map<String, dynamic>))
         .toList();
   }
 
@@ -107,55 +107,34 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
       drawer: const NavBar(),
-      backgroundColor: isDarkMode
-          ? ChartColors.backgroundDark
-          : Colors.white, // Apply white background for light mode
-      body: Stack(
-        children: [
-          CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                title: const Text(
-                  'Home',
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
-                ),
-                floating: true,
-                pinned: false,
-                snap: true,
-                actions: [
-                  IconButton(
-                    icon: Icon(
-                      isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                      color: isDarkMode ? Colors.white : Colors.black,
-                    ),
-                    onPressed: () {
-                      themeProvider.toggleTheme();
-                    },
-                  ),
-                ],
-              ),
-              SliverPadding(
-                padding: EdgeInsets.zero,
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate(
-                    [
-                      _buildHeader(isDarkMode),
-                      const SizedBox(height: 20),
-                      _buildUpcomingEventsSection(isDarkMode),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: _buildFooter(isDarkMode),
+      appBar: AppBar(
+        title: const Text("Home"),
+        backgroundColor: isDarkMode ? ChartColors.backgroundDark : Colors.white,
+        actions: [
+          IconButton(
+            icon: Icon(
+              isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
+            onPressed: () {
+              themeProvider.toggleTheme();
+            },
           ),
         ],
+      ),
+      backgroundColor: isDarkMode
+          ? Colors.black87
+          : Colors.white, // Ajuste no fundo para modo escuro
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildHeader(isDarkMode),
+            const SizedBox(height: 20),
+            _buildUpcomingEventsSection(isDarkMode),
+            const SizedBox(height: 20),
+            _buildFooter(isDarkMode),
+          ],
+        ),
       ),
     );
   }
@@ -166,8 +145,8 @@ class _HomeState extends State<Home> {
       height: 200,
       decoration: BoxDecoration(
         color: isDarkMode
-            ? ChartColors.backgroundDark
-            : Colors.white, // Background will be white in light mode
+            ? Colors.black87
+            : Colors.white, // Ajuste no fundo da header
         image: const DecorationImage(
           image: AssetImage(tLogo),
           fit: BoxFit.contain,
@@ -197,7 +176,7 @@ class _HomeState extends State<Home> {
   }
 
   Widget _buildUpcomingEventsSection(bool isDarkMode) {
-    return FutureBuilder<List<Event>>(
+    return FutureBuilder<List<EventService>>(
       future: _eventsFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -206,6 +185,7 @@ class _HomeState extends State<Home> {
         if (snapshot.hasError) {
           return const Center(child: Text('Erro ao carregar eventos'));
         }
+
         final events = snapshot.data ?? [];
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,7 +212,7 @@ class _HomeState extends State<Home> {
                               fontWeight: FontWeight.bold,
                               color: isDarkMode
                                   ? ChartColors.eventTextColorDark
-                                  : Colors.black, // Text color
+                                  : Colors.black,
                             ),
                           ),
                         ),
@@ -245,7 +225,7 @@ class _HomeState extends State<Home> {
                                 fontSize: 14.0,
                                 color: isDarkMode
                                     ? ChartColors.eventTextColorDark
-                                    : Colors.black54, // Location color
+                                    : Colors.black54,
                               ),
                             ),
                           ),
@@ -273,7 +253,9 @@ class _HomeState extends State<Home> {
                   child: Text('Não há eventos agendados para este mês.')),
             const SizedBox(height: 20),
             Container(
-              color: isDarkMode ? ChartColors.backgroundDark : Colors.white,
+              color: isDarkMode
+                  ? Colors.black87
+                  : Colors.white, // Ajuste no fundo para o botão
               padding: const EdgeInsets.symmetric(vertical: 20.0),
               child: Center(
                 child: ElevatedButton(
@@ -287,8 +269,11 @@ class _HomeState extends State<Home> {
                     _navigateToEventsScreen(context);
                   },
                   child: const Text(
-                    'Todos os Eventos',
-                    style: TextStyle(color: Colors.white),
+                    "todos os eventos",
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -301,14 +286,9 @@ class _HomeState extends State<Home> {
 
   Widget _buildFooter(bool isDarkMode) {
     return Container(
-      width: double.infinity,
       padding: const EdgeInsets.all(20),
-      color: isDarkMode
-          ? ChartColors.backgroundDark
-          : Colors.white, // White footer
+      color: isDarkMode ? Colors.black87 : Colors.white,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text(
             'Informações Importantes',
@@ -333,28 +313,36 @@ class _HomeState extends State<Home> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
-                icon: Image.asset(tInsta, width: 40),
-                color: isDarkMode ? Colors.white : Colors.black,
+                icon: Image.asset(
+                  tInsta,
+                  width: 40,
+                ),
                 onPressed: _launchInstagram,
               ),
               IconButton(
-                icon: Image.asset(tFace, width: 40),
-                color: isDarkMode ? Colors.white : Colors.black,
+                icon: Image.asset(
+                  tFace,
+                  width: 40,
+                ),
                 onPressed: _launchFacebook,
               ),
               IconButton(
-                icon: Image.asset(tLogo, width: 50),
-                color: isDarkMode ? Colors.white : Colors.black,
+                icon: Image.asset(
+                  tLogo,
+                  width: 50,
+                ),
                 onPressed: _launchChurchPage,
               ),
               IconButton(
-                icon: Image.asset(tYoutube, width: 50),
-                color: isDarkMode ? Colors.white : Colors.black,
+                icon: Image.asset(
+                  tYoutube,
+                  width: 50,
+                ),
                 onPressed: _launchYouTube,
               ),
             ],
@@ -364,18 +352,20 @@ class _HomeState extends State<Home> {
     );
   }
 
-  void _navigateToEventsScreen(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const Events()),
-    );
-  }
-
-  void _navigateToEventDetailsScreen(BuildContext context, Event event) {
+  void _navigateToEventDetailsScreen(BuildContext context, EventService event) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => EventDetailsScreen(event: event),
+      ),
+    );
+  }
+
+  void _navigateToEventsScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const Events(),
       ),
     );
   }
