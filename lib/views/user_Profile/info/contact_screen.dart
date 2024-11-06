@@ -2,7 +2,7 @@ import 'package:churchapp/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-const String tWhatsApp = 'assets/icons/WhatsApp.jpg';
+const String tWhatsApp = 'assets/icons/whatsapp.png';
 
 class ContactScreen extends StatefulWidget {
   const ContactScreen({super.key});
