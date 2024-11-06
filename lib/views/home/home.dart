@@ -11,7 +11,6 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 const String tLogo = 'assets/icons/logo.png';
-const String trLogo = 'assets/icons/rlogo.png';
 const String tInsta = 'assets/icons/insta.png';
 const String tFace = 'assets/icons/face.png';
 const String tYoutube = 'assets/icons/youtube.png';
@@ -78,7 +77,7 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future<void> _launchDonationPage() async {
+  Future<void> _launchChurchPage() async {
     const donationUrl =
         "https://linktr.ee/igrejaresplandecendoasnacoes?utm_source=linktree_profile_share";
     try {
@@ -108,6 +107,8 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
       drawer: const NavBar(),
+      backgroundColor:
+          isDarkMode ? ChartColors.backgroundDark : ChartColors.backgroundColor,
       body: Stack(
         children: [
           CustomScrollView(
@@ -139,7 +140,7 @@ class _HomeState extends State<Home> {
                 sliver: SliverList(
                   delegate: SliverChildListDelegate(
                     [
-                      _buildHeader(),
+                      _buildHeader(isDarkMode),
                       const SizedBox(height: 20),
                       _buildUpcomingEventsSection(isDarkMode),
                       const SizedBox(height: 20),
@@ -151,19 +152,21 @@ class _HomeState extends State<Home> {
           ),
           Align(
             alignment: Alignment.bottomCenter,
-            child: _buildFooter(),
+            child: _buildFooter(isDarkMode),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(bool isDarkMode) {
     return Container(
       width: double.infinity,
       height: 200,
-      decoration: const BoxDecoration(
-        image: DecorationImage(
+      decoration: BoxDecoration(
+        color:
+            isDarkMode ? ChartColors.backgroundDark : ChartColors.whiteToDark,
+        image: const DecorationImage(
           image: AssetImage(tLogo),
           fit: BoxFit.contain,
         ),
@@ -175,7 +178,7 @@ class _HomeState extends State<Home> {
             child: Text(
               'Bem-vindo à Igreja',
               style: TextStyle(
-                color: ChartColors.headerTextColor,
+                color: ChartColors.white,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 shadows: [
@@ -274,19 +277,13 @@ class _HomeState extends State<Home> {
                       ? ChartColors.eventButtonColorDark
                       : ChartColors.eventButtonColorLight,
                   shape: const StadiumBorder(),
-                  foregroundColor: Colors.white,
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Events()),
-                  );
+                  _navigateToEventsScreen(context);
                 },
                 child: const Text(
                   'Todos os Eventos',
-                  style: TextStyle(
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
             ),
@@ -296,12 +293,14 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(bool isDarkMode) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      color: Colors.white,
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      color: isDarkMode ? ChartColors.backgroundDark : ChartColors.whiteToDark,
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text(
             'Informações Importantes',
@@ -309,67 +308,58 @@ class _HomeState extends State<Home> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
-          const Text(
-            'Endereço:\n'
-            'Rue de Rodange 67B, 6791 Aubange, Bélgica',
-            style: TextStyle(fontSize: 14),
+          Text(
+            'Endereço:\nRue de Rodange 67B, 6791 Aubange, Bélgica',
+            style: TextStyle(
+              fontSize: 14,
+              color: isDarkMode ? Colors.white70 : Colors.black87,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
-          const Text(
-            'Cultos:\n'
-            'Domingos 10h da manhã\n'
-            'Segundas 19h30',
-            style: TextStyle(fontSize: 14),
+          Text(
+            'Cultos:\nDomingos 10h da manhã\nSegundas 19h30',
+            style: TextStyle(
+              fontSize: 14,
+              color: isDarkMode ? Colors.white70 : Colors.black87,
+            ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 20),
-          _buildSocialMediaFooter(),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: Image.asset(tInsta, width: 40),
+                color: isDarkMode ? Colors.white : Colors.black,
+                onPressed: _launchInstagram,
+              ),
+              IconButton(
+                icon: Image.asset(tFace, width: 40),
+                color: isDarkMode ? Colors.white : Colors.black,
+                onPressed: _launchFacebook,
+              ),
+              IconButton(
+                icon: Image.asset(tLogo, width: 50),
+                color: isDarkMode ? Colors.white : Colors.black,
+                onPressed: _launchChurchPage,
+              ),
+              IconButton(
+                icon: Image.asset(tYoutube, width: 50),
+                color: isDarkMode ? Colors.white : Colors.black,
+                onPressed: _launchYouTube,
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSocialMediaFooter() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        GestureDetector(
-          onTap: _launchInstagram,
-          child: Image.asset(
-            tInsta,
-            width: 50,
-            height: 50,
-          ),
-        ),
-        const SizedBox(width: 10),
-        GestureDetector(
-          onTap: _launchFacebook,
-          child: Image.asset(
-            tFace,
-            width: 50,
-            height: 50,
-          ),
-        ),
-        const SizedBox(width: 10),
-        GestureDetector(
-          onTap: _launchDonationPage,
-          child: Image.asset(
-            trLogo,
-            width: 50,
-            height: 50,
-          ),
-        ),
-        const SizedBox(width: 10),
-        GestureDetector(
-          onTap: _launchYouTube,
-          child: Image.asset(
-            tYoutube,
-            width: 50,
-            height: 50,
-          ),
-        ),
-      ],
+  void _navigateToEventsScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const Events()),
     );
   }
 

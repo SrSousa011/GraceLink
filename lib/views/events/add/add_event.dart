@@ -260,7 +260,7 @@ class _AddEventFormState extends State<AddEventForm> {
         icon: Icon(icon,
             color: isDarkMode
                 ? ChartColors.eventTextColorDark
-                : ChartColors.eventTextColorLight),
+                : ChartColors.black),
       ),
     );
   }
@@ -276,7 +276,7 @@ class _AddEventFormState extends State<AddEventForm> {
         icon: Icon(Icons.calendar_today,
             color: isDarkMode
                 ? ChartColors.eventTextColorDark
-                : ChartColors.eventTextColorLight),
+                : ChartColors.black),
       ),
     );
   }
@@ -292,7 +292,7 @@ class _AddEventFormState extends State<AddEventForm> {
         icon: Icon(Icons.access_time,
             color: isDarkMode
                 ? ChartColors.eventTextColorDark
-                : ChartColors.eventTextColorLight),
+                : ChartColors.black),
       ),
     );
   }
@@ -310,7 +310,7 @@ class _AddEventFormState extends State<AddEventForm> {
         icon: Icon(Icons.location_on,
             color: isDarkMode
                 ? ChartColors.eventTextColorDark
-                : ChartColors.eventTextColorLight),
+                : ChartColors.black),
       ),
     );
   }

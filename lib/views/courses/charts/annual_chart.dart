@@ -125,7 +125,7 @@ class AnnualCoursesChart extends StatelessWidget {
                 _buildLegendItem('Mulher Única', safeMonthlyMulherUnica,
                     ChartColors.mulherUnica, isDarkMode),
                 _buildLegendItem(
-                    'Total', annualTotalIncome, ChartColors.total, isDarkMode),
+                    'Total', annualTotalIncome, ChartColors.black, isDarkMode),
               ],
             ),
           ],

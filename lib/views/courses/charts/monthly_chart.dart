@@ -128,7 +128,7 @@ class MonthlyCoursesChart extends StatelessWidget {
                 _buildLegendItem('Mulher Única', safeMonthlyMulherUnica,
                     ChartColors.mulherUnica, isDarkMode),
                 _buildLegendItem(
-                    'Total', currentTotalIncome, ChartColors.total, isDarkMode),
+                    'Total', currentTotalIncome, ChartColors.black, isDarkMode),
               ],
             ),
           ],
