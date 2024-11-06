@@ -16,7 +16,7 @@ import 'package:churchapp/views/events/event_service.dart';
 import 'package:churchapp/views/events/event_detail/event_details.dart';
 
 class EventDetailsScreen extends StatefulWidget {
-  final Event event;
+  final EventService event;
 
   const EventDetailsScreen({super.key, required this.event});
 
@@ -25,7 +25,7 @@ class EventDetailsScreen extends StatefulWidget {
 }
 
 class _EventDetailsScreenState extends State<EventDetailsScreen> {
-  late Event _event;
+  late EventService _event;
   bool _isAdmin = false;
   String? _currentUserId;
   final AuthenticationService _authService = AuthenticationService();
@@ -107,12 +107,63 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               color: isDarkMode ? Colors.white : Colors.black),
           onPressed: _navigateToEventScreen,
         ),
-        title: const Text(
-          'Evento',
-          style: TextStyle(
-            fontSize: 18,
-          ),
+        title: Text(
+          _event.title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          overflow: TextOverflow.ellipsis,
         ),
+        actions: [
+          if (_shouldShowPopupMenu())
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == 'edit') {
+                  _navigateToUpdateEventScreen(context, _event);
+                } else if (value == 'changeImage') {
+                  _pickImage();
+                } else if (value == 'delete') {
+                  EventDelete.confirmDeleteEvent(
+                    context,
+                    _event.id,
+                    _event.title,
+                  );
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                  value: 'edit',
+                  child: ListTile(
+                    leading: Icon(Icons.edit,
+                        color: isDarkMode ? Colors.white : Colors.blue),
+                    title: Text('Editar',
+                        style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black)),
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'changeImage',
+                  child: ListTile(
+                    leading: Icon(Icons.image,
+                        color: isDarkMode ? Colors.white : Colors.blue),
+                    title: Text('Nova foto',
+                        style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black)),
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'delete',
+                  child: ListTile(
+                    leading: Icon(Icons.delete,
+                        color: isDarkMode ? Colors.grey[300] : Colors.red),
+                    title: Text('Deletar',
+                        style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.red)),
+                  ),
+                ),
+              ],
+              icon: Icon(Icons.more_vert,
+                  color: isDarkMode ? Colors.white : Colors.black),
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -130,96 +181,14 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 }
 
                 final eventData = snapshot.data!;
-                final updatedEvent = Event.fromSnapshot(eventData);
+                final updatedEvent = EventService.fromSnapshot(eventData);
+
+                _event = updatedEvent;
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 4.0),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(top: 4.0, left: 12.0),
-                            child: Text(
-                              updatedEvent.title,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: isDarkMode ? Colors.white : Colors.black,
-                              ),
-                            ),
-                          ),
-                          if (_shouldShowPopupMenu())
-                            PopupMenuButton<String>(
-                              onSelected: (value) {
-                                if (value == 'edit') {
-                                  _navigateToUpdateEventScreen(context, _event);
-                                } else if (value == 'changeImage') {
-                                  _pickImage();
-                                } else if (value == 'delete') {
-                                  EventDelete.confirmDeleteEvent(
-                                    context,
-                                    _event.id,
-                                    _event.title,
-                                  );
-                                }
-                              },
-                              itemBuilder: (BuildContext context) =>
-                                  <PopupMenuEntry<String>>[
-                                PopupMenuItem<String>(
-                                  value: 'edit',
-                                  child: ListTile(
-                                    leading: Icon(Icons.edit,
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.blue),
-                                    title: Text('Editar',
-                                        style: TextStyle(
-                                            color: isDarkMode
-                                                ? Colors.white
-                                                : Colors.black)),
-                                  ),
-                                ),
-                                PopupMenuItem<String>(
-                                  value: 'changeImage',
-                                  child: ListTile(
-                                    leading: Icon(Icons.image,
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.blue),
-                                    title: Text('Nova foto',
-                                        style: TextStyle(
-                                            color: isDarkMode
-                                                ? Colors.white
-                                                : Colors.black)),
-                                  ),
-                                ),
-                                PopupMenuItem<String>(
-                                  value: 'delete',
-                                  child: ListTile(
-                                    leading: Icon(Icons.delete,
-                                        color: isDarkMode
-                                            ? Colors.grey[300]
-                                            : Colors.red),
-                                    title: Text('Deletar',
-                                        style: TextStyle(
-                                            color: isDarkMode
-                                                ? Colors.white
-                                                : Colors.red)),
-                                  ),
-                                ),
-                              ],
-                              icon: Icon(Icons.more_vert,
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black),
-                            ),
-                        ],
-                      ),
-                    ),
                     Padding(
                       padding: const EdgeInsets.only(left: 22.0, top: 4.0),
                       child: Text(
@@ -262,8 +231,9 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     );
   }
 
-  void _navigateToUpdateEventScreen(BuildContext context, Event event) async {
-    final updatedEvent = await Navigator.push<Event>(
+  void _navigateToUpdateEventScreen(
+      BuildContext context, EventService event) async {
+    final updatedEvent = await Navigator.push<EventService>(
       context,
       MaterialPageRoute(builder: (context) => UpdateEventForm(event: event)),
     );
@@ -283,7 +253,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
     if (result != null && context.mounted) {
       setState(() {
-        _event = Event(
+        _event = EventService(
           id: result['id'],
           title: result['title'],
           description: result['description'],
