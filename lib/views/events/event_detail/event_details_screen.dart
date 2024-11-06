@@ -231,6 +231,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 10),
                     Padding(
                       padding: const EdgeInsets.all(0.0),
                       child: EventImage(
