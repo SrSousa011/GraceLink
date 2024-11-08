@@ -25,6 +25,7 @@ class _AddEventFormState extends State<AddEventForm> {
   TimeOfDay? _selectedTime;
   String _location = '';
   String? _imageUrl;
+  bool _isLoadingImage = false;
   final ImagePicker _picker = ImagePicker();
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -39,8 +40,8 @@ class _AddEventFormState extends State<AddEventForm> {
     _locationController = TextEditingController();
     _selectedDate = DateTime.now();
     _selectedTime = TimeOfDay.now();
-    _notificationService.requestNotificationPermission();
     _authenticationService = AuthenticationService();
+    _notificationService.initialize(NotificationEvents().navigatorKey);
   }
 
   @override
@@ -80,19 +81,24 @@ class _AddEventFormState extends State<AddEventForm> {
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
+      setState(() {
+        _isLoadingImage = true;
+      });
       try {
         final file = await pickedFile.readAsBytes();
         final fileName = DateTime.now().millisecondsSinceEpoch.toString();
         final storageRef = _storage.ref().child('event_images/$fileName');
         final uploadTask = storageRef.putData(file);
-
         final snapshot = await uploadTask.whenComplete(() {});
         final downloadUrl = await snapshot.ref.getDownloadURL();
-
         setState(() {
           _imageUrl = downloadUrl;
+          _isLoadingImage = false;
         });
       } catch (e) {
+        setState(() {
+          _isLoadingImage = false;
+        });
         if (!mounted) return;
         _showErrorDialog(context, 'Erro ao selecionar imagem',
             'Ocorreu um erro ao tentar selecionar a imagem: ${e.toString()}');
@@ -215,14 +221,30 @@ class _AddEventFormState extends State<AddEventForm> {
                 const SizedBox(height: 20.0),
                 _buildLocationField(isDarkMode: isDarkMode),
                 const SizedBox(height: 20.0),
-                if (_imageUrl != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Image.network(
-                      _imageUrl!,
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
+                if (_isLoadingImage)
+                  Center(child: CircularProgressIndicator())
+                else if (_imageUrl != null)
+                  GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Dialog(
+                            child: InteractiveViewer(
+                              child: Image.network(_imageUrl!),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Image.network(
+                        _imageUrl!,
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 const SizedBox(height: 100.0),
@@ -272,7 +294,7 @@ class _AddEventFormState extends State<AddEventForm> {
       decoration: InputDecoration(
         labelText: _selectedDate != null
             ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
-            : 'Selecionar Data',
+            : 'Selecione a data',
         icon: Icon(Icons.calendar_today,
             color: isDarkMode
                 ? ChartColors.eventTextColorDark
@@ -288,7 +310,7 @@ class _AddEventFormState extends State<AddEventForm> {
       decoration: InputDecoration(
         labelText: _selectedTime != null
             ? _selectedTime!.format(context)
-            : 'Selecionar Hora',
+            : 'Selecione o horário',
         icon: Icon(Icons.access_time,
             color: isDarkMode
                 ? ChartColors.eventTextColorDark
@@ -299,14 +321,14 @@ class _AddEventFormState extends State<AddEventForm> {
 
   Widget _buildLocationField({required bool isDarkMode}) {
     return TextField(
+      controller: _locationController,
       onChanged: (value) {
         setState(() {
           _location = value;
         });
       },
-      controller: _locationController,
       decoration: InputDecoration(
-        labelText: 'Localização do Evento',
+        labelText: 'Localização',
         icon: Icon(Icons.location_on,
             color: isDarkMode
                 ? ChartColors.eventTextColorDark
@@ -316,24 +338,12 @@ class _AddEventFormState extends State<AddEventForm> {
   }
 
   Widget _buildSaveButton({required bool isDarkMode}) {
-    return ElevatedButton(
+    return FloatingActionButton(
       onPressed: () => _saveEvent(context),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isDarkMode
-            ? ChartColors.eventButtonColorDark
-            : ChartColors.eventButtonColorLight,
-        minimumSize: const Size(100, 40),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-      ),
-      child: Text(
-        'Salvar',
-        style: TextStyle(
-          color: ChartColors.whiteToDark,
-          fontSize: 14,
-        ),
-      ),
+      backgroundColor: isDarkMode
+          ? ChartColors.eventButtonColorDark
+          : ChartColors.eventButtonColorLight,
+      child: Icon(Icons.save, color: ChartColors.whiteToDark),
     );
   }
 }

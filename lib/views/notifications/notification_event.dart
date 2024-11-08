@@ -9,10 +9,11 @@ class NotificationEvents {
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   FlutterLocalNotificationsPlugin? _flutterLocalNotificationsPlugin;
+  bool _isInitialized = false;
 
   NotificationEvents._internal();
 
-  Future<void> init(GlobalKey<NavigatorState> navigatorKey) async {
+  Future<void> initialize(GlobalKey<NavigatorState> navigatorKey) async {
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
     const AndroidInitializationSettings initializationSettingsAndroid =
@@ -54,6 +55,8 @@ class NotificationEvents {
     });
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+    _isInitialized = true; // Marca como inicializado
   }
 
   static Future<void> _firebaseMessagingBackgroundHandler(
@@ -91,7 +94,7 @@ class NotificationEvents {
 
   Future<void> showNotification(String title, String body, String payload,
       {required String eventId}) async {
-    if (_flutterLocalNotificationsPlugin == null) {
+    if (!_isInitialized || _flutterLocalNotificationsPlugin == null) {
       throw Exception("Notification plugin not initialized");
     }
 
