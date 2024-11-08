@@ -5,7 +5,7 @@ import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/views/events/event_service.dart';
 
 class UpdateEventForm extends StatefulWidget {
-  final Event event;
+  final EventService event;
 
   const UpdateEventForm({super.key, required this.event});
 
@@ -77,7 +77,7 @@ class _UpdateEventFormState extends State<UpdateEventForm> {
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty &&
         _locationController.text.isNotEmpty) {
-      final updatedEvent = Event(
+      final updatedEvent = EventService(
         id: widget.event.id,
         title: _titleController.text,
         description: _descriptionController.text,

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class Event {
+class EventService {
   final String id;
   final String title;
   final String description;
@@ -12,7 +12,7 @@ class Event {
   final String createdBy;
   final String? imageUrl;
 
-  Event({
+  EventService({
     required this.id,
     required this.title,
     required this.description,
@@ -23,7 +23,7 @@ class Event {
     this.imageUrl,
   });
 
-  factory Event.fromFirestore(String id, Map<String, dynamic> data) {
+  factory EventService.fromFirestore(String id, Map<String, dynamic> data) {
     DateTime eventDate;
 
     if (data['date'] is Timestamp) {
@@ -31,9 +31,9 @@ class Event {
     } else if (data['date'] is String) {
       final parts = data['date'].split('/');
       eventDate = DateTime(
-        int.parse(parts[2]), // Year
-        int.parse(parts[1]), // Month
-        int.parse(parts[0]), // Day
+        int.parse(parts[2]),
+        int.parse(parts[1]),
+        int.parse(parts[0]),
       );
     } else {
       throw Exception('Invalid date format');
@@ -50,7 +50,7 @@ class Event {
       throw Exception('Invalid time format');
     }
 
-    return Event(
+    return EventService(
       id: id,
       title: data['title'] ?? '',
       description: data['description'] ?? '',
@@ -62,9 +62,9 @@ class Event {
     );
   }
 
-  factory Event.fromSnapshot(DocumentSnapshot snapshot) {
+  factory EventService.fromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
-    return Event.fromFirestore(snapshot.id, data);
+    return EventService.fromFirestore(snapshot.id, data);
   }
 
   Map<String, dynamic> toMap() {
@@ -80,7 +80,7 @@ class Event {
   }
 }
 
-Future<void> addEvent(Event event) async {
+Future<void> addEvent(EventService event) async {
   try {
     CollectionReference events =
         FirebaseFirestore.instance.collection('events');
@@ -93,7 +93,7 @@ Future<void> addEvent(Event event) async {
   }
 }
 
-Future<void> updateEvent(Event event, String eventId) async {
+Future<void> updateEvent(EventService event, String eventId) async {
   try {
     CollectionReference events =
         FirebaseFirestore.instance.collection('events');
@@ -119,14 +119,14 @@ Future<void> deleteEvent(String eventId) async {
   }
 }
 
-Future<Event> getEventById(String eventId) async {
+Future<EventService> getEventById(String eventId) async {
   try {
     DocumentReference eventRef =
         FirebaseFirestore.instance.collection('events').doc(eventId);
     DocumentSnapshot snapshot = await eventRef.get();
 
     if (snapshot.exists) {
-      return Event.fromFirestore(
+      return EventService.fromFirestore(
           eventId, snapshot.data() as Map<String, dynamic>);
     } else {
       throw Exception('Event not found');
@@ -139,7 +139,7 @@ Future<Event> getEventById(String eventId) async {
   }
 }
 
-Future<List<Event>> getAllEvents() async {
+Future<List<EventService>> getAllEvents() async {
   try {
     CollectionReference events =
         FirebaseFirestore.instance.collection('events');
@@ -149,7 +149,8 @@ Future<List<Event>> getAllEvents() async {
       return [];
     } else {
       return snapshot.docs.map((doc) {
-        return Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>);
+        return EventService.fromFirestore(
+            doc.id, doc.data() as Map<String, dynamic>);
       }).toList();
     }
   } catch (e) {

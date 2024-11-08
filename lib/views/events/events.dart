@@ -16,9 +16,9 @@ class Events extends StatefulWidget {
 }
 
 class _EventsState extends State<Events> {
-  Future<List<Event>>? _eventsFuture;
-  List<Event> _allEvents = [];
-  List<Event> _filteredEvents = [];
+  Future<List<EventService>>? _eventsFuture;
+  List<EventService> _allEvents = [];
+  List<EventService> _filteredEvents = [];
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
@@ -31,13 +31,13 @@ class _EventsState extends State<Events> {
     _fetchCurrentUserData();
   }
 
-  Future<List<Event>> _fetchEvents() async {
+  Future<List<EventService>> _fetchEvents() async {
     CollectionReference events =
         FirebaseFirestore.instance.collection('events');
     var snapshot = await events.orderBy('date', descending: true).get();
     final eventsList = snapshot.docs
-        .map((doc) =>
-            Event.fromFirestore(doc.id, doc.data() as Map<String, dynamic>))
+        .map((doc) => EventService.fromFirestore(
+            doc.id, doc.data() as Map<String, dynamic>))
         .toList();
 
     setState(() {
@@ -48,7 +48,7 @@ class _EventsState extends State<Events> {
     return eventsList;
   }
 
-  List<Event> _filterEvents(String query) {
+  List<EventService> _filterEvents(String query) {
     if (query.isEmpty) {
       return _allEvents;
     }
@@ -137,7 +137,7 @@ class _EventsState extends State<Events> {
           ),
           SliverPadding(
             padding: const EdgeInsets.all(0.0),
-            sliver: FutureBuilder<List<Event>>(
+            sliver: FutureBuilder<List<EventService>>(
               future: _eventsFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -248,7 +248,8 @@ class _EventsState extends State<Events> {
     }
   }
 
-  void _navigateToEventDetailsScreen(BuildContext context, Event event) async {
+  void _navigateToEventDetailsScreen(
+      BuildContext context, EventService event) async {
     final updatedEvent = await Navigator.push(
       context,
       _createPageRoute(EventDetailsScreen(event: event)),

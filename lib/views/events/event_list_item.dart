@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class EventListItem extends StatelessWidget {
-  final Event event;
+  final EventService event;
 
   const EventListItem({super.key, required this.event});
 

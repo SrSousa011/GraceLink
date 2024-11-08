@@ -3,8 +3,8 @@ import 'package:churchapp/views/events/event_service.dart';
 import 'package:flutter/material.dart';
 
 class EventListView extends StatelessWidget {
-  final List<Event> events;
-  final void Function(Event) onTap;
+  final List<EventService> events;
+  final void Function(EventService) onTap;
 
   const EventListView({
     super.key,
