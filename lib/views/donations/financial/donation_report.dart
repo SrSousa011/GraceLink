@@ -85,6 +85,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
 
               final donations = donationsSnapshot.data ?? [];
 
+              // ignore: avoid_types_as_parameter_names
               final double totalBalance = donations.fold(0.0, (sum, donation) {
                 return sum + (donation.donationValue.toDouble());
               });
@@ -97,6 +98,7 @@ class _DonationReportScreenState extends State<DonationReportScreen> {
                 final timestamp = donation.timestamp.toDate();
                 return timestamp.isAfter(startOfMonth) &&
                     timestamp.isBefore(endOfMonth);
+                // ignore: avoid_types_as_parameter_names
               }).fold(0.0, (sum, donation) {
                 return sum + (donation.donationValue.toDouble());
               });
