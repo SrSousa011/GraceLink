@@ -41,7 +41,7 @@ class _AddEventFormState extends State<AddEventForm> {
     _selectedDate = DateTime.now();
     _selectedTime = TimeOfDay.now();
     _authenticationService = AuthenticationService();
-    _notificationService.initialize(NotificationEvents().navigatorKey);
+    _notificationService.init(NotificationEvents().navigatorKey);
   }
 
   @override

@@ -184,8 +184,8 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
       });
 
       await NotificationPhotos().showNotification(
-        'Nova Foto Adicionada',
-        'Uma nova foto foi adicionada na localização: $location.',
+        '🎉 Nova Foto Acabou de Chegar!',
+        'Não perca! Clique aqui para conferir a foto recém-adicionada.',
         'fotos_payload',
       );
 

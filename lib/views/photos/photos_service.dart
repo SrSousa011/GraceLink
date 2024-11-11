@@ -1,8 +1,8 @@
-import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:churchapp/data/model/photos_data.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
@@ -46,23 +46,19 @@ class PhotosService {
   }
 
   Future<void> updatePhotoData(
-      String location, // ID do documento
-      List<String> imageUrls, // Novos URLs de imagens
-      String uploadId // ID de upload associado
-      ) async {
+      String location, List<String> imageUrls, String uploadId) async {
     final locationDocRef = _firestore.collection('photos').doc(location);
 
     try {
-      // Atualiza os campos específicos
       await locationDocRef.update({
         'urls': imageUrls,
         'uploadId': uploadId,
-        'updatedAt': FieldValue
-            .serverTimestamp(), // Adiciona um campo de timestamp para rastrear quando foi atualizado
+        'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      // Melhorar a captura e registro de erros para depuração
-      print('Error updating photo data: $e');
+      if (kDebugMode) {
+        print('Error updating photo data: $e');
+      }
       throw Exception('Error updating photo data: $e');
     }
   }
