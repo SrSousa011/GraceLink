@@ -9,6 +9,8 @@ class NotificationPhotos {
 
   NotificationPhotos._internal();
 
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   Future<void> init(GlobalKey<NavigatorState> navigatorKey) async {
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
