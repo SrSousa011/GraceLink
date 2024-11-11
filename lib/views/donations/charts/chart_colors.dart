@@ -9,7 +9,9 @@ class DonationChartColors {
 
   static const Color yearlyChart = Colors.green;
 
-  static bool isDarkMode = false;
-
-  static Color themeTextColor = Colors.black;
+  static Color themeTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+  }
 }

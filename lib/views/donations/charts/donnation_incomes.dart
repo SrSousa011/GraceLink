@@ -165,8 +165,6 @@ class _DonationIncomesState extends State<DonationIncomes> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Renda das Doações'),
@@ -182,7 +180,7 @@ class _DonationIncomesState extends State<DonationIncomes> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: DonationChartColors.themeTextColor,
+                  color: DonationChartColors.themeTextColor(context),
                 ),
               ),
               const SizedBox(height: 16),
@@ -192,7 +190,6 @@ class _DonationIncomesState extends State<DonationIncomes> {
                 currentProjetoDoarAAmar: currentProjetoDoarAAmar,
                 currentMissaoAfrica: currentMissaoAfrica,
                 currentotalIncome: currentotalIncome,
-                isDarkMode: isDarkMode,
               ),
               const SizedBox(height: 60),
               Text(
@@ -200,7 +197,7 @@ class _DonationIncomesState extends State<DonationIncomes> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: DonationChartColors.themeTextColor,
+                  color: DonationChartColors.themeTextColor(context),
                 ),
               ),
               const SizedBox(height: 16),
@@ -210,7 +207,6 @@ class _DonationIncomesState extends State<DonationIncomes> {
                 totalProjetoDoarAAmar: totalAnnualProjetoDoarAAmar,
                 totalMissaoAfrica: totalAnnualMissaoAfrica,
                 totalAnnualDonations: totalIncome,
-                isDarkMode: isDarkMode,
               ),
               const SizedBox(height: 60),
               Text(
@@ -218,13 +214,13 @@ class _DonationIncomesState extends State<DonationIncomes> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: DonationChartColors.themeTextColor,
+                  color: DonationChartColors.themeTextColor(context),
                 ),
               ),
               const SizedBox(height: 20),
               YearlyDonationsChart(
                 monthlyDonations: monthlyDonations,
-                isDarkMode: isDarkMode,
+                isDarkMode: false,
               ),
             ],
           ),

@@ -9,7 +9,6 @@ class AnnualDonationsChart extends StatelessWidget {
   final double totalProjetoDoarAAmar;
   final double totalMissaoAfrica;
   final double totalAnnualDonations;
-  final bool isDarkMode;
 
   const AnnualDonationsChart({
     super.key,
@@ -18,7 +17,6 @@ class AnnualDonationsChart extends StatelessWidget {
     required this.totalProjetoDoarAAmar,
     required this.totalMissaoAfrica,
     required this.totalAnnualDonations,
-    required this.isDarkMode,
   });
 
   double safeValue(double? value) => value?.isFinite == true ? value! : 0;
@@ -44,28 +42,32 @@ class AnnualDonationsChart extends StatelessWidget {
                   color: DonationChartColors.dizimo,
                   radius: 60,
                   titleStyle: TextStyle(
-                      fontSize: 14, color: DonationChartColors.themeTextColor),
+                      fontSize: 14,
+                      color: DonationChartColors.themeTextColor(context)),
                 ),
                 PieChartSectionData(
                   value: safeTotalOferta,
                   color: DonationChartColors.oferta,
                   radius: 60,
                   titleStyle: TextStyle(
-                      fontSize: 14, color: DonationChartColors.themeTextColor),
+                      fontSize: 14,
+                      color: DonationChartColors.themeTextColor(context)),
                 ),
                 PieChartSectionData(
                   value: safeTotalProjetoDoarAAmar,
                   color: DonationChartColors.projetoDoarAAmar,
                   radius: 60,
                   titleStyle: TextStyle(
-                      fontSize: 14, color: DonationChartColors.themeTextColor),
+                      fontSize: 14,
+                      color: DonationChartColors.themeTextColor(context)),
                 ),
                 PieChartSectionData(
                   value: safeTotalMissaoAfrica,
                   color: DonationChartColors.missaoAfrica,
                   radius: 60,
                   titleStyle: TextStyle(
-                      fontSize: 14, color: DonationChartColors.themeTextColor),
+                      fontSize: 14,
+                      color: DonationChartColors.themeTextColor(context)),
                 ),
               ],
               borderData: FlBorderData(show: false),
@@ -83,18 +85,18 @@ class AnnualDonationsChart extends StatelessWidget {
               runSpacing: 8.0,
               children: [
                 _buildLegendItem('Dizimo', safeTotalDizimo,
-                    DonationChartColors.dizimo, isDarkMode),
+                    DonationChartColors.dizimo, context),
                 _buildLegendItem('Oferta', safeTotalOferta,
-                    DonationChartColors.oferta, isDarkMode),
+                    DonationChartColors.oferta, context),
                 _buildLegendItem(
                     'Projeto Doar a Amar',
                     safeTotalProjetoDoarAAmar,
                     DonationChartColors.projetoDoarAAmar,
-                    isDarkMode),
+                    context),
                 _buildLegendItem('Missão África', safeTotalMissaoAfrica,
-                    DonationChartColors.missaoAfrica, isDarkMode),
+                    DonationChartColors.missaoAfrica, context),
                 _buildLegendItem('Total', safeTotalAnnualDonations,
-                    DonationChartColors.total, isDarkMode),
+                    DonationChartColors.total, context),
               ],
             ),
           ],
@@ -104,7 +106,7 @@ class AnnualDonationsChart extends StatelessWidget {
   }
 
   Widget _buildLegendItem(
-      String title, double value, Color color, bool isDarkMode) {
+      String title, double value, Color color, BuildContext context) {
     return Row(
       children: [
         Container(
@@ -115,7 +117,7 @@ class AnnualDonationsChart extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           '$title: ${CurrencyConverter.format(value)}',
-          style: TextStyle(color: DonationChartColors.themeTextColor),
+          style: TextStyle(color: DonationChartColors.themeTextColor(context)),
         ),
       ],
     );

@@ -9,7 +9,6 @@ class MonthlyDonationsChart extends StatelessWidget {
   final double currentProjetoDoarAAmar;
   final double currentMissaoAfrica;
   final double currentotalIncome;
-  final bool isDarkMode;
 
   const MonthlyDonationsChart({
     super.key,
@@ -18,7 +17,6 @@ class MonthlyDonationsChart extends StatelessWidget {
     required this.currentProjetoDoarAAmar,
     required this.currentMissaoAfrica,
     required this.currentotalIncome,
-    required this.isDarkMode,
   });
 
   @override
@@ -44,28 +42,32 @@ class MonthlyDonationsChart extends StatelessWidget {
                   color: DonationChartColors.dizimo,
                   radius: 60,
                   titleStyle: TextStyle(
-                      fontSize: 14, color: DonationChartColors.themeTextColor),
+                      fontSize: 14,
+                      color: DonationChartColors.themeTextColor(context)),
                 ),
                 PieChartSectionData(
                   value: safeMonthlyOferta,
                   color: DonationChartColors.oferta,
                   radius: 60,
                   titleStyle: TextStyle(
-                      fontSize: 14, color: DonationChartColors.themeTextColor),
+                      fontSize: 14,
+                      color: DonationChartColors.themeTextColor(context)),
                 ),
                 PieChartSectionData(
                   value: safeMonthlyProjetoDoarAAmar,
                   color: DonationChartColors.projetoDoarAAmar,
                   radius: 60,
                   titleStyle: TextStyle(
-                      fontSize: 14, color: DonationChartColors.themeTextColor),
+                      fontSize: 14,
+                      color: DonationChartColors.themeTextColor(context)),
                 ),
                 PieChartSectionData(
                   value: safeMonthlyMissaoAfrica,
                   color: DonationChartColors.missaoAfrica,
                   radius: 60,
                   titleStyle: TextStyle(
-                      fontSize: 14, color: DonationChartColors.themeTextColor),
+                      fontSize: 14,
+                      color: DonationChartColors.themeTextColor(context)),
                 ),
               ],
               borderData: FlBorderData(show: false),
@@ -83,18 +85,18 @@ class MonthlyDonationsChart extends StatelessWidget {
               runSpacing: 8.0,
               children: [
                 _buildLegendItem('Dizimo', safeMonthlyDizimo,
-                    DonationChartColors.dizimo, isDarkMode),
+                    DonationChartColors.dizimo, context),
                 _buildLegendItem('Oferta', safeMonthlyOferta,
-                    DonationChartColors.oferta, isDarkMode),
+                    DonationChartColors.oferta, context),
                 _buildLegendItem(
                     'Projeto Doar a Amar',
                     safeMonthlyProjetoDoarAAmar,
                     DonationChartColors.projetoDoarAAmar,
-                    isDarkMode),
+                    context),
                 _buildLegendItem('Missão África', safeMonthlyMissaoAfrica,
-                    DonationChartColors.missaoAfrica, isDarkMode),
+                    DonationChartColors.missaoAfrica, context),
                 _buildLegendItem('Total', currentotalIncome,
-                    DonationChartColors.total, isDarkMode),
+                    DonationChartColors.total, context),
               ],
             ),
           ],
@@ -107,7 +109,7 @@ class MonthlyDonationsChart extends StatelessWidget {
     String title,
     double value,
     Color color,
-    bool isDarkMode,
+    BuildContext context,
   ) {
     return Row(
       children: [
@@ -119,7 +121,7 @@ class MonthlyDonationsChart extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           '$title: ${CurrencyConverter.format(value)}',
-          style: TextStyle(color: DonationChartColors.themeTextColor),
+          style: TextStyle(color: DonationChartColors.themeTextColor(context)),
         ),
       ],
     );

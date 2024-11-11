@@ -9,11 +9,10 @@ class NotificationEvents {
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   FlutterLocalNotificationsPlugin? _flutterLocalNotificationsPlugin;
-  bool _isInitialized = false;
 
   NotificationEvents._internal();
 
-  Future<void> initialize(GlobalKey<NavigatorState> navigatorKey) async {
+  Future<void> init(GlobalKey<NavigatorState> navigatorKey) async {
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
     const AndroidInitializationSettings initializationSettingsAndroid =
@@ -44,26 +43,21 @@ class NotificationEvents {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (message.notification != null) {
         String eventId = message.data['eventId'] ?? '';
-        String eventTitle = message.data['eventTitle'] ?? 'Evento Adicionado';
         showNotification(
-          "Novo Evento Adicionado",
-          "O evento '$eventTitle' foi adicionado.",
+          message.notification!.title ?? "Novo Evento",
+          message.notification!.body ?? "Você tem um novo evento.",
           message.data['url'] ?? '',
-          eventId: eventId,
+          eventId: eventId, // Adicionando eventId
         );
       }
     });
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-    _isInitialized = true; // Marca como inicializado
   }
 
   static Future<void> _firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
-    if (kDebugMode) {
-      print("Handling a background message: ${message.messageId}");
-    }
+    print("Handling a background message: ${message.messageId}");
   }
 
   Future<void> requestNotificationPermission() async {
@@ -94,7 +88,7 @@ class NotificationEvents {
 
   Future<void> showNotification(String title, String body, String payload,
       {required String eventId}) async {
-    if (!_isInitialized || _flutterLocalNotificationsPlugin == null) {
+    if (_flutterLocalNotificationsPlugin == null) {
       throw Exception("Notification plugin not initialized");
     }
 
@@ -122,13 +116,12 @@ class NotificationEvents {
 
     int notificationId =
         DateTime.now().millisecondsSinceEpoch.remainder(100000);
-    String payloadWithId = '$payload|$eventId';
     await _flutterLocalNotificationsPlugin?.show(
       notificationId,
       title,
       body,
       platformChannelSpecifics,
-      payload: payloadWithId,
+      payload: payload,
     );
   }
 }
