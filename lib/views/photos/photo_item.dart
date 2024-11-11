@@ -49,6 +49,7 @@ class PhotosScreen extends StatelessWidget {
                 isAdmin: isAdmin,
                 onDownload: (uploadId) {},
                 onDelete: (uploadId) => _deletePhoto(context, uploadId),
+                onUploadStateChange: (uploadId, isUploading) {},
               );
             }).toList(),
           );
@@ -81,6 +82,7 @@ class PhotoItem extends StatelessWidget {
   final bool isAdmin;
   final Function(String) onDownload;
   final Function(String) onDelete;
+  final Function(String, bool) onUploadStateChange;
 
   const PhotoItem({
     super.key,
@@ -88,6 +90,7 @@ class PhotoItem extends StatelessWidget {
     required this.isAdmin,
     required this.onDownload,
     required this.onDelete,
+    required this.onUploadStateChange,
   });
 
   @override
@@ -146,26 +149,28 @@ class PhotoItem extends StatelessWidget {
                     onDownload(photo.uploadId);
                   } else if (value == 'delete' && isAdmin) {
                     showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Confirmar Exclusão'),
-                        content: const Text(
-                            'Você tem certeza que deseja excluir esta foto?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            child: const Text('Cancelar'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              onDelete(photo.uploadId);
-                              Navigator.of(context).pop(true);
-                            },
-                            child: const Text('Excluir'),
-                          ),
-                        ],
-                      ),
-                    );
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Confirmar Exclusão'),
+                            content: const Text(
+                                'Você tem certeza que deseja excluir esta foto?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
+                                child: const Text('Cancelar'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  onDelete(photo.uploadId);
+                                  Navigator.of(context).pop(true);
+                                },
+                                child: const Text('Excluir'),
+                              ),
+                            ],
+                          );
+                        });
                   }
                 },
                 itemBuilder: (BuildContext context) {

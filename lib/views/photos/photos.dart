@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:churchapp/data/model/photos_data.dart';
 import 'package:churchapp/data/model/user_data.dart';
-import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/notifications/notification_photo.dart';
 import 'package:churchapp/views/photos/image_source.dart';
 import 'package:dio/dio.dart';
@@ -30,9 +29,11 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   final List<XFile> _pickedFiles = [];
   XFile? _selectedImage;
   final TextEditingController _locationController = TextEditingController();
+  final NotificationPhotos _notificationService = NotificationPhotos();
 
   bool _isAdmin = false;
   bool _isSearching = false;
+  bool _isUploading = false;
   String _searchQuery = '';
   List<PhotoData> _allPhotos = [];
   List<PhotoData> _filteredPhotos = [];
@@ -41,6 +42,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   void initState() {
     super.initState();
     _fetchUserRole();
+    _notificationService.init(NotificationPhotos().navigatorKey);
   }
 
   Future<void> _fetchUserRole() async {
@@ -151,6 +153,10 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
       return;
     }
 
+    setState(() {
+      _isUploading = true;
+    });
+
     try {
       final uploadId = DateTime.now().millisecondsSinceEpoch.toString();
       final locationDocRef = _firestore.collection('photos').doc(uploadId);
@@ -186,9 +192,13 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
       setState(() {
         _pickedFiles.clear();
         _locationController.clear();
+        _isUploading = false;
       });
     } catch (e) {
       if (!mounted) return;
+      setState(() {
+        _isUploading = false;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro ao adicionar foto: $e')),
       );
@@ -213,6 +223,18 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
         SnackBar(content: Text('Erro ao excluir a foto: $e')),
       );
     }
+  }
+
+  Future<void> _handleUploadStateChange(
+      String uploadId, bool isUploading) async {
+    setState(() {
+      final index =
+          _filteredPhotos.indexWhere((photo) => photo.uploadId == uploadId);
+      if (index != -1) {
+        _filteredPhotos[index] =
+            _filteredPhotos[index].copyWith(isUploading: isUploading);
+      }
+    });
   }
 
   Future<void> _handleDowload(String uploadId) async {
@@ -301,108 +323,110 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const NavBar(),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            title: _isSearching
-                ? TextField(
-                    autofocus: true,
-                    onChanged: _updateSearchQuery,
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Pesquisar fotos...',
-                    ),
-                  )
-                : const Text(
-                    'Galeria de Foto',
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
-                  ),
-            floating: true,
-            pinned: true,
-            actions: [
-              _isSearching
-                  ? IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        setState(() {
-                          _isSearching = false;
-                          _searchQuery = '';
-                          _updateSearchQuery('');
-                        });
-                      },
-                    )
-                  : IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: () {
-                        setState(() {
-                          _isSearching = true;
-                        });
-                      },
-                    ),
-            ],
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.all(0.0),
-            sliver: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('photos')
-                  .orderBy('createdAt', descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SliverToBoxAdapter(
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
+      body: _isUploading
+          ? const Center(child: CircularProgressIndicator())
+          : CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  title: _isSearching
+                      ? TextField(
+                          autofocus: true,
+                          onChanged: _updateSearchQuery,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Pesquisar fotos...',
+                          ),
+                        )
+                      : const Text(
+                          'Galeria de Foto',
+                          style: TextStyle(
+                            fontSize: 18,
+                          ),
+                        ),
+                  floating: true,
+                  pinned: true,
+                  actions: [
+                    _isSearching
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              setState(() {
+                                _isSearching = false;
+                                _searchQuery = '';
+                                _updateSearchQuery('');
+                              });
+                            },
+                          )
+                        : IconButton(
+                            icon: const Icon(Icons.search),
+                            onPressed: () {
+                              setState(() {
+                                _isSearching = true;
+                              });
+                            },
+                          ),
+                  ],
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.all(0.0),
+                  sliver: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('photos')
+                        .orderBy('createdAt', descending: true)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const SliverToBoxAdapter(
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
 
-                if (snapshot.hasError) {
-                  return SliverToBoxAdapter(
-                    child: Center(child: Text('Erro: ${snapshot.error}')),
-                  );
-                }
+                      if (snapshot.hasError) {
+                        return SliverToBoxAdapter(
+                          child: Center(child: Text('Erro: ${snapshot.error}')),
+                        );
+                      }
 
-                final photosList = snapshot.data?.docs.map((doc) {
-                      final data = doc.data() as Map<String, dynamic>;
-                      return PhotoData(
-                        urls: List<String>.from(data['urls'] ?? []),
-                        uploadId: data['uploadId'] ?? '',
-                        location: data['location'] ?? '',
-                        createdAt: data['createdAt'] as Timestamp,
-                      );
-                    }).toList() ??
-                    [];
+                      final photosList = snapshot.data?.docs.map((doc) {
+                            final data = doc.data() as Map<String, dynamic>;
+                            return PhotoData(
+                              urls: List<String>.from(data['urls'] ?? []),
+                              uploadId: data['uploadId'] ?? '',
+                              location: data['location'] ?? '',
+                              createdAt: data['createdAt'] as Timestamp,
+                            );
+                          }).toList() ??
+                          [];
+                      _allPhotos = photosList;
+                      _filteredPhotos = _filterPhotos(_searchQuery);
 
-                _allPhotos = photosList;
-                _filteredPhotos = _filterPhotos(_searchQuery);
+                      if (_filteredPhotos.isEmpty) {
+                        return const SliverToBoxAdapter(
+                          child:
+                              Center(child: Text('Nenhuma foto encontrada.')),
+                        );
+                      }
 
-                if (_filteredPhotos.isEmpty) {
-                  return const SliverToBoxAdapter(
-                    child: Center(child: Text('Nenhuma foto encontrada.')),
-                  );
-                }
-
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final photo = _filteredPhotos[index];
-                      return PhotoItem(
-                        photo: photo,
-                        isAdmin: _isAdmin,
-                        onDownload: _handleDowload,
-                        onDelete: _handleDelete,
+                      return SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final photo = _filteredPhotos[index];
+                            return PhotoItem(
+                              photo: photo,
+                              isAdmin: _isAdmin,
+                              onDownload: _handleDowload,
+                              onDelete: _handleDelete,
+                              onUploadStateChange: _handleUploadStateChange,
+                            );
+                          },
+                          childCount: _filteredPhotos.length,
+                        ),
                       );
                     },
-                    childCount: _filteredPhotos.length,
                   ),
-                );
-              },
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
       floatingActionButton: _isAdmin
           ? FloatingActionButton(
               onPressed: _showImageSourceSelection,
