@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:churchapp/data/model/photos_data.dart';
 import 'package:churchapp/data/model/user_data.dart';
+import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/notifications/notification_photo.dart';
 import 'package:churchapp/views/photos/image_source.dart';
 import 'package:dio/dio.dart';
@@ -323,6 +324,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const NavBar(),
       body: _isUploading
           ? const Center(child: CircularProgressIndicator())
           : CustomScrollView(
