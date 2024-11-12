@@ -44,13 +44,33 @@ class _MembersDashboardState extends State<MembersDashboard> {
       setState(() {
         _totalMembers = members.length;
 
-        _totalMen = members
-            .where((doc) => (doc.data()['gender'] as String?) == 'Masculino')
-            .length;
+        _totalMen = members.where((doc) {
+          final gender = doc.data()['gender'] as String?;
+          final dateOfBirthTimestamp = doc.data()['dateOfBirth'] as Timestamp?;
+          if (gender == null || dateOfBirthTimestamp == null) return false;
 
-        _totalWomen = members
-            .where((doc) => (doc.data()['gender'] as String?) == 'Feminino')
-            .length;
+          final dateOfBirth = dateOfBirthTimestamp.toDate();
+          final age = now.year - dateOfBirth.year;
+          final isBeforeBirthday = now.month < dateOfBirth.month ||
+              (now.month == dateOfBirth.month && now.day < dateOfBirth.day);
+
+          return (age > 12 || (age == 12 && !isBeforeBirthday)) &&
+              gender == 'Masculino';
+        }).length;
+
+        _totalWomen = members.where((doc) {
+          final gender = doc.data()['gender'] as String?;
+          final dateOfBirthTimestamp = doc.data()['dateOfBirth'] as Timestamp?;
+          if (gender == null || dateOfBirthTimestamp == null) return false;
+
+          final dateOfBirth = dateOfBirthTimestamp.toDate();
+          final age = now.year - dateOfBirth.year;
+          final isBeforeBirthday = now.month < dateOfBirth.month ||
+              (now.month == dateOfBirth.month && now.day < dateOfBirth.day);
+
+          return (age > 12 || (age == 12 && !isBeforeBirthday)) &&
+              gender == 'Feminino';
+        }).length;
 
         _totalChildren = members.where((doc) {
           final dateOfBirthTimestamp = doc.data()['dateOfBirth'] as Timestamp?;
@@ -60,9 +80,8 @@ class _MembersDashboardState extends State<MembersDashboard> {
           final age = now.year - dateOfBirth.year;
           final isBeforeBirthday = now.month < dateOfBirth.month ||
               (now.month == dateOfBirth.month && now.day < dateOfBirth.day);
-          final isChild = age < 12 || (age == 12 && !isBeforeBirthday);
 
-          return isChild;
+          return age < 12 || (age == 12 && !isBeforeBirthday);
         }).length;
 
         _newSignUps = members.where((doc) {
