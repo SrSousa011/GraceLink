@@ -120,8 +120,15 @@ class AuthMethods {
 
     String pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
     RegExp regex = RegExp(pattern);
+
     if (!regex.hasMatch(value!)) {
       return 'Insira um e-mail válido';
+    }
+
+    if (!value.endsWith('@gmail.com') &&
+        !value.endsWith('@outlook.com') &&
+        !value.endsWith('@hotmail.com')) {
+      return 'O e-mail deve ser @gmail.com, @outlook.com ou @hotmail.com';
     }
 
     return null;
