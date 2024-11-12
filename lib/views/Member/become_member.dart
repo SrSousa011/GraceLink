@@ -21,6 +21,8 @@ class _BecomeMemberState extends State<BecomeMember> {
   late TextEditingController _reasonForMembershipController;
   late TextEditingController _referenceController;
   late TextEditingController _previousChurchController;
+  final NotificationBecomeMember _notificationService =
+      NotificationBecomeMember();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
@@ -40,6 +42,7 @@ class _BecomeMemberState extends State<BecomeMember> {
     _reasonForMembershipController = TextEditingController();
     _referenceController = TextEditingController();
     _previousChurchController = TextEditingController();
+    _notificationService.init(NotificationBecomeMember().navigatorKey);
   }
 
   Future<bool> _navigateToTermsAndConditions() async {
