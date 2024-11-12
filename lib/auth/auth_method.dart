@@ -89,7 +89,7 @@ class AuthMethods {
     }
   }
 
-  Future<String> loginUser({
+  Future<String?> loginUser({
     required String email,
     required String password,
   }) async {
@@ -105,12 +105,19 @@ class AuthMethods {
         password: password,
       );
 
-      return 'User ${userCredential.user!.displayName ?? 'User'} logged in successfully';
+      return 'Usuário ${userCredential.user!.displayName ?? 'usuário'} logado com sucesso';
     } on FirebaseAuthException catch (e) {
-      return 'Error: ${e.message}';
+      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+        return credentialsInvalid();
+      }
+      return 'Erro: ${e.message}';
     } catch (err) {
-      return 'Error: ${err.toString()}';
+      return 'Erro: ${err.toString()}';
     }
+  }
+
+  String? credentialsInvalid() {
+    return 'E-mail ou senha incorretos. Tente novamente.';
   }
 
   String? _validateEmail(String? value) {

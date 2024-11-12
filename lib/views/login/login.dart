@@ -26,6 +26,7 @@ class _LoginState extends State<Login> {
   bool _isLoading = false;
   bool _isPasswordVisible = false;
   final LocalSettings _localSettings = LocalSettings();
+  String? _loginErrorMessage;
 
   @override
   void initState() {
@@ -60,12 +61,9 @@ class _LoginState extends State<Login> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            duration: const Duration(seconds: 3),
-          ),
-        );
+        setState(() {
+          _loginErrorMessage = 'E-mail ou senha incorretos. Tente novamente.';
+        });
       }
     } finally {
       if (mounted) {
@@ -77,6 +75,10 @@ class _LoginState extends State<Login> {
   }
 
   Future<void> _validateAndSubmit() async {
+    setState(() {
+      _loginErrorMessage = null;
+    });
+
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _isLoading = true;
@@ -134,6 +136,18 @@ class _LoginState extends State<Login> {
                 _buildEmailField(textColor, borderColor),
                 const SizedBox(height: 20),
                 _buildPasswordField(textColor, borderColor),
+                const SizedBox(height: 20),
+                if (_loginErrorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 0.0),
+                    child: Text(
+                      _loginErrorMessage!,
+                      style: const TextStyle(
+                        color: Color(0xFFFFA726),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: 20),
                 _buildButtonRow(textColor),
               ],
