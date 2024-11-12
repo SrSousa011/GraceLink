@@ -37,7 +37,7 @@ class AuthMethods {
         day == 0 ||
         month == 0 ||
         year == 0) {
-      return 'Please fill in all fields';
+      return 'Por favor preencha todos os campos';
     }
 
     String? emailError = _validateEmail(email);
@@ -115,13 +115,13 @@ class AuthMethods {
 
   String? _validateEmail(String? value) {
     if (_isEmpty(value)) {
-      return 'Please enter your email';
+      return 'Por favor, insira seu e-mail';
     }
 
     String pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
     RegExp regex = RegExp(pattern);
     if (!regex.hasMatch(value!)) {
-      return 'Please enter a valid email';
+      return 'Insira um e-mail válido';
     }
 
     return null;
@@ -129,11 +129,11 @@ class AuthMethods {
 
   String? _validatePassword(String? value) {
     if (_isEmpty(value)) {
-      return 'Please enter your password';
+      return 'Por favor, digite sua senha';
     }
 
     if (value!.length < 6) {
-      return 'Password must be at least 6 characters long';
+      return 'A senha deve ter pelo menos 6 caracteres';
     }
 
     return null;
@@ -141,7 +141,7 @@ class AuthMethods {
 
   String? _validateConfirmPassword(String password, String confirmPassword) {
     if (password != confirmPassword) {
-      return 'Passwords do not match';
+      return 'As senhas não correspondem';
     }
     return null;
   }
@@ -156,28 +156,28 @@ class AuthMethods {
 
   String? validateFirstName(String? value) {
     if (_isEmpty(value)) {
-      return 'First Name cannot be empty';
+      return 'O primeiro nome não pode estar vazio';
     }
     return null;
   }
 
   String? validateLastName(String? value) {
     if (_isEmpty(value)) {
-      return 'Last Name cannot be empty';
+      return 'Sobrenome não pode estar vazio';
     }
     return null;
   }
 
   String? validateCity(String? value) {
     if (_isEmpty(value)) {
-      return 'City cannot be empty';
+      return 'A cidade não pode estar vazia';
     }
     return null;
   }
 
   String? validateCountry(String? value) {
     if (_isEmpty(value)) {
-      return 'Country cannot be empty';
+      return 'O país não pode estar vazio';
     }
     return null;
   }
@@ -205,7 +205,7 @@ class AuthMethods {
           .toList();
     } catch (e) {
       if (kDebugMode) {
-        print('Error retrieving photo details: $e');
+        print('Erro ao recuperar detalhes da foto: $e');
       }
       return [];
     }
@@ -222,7 +222,7 @@ class AuthMethods {
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
       if (kDebugMode) {
-        print('Error checking email existence: $e');
+        print('Erro ao verificar a existência do e-mail: $e');
       }
       return false;
     }
