@@ -37,18 +37,18 @@ dependencies:
   cupertino_icons: ^1.0.6
   intl: 0.19.0
   country_icons: 3.0.0
-  firebase_core: ^2.27.2
-  firebase_messaging: ^14.7.20
-  firebase_auth: ^4.18.0
-  cloud_firestore: ^4.15.10
-  firebase_storage: ^11.6.11
+  firebase_core: ^3.8.0
+  firebase_messaging: ^15.1.5
+  firebase_auth: ^5.3.3
+  cloud_firestore: ^5.5.0
+  firebase_storage: ^12.3.6
   provider: ^6.1.2
   shared_preferences: ^2.0.8
   url_launcher: ^6.3.0
   image_picker: ^1.1.2  
-  firebase_app_check: ^0.2.2+7
+  firebase_app_check: ^0.3.1+6
   permission_handler: ^11.3.1
-  flutter_local_notifications: ^17.2.1
+  flutter_local_notifications: ^18.0.1
   youtube_explode_dart: ^2.2.1
   line_awesome_flutter: ^3.0.1
   cached_network_image: ^3.3.1
@@ -71,6 +71,7 @@ dependencies:
   image: ^4.2.0
   flutter_charts: ^0.5.2
   build_runner: ^2.4.9
+  firebase_analytics: ^11.3.5
 
 dev_dependencies:
   flutter_test:
@@ -81,7 +82,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.1
+  flutter_lints: ^5.0.0
   mockito: ^5.4.4
   integration_test:
     sdk: flutter
