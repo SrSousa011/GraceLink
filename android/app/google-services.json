@@ -9,10 +9,15 @@
       "client_info": {
         "mobilesdk_app_id": "1:94231497145:android:29a8c5049453cc5e9b8e68",
         "android_client_info": {
-          "package_name": "com.example.grace"
+          "package_name": "com.gracelink"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "94231497145-2jcpggtpvupls04heeo18tf68ioqe19o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCfNTLZbPh1XQqRhnhm5TMAtWjGto8if0w"
@@ -20,7 +25,55 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "94231497145-2jcpggtpvupls04heeo18tf68ioqe19o.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "94231497145-prthqfh93ngc7c9gtjs0tmqj9f31mski.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gracelink"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:94231497145:android:2bb2c120947d952f9b8e68",
+        "android_client_info": {
+          "package_name": "com.gracelink"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "94231497145-2jcpggtpvupls04heeo18tf68ioqe19o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfNTLZbPh1XQqRhnhm5TMAtWjGto8if0w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "94231497145-2jcpggtpvupls04heeo18tf68ioqe19o.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "94231497145-prthqfh93ngc7c9gtjs0tmqj9f31mski.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gracelink"
+              }
+            }
+          ]
         }
       }
     }
