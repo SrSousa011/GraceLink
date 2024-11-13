@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.grace"  // Altere para seu pacote
+    namespace "com.gracelink"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -42,7 +42,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.0' // Mantenha a versão compatível
+        kotlinCompilerExtensionVersion '1.4.0' 
     }
 
     sourceSets {
@@ -50,7 +50,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.grace" // Altere para seu pacote
+        applicationId "com.gracelink" 
         minSdkVersion 23
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
@@ -69,9 +69,8 @@ flutter {
     source '../..'
 }
 
-// Definição da versão do Compose
 ext {
-    compose_version = '1.4.0' // A versão do Compose deve corresponder ao kotlinCompilerExtensionVersion
+    compose_version = '1.4.0'
 }
 
 dependencies {
