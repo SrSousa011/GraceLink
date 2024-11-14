@@ -47,7 +47,7 @@ class NotificationEvents {
           message.notification!.title ?? "Novo Evento",
           message.notification!.body ?? "Você tem um novo evento.",
           message.data['url'] ?? '',
-          eventId: eventId, // Adicionando eventId
+          eventId: eventId,
         );
       }
     });
