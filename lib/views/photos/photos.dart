@@ -43,7 +43,8 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   void initState() {
     super.initState();
     _fetchUserRole();
-    _notificationService.init(NotificationPhotos().navigatorKey);
+    final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+    _notificationService.init(navigatorKey);
   }
 
   Future<void> _fetchUserRole() async {

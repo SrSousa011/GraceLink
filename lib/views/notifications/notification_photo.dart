@@ -9,8 +9,6 @@ class NotificationPhotos {
 
   NotificationPhotos._internal();
 
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
   Future<void> init(GlobalKey<NavigatorState> navigatorKey) async {
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -32,8 +30,14 @@ class NotificationPhotos {
     await _flutterLocalNotificationsPlugin?.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) async {
-        if (response.payload != null && navigatorKey.currentState != null) {
+        if (response.payload != null) {
+          print("Notification tapped with payload: ${response.payload}");
+        }
+        if (navigatorKey.currentState != null) {
+          print("Navigator Key is ready, navigating to /photos");
           navigatorKey.currentState!.pushNamed('/photos');
+        } else {
+          print("Navigator Key is null, unable to navigate");
         }
       },
     );
