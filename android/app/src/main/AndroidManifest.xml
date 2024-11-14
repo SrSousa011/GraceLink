@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.gracelink">
+    package="com.gracelink">
 
     <!-- Required for accessing the internet and downloading files -->
     <uses-permission android:name="android.permission.INTERNET"/>
