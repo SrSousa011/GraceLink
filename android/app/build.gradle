@@ -60,12 +60,16 @@ android {
         multiDexEnabled true
     }
 
-    signingConfigs {
+ signingConfigs {
         release {
-            storeFile file("C:/_repos/GraceLink/my-release-key.keystore")
-            storePassword "956030"
-            keyAlias "my-key-alias" 
-            keyPassword "956030"
+            if (project.hasProperty('keyProperties')) {
+                def keyProperties = new Properties()
+                file("key.properties").withInputStream { keyProperties.load(it) }
+                storeFile file(keyProperties['storeFile'])
+                storePassword keyProperties['storePassword']
+                keyAlias keyProperties['keyAlias']
+                keyPassword keyProperties['keyPassword']
+            }
         }
     }
 
