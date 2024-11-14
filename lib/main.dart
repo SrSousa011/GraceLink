@@ -1,11 +1,11 @@
-import 'package:churchapp/views/notifications/notification_become_member.dart';
-import 'package:churchapp/views/notifications/notification_event.dart';
-import 'package:churchapp/views/notifications/notification_photo.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
 import 'package:churchapp/route/routes.dart';
+import 'package:churchapp/views/notifications/notification_become_member.dart';
+import 'package:churchapp/views/notifications/notification_event.dart';
+import 'package:churchapp/views/notifications/notification_photo.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -13,6 +13,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  NotificationPhotos().init(navigatorKey);
+  NotificationEvents().init(navigatorKey);
+  NotificationBecomeMember().init(navigatorKey);
 
   runApp(
     MultiProvider(
@@ -24,24 +30,8 @@ void main() async {
   );
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      NotificationPhotos().init(AppRoutes.navigatorKey);
-      NotificationEvents().init(AppRoutes.navigatorKey);
-      NotificationBecomeMember().init(AppRoutes.navigatorKey);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
