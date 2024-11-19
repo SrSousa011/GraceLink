@@ -82,7 +82,7 @@ class NotificationService {
         break;
       case 'become_member':
         debugPrint('Navigating to Become Member Page');
-        Get.toNamed('/become_member');
+        Get.toNamed('/member_list', arguments: {'filter': 'all'});
         break;
       default:
         debugPrint('Payload not handled: $payload');

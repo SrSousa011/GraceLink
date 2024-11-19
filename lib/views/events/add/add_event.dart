@@ -141,9 +141,10 @@ class _AddEventFormState extends State<AddEventForm> {
         await _firestore.collection('events').doc(eventId).set(newEvent);
 
         await NotificationService().showNotification(
-            title: 'Novo Evento Criado!',
-            body: 'Clique aqui para ver o evento que está por vir!',
-            payload: 'event_page');
+          title: 'Evento ${_titleController.text} Criado!',
+          body: 'Clique aqui para ver mais detalhes sobre o evento!',
+          payload: 'event_page',
+        );
 
         if (!context.mounted) return;
         Navigator.pushReplacement(
