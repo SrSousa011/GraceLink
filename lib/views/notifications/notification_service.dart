@@ -114,7 +114,7 @@ class NotificationService {
             } else if (payload == 'event_page') {
               Get.toNamed('/event_page');
             } else if (payload == 'become_member') {
-              Get.toNamed('/become_member');
+              Get.toNamed('/member_list');
             } else {
               Get.snackbar(
                 'Notification',
