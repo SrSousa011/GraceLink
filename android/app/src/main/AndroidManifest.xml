@@ -11,6 +11,7 @@
         android:label="Resplandecendo as Nações "
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true">
 
         <activity

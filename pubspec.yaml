@@ -116,5 +116,5 @@ flutter:
 flutter_icons:
   android: true
   ios: true
-  image_path: "C:/_repos/GraceLink/android/app/src/main/res/mipmap-hdpi/ic_launcher.png"
+  image_path: "assetsicon/app_icon.png"
 
