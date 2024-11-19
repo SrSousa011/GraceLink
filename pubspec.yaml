@@ -102,7 +102,7 @@ flutter:
     - assets/aboutUs/hands.jpg
     - assets/aboutUs/joaldo.jpg
     - assets/imagens/default_avatar.png
-
+    
   # Custom fonts
   # Uncomment if you need to add custom fonts
   # fonts:
@@ -116,5 +116,5 @@ flutter:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/icon/app_icon.png"
+  image_path: "assets/icons/app_icon.png"
 
