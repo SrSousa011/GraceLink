@@ -73,8 +73,7 @@ class AppRoutes {
     GetPage(
       name: '/subscriber_info',
       page: () {
-        final args = ModalRoute.of(Get.context!)!.settings.arguments
-            as Map<String, dynamic>?;
+        final args = Get.arguments as Map<String, dynamic>?;
         return SubscriberInfo(
           userId: args?['userId'] ?? '',
           userName: args?['userName'] ?? '',
@@ -89,8 +88,7 @@ class AppRoutes {
     GetPage(
       name: '/member_list',
       page: () {
-        final args = ModalRoute.of(Get.context!)!.settings.arguments
-            as Map<String, dynamic>?;
+        final args = Get.arguments as Map<String, dynamic>?;
         final filter = args?['filter'] ?? 'all';
         return BecomeMemberList(filter: filter);
       },
@@ -115,8 +113,7 @@ class AppRoutes {
     '/courses_user_dashboard': (context) => const CoursesUserDashboard(),
     '/subscribers_list': (context) => const SubscribersList(),
     '/subscriber_info': (context) {
-      final args =
-          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+      final args = Get.arguments as Map<String, dynamic>?;
       return SubscriberInfo(
         userId: args?['userId'] ?? '',
         userName: args?['userName'] ?? '',
