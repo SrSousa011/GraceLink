@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:churchapp/data/model/photos_data.dart';
 import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/views/nav_bar/nav_bar.dart';
-import 'package:churchapp/views/notifications/notification_photo.dart';
+import 'package:churchapp/views/notifications/notification_service.dart';
 import 'package:churchapp/views/photos/image_source.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +30,7 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   final List<XFile> _pickedFiles = [];
   XFile? _selectedImage;
   final TextEditingController _locationController = TextEditingController();
-  final NotificationPhotos _notificationService = NotificationPhotos();
+  final NotificationService _notificationService = NotificationService();
 
   bool _isAdmin = false;
   bool _isSearching = false;
@@ -43,8 +43,8 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
   void initState() {
     super.initState();
     _fetchUserRole();
-    final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-    _notificationService.init(navigatorKey);
+    _notificationService.initialize();
+    _notificationService.requestIOSPermissions();
   }
 
   Future<void> _fetchUserRole() async {
@@ -185,11 +185,10 @@ class _PhotoGalleryPageState extends State<PhotoGalleryPage> {
         'urls': imageUrls,
       });
 
-      await NotificationPhotos().showNotification(
-        '🎉 Nova Foto Acabou de Chegar!',
-        'Não perca! Clique aqui para conferir a foto recém-adicionada.',
-        'fotos_payload',
-      );
+      await NotificationService().showNotification(
+          title: '🎉 Nova Foto Acabou de Chegar!',
+          body: 'Não perca! Clique aqui para conferir a foto recém-adicionada.',
+          payload: 'photos');
 
       setState(() {
         _pickedFiles.clear();

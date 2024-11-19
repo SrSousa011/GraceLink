@@ -1,4 +1,5 @@
 import 'package:churchapp/data/model/user_data.dart';
+import 'package:churchapp/views/notifications/notification_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -21,6 +22,7 @@ class _EventsState extends State<Events> {
   List<EventService> _filteredEvents = [];
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
+  final NotificationService _notificationService = NotificationService();
   bool _isSearching = false;
   bool _isAdmin = false;
 
@@ -29,6 +31,8 @@ class _EventsState extends State<Events> {
     super.initState();
     _eventsFuture = _fetchEvents();
     _fetchCurrentUserData();
+    _notificationService.initialize();
+    _notificationService.requestIOSPermissions();
   }
 
   Future<List<EventService>> _fetchEvents() async {

@@ -7,7 +7,7 @@ import 'package:churchapp/auth/auth_service.dart';
 import 'package:churchapp/views/events/events.dart';
 import 'package:provider/provider.dart';
 import 'package:churchapp/theme/theme_provider.dart';
-import 'package:churchapp/views/notifications/notification_event.dart';
+import 'package:churchapp/views/notifications/notification_service.dart';
 import 'package:churchapp/theme/chart_colors.dart';
 
 class AddEventForm extends StatefulWidget {
@@ -29,8 +29,8 @@ class _AddEventFormState extends State<AddEventForm> {
   final ImagePicker _picker = ImagePicker();
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final NotificationEvents _notificationService = NotificationEvents();
   late AuthenticationService _authenticationService;
+  final NotificationService _notificationService = NotificationService();
 
   @override
   void initState() {
@@ -41,7 +41,7 @@ class _AddEventFormState extends State<AddEventForm> {
     _selectedDate = DateTime.now();
     _selectedTime = TimeOfDay.now();
     _authenticationService = AuthenticationService();
-    _notificationService.init(NotificationEvents().navigatorKey);
+    _notificationService.initialize();
   }
 
   @override
@@ -124,7 +124,6 @@ class _AddEventFormState extends State<AddEventForm> {
       final createdDateTime = DateTime.now();
       if (!context.mounted) return;
       DateFormat('dd/MM/yyyy').format(_selectedDate!);
-      final formattedTime = _selectedTime!.format(context);
       DateFormat('dd/MM/yyyy HH:mm:ss').format(createdDateTime);
 
       final newEvent = {
@@ -140,12 +139,11 @@ class _AddEventFormState extends State<AddEventForm> {
 
       try {
         await _firestore.collection('events').doc(eventId).set(newEvent);
-        await _notificationService.showNotification(
-          _titleController.text,
-          _locationController.text,
-          formattedTime,
-          eventId: eventId,
-        );
+
+        await NotificationService().showNotification(
+            title: 'Novo Evento Criado!',
+            body: 'Clique aqui para ver o evento que está por vir!',
+            payload: 'event_page');
 
         if (!context.mounted) return;
         Navigator.pushReplacement(

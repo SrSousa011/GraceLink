@@ -1,6 +1,6 @@
 import 'package:churchapp/data/model/user_data.dart';
 import 'package:churchapp/views/member/terms_and_condictions.dart';
-import 'package:churchapp/views/notifications/notification_become_member.dart';
+import 'package:churchapp/views/notifications/notification_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,8 +21,7 @@ class _BecomeMemberState extends State<BecomeMember> {
   late TextEditingController _reasonForMembershipController;
   late TextEditingController _referenceController;
   late TextEditingController _previousChurchController;
-  final NotificationBecomeMember _notificationService =
-      NotificationBecomeMember();
+  final NotificationService _notificationService = NotificationService();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
@@ -42,7 +41,8 @@ class _BecomeMemberState extends State<BecomeMember> {
     _reasonForMembershipController = TextEditingController();
     _referenceController = TextEditingController();
     _previousChurchController = TextEditingController();
-    _notificationService.init(NotificationBecomeMember().navigatorKey);
+    _notificationService.initialize();
+    _notificationService.requestIOSPermissions();
   }
 
   Future<bool> _navigateToTermsAndConditions() async {
@@ -114,11 +114,11 @@ class _BecomeMemberState extends State<BecomeMember> {
 
           String memberName = _fullNameController.text;
 
-          await NotificationBecomeMember().showNotification(
-            "Novo Membro",
-            "$memberName se tornou um novo membro da comunidade.",
-            "Detalhes do membro",
-          );
+          await NotificationService().showNotification(
+              title: 'Novo Membro Se Cadastrou!',
+              body:
+                  '$memberName agora é um membro da nossa comunidade! Clique aqui para ver mais detalhes',
+              payload: 'become_member');
 
           _clearFields();
 
