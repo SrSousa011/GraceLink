@@ -48,28 +48,22 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true    
-        versionCode 1      
-        versionName "1.0.0"
-}
+    }
 
-  signingConfigs {
+    signingConfigs {
         release {
-            // Caminho para o seu arquivo keystore
             storeFile file("C:/_repos/GraceLink/android/app/my-release-key.keystore")
-            storePassword "956030" // A senha do keystore
-            keyAlias "key0" // O alias da chave (gerado ao criar o keystore)
-            keyPassword "956030" // A senha da chave (gerada ao criar o keystore)
+            storePassword "956030" 
+            keyAlias "key0"
+            keyPassword "956030"
         }
     }
 
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            //minifyEnabled true
-            //shrinkResources true    
-            minifyEnabled false    
-            shrinkResources false  
-   
+            minifyEnabled true
+            shrinkResources true    
         }
     }
 }
@@ -82,14 +76,20 @@ dependencies {
     // Firebase BoM
     implementation platform('com.google.firebase:firebase-bom:32.7.4')
 
+
+    // Adicione a dependência do Firebase App Check
+    implementation 'com.google.firebase:firebase-appcheck-safetynet:16.1.0'
+    
     // Firebase dependencies
     implementation 'com.google.firebase:firebase-analytics'
     implementation "com.google.firebase:firebase-analytics-ktx"
 
+    // Firebase Messaging
+    implementation 'com.google.firebase:firebase-messaging'
+
     // Outras dependências
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
-
-
     implementation "androidx.window:window:1.0.0"
+
 }
