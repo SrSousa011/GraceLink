@@ -2,13 +2,11 @@
     package="com.gracelink">
 
     <!-- Required for accessing the internet and downloading files -->
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>     
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-   <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/> 
 
-Resplandecendo Nações 
     <application
         android:label="Resplandecendo as Nações "
         android:name="${applicationName}"
