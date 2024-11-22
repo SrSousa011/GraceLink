@@ -11,24 +11,35 @@ pipeline {
             }
         }
 
+        stage('Setup Node.js') {
+            steps {
+                echo 'Setting up Node.js environment...'
+                script {
+                    def nodeHome = tool name: "NodeJS ${NODE_VERSION}"
+                    env.PATH = "${nodeHome}/bin:${env.PATH}"
+                }
+                bat 'node -v' 
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 echo 'Installing npm dependencies...'
-                sh 'npm install'
+                bat 'npm install' 
             }
         }
 
         stage('Build') {
             steps {
                 echo 'Building the project...'
-                sh 'npm run build'
+                bat 'npm run build' 
             }
         }
 
         stage('Run Unit Tests') {
             steps {
                 echo 'Running unit tests...'
-                sh 'npm run test'
+                bat 'npm run test'
             }
         }
     }
