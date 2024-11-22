@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    environment {
+    someTool  {
         NODE_VERSION = '20.11.1'
     }
     stages {
