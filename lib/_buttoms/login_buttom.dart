@@ -1,17 +1,21 @@
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:flutter/material.dart';
-import 'package:churchapp/views/login.dart';
 
 class LoginButton extends StatelessWidget {
-  const LoginButton({super.key});
+  final BaseAuth auth;
+  final void Function() onSignedIn;
+
+  const LoginButton({
+    super.key,
+    required this.auth,
+    required this.onSignedIn,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const SignInPage()),
-        );
+        onSignedIn();
       },
       style: ElevatedButton.styleFrom(
         foregroundColor: const Color(0xFF1E88E5),

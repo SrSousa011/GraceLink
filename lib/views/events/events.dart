@@ -1,369 +1,288 @@
-// ignore_for_file: file_names, library_private_types_in_public_api
-
-import 'package:churchapp/views/events/Floating_action_button_widget.dart';
-import 'package:churchapp/views/events/app_bar_widget.dart';
-import 'package:churchapp/views/events/event_list_view.dart';
-import 'package:churchapp/views/nav_bar.dart';
+import 'package:churchapp/data/model/user_data.dart';
+import 'package:churchapp/views/notifications/notification_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
-void main() {
-  runApp(const MaterialApp(
-    home: Events(),
-  ));
-}
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:churchapp/views/events/add/add_event.dart';
+import 'package:churchapp/views/events/event_detail/event_details_screen.dart';
+import 'package:churchapp/views/nav_bar/nav_bar.dart';
+import 'package:churchapp/views/events/event_service.dart';
 
 class Events extends StatefulWidget {
   const Events({super.key});
 
   @override
-  _EventsState createState() => _EventsState();
+  State<Events> createState() => _EventsState();
 }
 
 class _EventsState extends State<Events> {
-  List<Event> events = [
-    Event(
-      title: 'Culto de Domingo',
-      description:
-          'Participe do nosso culto dominical com louvor, adoração e uma mensagem inspiradora.',
-      date: DateTime(2024, 3, 1, 10, 0),
-      time: const TimeOfDay(hour: 10, minute: 0), // Adding a default time
-      location: 'Igreja da Comunidade',
-    ),
-    Event(
-      title: 'Grupo de Estudo Bíblico',
-      description:
-          'Venha participar do nosso grupo de estudo bíblico semanal para aprender mais sobre a Palavra de Deus.',
-      date: DateTime(2024, 3, 4, 19, 0),
-      time: const TimeOfDay(hour: 10, minute: 0), // Adding a default time
-      location: 'Salão da Igreja',
-    ),
-    Event(
-      title: 'Concerto de Natal',
-      description:
-          'Celebre a época festiva com músicas de Natal apresentadas pelo coro da igreja.',
-      date: DateTime(2024, 12, 20, 18, 30),
-      time: const TimeOfDay(hour: 10, minute: 0), // Adding a default time
-      location: 'Igreja da Comunidade',
-    ),
-  ];
+  Future<List<EventService>>? _eventsFuture;
+  List<EventService> _allEvents = [];
+  List<EventService> _filteredEvents = [];
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
+  final NotificationService _notificationService = NotificationService();
+  bool _isSearching = false;
+  bool _isAdmin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _eventsFuture = _fetchEvents();
+    _fetchCurrentUserData();
+    _notificationService.initialize();
+    _notificationService.requestIOSPermissions();
+  }
+
+  Future<List<EventService>> _fetchEvents() async {
+    CollectionReference events =
+        FirebaseFirestore.instance.collection('events');
+    var snapshot = await events.orderBy('date', descending: true).get();
+    final eventsList = snapshot.docs
+        .map((doc) => EventService.fromFirestore(
+            doc.id, doc.data() as Map<String, dynamic>))
+        .toList();
+
+    setState(() {
+      _allEvents = eventsList;
+      _filteredEvents = _filterEvents(_searchQuery);
+    });
+
+    return eventsList;
+  }
+
+  List<EventService> _filterEvents(String query) {
+    if (query.isEmpty) {
+      return _allEvents;
+    }
+    final lowercasedQuery = query.toLowerCase();
+    return _allEvents.where((event) {
+      return event.title.toLowerCase().contains(lowercasedQuery);
+    }).toList();
+  }
+
+  void _updateSearchQuery(String query) {
+    setState(() {
+      _searchQuery = query;
+      _filteredEvents = _filterEvents(_searchQuery);
+    });
+  }
+
+  Future<void> _fetchCurrentUserData() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      final userId = user.uid;
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      final userData = UserData.fromDocument(doc);
+
+      setState(() {
+        _isAdmin = userData.role == 'admin';
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao buscar dados do usuário: $e');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppBarWidget(title: 'Eventos'),
       drawer: const NavBar(),
-      body: EventListView(
-        events: events,
-        onTap: (event) {
-          _navigateToEventDetailsScreen(context, event);
-        },
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title: _isSearching
+                ? TextField(
+                    controller: _searchController,
+                    autofocus: true,
+                    onChanged: _updateSearchQuery,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Pesquisar eventos...',
+                    ),
+                  )
+                : const Text(
+                    'Eventos',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+            floating: true,
+            pinned: false,
+            snap: true,
+            actions: [
+              _isSearching
+                  ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        setState(() {
+                          _isSearching = false;
+                          _searchController.clear();
+                          _updateSearchQuery('');
+                        });
+                      },
+                    )
+                  : IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () {
+                        setState(() {
+                          _isSearching = true;
+                        });
+                      },
+                    ),
+            ],
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.all(0.0),
+            sliver: FutureBuilder<List<EventService>>(
+              future: _eventsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SliverFillRemaining(
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                if (snapshot.hasError) {
+                  return const SliverFillRemaining(
+                      child: Center(child: Text('Erro ao carregar eventos')));
+                }
+                if (!snapshot.hasData || _filteredEvents.isEmpty) {
+                  return const SliverFillRemaining(
+                      child: Center(child: Text('Nenhum evento encontrado')));
+                }
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final event = _filteredEvents[index];
+                      return GestureDetector(
+                        onTap: () {
+                          _navigateToEventDetailsScreen(context, event);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 4.0, left: 24.0),
+                                child: Text(
+                                  event.title,
+                                  style: const TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              if (event.location.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 24.0, top: 4.0),
+                                  child: Text(
+                                    event.location,
+                                    style: const TextStyle(
+                                      fontSize: 14.0,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              if (event.imageUrl != null &&
+                                  event.imageUrl!.isNotEmpty)
+                                GestureDetector(
+                                  onTap: () {
+                                    _navigateToEventDetailsScreen(
+                                        context, event);
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.only(top: 8.0),
+                                    width: MediaQuery.of(context).size.width,
+                                    child: Image.network(
+                                      event.imageUrl!,
+                                      height: 250,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              const SizedBox(height: 40),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    childCount: _filteredEvents.length,
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButtonWidget(
-        onPressed: () {
-          _navigateToAddEventScreen(context);
-        },
-        tooltip: 'Novo Evento',
-        icon: Icons.add,
-      ),
+      floatingActionButton: _isAdmin
+          ? FloatingActionButton(
+              onPressed: () {
+                _navigateToAddEventScreen(context);
+              },
+              tooltip: 'Novo Evento',
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 
   void _navigateToAddEventScreen(BuildContext context) async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const AddEventForm()),
+      _createPageRoute(const AddEventForm()),
     );
-    if (result != null) {
+
+    if (result != null && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Evento adicionado com sucesso')),
+      );
       setState(() {
-        events.add(result);
+        _eventsFuture = _fetchEvents();
       });
     }
   }
 
-  void _navigateToEventDetailsScreen(BuildContext context, Event event) {
-    Navigator.push(
+  void _navigateToEventDetailsScreen(
+      BuildContext context, EventService event) async {
+    final updatedEvent = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => EventDetailsScreen(event: event)),
+      _createPageRoute(EventDetailsScreen(event: event)),
     );
-  }
-}
 
-class AddEventForm extends StatefulWidget {
-  const AddEventForm({Key? key}) : super(key: key);
-
-  @override
-  _AddEventFormState createState() => _AddEventFormState();
-}
-
-class _AddEventFormState extends State<AddEventForm> {
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  DateTime? _selectedDate;
-  TimeOfDay? _selectedTime;
-  final _selectController = TextEditingController();
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null && picked != _selectedDate) {
+    if (updatedEvent != null && context.mounted) {
       setState(() {
-        _selectedDate = picked;
+        _eventsFuture = _fetchEvents();
       });
-    }
-  }
-
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (picked != null && picked != _selectedTime) {
-      setState(() {
-        _selectedTime = picked;
-      });
-    }
-  }
-
-  Future<void> _selectLocation(BuildContext context) async {
-    // Implementar a lógica para selecionar o local aqui
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const AppBarWidget(title: 'Novo Evento'),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Título do Evento',
-                icon: Icon(Icons.title),
-              ),
-            ),
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Descrição do Evento',
-                icon: Icon(Icons.description),
-              ),
-            ),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.calendar_today),
-                  onPressed: () {
-                    _selectDate(context);
-                  },
-                ),
-                Text(
-                  _selectedDate == null
-                      ? 'Selecione a data'
-                      : DateFormat('dd/MM/yyyy').format(_selectedDate!),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.access_time),
-                  onPressed: () {
-                    _selectTime(context);
-                  },
-                ),
-                Text(
-                  _selectedTime == null
-                      ? 'Selecione o horário'
-                      : _selectedTime!.format(context),
-                ),
-              ],
-            ),
-            TextField(
-              controller: _selectController,
-              decoration: const InputDecoration(
-                labelText: 'Selecione Local',
-                icon: Icon(Icons.location_on),
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                _saveEvent(context);
-              },
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.blue,
-              ),
-              child: const Text('Salvar'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _saveEvent(BuildContext context) {
-    if (_titleController.text.isNotEmpty &&
-        _descriptionController.text.isNotEmpty &&
-        _selectedDate != null &&
-        _selectedTime != null &&
-        _selectController.text.isNotEmpty) {
-      final newEvent = Event(
-        title: _titleController.text,
-        description: _descriptionController.text,
-        date: _selectedDate!,
-        time: _selectedTime!,
-        location: _selectController.text,
-      );
-      Navigator.pop(context, newEvent);
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Erro ao salvar evento'),
-            content: const Text('Por favor, preencha todos os campos.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Evento atualizado')),
       );
     }
   }
-}
 
-class EventDetailsScreen extends StatelessWidget {
-  final Event event;
+  PageRouteBuilder _createPageRoute(Widget page) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeInOut;
 
-  const EventDetailsScreen({Key? key, required this.event}) : super(key: key);
+        var tween = Tween(begin: begin, end: end);
+        var offsetAnimation =
+            animation.drive(tween.chain(CurveTween(curve: curve)));
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(event.title),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Title: ${event.title}',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Description: ${event.description}',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Date: ${DateFormat('dd/MM/yyyy').format(event.date)}',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Time: ${event.time.format(context)}',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Location: ${event.location}',
-              style: const TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
-      ),
+        return SlideTransition(position: offsetAnimation, child: child);
+      },
     );
   }
-}
-
-class EventCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final DateTime date;
-  final TimeOfDay time;
-  final String location;
-
-  const EventCard({
-    Key? key,
-    required this.title,
-    required this.description,
-    required this.date,
-    required this.time,
-    required this.location,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              description,
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Data: ${DateFormat('dd/MM/yyyy').format(date)}',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Horário: ${time.format(context)}',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Local: $location',
-              style: const TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class Event {
-  final String title;
-  final String description;
-  final DateTime date;
-  final TimeOfDay time;
-  final String location;
-
-  Event({
-    required this.title,
-    required this.description,
-    required this.date,
-    required this.time,
-    required this.location,
-  });
 }

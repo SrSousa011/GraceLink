@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyA__IZGCfKnPGCEAmPa6bAAzdK7WRkFbwI</string>
+	<string>AIzaSyCRkNMWiLdm3XvdOJAKFqN0RHa9mTQP3m0</string>
 	<key>GCM_SENDER_ID</key>
-	<string>823433758690</string>
+	<string>94231497145</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.example.grace</string>
 	<key>PROJECT_ID</key>
-	<string>gracelink-1a2da</string>
+	<string>gracelink-ee62c</string>
 	<key>STORAGE_BUCKET</key>
-	<string>gracelink-1a2da.appspot.com</string>
+	<string>gracelink-ee62c.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:823433758690:ios:a80befea584ff6eede9bbb</string>
+	<string>1:94231497145:ios:ca095ee267e3cae49b8e68</string>
 </dict>
 </plist>

@@ -1,9 +1,10 @@
-import 'package:churchapp/views/events/events.dart';
+import 'package:churchapp/views/events/event_list_item.dart';
+import 'package:churchapp/views/events/event_service.dart';
 import 'package:flutter/material.dart';
 
 class EventListView extends StatelessWidget {
-  final List<Event> events;
-  final void Function(Event) onTap;
+  final List<EventService> events;
+  final void Function(EventService) onTap;
 
   const EventListView({
     super.key,
@@ -18,13 +19,7 @@ class EventListView extends StatelessWidget {
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () => onTap(events[index]),
-          child: EventCard(
-            title: events[index].title,
-            description: events[index].description,
-            date: events[index].date,
-            time: events[index].time,
-            location: events[index].location,
-          ),
+          child: EventListItem(event: events[index]),
         );
       },
     );

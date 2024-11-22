@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.grace"
+    namespace "com.gracelink"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -42,15 +42,21 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.example.grace"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+        applicationId "com.gracelink"
         minSdkVersion 23
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        multiDexEnabled true
+        multiDexEnabled true    
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("C:/_repos/GraceLink/android/app/my-release-key.keystore")
+            storePassword "956030" 
+            keyAlias "key0"
+            keyPassword "956030"
+        }
     }
 
    signingConfigs {
@@ -67,9 +73,9 @@ android {
     }
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false    
         }
     }
 }
@@ -79,15 +85,23 @@ flutter {
 }
 
 dependencies {
-  // Import the Firebase BoM
-  implementation platform('com.google.firebase:firebase-bom:32.7.4')
+    // Firebase BoM
+    implementation platform('com.google.firebase:firebase-bom:32.7.4')
 
 
-  // TODO: Add the dependencies for Firebase products you want to use
-  // When using the BoM, don't specify versions in Firebase dependencies
-  implementation 'com.google.firebase:firebase-analytics'
+    // Adicione a dependência do Firebase App Check
+    implementation 'com.google.firebase:firebase-appcheck-safetynet:16.1.0'
+    
+    // Firebase dependencies
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation "com.google.firebase:firebase-analytics-ktx"
 
+    // Firebase Messaging
+    implementation 'com.google.firebase:firebase-messaging'
 
-  // Add the dependencies for any other desired Firebase products
-  // https://firebase.google.com/docs/android/setup#available-libraries
+    // Outras dependências
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    implementation "androidx.window:window:1.0.0"
+
 }

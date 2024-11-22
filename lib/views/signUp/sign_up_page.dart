@@ -1,7 +1,20 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:churchapp/auth/auth_method.dart';
+import 'package:churchapp/auth/auth_service.dart';
+import 'package:churchapp/views/home/home.dart';
+import 'package:churchapp/views/signUp/date_birth.dart';
+import 'package:churchapp/views/signUp/gender.dart';
+import 'package:churchapp/views/signUp/phone.dart';
+import 'package:churchapp/views/signUp/telephone_number.dart';
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+  const SignUpPage({super.key, required this.auth, required this.onSignedIn});
+  final BaseAuth auth;
+  final VoidCallback onSignedIn;
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
@@ -10,15 +23,26 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
+  late TextEditingController _cityController;
+  late TextEditingController _countryController;
   late TextEditingController _emailController;
   late TextEditingController _confirmEmailController;
   late TextEditingController _passwordController;
   late TextEditingController _confirmPasswordController;
+  late TextEditingController _phoneNumberController;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  bool _isLoading = false;
+  bool _isPasswordVisible = false;
+  bool _isPasswordConfVisible = false;
+  final AuthMethods _authMethods = AuthMethods();
 
   int? selectedDay;
   int? selectedMonth;
   int? selectedYear;
   String selectedGender = 'Male';
+  String selectedDDD = '+1';
+  int numberOfPhoneDigits = 10;
 
   @override
   void initState() {
@@ -29,6 +53,9 @@ class _SignUpPageState extends State<SignUpPage> {
     _confirmEmailController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
+    _phoneNumberController = TextEditingController();
+    _cityController = TextEditingController();
+    _countryController = TextEditingController();
   }
 
   @override
@@ -39,6 +66,9 @@ class _SignUpPageState extends State<SignUpPage> {
     _confirmEmailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _phoneNumberController.dispose();
+    _cityController.dispose();
+    _countryController.dispose();
     super.dispose();
   }
 
@@ -46,16 +76,42 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SignUp'),
+        title: const Text(
+          'Registrar-se',
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: buildInputs() + buildLoginButton(),
+        child: Form(
+          key: _formKey,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildNameSection(),
+                  const SizedBox(height: 20.0),
+                  _buildDateOfBirthSection(),
+                  const SizedBox(height: 20.0),
+                  _buildPhoneNumberSection(),
+                  const SizedBox(height: 20.0),
+                  _buildGenderSection(),
+                  const SizedBox(height: 20.0),
+                  _buildCityAndCountry(),
+                  const SizedBox(height: 20.0),
+                  _buildEmailSection(),
+                  const SizedBox(height: 20.0),
+                  _buildPasswordSection(),
+                  const SizedBox(height: 20.0),
+                  _buildPasswordSectionConfirmation(),
+                  const SizedBox(height: 20.0),
+                  _buildSignUpButton(),
+                ],
+              ),
             ),
           ),
         ),
@@ -63,213 +119,337 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  List<Widget> buildInputs() {
-    return <Widget>[
-      const SizedBox(height: 20.0),
-      TextFieldWidget(
-        labelText: 'First Name',
-        controller: _firstNameController,
-      ),
-      const SizedBox(height: 20.0),
-      TextFieldWidget(
-        labelText: 'Last Name',
-        controller: _lastNameController,
-      ),
-      const SizedBox(height: 20.0),
-      DateOfBirthDropdowns(
-        selectedDay: selectedDay,
-        selectedMonth: selectedMonth,
-        selectedYear: selectedYear,
-        onChangedDay: (value) {
-          setState(() {
-            selectedDay = value;
-          });
-        },
-        onChangedMonth: (value) {
-          setState(() {
-            selectedMonth = value;
-          });
-        },
-        onChangedYear: (value) {
-          setState(() {
-            selectedYear = value;
-          });
-        },
-      ),
-      const SizedBox(height: 20.0),
-      GenderDropdown(
-        selectedGender: selectedGender,
-        onChangedGender: (value) {
-          setState(() {
-            selectedGender = value!;
-          });
-        },
-      ),
-      const SizedBox(height: 20.0),
-      TextFieldWidget(
-        labelText: 'Email',
-        controller: _emailController,
-      ),
-      const SizedBox(height: 20.0),
-      TextFieldWidget(
-        labelText: 'Confirm Email',
-        controller: _confirmEmailController,
-      ),
-      const SizedBox(height: 20.0),
-      TextFieldWidget(
-        labelText: 'Password',
-        controller: _passwordController,
-      ),
-      const SizedBox(height: 20.0),
-      TextFieldWidget(
-        labelText: 'Confirm Password',
-        controller: _confirmPasswordController,
-      ),
-    ];
-  }
-}
-
-List<Widget> buildLoginButton() {
-  return [
-    const SizedBox(height: 20.0),
-    ElevatedButton(
-        onPressed: () {
-          // Validate fields and navigate to next step
-        },
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
-          backgroundColor: const Color.fromARGB(255, 90, 175, 249),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
+  Widget _buildNameSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildTextField(
+          labelText: 'First Name',
+          controller: _firstNameController,
+          validator: _authMethods.validateFirstName,
         ),
-        child: const Text('Next'))
-  ];
-}
+        const SizedBox(height: 20.0),
+        _buildTextField(
+          labelText: 'Last Name',
+          controller: _lastNameController,
+          validator: _authMethods.validateLastName,
+        ),
+      ],
+    );
+  }
 
-class DateOfBirthDropdowns extends StatelessWidget {
-  const DateOfBirthDropdowns({
-    super.key,
-    this.selectedDay,
-    this.selectedMonth,
-    this.selectedYear,
-    required this.onChangedDay,
-    required this.onChangedMonth,
-    required this.onChangedYear,
-  });
+  Widget _buildCityAndCountry() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildTextField(
+          labelText: 'City',
+          controller: _cityController,
+          validator: _authMethods.validateCity,
+        ),
+        const SizedBox(height: 20.0),
+        _buildTextField(
+          labelText: 'Country',
+          controller: _countryController,
+          validator: _authMethods.validateCountry,
+        ),
+      ],
+    );
+  }
 
-  final int? selectedDay;
-  final int? selectedMonth;
-  final int? selectedYear;
-  final ValueChanged<int?> onChangedDay;
-  final ValueChanged<int?> onChangedMonth;
-  final ValueChanged<int?> onChangedYear;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildPhoneNumberSection() {
     return Row(
-      children: <Widget>[
+      children: [
         Expanded(
-          child: DropdownButtonFormField<int>(
-            decoration: const InputDecoration(
-              labelText: 'Day',
-            ),
-            value: selectedDay,
-            onChanged: onChangedDay,
-            items: List.generate(31, (index) {
-              return DropdownMenuItem<int>(
-                value: index + 1,
-                child: Text((index + 1).toString()),
-              );
-            }),
+          flex: 1,
+          child: CountryCodeDropdown(
+            selectedDDD: selectedDDD,
+            dropdownItems: dddCountryList
+                .map((item) => DropdownMenuItem<String>(
+                      value: item.dddCode,
+                      child: Text(item.dddCode),
+                    ))
+                .toList(),
+            onChanged: (String? value) {
+              setState(() {
+                selectedDDD = value!;
+                numberOfPhoneDigits = dddCountryList
+                    .firstWhere((element) => element.dddCode == selectedDDD)
+                    .numberOfDigits;
+              });
+            },
           ),
         ),
         const SizedBox(width: 20.0),
         Expanded(
-          child: DropdownButtonFormField<int>(
-            decoration: const InputDecoration(
-              labelText: 'Month',
-            ),
-            value: selectedMonth,
-            onChanged: onChangedMonth,
-            items: List.generate(12, (index) {
-              return DropdownMenuItem<int>(
-                value: index + 1,
-                child: Text((index + 1).toString()),
-              );
-            }),
-          ),
-        ),
-        const SizedBox(width: 20.0),
-        Expanded(
-          child: DropdownButtonFormField<int>(
-            decoration: const InputDecoration(
-              labelText: 'Year',
-            ),
-            value: selectedYear,
-            onChanged: onChangedYear,
-            items: List.generate(80, (index) {
-              return DropdownMenuItem<int>(
-                value: DateTime.now().year - index,
-                child: Text((DateTime.now().year - index).toString()),
-              );
-            }),
+          flex: 2,
+          child: PhoneTextField(
+            maxLength: numberOfPhoneDigits,
+            controller: _phoneNumberController,
           ),
         ),
       ],
     );
   }
-}
 
-class GenderDropdown extends StatelessWidget {
-  const GenderDropdown({
-    super.key,
-    required this.selectedGender,
-    required this.onChangedGender,
-  });
+  Widget _buildDateOfBirthSection() {
+    return DateOfBirthDropdowns(
+      selectedDay: selectedDay,
+      selectedMonth: selectedMonth,
+      selectedYear: selectedYear,
+      onChangedDay: (value) {
+        setState(() {
+          selectedDay = value;
+        });
+      },
+      onChangedMonth: (value) {
+        setState(() {
+          selectedMonth = value;
+        });
+      },
+      onChangedYear: (value) {
+        setState(() {
+          selectedYear = value;
+        });
+      },
+    );
+  }
 
-  final String selectedGender;
-  final ValueChanged<String?> onChangedGender;
+  Widget _buildEmailSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildTextField(
+          labelText: 'Email',
+          controller: _emailController,
+          validator: _authMethods.validateEmail,
+        ),
+        const SizedBox(height: 20.0),
+        _buildTextField(
+          labelText: 'Confirm Email',
+          controller: _confirmEmailController,
+          validator: _validateEmailConf,
+        ),
+      ],
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      decoration: const InputDecoration(
-        labelText: 'Select Gender',
+  Widget _buildPasswordSection() {
+    return _buildPasswordField(
+      controller: _passwordController,
+      obscureText: !_isPasswordConfVisible,
+      labelText: 'Password',
+      onVisibilityToggle: () {
+        setState(() {
+          _isPasswordConfVisible = !_isPasswordConfVisible;
+        });
+      },
+      isPasswordVisible: _isPasswordConfVisible,
+      validator: _authMethods.validatePassword,
+    );
+  }
+
+  Widget _buildPasswordSectionConfirmation() {
+    return _buildPasswordField(
+      controller: _confirmPasswordController,
+      obscureText: !_isPasswordVisible,
+      labelText: 'Confirm Password',
+      onVisibilityToggle: () {
+        setState(() {
+          _isPasswordVisible = !_isPasswordVisible;
+        });
+      },
+      isPasswordVisible: _isPasswordVisible,
+      validator: _validatePasswordConf,
+    );
+  }
+
+  Widget _buildGenderSection() {
+    return GenderDropdown(
+      selectedGender: selectedGender,
+      onChangedGender: (value) {
+        setState(() {
+          selectedGender = value!;
+        });
+      },
+    );
+  }
+
+  Widget _buildSignUpButton() {
+    return ElevatedButton(
+      onPressed: _isLoading ? null : _validateAndSubmit,
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 90, 175, 249),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
       ),
-      value: selectedGender,
-      onChanged: onChangedGender,
-      items: const [
-        DropdownMenuItem<String>(
-          value: 'Male',
-          child: Text('Male'),
-        ),
-        DropdownMenuItem<String>(
-          value: 'Female',
-          child: Text('Female'),
-        ),
-      ],
+      child: const Text('Sign Up'),
     );
   }
-}
 
-class TextFieldWidget extends StatelessWidget {
-  const TextFieldWidget({
-    super.key,
-    required this.labelText,
-    required this.controller,
-  });
+  Widget _buildTextField({
+    required String labelText,
+    required TextEditingController controller,
+    FormFieldValidator<String>? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(labelText: labelText),
+      validator: validator,
+    );
+  }
 
-  final String labelText;
-  final TextEditingController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required bool obscureText,
+    required String labelText,
+    required VoidCallback onVisibilityToggle,
+    required bool isPasswordVisible,
+    required FormFieldValidator<String>? validator,
+  }) {
+    return TextFormField(
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
+        suffixIcon: IconButton(
+          icon: Icon(
+            isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+          ),
+          onPressed: onVisibilityToggle,
+        ),
       ),
+      obscureText: obscureText,
+      validator: validator,
+    );
+  }
+
+  String? _validateEmailConf(String? value) {
+    final String email = _emailController.text.trim();
+    if (value != email) {
+      return 'Emails do not match';
+    }
+    return null;
+  }
+
+  String? _validatePasswordConf(String? value) {
+    final String passwordControllerValue = _passwordController.text.trim();
+    if (value != passwordControllerValue) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+
+  Future<void> _validateAndSubmit() async {
+    final form = _formKey.currentState;
+    if (form!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      String email = _emailController.text.trim();
+      String password = _passwordController.text;
+
+      String? firstName = _firstNameController.text.trim();
+      String? lastName = _lastNameController.text.trim();
+      String? phoneNumber = _phoneNumberController.text.trim();
+      String? city = _cityController.text.trim();
+      String? country = _countryController.text.trim();
+
+      DateTime? dateOfBirth;
+      if (selectedYear != null &&
+          selectedMonth != null &&
+          selectedDay != null) {
+        dateOfBirth = DateTime(
+          selectedYear!,
+          selectedMonth!,
+          selectedDay!,
+        );
+      }
+
+      try {
+        UserCredential userCredential =
+            await widget.auth.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set({
+          'fullName': '$firstName $lastName',
+          'email': email,
+          'phoneNumber': selectedDDD + (phoneNumber),
+          'address': '$city $country',
+          'dateOfBirth': dateOfBirth,
+        });
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        widget.onSignedIn();
+
+        if (kDebugMode) {
+          print('User created: ${userCredential.user!.uid}');
+        }
+
+        if (mounted) {
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => const Home(),
+          ));
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error: $e');
+        }
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Sign Up Error'),
+              content: Text('Failed to sign up: $e'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
+  }
+
+  void showError(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Validation Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

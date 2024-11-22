@@ -1,4 +1,4 @@
-package com.example.grace
+package com.gracelink
 
 import io.flutter.embedding.android.FlutterActivity
 

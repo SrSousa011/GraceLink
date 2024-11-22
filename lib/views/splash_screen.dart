@@ -1,10 +1,11 @@
-import 'package:churchapp/views/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:churchapp/views/welcome.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+const String logoPath = 'assets/icons/logo.png';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key, required NavBar drawer});
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -14,20 +15,18 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 500),
-          pageBuilder: (_, __, ___) => const Welcome(title: 'GraceLink'),
-          transitionsBuilder: (_, animation, __, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
-        ),
-      );
+    _checkAuthStatus();
+  }
+
+  Future<void> _checkAuthStatus() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    Timer(const Duration(seconds: 1), () {
+      if (user != null) {
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        Navigator.pushReplacementNamed(context, '/welcome');
+      }
     });
   }
 
@@ -44,6 +43,13 @@ class _SplashScreenState extends State<SplashScreen> {
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Center(
+          child: SizedBox(
+            width: 450,
+            height: 450,
+            child: Image.asset(logoPath),
           ),
         ),
       ),

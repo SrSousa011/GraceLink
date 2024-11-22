@@ -2,20 +2,54 @@ import 'package:flutter/material.dart';
 
 class DonationType extends StatefulWidget {
   final void Function(String) onTypeSelected;
+  final String donationType;
+  final Color donationTypeButtonColor;
+  final Color donationTypeTextColor;
 
   const DonationType({
-    Key? key,
+    super.key,
     required this.onTypeSelected,
-    required String donationType,
-  }) : super(key: key);
+    required this.donationType,
+    required this.donationTypeButtonColor,
+    required this.donationTypeTextColor,
+  });
 
   @override
   State<DonationType> createState() => _DonationTypeState();
 }
 
 class _DonationTypeState extends State<DonationType> {
-  late String selectedDonationType = '';
-  late String selectedFoodType = '';
+  String? selectedDonationType = '';
+  String? selectedFoodType = '';
+
+  void showWarningDialog(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final attentionIconColor = isDarkMode ? Colors.grey : Colors.orange;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: <Widget>[
+              Icon(Icons.warning, color: attentionIconColor),
+              const SizedBox(width: 8.0),
+              const Text('Atenção'),
+            ],
+          ),
+          content: const Text('Você só pode selecionar um tipo de doação.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +68,7 @@ class _DonationTypeState extends State<DonationType> {
               ),
             ),
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -45,6 +77,11 @@ class _DonationTypeState extends State<DonationType> {
                 height: 150,
                 child: ElevatedButton.icon(
                   onPressed: () async {
+                    if (selectedFoodType!.isNotEmpty) {
+                      showWarningDialog(context);
+                      return;
+                    }
+
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -65,25 +102,29 @@ class _DonationTypeState extends State<DonationType> {
                     }
                   },
                   icon: const Icon(Icons.attach_money),
-                  label: Text(selectedDonationType.isEmpty
+                  label: Text(selectedDonationType!.isEmpty
                       ? "Escolha o tipo de doação"
-                      : selectedDonationType),
+                      : selectedDonationType!),
                   style: ElevatedButton.styleFrom(
+                    foregroundColor: widget.donationTypeTextColor,
+                    backgroundColor: widget.donationTypeButtonColor,
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(22.0), // Borda quadrada
+                      borderRadius: BorderRadius.circular(22.0),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(
-                width: 20,
-              ),
+              const SizedBox(width: 20),
               SizedBox(
                 width: 150,
                 height: 150,
                 child: ElevatedButton.icon(
                   onPressed: () async {
+                    if (selectedDonationType!.isNotEmpty) {
+                      showWarningDialog(context);
+                      return;
+                    }
+
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -104,20 +145,21 @@ class _DonationTypeState extends State<DonationType> {
                     }
                   },
                   icon: const Icon(Icons.food_bank),
-                  label: Text(selectedFoodType.isEmpty
+                  label: Text(selectedFoodType!.isEmpty
                       ? "Selecione o tipo de alimento"
-                      : selectedFoodType),
+                      : selectedFoodType!),
                   style: ElevatedButton.styleFrom(
+                    foregroundColor: widget.donationTypeTextColor,
+                    backgroundColor: widget.donationTypeButtonColor,
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(22.0), // Borda quadrada
+                      borderRadius: BorderRadius.circular(22.0),
                     ),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 70.0), // Adicionando o SizedBox aqui
+          const SizedBox(height: 70.0),
         ],
       ),
     );
@@ -127,8 +169,7 @@ class _DonationTypeState extends State<DonationType> {
 class DonationOptionsScreen extends StatelessWidget {
   final void Function(String) onTypeSelected;
 
-  const DonationOptionsScreen({Key? key, required this.onTypeSelected})
-      : super(key: key);
+  const DonationOptionsScreen({super.key, required this.onTypeSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -165,8 +206,7 @@ class DonationOptionsScreen extends StatelessWidget {
 class FoodOptionsScreen extends StatelessWidget {
   final void Function(String) onTypeSelected;
 
-  const FoodOptionsScreen({Key? key, required this.onTypeSelected})
-      : super(key: key);
+  const FoodOptionsScreen({super.key, required this.onTypeSelected});
 
   @override
   Widget build(BuildContext context) {
