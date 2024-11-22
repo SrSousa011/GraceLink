@@ -1,31 +1,55 @@
 pipeline {
     agent any
-    tools {
-        nodejs 'Node 20.11.1'
+    environment {
+        NODE_VERSION = '20.11.1'
     }
     stages {
         stage('Checkout') {
             steps {
-                script {
-                    checkout([$class: 'GitSCM', 
-                        branches: [[name: '*/main']],
-                        userRemoteConfigs: [[url: 'https://github.com/SrSousa011/GraceLink.git']]
-                    ])
-                }
+                echo 'Cloning repository...'
+                git url: 'https://github.com/SrSousa011/GraceLink.git', branch: 'main'
             }
         }
-        
+
+        stage('Setup Node.js') {
+            steps {
+                echo 'Setting up Node.js environment...'
+                script {
+                    def nodeHome = tool name: "NodeJS ${NODE_VERSION}"
+                    env.PATH = "${nodeHome}/bin:${env.PATH}"
+                }
+                bat 'node -v' 
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                echo 'Installing npm dependencies...'
+                bat 'npm install' 
+            }
+        }
+
         stage('Build') {
             steps {
-                bat 'npm install'
-                bat 'npm run build'
+                echo 'Building the project...'
+                bat 'npm run build' 
             }
         }
 
         stage('Run Unit Tests') {
             steps {
+                echo 'Running unit tests...'
                 bat 'npm run test'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline executed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check logs for errors.'
         }
     }
 }
