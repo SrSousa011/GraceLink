@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+    environment {
+        NODE_VERSION = '20.11.1'
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Cloning repository...'
+                git url: 'https://github.com/SrSousa011/GraceLink.git', branch: 'main'
+            }
+        }
+
+        stage('Setup Node.js') {
+            steps {
+                echo 'Setting up Node.js environment...'
+                script {
+                    def nodeHome = tool name: "NodeJS ${NODE_VERSION}"
+                    env.PATH = "${nodeHome}/bin:${env.PATH}"
+                }
+                sh 'node -v'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                echo 'Installing npm dependencies...'
+                sh 'npm install'
+                sh 'npm run build'
+            }
+        }
+
+
+        stage('Run Unit Tests') {
+            steps {
+                echo 'Running unit tests...'
+                sh 'npm run test'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline executed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check logs for errors.'
+        }
+    }
+}
