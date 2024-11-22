@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        nodejs = '20.11.1'
+        nodejs 'Node 20.11.1'
     }
     stages {
         stage('Checkout') {
@@ -14,16 +14,10 @@ pipeline {
                 }
             }
         }
-
-        stage('Install Dependencies') {
-            steps {
-                bat 'node -v'
-                bat 'npm install'
-            }
-        }
-
+        
         stage('Build') {
             steps {
+                bat 'npm install'
                 bat 'npm run build'
             }
         }
@@ -32,15 +26,6 @@ pipeline {
             steps {
                 bat 'npm run test'
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline executed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed. Check logs for errors.'
         }
     }
 }
