@@ -1,19 +1,8 @@
-@Library('pipeline-library') _
-
-import com.corp.lib.EnvironmentHelper
-
-debug_pipeline {
-    JDK  = EnvironmentHelper.JDK_17  
-    NODE = EnvironmentHelper.NODE_20 
-}
-
 pipeline {
     agent any
-
     tools {
-        nodejs "${NODE}"
+        nodejs 'Node 20.11.1'
     }
-
     stages {
         stage('Checkout') {
             steps {
@@ -25,7 +14,7 @@ pipeline {
                 }
             }
         }
-
+        
         stage('Build') {
             steps {
                 bat 'npm install'
