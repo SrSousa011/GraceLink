@@ -1,8 +1,19 @@
+@Library('pipeline-library') _
+
+import com.corp.lib.EnvironmentHelper
+
+debug_pipeline {
+    JDK  = EnvironmentHelper.JDK_17  
+    NODE = EnvironmentHelper.NODE_20 
+}
+
 pipeline {
     agent any
+
     tools {
-        nodejs 'Node 20.11.1'  // This should match the name of the Node.js tool in Global Tool Configuration
+        nodejs "${NODE}"
     }
+
     stages {
         stage('Checkout') {
             steps {
@@ -14,7 +25,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Build') {
             steps {
                 bat 'npm install'
