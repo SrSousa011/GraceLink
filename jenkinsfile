@@ -1,29 +1,34 @@
+@Library('pipeline-library') _
+
+import com.corp.lib.EnvironmentHelper
+
+debug_pipeline {
+    JDK  = EnvironmentHelper.JDK_17  
+    NODE = EnvironmentHelper.NODE_20 
+}
+
 pipeline {
     agent any
+
     tools {
-        nodejs = '20.11.1'
+        nodejs "${NODE}"
     }
+
     stages {
         stage('Checkout') {
             steps {
                 script {
                     checkout([$class: 'GitSCM', 
-                        branches: [[name: 'refs/heads/main']],
+                        branches: [[name: '*/main']],
                         userRemoteConfigs: [[url: 'https://github.com/SrSousa011/GraceLink.git']]
                     ])
                 }
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                bat 'node -v'
-                bat 'npm install'
-            }
-        }
-
         stage('Build') {
             steps {
+                bat 'npm install'
                 bat 'npm run build'
             }
         }
@@ -32,15 +37,6 @@ pipeline {
             steps {
                 bat 'npm run test'
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline executed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed. Check logs for errors.'
         }
     }
 }
