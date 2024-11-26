@@ -1,9 +1,9 @@
 pipeline {
     agent any
     environment {
-        // Ensure Git and Flutter are in the PATH during execution
         PATH = "C:\\Program Files\\Git\\bin;C:\\path\\to\\flutter\\bin;${env.PATH}"
     }
+
     stages {
         stage('Checkout') {
             steps {
@@ -18,41 +18,41 @@ pipeline {
 
         stage('Clean') {
             steps {
-                bat 'flutter clean'  // Running flutter clean to remove old build artifacts
+                bat 'flutter clean'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                bat 'flutter pub get'  // Fetch Flutter dependencies
+                bat 'flutter pub get'
             }
         }
 
         stage('Build App Bundle') {
             steps {
-                bat 'flutter build appbundle --release'  // Build the release Android App Bundle (.aab)
+                bat 'flutter build appbundle --release'
             }
         }
 
         stage('Run Tests') {
             steps {
-                bat 'flutter test'  // Run Flutter unit tests
+                bat 'flutter test'
             }
         }
 
         stage('Archive Build Artifacts') {
             steps {
-                archiveArtifacts artifacts: 'build/app/outputs/bundle/release/*.aab', allowEmptyArchive: true  // Archive the generated .aab file
+                archiveArtifacts artifacts: 'build/app/outputs/bundle/release/*.aab', allowEmptyArchive: true
             }
         }
     }
 
     post {
         success {
-            bat 'echo Build was successful!'  // Corrected success message
+            bat 'echo Build was successful!'
         }
         failure {
-            bat 'echo Build failed!'  // Corrected failure message
+            bat 'echo Build failed!'
         }
     }
 }
