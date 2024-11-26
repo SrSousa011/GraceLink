@@ -1,9 +1,13 @@
 pipeline {
     agent any
+    environment {
+        PATH = "C:\\Program Files\\Git\\bin;C:\\path\\to\\flutter\\bin;${env.PATH}"
+    }
+
     stages {
         stage('Testar Git') {
             steps {
-                bat 'git --version' // Para Windows
+                bat 'git --version'
             }
         }
 
