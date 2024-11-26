@@ -1,0 +1,16 @@
+{
+  "name": "gracelink",
+  "version": "1.0.0",
+  "description": "GraceLink is a mobile application designed to enhance the experience of church members by providing various features and functionalities tailored to their needs. This project aims to streamline communication, facilitate event management, and foster community engagement within the church.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
