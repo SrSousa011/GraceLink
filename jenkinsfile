@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        // Add Git and Flutter to the PATH environment variable explicitly
+        // Ensure Git and Flutter are in the PATH during execution
         PATH = "C:\\Program Files\\Git\\bin;C:\\path\\to\\flutter\\bin;${env.PATH}"
     }
     stages {
@@ -49,10 +49,10 @@ pipeline {
 
     post {
         success {
-            bat 'Build was successful!'  // Success message (printed to Jenkins console)
+            bat 'echo Build was successful!'  // Corrected success message
         }
         failure {
-            bat 'Build failed!'  // Failure message (printed to Jenkins console)
+            bat 'echo Build failed!'  // Corrected failure message
         }
     }
 }
