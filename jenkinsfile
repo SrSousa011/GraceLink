@@ -1,8 +1,5 @@
 pipeline {
     agent any
-    tools {
-        nodejs 'Node 20.11.1'
-    }
     stages {
         stage('Checkout') {
             steps {
@@ -14,18 +11,46 @@ pipeline {
                 }
             }
         }
-        
-        stage('Build') {
+
+        stage('Clean') {
             steps {
-                bat 'npm install'
-                bat 'npm run build'
+                bat 'flutter clean'  // Running flutter clean to remove old build artifacts
             }
         }
 
-        stage('Run Unit Tests') {
+        stage('Install Dependencies') {
             steps {
-                bat 'npm run test'
+                bat 'flutter pub get'  // Fetch Flutter dependencies
             }
+        }
+
+        stage('Build App Bundle') {
+            steps {
+                bat 'flutter build appbundle --release'  // Build the release Android App Bundle (.aab)
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                bat 'flutter test'  // Run Flutter unit tests
+            }
+        }
+
+        stage('Archive Build Artifacts') {
+            steps {
+                archiveArtifacts artifacts: 'build/app/outputs/bundle/release/*.aab', allowEmptyArchive: true  // Archive the generated .aab file
+            }
+        }
+    }
+
+    post {
+        success {
+            bat 'Build was successful!'  // Success message (printed to Jenkins console)
+            // Optionally send success notifications (Slack, email, etc.)
+        }
+        failure {
+            bat 'Build failed!'  // Failure message (printed to Jenkins console)
+            // Optionally send failure notifications (Slack, email, etc.)
         }
     }
 }
