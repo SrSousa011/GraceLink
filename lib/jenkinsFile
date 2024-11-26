@@ -1,8 +1,5 @@
 pipeline {
     agent any
-    tools {
-        nodejs 'Node 20.11.1'
-    }
     stages {
         stage('Checkout') {
             steps {
@@ -15,16 +12,24 @@ pipeline {
             }
         }
         
-        stage('Build') {
+        stage('Install Dependencies') {
             steps {
-                bat 'npm install'
-                bat 'npm run build'
+                echo 'Running Flutter pub get'
+                bat 'flutter pub get' // Fetch Flutter dependencies
             }
         }
 
-        stage('Run Unit Tests') {
+        stage('Build APK') {
             steps {
-                bat 'npm run test'
+                echo 'Building APK for Android'
+                bat 'flutter build apk --release' // Build release APK
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                echo 'Running Flutter tests'
+                bat 'flutter test' // Run Flutter unit tests
             }
         }
     }
