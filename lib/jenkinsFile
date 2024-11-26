@@ -11,26 +11,46 @@ pipeline {
                 }
             }
         }
-        
+
+        stage('Clean') {
+            steps {
+                bat 'flutter clean'  // Running flutter clean to remove old build artifacts
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
-                echo 'Running Flutter pub get'
-                bat 'flutter pub get' // Fetch Flutter dependencies
+                bat 'flutter pub get'  // Fetch Flutter dependencies
             }
         }
 
         stage('Build App Bundle') {
             steps {
-                echo 'Building Android App Bundle for release'
-                bat 'flutter build appbundle --release' // Build release app bundle
+                bat 'flutter build appbundle --release'  // Build the release Android App Bundle (.aab)
             }
         }
 
         stage('Run Tests') {
             steps {
-                echo 'Running Flutter tests'
-                bat 'flutter test' // Run Flutter unit tests
+                bat 'flutter test'  // Run Flutter unit tests
             }
+        }
+
+        stage('Archive Build Artifacts') {
+            steps {
+                archiveArtifacts artifacts: 'build/app/outputs/bundle/release/*.aab', allowEmptyArchive: true  // Archive the generated .aab file
+            }
+        }
+    }
+
+    post {
+        success {
+            bat 'Build was successful!'  // Success message (printed to Jenkins console)
+            // Optionally send success notifications (Slack, email, etc.)
+        }
+        failure {
+            bat 'Build failed!'  // Failure message (printed to Jenkins console)
+            // Optionally send failure notifications (Slack, email, etc.)
         }
     }
 }
