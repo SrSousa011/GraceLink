@@ -19,10 +19,10 @@ pipeline {
             }
         }
 
-        stage('Build APK') {
+        stage('Build App Bundle') {
             steps {
-                echo 'Building APK for Android'
-                bat 'flutter build apk --release' // Build release APK
+                echo 'Building Android App Bundle for release'
+                bat 'flutter build appbundle --release' // Build release app bundle
             }
         }
 
