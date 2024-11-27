@@ -1,74 +1,91 @@
 pipeline {
     agent any
     environment {
-        PATH = "C:\\Program Files\\Git\\bin;C:\\src\\flutter\\bin;${env.PATH}"
+        // Set Git home directory explicitly
+        GIT_HOME = "C:\\Program Files\\Git"
+        // Ensure Git is found by Flutter by setting GIT_EXECUTABLE
+        GIT_EXECUTABLE = 'C:\\Program Files\\Git\\bin\\git.exe'
+        // Clean the PATH and ensure Git and Flutter are correctly placed
+        PATH = "C:\\Program Files\\Git\\bin;C:\\Program Files\\Git\\cmd;C:\\src\\flutter\\bin;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\src\\flutter\\bin;C:\\Program Files\\nodejs\\;C:\\Program Files\\flutter\\bin;C:\\src\\gradle-8.10.2\\bin;C:\\Program Files\\Java\\jdk-17\\bin;C:\\Users\\lucas\\AppData\\Local\\Android\\Sdk\\build-tools\\30.0.3;C:\\ngrok;C:\\Program Files\\Git\\cmd"
     }
-
     stages {
+        stage('Declarative: Checkout SCM') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Debug Environment') {
             steps {
-                bat '''
-                echo Setting up paths...
-                set GIT_HOME=C:\\Program Files\\Git
-                set PATH=%GIT_HOME%\\bin;%GIT_HOME%\\cmd;C:\\src\\flutter\\bin;%PATH%
-                echo Validating environment:
-                echo Current PATH: %PATH%
-                git --version || echo Git not found!
-                flutter --version || echo Flutter not found!
-                echo Running Flutter doctor...
-                flutter doctor
-                '''
+                script {
+                    // Echo current PATH to verify the correct Git path is included
+                    bat """
+                        echo Setting up paths...
+                        echo Current PATH: %PATH%
+                    """
+                    // Validate Git installation
+                    bat 'git --version || echo Git not found!'
+                    // Validate Flutter access to Git
+                    bat """
+                        echo Validating Flutter's access to Git:
+                        flutter doctor --verbose || echo Flutter cannot locate Git.
+                    """
+                }
             }
         }
 
         stage('Checkout') {
             steps {
                 script {
-                    checkout([$class: 'GitSCM', 
-                        branches: [[name: '*/main']],
-                        userRemoteConfigs: [[url: 'https://github.com/SrSousa011/GraceLink.git']]
-                    ])
+                    // Checkout repository
+                    checkout scm
                 }
             }
         }
 
         stage('Clean') {
             steps {
-                bat 'flutter clean'
+                // Clean workspace or perform necessary cleanup
+                cleanWs()
             }
         }
 
         stage('Install Dependencies') {
             steps {
+                // Install project dependencies
                 bat 'flutter pub get'
             }
         }
 
         stage('Build App Bundle') {
             steps {
-                bat 'flutter build appbundle --release'
+                // Build the app bundle
+                bat 'flutter build appbundle'
             }
         }
 
         stage('Run Tests') {
             steps {
+                // Run tests if needed
                 bat 'flutter test'
             }
         }
 
         stage('Archive Build Artifacts') {
             steps {
-                archiveArtifacts artifacts: 'build/app/outputs/bundle/release/*.aab', allowEmptyArchive: true
+                // Archive any build artifacts if required
+                archiveArtifacts artifacts: '**/build/app/outputs/**/*.aab', allowEmptyArchive: true
             }
         }
     }
 
     post {
-        success {
-            bat 'echo Build was successful!'
+        always {
+            // Always notify on build completion or failure
+            echo 'Build finished!'
         }
         failure {
-            bat 'echo Build failed!'
+            echo 'Build failed!'
         }
     }
 }
