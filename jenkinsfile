@@ -8,17 +8,16 @@ pipeline {
         stage('Debug Environment') {
             steps {
                 bat '''
-                set PATH=C:\\Program Files\\Git\\bin;C:\\src\\flutter\\bin;%PATH%
-                echo %PATH%
-                where git
+                echo Setting up paths...
+                set GIT_HOME=C:\\Program Files\\Git
+                set PATH=%GIT_HOME%\\bin;%GIT_HOME%\\cmd;C:\\src\\flutter\\bin;%PATH%
+                echo Validating environment:
+                echo Current PATH: %PATH%
+                git --version || echo Git not found!
+                flutter --version || echo Flutter not found!
+                echo Running Flutter doctor...
                 flutter doctor
                 '''
-            }
-        }
-
-        stage('Test Git') {
-            steps {
-                bat 'git --version'
             }
         }
 
