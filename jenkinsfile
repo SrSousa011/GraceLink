@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        PATH = "C:\\Program Files\\Git\\bin;C:\\path\\to\\flutter\\bin;${env.PATH}"
+        PATH = "${env.PATH};C:\\Program Files\\Git\\bin"
     }
 
     stages {
