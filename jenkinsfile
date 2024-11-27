@@ -1,26 +1,24 @@
-stage('Debug Environment') {
-    steps {
-        bat '''
-        set PATH=C:\\Program Files\\Git\\bin;C:\\src\\flutter\\bin;%PATH%
-        echo %PATH%
-        where git
-        flutter doctor
-        '''
+pipeline {
+    agent any
+    environment {
+        PATH = "C:\\Program Files\\Git\\bin;C:\\src\\flutter\\bin;${env.PATH}"
     }
 
-
     stages {
-        stage('Testar Git') {
+        stage('Debug Environment') {
             steps {
-                bat 'git --version'
+                bat '''
+                set PATH=C:\\Program Files\\Git\\bin;C:\\src\\flutter\\bin;%PATH%
+                echo %PATH%
+                where git
+                flutter doctor
+                '''
             }
         }
 
-        stage('Debug Environment') {
+        stage('Test Git') {
             steps {
-                bat 'echo %PATH%'
-                bat 'where git'
-                bat 'flutter doctor'
+                bat 'git --version'
             }
         }
 
