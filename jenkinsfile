@@ -1,18 +1,55 @@
 pipeline {
     agent any
     stages {
+        stage('Check Git Version') {
+            steps {
+                script {
+                    echo 'Checking Git version...'
+                    bat 'git --version'
+                }
+            }
+        }
         stage('Checkout') {
             steps {
                 git branch: 'main', 
                     url: 'https://github.com/SrSousa011/GraceLink.git'
             }
         }
-        stage('Build and Test') {
+        stage('Flutter Clean') {
             steps {
-                sh 'flutter clean'
-                sh 'flutter pub get'
-                sh 'flutter test'
+                script {
+                    bat 'flutter clean'
+                }
             }
+        }
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    bat 'flutter pub get'
+                }
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                script {
+                    bat 'flutter test'
+                }
+            }
+        }
+        stage('Build App Bundle') {
+            steps {
+                script {
+                    bat 'flutter build apk --release'
+                }
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Build and tests passed successfully!'
+        }
+        failure {
+            echo 'Build or tests failed. Check the logs for details.'
         }
     }
 }
