@@ -19,6 +19,15 @@ pipeline {
                     url: 'https://github.com/SrSousa011/GraceLink.git'
             }
         }
+        stage('Debug PATH') {
+            steps {
+                script {
+                    // Debugging step to print the PATH environment variable
+                    echo "Current PATH: ${env.PATH}"
+                    bat 'echo %PATH%' // Windows batch command to print PATH
+                }
+            }
+        }
         stage('Flutter Clean') {
             steps {
                 script {
