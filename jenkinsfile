@@ -27,20 +27,7 @@ pipeline {
                 }
             }
         }
-        
-        // Flutter clean step
-        stage('Flutter Clean') {
-            steps {
-                bat 'flutter clean'
-            }
-        }
-
-        // Install Flutter dependencies
-        stage('Install Dependencies') {
-            steps {
-                bat 'flutter pub get'
-            }
-        }
+    
 
         // Run Flutter tests
         stage('Run Tests') {
