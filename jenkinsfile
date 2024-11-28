@@ -18,11 +18,12 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    // Checkout from GitHub using a shallow clone to avoid fetching large history
-                    checkout([$class: 'GitSCM', 
+                    // Corrected checkout with shallow clone
+                    checkout([
+                        $class: 'GitSCM', 
                         branches: [[name: '*/main']],
-                        userRemoteConfigs: [[url: 'git@github.com:SrSousa011/GraceLink.git']]
-                        extensions: [[$class: 'CloneOption', depth: 1, noTags: false]]
+                        userRemoteConfigs: [[url: 'https://github.com/SrSousa011/GraceLink.git']],
+                        extensions: [[$class: 'CloneOption', shallow: true, depth: 1]]
                     ])
                 }
             }
