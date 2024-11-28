@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        // Make sure to include the full path to Git and Flutter
+        // Make sure to include the full path to Git and Flutter in the environment PATH
         PATH = "C:\\Program Files\\Git\\bin;C:\\src\\flutter\\bin;${env.PATH}"
     }
     stages {
@@ -32,7 +32,8 @@ pipeline {
             steps {
                 script {
                     echo 'Running flutter clean...'
-                    bat 'flutter clean'
+                    // Explicitly set the PATH for flutter commands
+                    bat 'set PATH=C:\\Program Files\\Git\\bin;C:\\src\\flutter\\bin;%PATH% && flutter clean'
                 }
             }
         }
@@ -40,7 +41,7 @@ pipeline {
             steps {
                 script {
                     echo 'Installing dependencies...'
-                    bat 'flutter pub get'
+                    bat 'set PATH=C:\\Program Files\\Git\\bin;C:\\src\\flutter\\bin;%PATH% && flutter pub get'
                 }
             }
         }
@@ -48,7 +49,7 @@ pipeline {
             steps {
                 script {
                     echo 'Running tests...'
-                    bat 'flutter test'
+                    bat 'set PATH=C:\\Program Files\\Git\\bin;C:\\src\\flutter\\bin;%PATH% && flutter test'
                 }
             }
         }
@@ -56,7 +57,7 @@ pipeline {
             steps {
                 script {
                     echo 'Building app bundle...'
-                    bat 'flutter build appbundle --release'
+                    bat 'set PATH=C:\\Program Files\\Git\\bin;C:\\src\\flutter\\bin;%PATH% && flutter build appbundle --release'
                 }
             }
         }
