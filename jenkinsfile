@@ -1,91 +1,74 @@
 pipeline {
     agent any
-    environment {
-        // Set Git home directory explicitly
-        GIT_HOME = "C:\\Program Files\\Git"
-        // Ensure Git is found by Flutter by setting GIT_EXECUTABLE
-        GIT_EXECUTABLE = 'C:\\Program Files\\Git\\bin\\git.exe'
-        // Clean the PATH and ensure Git and Flutter are correctly placed
-        PATH = "C:\\Program Files\\Git\\bin;C:\\Program Files\\Git\\cmd;C:\\src\\flutter\\bin;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\src\\flutter\\bin;C:\\Program Files\\nodejs\\;C:\\Program Files\\flutter\\bin;C:\\src\\gradle-8.10.2\\bin;C:\\Program Files\\Java\\jdk-17\\bin;C:\\Users\\lucas\\AppData\\Local\\Android\\Sdk\\build-tools\\30.0.3;C:\\ngrok;C:\\Program Files\\Git\\cmd"
-    }
     stages {
-        stage('Declarative: Checkout SCM') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Debug Environment') {
-            steps {
-                script {
-                    // Echo current PATH to verify the correct Git path is included
-                    bat """
-                        echo Setting up paths...
-                        echo Current PATH: %PATH%
-                    """
-                    // Validate Git installation
-                    bat 'git --version || echo Git not found!'
-                    // Validate Flutter access to Git
-                    bat """
-                        echo Validating Flutter's access to Git:
-                        flutter doctor --verbose || echo Flutter cannot locate Git.
-                    """
-                }
-            }
-        }
-
         stage('Checkout') {
             steps {
                 script {
-                    // Checkout repository
-                    checkout scm
+                    // Checkout do repositório Git
+                    checkout([$class: 'GitSCM', 
+                        branches: [[name: '*/main']],
+                        userRemoteConfigs: [[url: 'https://github.com/SrSousa011/GraceLink.git']]
+                    ])
                 }
             }
         }
 
-        stage('Clean') {
+        stage('Clean Workspace') {
             steps {
-                // Clean workspace or perform necessary cleanup
+                // Limpeza do workspace
                 cleanWs()
+            }
+        }
+
+        stage('Flutter Clean') {
+            steps {
+                // Executa o flutter clean
+                bat 'flutter clean'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                // Install project dependencies
+                // Instala as dependências do Flutter
                 bat 'flutter pub get'
-            }
-        }
-
-        stage('Build App Bundle') {
-            steps {
-                // Build the app bundle
-                bat 'flutter build appbundle'
             }
         }
 
         stage('Run Tests') {
             steps {
-                // Run tests if needed
+                // Executa os testes do Flutter
                 bat 'flutter test'
             }
         }
 
-        stage('Archive Build Artifacts') {
+        stage('Build App Bundle') {
             steps {
-                // Archive any build artifacts if required
-                archiveArtifacts artifacts: '**/build/app/outputs/**/*.aab', allowEmptyArchive: true
+                // Gera o app bundle com o comando --release
+                bat 'flutter build appbundle --release'
+            }
+        }
+
+        stage('Success') {
+            steps {
+                script {
+                    // Notifica ou registra que a pipeline foi concluída com sucesso
+                    echo "Pipeline executed successfully!"
+                }
             }
         }
     }
-
     post {
-        always {
-            // Always notify on build completion or failure
-            echo 'Build finished!'
+        success {
+            script {
+                // Ação adicional após sucesso, como enviar notificação
+                echo "Build and tests succeeded!"
+            }
         }
         failure {
-            echo 'Build failed!'
+            script {
+                // Ação adicional após falha, como envio de alerta
+                echo "Build or tests failed. Check the logs for details."
+            }
         }
     }
 }
