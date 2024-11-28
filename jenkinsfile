@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+        PATH = "C:\\Program Files\\Git\\bin;C:\\src\\flutter\\bin;${env.PATH}"
+    }
     stages {
         stage('Check Git Version') {
             steps {
@@ -36,7 +39,6 @@ pipeline {
                 }
             }
         }
-
         stage('Build App Bundle') {
             steps {
                 script {
