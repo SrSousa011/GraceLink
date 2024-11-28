@@ -19,6 +19,22 @@ pipeline {
                     url: 'https://github.com/SrSousa011/GraceLink.git'
             }
         }
+        stage('Flutter Clean') {
+            steps {
+                script {
+                    echo 'Running flutter clean...'
+                    bat 'flutter clean'
+                }
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    echo 'Installing dependencies...'
+                    bat 'flutter pub get'
+                }
+            }
+        }
         stage('Run Tests') {
             steps {
                 script {
