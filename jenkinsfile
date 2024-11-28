@@ -1,6 +1,7 @@
 pipeline {
     agent any
     environment {
+        // Make sure to include the full path to Git and Flutter
         PATH = "C:\\Program Files\\Git\\bin;C:\\src\\flutter\\bin;${env.PATH}"
     }
     stages {
@@ -14,24 +15,8 @@ pipeline {
         }
         stage('Checkout') {
             steps {
-                git branch: 'main', 
+                git branch: 'main',
                     url: 'https://github.com/SrSousa011/GraceLink.git'
-            }
-        }
-        stage('Flutter Clean') {
-            steps {
-                script {
-                    echo 'Running flutter clean...'
-                    bat 'flutter clean'
-                }
-            }
-        }
-        stage('Install Dependencies') {
-            steps {
-                script {
-                    echo 'Installing dependencies...'
-                    bat 'flutter pub get'
-                }
             }
         }
         stage('Run Tests') {
