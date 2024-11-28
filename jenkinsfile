@@ -1,72 +1,18 @@
 pipeline {
     agent any
-
     stages {
-        // Increase Git buffer size and timeout before checkout
-        stage('Prepare Git Configurations') {
-            steps {
-                script {
-                    // Increase the Git buffer size to handle large fetches (500MB)
-                    bat 'git config --global http.postBuffer 524288000'  // 500MB buffer
-                    // Set a larger timeout for Git fetch (10 minutes)
-                    bat 'git config --global fetch.timeout 600'  // 600 seconds (10 minutes)
-                }
-            }
-        }
-
-        // Checkout the repository
         stage('Checkout') {
             steps {
-                script {
-                    // Checkout from GitHub using a shallow clone to avoid fetching large history
-                    checkout([$class: 'GitSCM', 
-                        branches: [[name: '*/main']],
-                        userRemoteConfigs: [[url: 'https://github.com/SrSousa011/GraceLink.git']],  // Or switch to SSH if needed
-                        extensions: [[$class: 'CloneOption', depth: 1, noTags: false]]
-                    ])
-                }
+                git branch: 'main', 
+                    url: 'https://github.com/SrSousa011/GraceLink.git'
             }
         }
-    
-
-        // Run Flutter tests
-        stage('Run Tests') {
+        stage('Build and Test') {
             steps {
-                bat 'flutter test'
-            }
-        }
-
-        // Build the app bundle for release
-        stage('Build App Bundle') {
-            steps {
-                bat 'flutter build appbundle --release'
-            }
-        }
-
-        // Success stage
-        stage('Success') {
-            steps {
-                script {
-                    echo "Pipeline executed successfully!"
-                }
-            }
-        }
-    }
-
-    // Post actions for success and failure
-    post {
-        success {
-            script {
-                echo "Build and tests succeeded!"
-            }
-        }
-        failure {
-            script {
-                echo "Build or tests failed. Check the logs for details."
+                sh 'flutter clean'
+                sh 'flutter pub get'
+                sh 'flutter test'
             }
         }
     }
 }
-
-
-
