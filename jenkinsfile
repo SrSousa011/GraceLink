@@ -28,14 +28,16 @@ pipeline {
                 }
             }
         }
-        stage('Flutter Clean') {
-            steps {
-                script {
-                    echo 'Running flutter clean...'
-                    bat "\"${env.FLUTTER_PATH}\" clean"
-                }
-            }
+stage('Flutter Clean') {
+    steps {
+        script {
+            echo 'Running flutter clean...'
+            bat "\"C:\\Program Files\\Git\\bin\\git.exe\" --version" // To ensure Git is found first
+            bat "\"C:\\src\\flutter\\bin\\flutter.bat\" clean"
         }
+    }
+}
+
         stage('Install Dependencies') {
             steps {
                 script {
