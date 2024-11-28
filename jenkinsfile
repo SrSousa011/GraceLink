@@ -1,72 +1,87 @@
 pipeline {
     agent any
+
     stages {
+        // Increase Git buffer size and timeout before checkout
+        stage('Prepare Git Configurations') {
+            steps {
+                script {
+                    // Increase the Git buffer size to handle large fetches (500MB)
+                    bat 'git config --global http.postBuffer 524288000'  // 500MB buffer
+                    // Set a larger timeout for Git fetch (10 minutes)
+                    bat 'git config --global fetch.timeout 600'  // 600 seconds (10 minutes)
+                }
+            }
+        }
+
+        // Checkout the repository
         stage('Checkout') {
             steps {
                 script {
-                    // Checkout do repositório Git
+                    // Checkout from GitHub using a shallow clone to avoid fetching large history
                     checkout([$class: 'GitSCM', 
                         branches: [[name: '*/main']],
-                        userRemoteConfigs: [[url: 'https://github.com/SrSousa011/GraceLink.git']]
+                        userRemoteConfigs: [[url: 'git@github.com:SrSousa011/GraceLink.git']]
+                        extensions: [[$class: 'CloneOption', depth: 1, noTags: false]]
                     ])
                 }
             }
         }
 
+        // Clean up workspace
         stage('Clean Workspace') {
             steps {
-                // Limpeza do workspace
                 cleanWs()
             }
         }
 
+        // Flutter clean step
         stage('Flutter Clean') {
             steps {
-                // Executa o flutter clean
                 bat 'flutter clean'
             }
         }
 
+        // Install Flutter dependencies
         stage('Install Dependencies') {
             steps {
-                // Instala as dependências do Flutter
                 bat 'flutter pub get'
             }
         }
 
+        // Run Flutter tests
         stage('Run Tests') {
             steps {
-                // Executa os testes do Flutter
                 bat 'flutter test'
             }
         }
 
+        // Build the app bundle for release
         stage('Build App Bundle') {
             steps {
-                // Gera o app bundle com o comando --release
                 bat 'flutter build appbundle --release'
             }
         }
 
+        // Success stage
         stage('Success') {
             steps {
                 script {
-                    // Notifica ou registra que a pipeline foi concluída com sucesso
                     echo "Pipeline executed successfully!"
                 }
             }
         }
     }
+
+    // Post actions for success and failure
     post {
         success {
             script {
-                // Ação adicional após sucesso, como enviar notificação
                 echo "Build and tests succeeded!"
             }
         }
         failure {
             script {
-                // Ação adicional após falha, como envio de alerta
                 echo "Build or tests failed. Check the logs for details."
             }
         }
