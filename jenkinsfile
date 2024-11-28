@@ -36,10 +36,11 @@ pipeline {
                 }
             }
         }
+
         stage('Build App Bundle') {
             steps {
                 script {
-                    bat 'flutter build apk --release'
+                    bat 'flutter build appbundle --release'
                 }
             }
         }
