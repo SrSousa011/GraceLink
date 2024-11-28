@@ -1,3 +1,6 @@
+the script
+
+
 pipeline {
     agent any
 
@@ -18,24 +21,16 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    // Corrected checkout with shallow clone
-                    checkout([
-                        $class: 'GitSCM', 
+                    // Checkout from GitHub using a shallow clone to avoid fetching large history
+                    checkout([$class: 'GitSCM', 
                         branches: [[name: '*/main']],
-                        userRemoteConfigs: [[url: 'https://github.com/SrSousa011/GraceLink.git']],
-                        extensions: [[$class: 'CloneOption', shallow: true, depth: 1]]
+                        userRemoteConfigs: [[url: 'https://github.com/SrSousa011/GraceLink.git']],  // Or switch to SSH if needed
+                        extensions: [[$class: 'CloneOption', depth: 1, noTags: false]]
                     ])
                 }
             }
         }
-
-        // Clean up workspace
-        stage('Clean Workspace') {
-            steps {
-                cleanWs()
-            }
-        }
-
+        
         // Flutter clean step
         stage('Flutter Clean') {
             steps {
@@ -88,3 +83,6 @@ pipeline {
         }
     }
 }
+
+
+
