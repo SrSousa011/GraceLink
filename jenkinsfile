@@ -1,17 +1,9 @@
 pipeline {
     agent any
-    environment {
-        // Full path to Git and Flutter
-        GIT_PATH = "C:\\Program Files\\Git\\bin\\git.exe"
-        FLUTTER_PATH = "C:\\src\\flutter\\bin\\flutter.bat"
-    }
     stages {
         stage('Check Git Version') {
             steps {
-                script {
-                    echo 'Checking Git version...'
-                    bat "\"${env.GIT_PATH}\" --version"
-                }
+                bat "git --version"
             }
         }
         stage('Checkout') {
@@ -20,46 +12,24 @@ pipeline {
                     url: 'https://github.com/SrSousa011/GraceLink.git'
             }
         }
-        stage('Debug PATH') {
+        stage('Flutter Clean') {
             steps {
-                script {
-                    echo "Current PATH: ${env.PATH}"
-                    bat 'echo %PATH%'
-                }
+                bat "flutter clean"
             }
         }
-stage('Flutter Clean') {
-    steps {
-        script {
-            echo 'Running flutter clean...'
-            bat "\"C:\\Program Files\\Git\\bin\\git.exe\" --version" // To ensure Git is found first
-            bat "\"C:\\src\\flutter\\bin\\flutter.bat\" clean"
-        }
-    }
-}
-
         stage('Install Dependencies') {
             steps {
-                script {
-                    echo 'Installing dependencies...'
-                    bat "\"${env.FLUTTER_PATH}\" pub get"
-                }
+                bat "flutter pub get"
             }
         }
         stage('Run Tests') {
             steps {
-                script {
-                    echo 'Running tests...'
-                    bat "\"${env.FLUTTER_PATH}\" test"
-                }
+                bat "flutter test"
             }
         }
         stage('Build App Bundle') {
             steps {
-                script {
-                    echo 'Building app bundle...'
-                    bat "\"${env.FLUTTER_PATH}\" build appbundle --release"
-                }
+                bat "flutter build appbundle --release"
             }
         }
     }
@@ -72,3 +42,4 @@ stage('Flutter Clean') {
         }
     }
 }
+
