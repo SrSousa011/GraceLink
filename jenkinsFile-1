@@ -5,19 +5,22 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '5'))
     }
 
+    environment {
+        SONARQUBE_SERVER = 'sq1'
+    }
+
     stages {
         stage('Build') {
             steps {
                 script {
-                    // Run clean and package before sonar scan
                     bat 'mvn clean package'
                 }
             }
         }
 
-        stage('Scan') {
+        stage('SonarQube Scan') {
             steps {
-                withSonarQubeEnv('sq1') {  // 'sq1' is the SonarQube installation name in Jenkins
+                withSonarQubeEnv(SONARQUBE_SERVER) {
                     bat 'mvn sonar:sonar'
                 }
             }
@@ -26,14 +29,12 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 script {
-                    // Wait for the SonarQube analysis result and check the Quality Gate status
                     def qualityGate = waitForQualityGate()
 
-                    // Check if the Quality Gate passed
                     if (qualityGate.status != 'OK') {
                         echo "Quality Gate failed: ${qualityGate.status}"
-                        currentBuild.result = 'ABORTED'  // Abort the pipeline if Quality Gate fails
-                        return  // Terminate the pipeline immediately
+                        currentBuild.result = 'ABORTED'
+                        return
                     }
                 }
             }
@@ -42,8 +43,21 @@ pipeline {
 
     post {
         always {
-            // Optionally, you can archive the build results, reports, etc.
-            // archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
+            script {
+                echo "Performing post-build actions on Windows"
+            }
+        }
+
+        success {
+            script {
+                echo "Build and SonarQube scan passed successfully!"
+            }
+        }
+
+        failure {
+            script {
+                echo "Build failed. Check the logs for more details."
+            }
         }
     }
 }
