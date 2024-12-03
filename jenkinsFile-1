@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SCANNER_HOME = 'C:\\sonar-scanner\\sonar-scanner-6.2.1.4610' // Update with your scanner's path
+        SCANNER_HOME = 'C:\\sonar-scanner\\sonar-scanner-6.2.1.4610'  // Path to your SonarQube scanner
     }
 
     stages {
@@ -14,7 +14,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('sonar') { // Ensure this matches the name of your SonarQube installation
+                withSonarQubeEnv('sq1') {  // Ensure this matches the SonarQube installation name in Jenkins
                     bat "${SCANNER_HOME}\\bin\\sonar-scanner.bat"
                 }
             }
