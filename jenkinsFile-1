@@ -1,21 +1,16 @@
 pipeline {
     agent any
 
-    environment {
-        SCANNER_HOME = 'C:\\sonar-scanner\\sonar-scanner-6.2.1.4610'  // Path to your SonarQube scanner
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
     }
 
     stages {
-        stage('Checkout') {
+        stage('Scan') {
             steps {
-                checkout scm
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('sq1') {  // Ensure this matches the SonarQube installation name in Jenkins
-                    bat "${SCANNER_HOME}\\bin\\sonar-scanner.bat"
+                withSonarQubeEnv('sq1') { // 'sq1' is the SonarQube installation name
+                    // Use "call mvnw.cmd" directly without "./"
+                    bat 'call mvnw.cmd clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
                 }
             }
         }
