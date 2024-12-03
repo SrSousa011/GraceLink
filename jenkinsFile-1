@@ -1,4 +1,4 @@
-pipeline {
+pipeline { 
     agent any
 
     options {
@@ -8,8 +8,7 @@ pipeline {
     stages {
         stage('Scan') {
             steps {
-                withSonarQubeEnv('sq1') { // 'sq1' is the SonarQube installation name
-                    // Use "call mvnw.cmd" directly without "./"
+                withSonarQubeEnv('sq1') {  // 'sq1' is the SonarQube installation name in Jenkins
                     bat 'call mvnw.cmd clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
                 }
             }
