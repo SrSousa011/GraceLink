@@ -22,5 +22,28 @@ pipeline {
                 }
             }
         }
+
+        stage('Quality Gate') {
+            steps {
+                script {
+                    // Wait for the SonarQube analysis result and check the Quality Gate status
+                    def qualityGate = waitForQualityGate()
+
+                    // Check if the Quality Gate passed
+                    if (qualityGate.status != 'OK') {
+                        echo "Quality Gate failed: ${qualityGate.status}"
+                        currentBuild.result = 'ABORTED'  // Abort the pipeline if Quality Gate fails
+                        return  // Terminate the pipeline immediately
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Optionally, you can archive the build results, reports, etc.
+            // archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
+        }
     }
 }
