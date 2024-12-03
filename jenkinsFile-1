@@ -1,5 +1,5 @@
 pipeline {
-    agent any  // This allows the pipeline to run on any available agent
+    agent any
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '5'))
@@ -9,7 +9,8 @@ pipeline {
         stage('Scan') {
             steps {
                 withSonarQubeEnv('sq1') { // 'sq1' is the SonarQube installation name
-                    bat './mvnw.cmd clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+                    // Use "call mvnw.cmd" directly without "./"
+                    bat 'call mvnw.cmd clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
                 }
             }
         }
