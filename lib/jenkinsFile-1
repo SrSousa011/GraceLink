@@ -1,0 +1,19 @@
+
+pipeline {
+    agent { label 'Windows' }
+
+    options { 
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+    }
+
+
+    stages {
+        stage('Scan') {
+            steps {
+                withSonarQubeEnv('sq1') { // 'sq1' is the SonarQube installation name
+                    bat './mvnw.cmd clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+                }
+            }
+        }
+    }
+}
