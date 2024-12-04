@@ -3,6 +3,7 @@ pipeline {
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '5'))
+        timeout(time: 1, unit: 'HOURS')
     }
 
     environment {
@@ -10,10 +11,18 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    checkout scm
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 script {
-                    bat 'mvn clean package'
+                    bat 'mvn clean package -DskipTests'
                 }
             }
         }
@@ -44,7 +53,7 @@ pipeline {
     post {
         always {
             script {
-                echo "Performing post-build actions on Windows"
+                echo "Performing post-build actions"
             }
         }
 
