@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        SONARQUBE_SERVER = 'sq1'
+        SONARQUBE_SERVER = 'sq1' // SonarQube server
     }
 
     stages {
@@ -19,7 +19,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    bat 'mvn clean package'  // You can update this to run your Flutter build instead
+                    bat 'mvn clean package'  // Build with Maven
                 }
             }
         }
@@ -28,8 +28,8 @@ pipeline {
             steps {
                 withSonarQubeEnv(SONARQUBE_SERVER) {
                     script {
-                        // Use your project key and the correct path for Dart code (lib)
-                        bat 'sonar-scanner -Dsonar.projectKey=gracelink -Dsonar.sources=lib -Dsonar.language=dart'
+                        // Maven SonarQube analysis using the sonar:sonar goal
+                        bat 'mvn sonar:sonar -Dsonar.projectKey=gracelink -Dsonar.sources=lib -Dsonar.tests=test -Dsonar.language=dart'
                     }
                 }
             }
