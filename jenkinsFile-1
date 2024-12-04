@@ -10,10 +10,16 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/SrSousa011/GraceLink.git'
+            }
+        }
+
         stage('Build') {
             steps {
                 script {
-                    bat 'mvn clean package'
+                    bat 'mvn clean package'  // You can update this to run your Flutter build instead
                 }
             }
         }
@@ -21,7 +27,10 @@ pipeline {
         stage('SonarQube Scan') {
             steps {
                 withSonarQubeEnv(SONARQUBE_SERVER) {
-                    bat 'mvn sonar:sonar'
+                    script {
+                        // Use your project key and the correct path for Dart code (lib)
+                        bat 'sonar-scanner -Dsonar.projectKey=gracelink -Dsonar.sources=lib -Dsonar.language=dart'
+                    }
                 }
             }
         }
