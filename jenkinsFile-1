@@ -18,21 +18,10 @@ pipeline {
             }
         }
 
-       stage('SonarQube Scan') {
+        stage('SonarQube Scan') {
             steps {
                 withSonarQubeEnv(SONARQUBE_SERVER) {
-                    script {
-                        // Run the SonarQube analysis and specify the `lib` directory for Flutter code
-                        bat '''
-                        sonar-scanner \
-                            -Dsonar.projectKey=gracelink \
-                            -Dsonar.sources=lib \
-                            -Dsonar.tests=test \
-                            -Dsonar.language=dart \
-                            -Dsonar.dart.pubspec=pubspec.yaml \
-                            -Dsonar.exclusions=**/*.json,**/*.png,**/*.jpg  // exclude non-code files
-                        '''
-                    }
+                    bat 'mvn sonar:sonar'
                 }
             }
         }
