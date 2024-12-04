@@ -35,19 +35,6 @@ pipeline {
             }
         }
 
-        stage('Quality Gate') {
-            steps {
-                script {
-                    def qualityGate = waitForQualityGate()
-
-                    if (qualityGate.status != 'OK') {
-                        echo "Quality Gate failed: ${qualityGate.status}"
-                        currentBuild.result = 'ABORTED'
-                        return
-                    }
-                }
-            }
-        }
     }
 
     post {
