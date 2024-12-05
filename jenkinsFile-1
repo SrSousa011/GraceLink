@@ -10,14 +10,6 @@ pipeline {
     }
 
     stages {
-
-        stage('GetCode') {
-            steps {
-                  git branch: 'main', url: 'https://github.com/SrSousa011/GraceLink.git'
-            }
-        }
-
-
         stage('Build') {
             steps {
                 script {
@@ -34,6 +26,7 @@ pipeline {
             }
         }
 
+
         stage('Quality Gate') {
             steps {
                 script {
@@ -47,7 +40,7 @@ pipeline {
                 }
             }
         }
-    } // Closing the stages block
+    }
 
     post {
         always {
