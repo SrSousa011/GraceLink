@@ -13,9 +13,10 @@ pipeline {
 
         stage('GetCode') {
             steps {
-                git 'https://github.com/SrSousa011/GraceLink.git'
+                  git branch: 'main', url: 'https://github.com/SrSousa011/GraceLink.git'
             }
         }
+
 
         stage('Build') {
             steps {
