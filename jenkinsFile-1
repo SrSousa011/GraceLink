@@ -6,23 +6,21 @@ pipeline {
     }
 
     environment {
-        SONARQUBE_SERVER = 'sq1'
+        SONARQUBE_SERVER = 'sq1'  
     }
 
     stages {
-        stage('Install Dependencies') {
+
+        stage('GetCode') {
             steps {
-                script {
-                    bat 'flutter pub get'
-                }
+                git 'https://github.com/SrSousa011/GraceLink.git'
             }
         }
 
-        stage('Build Flutter Project') {
+        stage('Build') {
             steps {
                 script {
-                    bat 'flutter clean'
-                    bat 'flutter build apk'
+                    bat 'mvn clean package'
                 }
             }
         }
@@ -30,10 +28,7 @@ pipeline {
         stage('SonarQube Scan') {
             steps {
                 withSonarQubeEnv(SONARQUBE_SERVER) {
-                    script {
-                        bat 'flutter pub run build_runner build'
-                        bat "mvn sonar:sonar -Dsonar.projectKey=com.gracelink:GraceLink -Dsonar.sources=lib -Dsonar.tests=test"
-                    }
+                    bat 'mvn sonar:sonar'
                 }
             }
         }
@@ -51,24 +46,24 @@ pipeline {
                 }
             }
         }
-    }
+    } // Closing the stages block
 
     post {
         always {
             script {
-                echo "Executing post-build actions for Flutter project"
+                echo "Executando ações pós-build no Windows"
             }
         }
 
         success {
             script {
-                echo "Build and SonarQube analysis completed successfully!"
+                echo "Build e análise SonarQube passaram com sucesso!"
             }
         }
 
         failure {
             script {
-                echo "Build or SonarQube analysis failed. Check logs for details."
+                echo "Build falhou. Verifique os logs para mais detalhes."
             }
         }
     }
