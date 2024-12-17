@@ -112,9 +112,16 @@ class _VideosState extends State<Videos> {
     if (duration == null) {
       return 'Desconhecido';
     }
-    final minutes = duration.inMinutes;
+
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes % 60;
     final seconds = duration.inSeconds % 60;
-    return '${minutes}m ${seconds}s';
+
+    if (hours > 0) {
+      return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    } else {
+      return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    }
   }
 
   String _timeAgo(DateTime? dateTime) {
