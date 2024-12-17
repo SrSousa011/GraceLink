@@ -301,28 +301,37 @@ class _VideosState extends State<Videos> {
                                                               Icons.error),
                                                     ),
                                                     Positioned(
-                                                      bottom: 8,
-                                                      right: 8,
-                                                      child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal: 6,
-                                                                vertical: 2),
-                                                        color: Colors.black
-                                                            .withOpacity(0.7),
-                                                        child: Text(
-                                                          _formatDuration(
-                                                              video.duration),
-                                                          style: const TextStyle(
+                                                        bottom: 8,
+                                                        right: 8,
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal: 8,
+                                                                  vertical: 4),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color:
+                                                                Colors.black54,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        4),
+                                                          ),
+                                                          child: Text(
+                                                            _formatDuration(
+                                                                video.duration),
+                                                            style:
+                                                                const TextStyle(
                                                               color:
                                                                   Colors.white,
                                                               fontWeight:
                                                                   FontWeight
-                                                                      .bold),
-                                                        ),
-                                                      ),
-                                                    ),
+                                                                      .bold,
+                                                              fontSize: 12,
+                                                            ),
+                                                          ),
+                                                        )),
                                                   ],
                                                 ),
                                                 const SizedBox(height: 8),
