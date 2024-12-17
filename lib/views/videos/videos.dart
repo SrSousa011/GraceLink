@@ -18,8 +18,6 @@ class Videos extends StatefulWidget {
 class _VideosState extends State<Videos> {
   final VideosService _videosService = VideosService();
   final TextEditingController _controller = TextEditingController();
-  bool _isSelectionMode = false;
-  final List<String> _selectedVideos = [];
   bool _showAddLinkField = false;
 
   final VideoCache _videoCache = VideoCache();
@@ -49,70 +47,7 @@ class _VideosState extends State<Videos> {
     }
   }
 
-  void _toggleSelectionMode() {
-    setState(() {
-      _isSelectionMode = !_isSelectionMode;
-      if (!_isSelectionMode) {
-        _selectedVideos.clear();
-      }
-    });
-  }
-
-  void _toggleVideoSelection(String videoId) {
-    setState(() {
-      if (_selectedVideos.contains(videoId)) {
-        _selectedVideos.remove(videoId);
-      } else {
-        _selectedVideos.add(videoId);
-      }
-    });
-  }
-
-  Future<void> _deleteSelectedVideos(BuildContext context) async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirmar Exclusão'),
-          content: const Text(
-              'Tem certeza que deseja excluir os vídeos selecionados?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancelar'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Excluir'),
-              onPressed: () async {
-                try {
-                  for (var videoId in _selectedVideos) {
-                    await _videosService.deleteVideo(videoId);
-                  }
-                  setState(() {
-                    _selectedVideos.clear();
-                    _isSelectionMode = false;
-                  });
-                  if (!context.mounted) return;
-                  Navigator.of(context).pop();
-                } catch (e) {
-                  debugPrint('Error deleting videos: $e');
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Erro ao deletar vídeos.'),
-                    ),
-                  );
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _addLink() async {
+  Future<void> _addLink() async {
     final String url = _controller.text.trim();
     String videoId = '';
 
@@ -124,7 +59,11 @@ class _VideosState extends State<Videos> {
 
     if (videoId.isNotEmpty) {
       try {
-        await _videosService.addVideo(videoId, url);
+        var yt = YT.YoutubeExplode();
+        var video = await yt.videos.get(YT.VideoId(videoId));
+        yt.close();
+
+        await _videosService.addVideo(videoId, url, video.title);
         setState(() {
           _controller.clear();
           _showAddLinkField = false;
@@ -187,8 +126,7 @@ class _VideosState extends State<Videos> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -197,20 +135,14 @@ class _VideosState extends State<Videos> {
         ),
         actions: [
           IconButton(
-            onPressed: _isSelectionMode
-                ? null
-                : () {
-                    setState(() {
-                      _showAddLinkField = !_showAddLinkField;
-                    });
-                  },
-            icon: const Icon(Icons.add_outlined),
-          ),
-          IconButton(
-            onPressed: _isSelectionMode
-                ? () => _deleteSelectedVideos(context)
-                : _toggleSelectionMode,
-            icon: Icon(_isSelectionMode ? Icons.delete : Icons.list),
+            onPressed: () {
+              setState(() {
+                _showAddLinkField = !_showAddLinkField;
+              });
+            },
+            icon: Icon(
+              _showAddLinkField ? Icons.close : Icons.add,
+            ),
           ),
         ],
       ),
@@ -222,31 +154,25 @@ class _VideosState extends State<Videos> {
             sliver: SliverVisibility(
               visible: _showAddLinkField,
               sliver: SliverToBoxAdapter(
-                child: Row(
+                child: Column(
                   children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _controller,
-                        decoration: const InputDecoration(
-                          labelText: 'Insira o link do YouTube',
-                          border: OutlineInputBorder(),
-                        ),
+                    TextField(
+                      controller: _controller,
+                      decoration: const InputDecoration(
+                        labelText: 'Insira o link do YouTube',
+                        border: OutlineInputBorder(),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
+                    const SizedBox(height: 10),
+                    IconButton(
                       onPressed: _addLink,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            isDarkMode ? Colors.grey[800] : Colors.blue,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
+                      icon: const Icon(
+                        Icons.add,
+                        color: Colors.white,
                       ),
-                      child: const Text(
-                        'Adicionar',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                      iconSize: 30,
+                      padding: const EdgeInsets.all(0),
+                      constraints: const BoxConstraints(),
                     ),
                   ],
                 ),
@@ -279,21 +205,12 @@ class _VideosState extends State<Videos> {
                         return Column(
                           children: [
                             InkWell(
-                              onTap: _isSelectionMode
-                                  ? () => _toggleVideoSelection(videoId)
-                                  : () => _launchURL(videoUrl),
+                              onTap: () => _launchURL(videoUrl),
                               child: SizedBox(
                                 width: double.infinity,
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    if (_isSelectionMode)
-                                      Checkbox(
-                                        value:
-                                            _selectedVideos.contains(videoId),
-                                        onChanged: (_) =>
-                                            _toggleVideoSelection(videoId),
-                                      ),
                                     Expanded(
                                       child: FutureBuilder<YT.Video>(
                                         future: _fetchVideo(videoUrl),
