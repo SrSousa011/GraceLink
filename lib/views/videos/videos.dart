@@ -19,8 +19,12 @@ class _VideosState extends State<Videos> {
   final VideosService _videosService = VideosService();
   final TextEditingController _controller = TextEditingController();
   bool _showAddLinkField = false;
+  bool _isSearching = false;
 
   final VideoCache _videoCache = VideoCache();
+
+  String _searchQuery = '';
+  List<Map<String, dynamic>> _filteredVideos = [];
 
   Future<YT.Video> _fetchVideo(String url) async {
     if (_videoCache.contains(url)) {
@@ -38,6 +42,25 @@ class _VideosState extends State<Videos> {
     _videoCache.add(url, video);
 
     return video;
+  }
+
+  List<Map<String, dynamic>> _filterVideos(
+      List<Map<String, dynamic>> videos, String query) {
+    if (query.isEmpty) {
+      return videos;
+    }
+    final lowercasedQuery = query.toLowerCase();
+    return videos.where((video) {
+      String title = video['title'] ?? '';
+      return title.toLowerCase().contains(lowercasedQuery);
+    }).toList();
+  }
+
+  void _updateSearchQuery(String query) {
+    setState(() {
+      _searchQuery = query.isNotEmpty ? query : '';
+      _filteredVideos = _filterVideos(_filteredVideos, _searchQuery);
+    });
   }
 
   Future<void> _launchURL(String url) async {
@@ -129,11 +152,35 @@ class _VideosState extends State<Videos> {
     Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Videos',
-          style: TextStyle(fontSize: 18),
-        ),
+        title: _isSearching
+            ? TextField(
+                controller: _controller,
+                onChanged: _updateSearchQuery,
+                decoration: const InputDecoration(
+                  hintText: 'Pesquisar vídeos...',
+                  border: InputBorder.none,
+                ),
+                autofocus: true,
+              )
+            : const Text(
+                'Videos',
+                style: TextStyle(fontSize: 18),
+              ),
         actions: [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                if (_isSearching) {
+                  _searchQuery = '';
+                  _filteredVideos = [];
+                }
+                _isSearching = !_isSearching;
+              });
+            },
+            icon: Icon(
+              _isSearching ? Icons.close : Icons.search,
+            ),
+          ),
           IconButton(
             onPressed: () {
               setState(() {
@@ -158,6 +205,7 @@ class _VideosState extends State<Videos> {
                   children: [
                     TextField(
                       controller: _controller,
+                      onChanged: _updateSearchQuery,
                       decoration: const InputDecoration(
                         labelText: 'Insira o link do YouTube',
                         border: OutlineInputBorder(),
@@ -196,11 +244,11 @@ class _VideosState extends State<Videos> {
                   );
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   List<Map<String, dynamic>> sortedList = snapshot.data!;
+                  _filteredVideos = _filterVideos(sortedList, _searchQuery);
                   return SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        var videoData = sortedList[index];
-                        var videoId = videoData['id'] as String;
+                        var videoData = _filteredVideos[index];
                         var videoUrl = videoData['url'] as String;
                         return Column(
                           children: [
@@ -240,11 +288,6 @@ class _VideosState extends State<Videos> {
                                                       height: 180,
                                                       width: double.infinity,
                                                       fit: BoxFit.cover,
-                                                      placeholder: (context,
-                                                              url) =>
-                                                          const Center(
-                                                              child:
-                                                                  CircularProgressIndicator()),
                                                       errorWidget: (context,
                                                               url, error) =>
                                                           const Icon(
@@ -264,12 +307,12 @@ class _VideosState extends State<Videos> {
                                                         child: Text(
                                                           _formatDuration(
                                                               video.duration),
-                                                          style:
-                                                              const TextStyle(
-                                                            color: Colors.white,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
+                                                          style: const TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
                                                         ),
                                                       ),
                                                     ),
@@ -287,9 +330,9 @@ class _VideosState extends State<Videos> {
                                                         .textTheme
                                                         .titleMedium!
                                                         .copyWith(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
                                                   ),
                                                 ),
                                                 const SizedBox(height: 4),
@@ -321,14 +364,13 @@ class _VideosState extends State<Videos> {
                           ],
                         );
                       },
-                      childCount: sortedList.length,
+                      childCount: _filteredVideos.length,
                     ),
                   );
                 } else {
                   return const SliverFillRemaining(
-                    child: Center(
-                      child: Text('Nenhum vídeo adicionado ainda.'),
-                    ),
+                    child:
+                        Center(child: Text('Nenhum vídeo adicionado ainda.')),
                   );
                 }
               },
