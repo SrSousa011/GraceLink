@@ -5,11 +5,12 @@ class VideosService {
   final CollectionReference _videosCollection =
       FirebaseFirestore.instance.collection('videos');
 
-  Future<void> addVideo(String id, String url) async {
+  Future<void> addVideo(String id, String url, String title) async {
     try {
       await _videosCollection.doc(id).set({
         'id': id,
         'url': url,
+        'title': title,
         'timestamp': DateTime.now(),
       });
     } catch (e) {
@@ -40,7 +41,7 @@ class VideosService {
       await _videosCollection.doc(id).delete();
     } catch (e) {
       if (kDebugMode) {
-        print('Error adding video: $e');
+        print('Error deleting video: $e');
       }
       rethrow;
     }
