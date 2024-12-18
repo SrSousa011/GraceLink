@@ -5,12 +5,17 @@ class VideosService {
   final CollectionReference _videosCollection =
       FirebaseFirestore.instance.collection('videos');
 
-  Future<void> addVideo(String id, String url, String title) async {
+  Future<void> addVideo(String id, String url, String title, String author,
+      String thumbnailUrl, Duration? duration, DateTime? uploadDate) async {
     try {
       await _videosCollection.doc(id).set({
         'id': id,
         'url': url,
         'title': title,
+        'author': author,
+        'thumbnailUrl': thumbnailUrl,
+        'duration': duration?.inSeconds,
+        'uploadDate': uploadDate?.toIso8601String(),
         'timestamp': DateTime.now(),
       });
     } catch (e) {
@@ -25,9 +30,13 @@ class VideosService {
     try {
       var snapshot =
           await _videosCollection.orderBy('timestamp', descending: true).get();
-      return snapshot.docs
-          .map((doc) => doc.data() as Map<String, dynamic>)
-          .toList();
+      return snapshot.docs.map((doc) {
+        var data = doc.data() as Map<String, dynamic>;
+        if (data['uploadDate'] != null) {
+          data['uploadDate'] = DateTime.parse(data['uploadDate']);
+        }
+        return data;
+      }).toList();
     } catch (e) {
       if (kDebugMode) {
         print('Error getting videos: $e');
