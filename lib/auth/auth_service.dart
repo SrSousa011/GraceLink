@@ -72,6 +72,8 @@ abstract class BaseAuth {
   Future<void> verifyCode(String verificationId, String smsCode);
 
   Future<void> sendEmailConfirmation(String email);
+
+  Future<bool> isAdmin();
 }
 
 class AuthenticationService implements BaseAuth {
@@ -627,6 +629,28 @@ class AuthenticationService implements BaseAuth {
     } catch (e) {
       if (kDebugMode) {
         print('Erro ao verificar o código do telefone: $e');
+      }
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> isAdmin() async {
+    try {
+      User? user = _firebaseAuth.currentUser;
+      if (user != null) {
+        DocumentSnapshot userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
+          String? role = data['role'];
+          return role == 'admin';
+        }
+      }
+      return false;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error checking admin status: $e');
       }
       return false;
     }
