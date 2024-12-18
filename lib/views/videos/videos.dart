@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:churchapp/views/videos/video_provider.dart';
 import 'package:churchapp/views/videos/videos_service.dart';
 import 'package:flutter/material.dart';
@@ -52,6 +53,7 @@ class _VideosState extends State<Videos> {
     });
 
     return Scaffold(
+      drawer: const NavBar(),
       appBar: AppBar(
         title: _isSearching
             ? TextField(
