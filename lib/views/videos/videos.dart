@@ -158,8 +158,8 @@ class _VideosState extends State<Videos> {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
-                                  _formatDuration(
-                                      video['duration'] ?? Duration.zero),
+                                  _formatDuration(_parseDuration(
+                                      video['duration'] ?? '0:00')),
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 12,
@@ -320,6 +320,25 @@ class _VideosState extends State<Videos> {
     }
     if (difference.inMinutes == 1) return '1 minuto atrás';
     return 'Agora';
+  }
+
+  Duration _parseDuration(dynamic duration) {
+    if (duration is Duration) {
+      return duration;
+    } else if (duration is String) {
+      try {
+        List<String> parts =
+            duration.split(':').map((e) => e.padLeft(2, '0')).toList();
+        int hours = parts.length == 3 ? int.parse(parts[0]) : 0;
+        int minutes = int.parse(parts[parts.length - 2]);
+        int seconds = int.parse(parts.last);
+        return Duration(hours: hours, minutes: minutes, seconds: seconds);
+      } catch (e) {
+        return Duration.zero;
+      }
+    } else {
+      return Duration.zero;
+    }
   }
 
   String _formatDuration(Duration duration) {
