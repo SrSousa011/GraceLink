@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:churchapp/views/videos/video_provider.dart';
+import 'package:churchapp/views/videos/videos_service.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as YT;
-import 'package:churchapp/theme/theme_provider.dart';
-import 'package:churchapp/views/nav_bar/nav_bar.dart';
-import 'package:churchapp/views/videos/videos_service.dart';
-import 'package:churchapp/views/videos/video_cache.dart';
 
 class Videos extends StatefulWidget {
   const Videos({super.key});
@@ -17,60 +15,167 @@ class Videos extends StatefulWidget {
 
 class _VideosState extends State<Videos> {
   final VideosService _videosService = VideosService();
+  final VideosProvider _videosProvider = VideosProvider();
   final TextEditingController _controller = TextEditingController();
   bool _showAddLinkField = false;
   bool _isSearching = false;
-
-  final VideoCache _videoCache = VideoCache();
-
+  bool _showDeleteIcons = false;
   String _searchQuery = '';
-  List<Map<String, dynamic>> _filteredVideos = [];
 
-  Future<YT.Video> _fetchVideo(String url) async {
-    if (_videoCache.contains(url)) {
-      return _videoCache.get(url)!;
-    }
-
-    var yt = YT.YoutubeExplode();
-    var videoId = YT.VideoId.parseVideoId(url);
-    if (videoId == null) {
-      throw Exception('Invalid video URL');
-    }
-    var video = await yt.videos.get(videoId);
-    yt.close();
-
-    _videoCache.add(url, video);
-
-    return video;
-  }
-
-  List<Map<String, dynamic>> _filterVideos(
-      List<Map<String, dynamic>> videos, String query) {
-    if (query.isEmpty) {
-      return videos;
-    }
-    final lowercasedQuery = query.toLowerCase();
-    return videos.where((video) {
-      String title = video['title'] ?? '';
-      return title.toLowerCase().contains(lowercasedQuery);
-    }).toList();
-  }
-
-  void _updateSearchQuery(String query) {
-    setState(() {
-      _searchQuery = query.isNotEmpty ? query : '';
-      _filteredVideos = _filterVideos(_filteredVideos, _searchQuery);
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final videosProvider =
+          Provider.of<VideosProvider>(context, listen: false);
+      if (videosProvider.videos.isEmpty) {
+        videosProvider.fetchVideos();
+      }
     });
   }
 
-  Future<void> _launchURL(String url) async {
-    final url0 = Uri.parse(url);
-    if (!await launchUrl(url0, mode: LaunchMode.externalApplication)) {
-      throw Exception('Could not launch $url0');
-    }
+  @override
+  Widget build(BuildContext context) {
+    final videosProvider = Provider.of<VideosProvider>(context);
+    List<Map<String, dynamic>> filteredVideos = videosProvider.videos
+        .where((video) => video['title']
+            .toString()
+            .toLowerCase()
+            .contains(_searchQuery.toLowerCase()))
+        .toList();
+
+    filteredVideos.sort((a, b) {
+      DateTime? aDate = a['uploadDate'];
+      DateTime? bDate = b['uploadDate'];
+      if (aDate == null || bDate == null) return 0;
+      return bDate.compareTo(aDate);
+    });
+
+    return Scaffold(
+      appBar: AppBar(
+        title: _isSearching
+            ? TextField(
+                controller: _controller,
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+                decoration: const InputDecoration(
+                  hintText: 'Pesquisar vídeos...',
+                  border: InputBorder.none,
+                ),
+                autofocus: true,
+              )
+            : const Text('Videos'),
+        actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                _controller.clear();
+                _searchQuery = '';
+              });
+            },
+          ),
+          IconButton(
+            icon: Icon(_showAddLinkField ? Icons.close : Icons.add),
+            onPressed: () {
+              setState(() {
+                _showAddLinkField = !_showAddLinkField;
+              });
+            },
+          ),
+          IconButton(
+            icon: Icon(_showDeleteIcons ? Icons.close : Icons.delete),
+            onPressed: () {
+              setState(() {
+                _showDeleteIcons = !_showDeleteIcons;
+              });
+            },
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          if (_showAddLinkField)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      decoration: const InputDecoration(
+                        labelText: 'Enter YouTube link',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => _addVideo(),
+                    icon: const Icon(Icons.add),
+                    iconSize: 30,
+                    padding: const EdgeInsets.all(0),
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+            ),
+          Expanded(
+            child: videosProvider.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                    itemCount: filteredVideos.length,
+                    itemBuilder: (context, index) {
+                      final video = filteredVideos[index];
+                      return ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 16),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CachedNetworkImage(
+                              imageUrl: video['thumbnailUrl'] ?? '',
+                              placeholder: (context, url) =>
+                                  const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => const Icon(
+                                  Icons.image_not_supported,
+                                  size: 200,
+                                  color: Colors.grey),
+                              width: double.infinity,
+                              height: 200,
+                              fit: BoxFit.cover,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(video['title'] ?? 'No title',
+                                style: Theme.of(context).textTheme.titleLarge),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${video['author'] ?? 'Unknown'} • ${_timeAgo(video['uploadDate'])}',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                        trailing: _showDeleteIcons
+                            ? IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () =>
+                                    _deleteVideo(videosProvider, video['id']),
+                              )
+                            : null,
+                        onTap: () => _launchURL(video['url'] ?? ''),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
   }
 
-  Future<void> _addLink() async {
+  Future<void> _addVideo() async {
     final String url = _controller.text.trim();
     String videoId = '';
 
@@ -86,314 +191,82 @@ class _VideosState extends State<Videos> {
         var video = await yt.videos.get(YT.VideoId(videoId));
         yt.close();
 
-        await _videosService.addVideo(videoId, url, video.title);
+        String title = video.title;
+        String author = video.author;
+        String thumbnailUrl = video.thumbnails.highResUrl;
+        Duration? duration = video.duration ?? Duration.zero;
+        DateTime? uploadDate = video.uploadDate;
+
+        await _videosService.addVideo(
+          videoId,
+          url,
+          title,
+          author,
+          thumbnailUrl,
+          duration,
+          uploadDate,
+        );
+
+        await _videosProvider.fetchVideos();
+
         setState(() {
           _controller.clear();
           _showAddLinkField = false;
         });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Vídeo adicionado com sucesso!')),
+        );
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Erro ao adicionar vídeo.'),
-          ),
+          const SnackBar(content: Text('Erro ao adicionar vídeo.')),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Por favor, insira um link válido do YouTube.'),
-        ),
+            content: Text('Por favor, insira um link válido do YouTube.')),
       );
     }
   }
 
-  String _formatDuration(Duration? duration) {
-    if (duration == null) {
-      return 'Desconhecido';
+  Future<void> _launchURL(String url) async {
+    if (url.isEmpty) return;
+    final url0 = Uri.parse(url);
+    if (!await launchUrl(url0, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch $url0');
     }
+  }
 
-    final hours = duration.inHours;
-    final minutes = duration.inMinutes % 60;
-    final seconds = duration.inSeconds % 60;
-
-    if (hours > 0) {
-      return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-    } else {
-      return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  Future<void> _deleteVideo(VideosProvider provider, String id) async {
+    try {
+      await provider.deleteVideo(id);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error deleting video')),
+      );
     }
   }
 
   String _timeAgo(DateTime? dateTime) {
-    if (dateTime == null) {
-      return 'Desconhecido';
-    }
+    if (dateTime == null) return 'Desconhecido';
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-
     if (difference.inDays >= 365) {
-      final years = (difference.inDays / 365).floor();
-      return '$years ano${years > 1 ? 's' : ''} atrás';
-    } else if (difference.inDays >= 30) {
-      final months = (difference.inDays / 30).floor();
-      return '$months mês${months > 1 ? 'es' : ''} atrás';
-    } else if (difference.inDays > 1) {
-      return '${difference.inDays} dias atrás';
-    } else if (difference.inDays == 1) {
-      return '1 dia atrás';
-    } else if (difference.inHours > 1) {
-      return '${difference.inHours} horas atrás';
-    } else if (difference.inHours == 1) {
-      return '1 hora atrás';
-    } else if (difference.inMinutes > 1) {
-      return '${difference.inMinutes} minutos atrás';
-    } else if (difference.inMinutes == 1) {
-      return '1 minuto atrás';
-    } else {
-      return 'Agora';
+      return '${(difference.inDays / 365).floor()} anos atrás';
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Provider.of<ThemeProvider>(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: _isSearching
-            ? TextField(
-                controller: _controller,
-                onChanged: _updateSearchQuery,
-                decoration: const InputDecoration(
-                  hintText: 'Pesquisar vídeos...',
-                  border: InputBorder.none,
-                ),
-                autofocus: true,
-              )
-            : const Text(
-                'Videos',
-                style: TextStyle(fontSize: 18),
-              ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                if (_isSearching) {
-                  _searchQuery = '';
-                  _filteredVideos = [];
-                }
-                _isSearching = !_isSearching;
-              });
-            },
-            icon: Icon(
-              _isSearching ? Icons.close : Icons.search,
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              setState(() {
-                _showAddLinkField = !_showAddLinkField;
-              });
-            },
-            icon: Icon(
-              _showAddLinkField ? Icons.close : Icons.add,
-            ),
-          ),
-        ],
-      ),
-      drawer: const NavBar(),
-      body: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.all(8.0),
-            sliver: SliverVisibility(
-              visible: _showAddLinkField,
-              sliver: SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: _controller,
-                      onChanged: _updateSearchQuery,
-                      decoration: const InputDecoration(
-                        labelText: 'Insira o link do YouTube',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    IconButton(
-                      onPressed: _addLink,
-                      icon: const Icon(
-                        Icons.add,
-                        color: Colors.white,
-                      ),
-                      iconSize: 30,
-                      padding: const EdgeInsets.all(0),
-                      constraints: const BoxConstraints(),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            sliver: FutureBuilder<List<Map<String, dynamic>>>(
-              future: _videosService.getVideos(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                } else if (snapshot.hasError) {
-                  return SliverFillRemaining(
-                    child: Center(
-                      child: Text('Erro: ${snapshot.error}'),
-                    ),
-                  );
-                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                  List<Map<String, dynamic>> sortedList = snapshot.data!;
-                  _filteredVideos = _filterVideos(sortedList, _searchQuery);
-                  return SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        var videoData = _filteredVideos[index];
-                        var videoUrl = videoData['url'] as String;
-                        return Column(
-                          children: [
-                            InkWell(
-                              onTap: () => _launchURL(videoUrl),
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: FutureBuilder<YT.Video>(
-                                        future: _fetchVideo(videoUrl),
-                                        builder: (context, videoSnapshot) {
-                                          if (videoSnapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const SizedBox(
-                                              height: 180,
-                                              child: Center(
-                                                  child:
-                                                      CircularProgressIndicator()),
-                                            );
-                                          } else if (videoSnapshot.hasError) {
-                                            return const Icon(
-                                                Icons.error_outline);
-                                          } else if (videoSnapshot.hasData) {
-                                            var video = videoSnapshot.data!;
-                                            return Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Stack(
-                                                  children: [
-                                                    CachedNetworkImage(
-                                                      imageUrl:
-                                                          'https://i.ytimg.com/vi/${video.id}/hqdefault.jpg',
-                                                      height: 180,
-                                                      width: double.infinity,
-                                                      fit: BoxFit.cover,
-                                                      errorWidget: (context,
-                                                              url, error) =>
-                                                          const Icon(
-                                                              Icons.error),
-                                                    ),
-                                                    Positioned(
-                                                        bottom: 8,
-                                                        right: 8,
-                                                        child: Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal: 8,
-                                                                  vertical: 4),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color:
-                                                                Colors.black54,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        4),
-                                                          ),
-                                                          child: Text(
-                                                            _formatDuration(
-                                                                video.duration),
-                                                            style:
-                                                                const TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 12,
-                                                            ),
-                                                          ),
-                                                        )),
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 8),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 8.0,
-                                                          right: 8.0),
-                                                  child: Text(
-                                                    video.title,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleMedium!
-                                                        .copyWith(
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 10.0,
-                                                          right: 10.0),
-                                                  child: Text(
-                                                    '${video.author} • ${_timeAgo(video.uploadDate)}',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodySmall,
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          } else {
-                                            return const SizedBox.shrink();
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                          ],
-                        );
-                      },
-                      childCount: _filteredVideos.length,
-                    ),
-                  );
-                } else {
-                  return const SliverFillRemaining(
-                    child:
-                        Center(child: Text('Nenhum vídeo adicionado ainda.')),
-                  );
-                }
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+    if (difference.inDays >= 30) {
+      return '${(difference.inDays / 30).floor()} meses atrás';
+    }
+    if (difference.inDays > 1) return '${difference.inDays} dias atrás';
+    if (difference.inDays == 1) return '1 dia atrás';
+    if (difference.inHours > 1) return '${difference.inHours} horas atrás';
+    if (difference.inHours == 1) return '1 hora atrás';
+    if (difference.inMinutes > 1) {
+      return '${difference.inMinutes} minutos atrás';
+    }
+    if (difference.inMinutes == 1) return '1 minuto atrás';
+    return 'Agora';
   }
 }
