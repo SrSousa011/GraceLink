@@ -15,8 +15,7 @@ class VideosService {
         'author': author,
         'thumbnailUrl': thumbnailUrl,
         'duration': duration?.inSeconds,
-        'uploadDate': uploadDate?.toIso8601String(),
-        'timestamp': DateTime.now(),
+        'uploadDate': uploadDate ?? FieldValue.serverTimestamp(),
       });
     } catch (e) {
       if (kDebugMode) {
@@ -29,11 +28,11 @@ class VideosService {
   Future<List<Map<String, dynamic>>> getVideos() async {
     try {
       var snapshot =
-          await _videosCollection.orderBy('timestamp', descending: true).get();
+          await _videosCollection.orderBy('uploadDate', descending: true).get();
       return snapshot.docs.map((doc) {
         var data = doc.data() as Map<String, dynamic>;
         if (data['uploadDate'] != null) {
-          data['uploadDate'] = DateTime.parse(data['uploadDate']);
+          data['uploadDate'] = (data['uploadDate'] as Timestamp).toDate();
         }
         return data;
       }).toList();

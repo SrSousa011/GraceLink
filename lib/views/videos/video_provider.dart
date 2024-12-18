@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'videos_service.dart';
 
@@ -28,6 +29,8 @@ class VideosProvider extends ChangeNotifier {
 
   Future<void> addVideo(String videoId, String url, String title, String author,
       String thumbnailUrl, Duration? duration, DateTime? uploadDate) async {
+    final uploadDateFinal = uploadDate ?? FieldValue.serverTimestamp();
+
     try {
       _videos.add({
         'id': videoId,
@@ -36,10 +39,11 @@ class VideosProvider extends ChangeNotifier {
         'author': author,
         'thumbnailUrl': thumbnailUrl,
         'duration': duration?.inSeconds,
-        'uploadDate': uploadDate?.toIso8601String(),
+        'uploadDate': uploadDateFinal,
       });
 
       _sortVideosByDate();
+
       notifyListeners();
 
       await _service.addVideo(
@@ -49,7 +53,7 @@ class VideosProvider extends ChangeNotifier {
         author,
         thumbnailUrl,
         duration,
-        uploadDate,
+        uploadDateFinal as DateTime?,
       );
     } catch (e) {
       if (kDebugMode) {
