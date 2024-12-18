@@ -4,6 +4,7 @@ import 'package:churchapp/views/videos/videos_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+// ignore: library_prefixes
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as YT;
 
 class Videos extends StatefulWidget {
@@ -15,7 +16,6 @@ class Videos extends StatefulWidget {
 
 class _VideosState extends State<Videos> {
   final VideosService _videosService = VideosService();
-  final VideosProvider _videosProvider = VideosProvider();
   final TextEditingController _controller = TextEditingController();
   bool _showAddLinkField = false;
   bool _isSearching = false;
@@ -131,8 +131,7 @@ class _VideosState extends State<Videos> {
                     itemBuilder: (context, index) {
                       final video = filteredVideos[index];
                       return ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 16),
+                        contentPadding: EdgeInsets.zero,
                         title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -148,13 +147,27 @@ class _VideosState extends State<Videos> {
                               height: 200,
                               fit: BoxFit.cover,
                             ),
-                            const SizedBox(height: 8),
-                            Text(video['title'] ?? 'No title',
-                                style: Theme.of(context).textTheme.titleLarge),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${video['author'] ?? 'Unknown'} • ${_timeAgo(video['uploadDate'])}',
-                              style: Theme.of(context).textTheme.bodyMedium,
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 4.0, horizontal: 16.0),
+                              child: Text(
+                                video['title'] ?? 'No title',
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 4.0, horizontal: 16.0),
+                              child: Text(
+                                '${video['author'] ?? 'Unknown'} • ${_timeAgo(video['uploadDate'])}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -177,56 +190,67 @@ class _VideosState extends State<Videos> {
 
   Future<void> _addVideo() async {
     final String url = _controller.text.trim();
-    String videoId = '';
+    String? videoId;
 
-    if (url.startsWith('https://www.youtube.com/')) {
-      videoId = YT.VideoId.parseVideoId(url)!;
-    } else if (url.startsWith('https://youtu.be/')) {
-      videoId = url.substring(url.lastIndexOf('/') + 1).split('?').first;
-    }
+    try {
+      if (url.startsWith('https://www.youtube.com/')) {
+        Uri parsedUrl = Uri.parse(url);
 
-    if (videoId.isNotEmpty) {
-      try {
-        var yt = YT.YoutubeExplode();
-        var video = await yt.videos.get(YT.VideoId(videoId));
-        yt.close();
-
-        String title = video.title;
-        String author = video.author;
-        String thumbnailUrl = video.thumbnails.highResUrl;
-        Duration? duration = video.duration ?? Duration.zero;
-        DateTime? uploadDate = video.uploadDate;
-
-        await _videosService.addVideo(
-          videoId,
-          url,
-          title,
-          author,
-          thumbnailUrl,
-          duration,
-          uploadDate,
-        );
-
-        await _videosProvider.fetchVideos();
-
-        setState(() {
-          _controller.clear();
-          _showAddLinkField = false;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Vídeo adicionado com sucesso!')),
-        );
-      } catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erro ao adicionar vídeo.')),
-        );
+        if (parsedUrl.queryParameters.containsKey('v')) {
+          videoId = parsedUrl.queryParameters['v'];
+        } else if (parsedUrl.pathSegments.contains('live')) {
+          videoId = parsedUrl.pathSegments.last;
+        }
+      } else if (url.startsWith('https://youtu.be/')) {
+        videoId = url.substring(url.lastIndexOf('/') + 1).split('?').first;
       }
-    } else {
+
+      if (videoId == null || videoId.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'ID do vídeo não encontrado. Por favor, insira um link válido do YouTube.',
+            ),
+          ),
+        );
+        return;
+      }
+
+      var yt = YT.YoutubeExplode();
+      var video = await yt.videos.get(YT.VideoId(videoId));
+      yt.close();
+
+      String title = video.title;
+      String author = video.author;
+      String thumbnailUrl = video.thumbnails.highResUrl;
+      Duration? duration = video.duration ?? Duration.zero;
+      DateTime? uploadDate = video.uploadDate;
+
+      await _videosService.addVideo(
+        videoId,
+        url,
+        title,
+        author,
+        thumbnailUrl,
+        duration,
+        uploadDate,
+      );
+
+      if (!mounted) return;
+      await Provider.of<VideosProvider>(context, listen: false).fetchVideos();
+
+      setState(() {
+        _controller.clear();
+        _showAddLinkField = false;
+      });
+
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Por favor, insira um link válido do YouTube.')),
+        const SnackBar(content: Text('Vídeo adicionado com sucesso!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao adicionar vídeo: $e')),
       );
     }
   }
@@ -243,9 +267,11 @@ class _VideosState extends State<Videos> {
     try {
       await provider.deleteVideo(id);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error deleting video')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error deleting video')),
+        );
+      }
     }
   }
 
