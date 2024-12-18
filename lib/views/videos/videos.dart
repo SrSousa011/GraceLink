@@ -1,11 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:churchapp/views/nav_bar/nav_bar.dart';
-import 'package:churchapp/views/videos/video_provider.dart';
-import 'package:churchapp/views/videos/videos_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-// ignore: library_prefixes
+import 'package:churchapp/views/nav_bar/nav_bar.dart';
+import 'package:churchapp/views/videos/video_provider.dart';
+import 'package:churchapp/views/videos/videos_service.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as YT;
 
 class Videos extends StatefulWidget {
@@ -134,8 +133,7 @@ class _VideosState extends State<Videos> {
                       final video = filteredVideos[index];
                       return ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        title: Stack(
                           children: [
                             CachedNetworkImage(
                               imageUrl: video['thumbnailUrl'] ?? '',
@@ -149,6 +147,32 @@ class _VideosState extends State<Videos> {
                               height: 200,
                               fit: BoxFit.cover,
                             ),
+                            Positioned(
+                              bottom: 8,
+                              right: 8,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 4.0, horizontal: 6.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  _formatDuration(
+                                      video['duration'] ?? Duration.zero),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                   vertical: 4.0, horizontal: 16.0),
@@ -164,7 +188,7 @@ class _VideosState extends State<Videos> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 4.0, horizontal: 16.0),
                               child: Text(
-                                '${video['author'] ?? 'Unknown'} • ${_timeAgo(video['uploadDate'])}',
+                                '${video['author'] ?? 'Desconhecido'} • ${_timeAgo(video['uploadDate'])}',
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey,
@@ -296,5 +320,17 @@ class _VideosState extends State<Videos> {
     }
     if (difference.inMinutes == 1) return '1 minuto atrás';
     return 'Agora';
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
+    if (hours > 0) {
+      return '${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}';
+    } else {
+      return '${twoDigits(minutes)}:${twoDigits(seconds)}';
+    }
   }
 }

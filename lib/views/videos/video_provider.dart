@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'videos_service.dart';
 
@@ -29,21 +28,19 @@ class VideosProvider extends ChangeNotifier {
 
   Future<void> addVideo(String videoId, String url, String title, String author,
       String thumbnailUrl, Duration? duration, DateTime? uploadDate) async {
-    final uploadDateFinal = uploadDate ?? FieldValue.serverTimestamp();
-
     try {
-      _videos.add({
+      final newVideo = {
         'id': videoId,
         'url': url,
         'title': title,
         'author': author,
         'thumbnailUrl': thumbnailUrl,
-        'duration': duration?.inSeconds,
-        'uploadDate': uploadDateFinal,
-      });
+        'duration': duration != null ? _formatDuration(duration) : '00:00',
+        'uploadDate': uploadDate ?? DateTime.now(),
+      };
 
+      _videos.add(newVideo);
       _sortVideosByDate();
-
       notifyListeners();
 
       await _service.addVideo(
@@ -53,7 +50,7 @@ class VideosProvider extends ChangeNotifier {
         author,
         thumbnailUrl,
         duration,
-        uploadDateFinal as DateTime?,
+        uploadDate,
       );
     } catch (e) {
       if (kDebugMode) {
@@ -76,10 +73,22 @@ class VideosProvider extends ChangeNotifier {
 
   void _sortVideosByDate() {
     _videos.sort((a, b) {
-      DateTime? aDate = a['uploadDate'];
-      DateTime? bDate = b['uploadDate'];
+      final aDate = a['uploadDate'] as DateTime?;
+      final bDate = b['uploadDate'] as DateTime?;
       if (aDate == null || bDate == null) return 0;
       return bDate.compareTo(aDate);
     });
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
+    if (hours > 0) {
+      return '${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}';
+    } else {
+      return '${twoDigits(minutes)}:${twoDigits(seconds)}';
+    }
   }
 }
