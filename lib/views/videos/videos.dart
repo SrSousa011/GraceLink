@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:churchapp/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -15,10 +16,12 @@ class Videos extends StatefulWidget {
 }
 
 class _VideosState extends State<Videos> {
+  final AuthenticationService _auth = AuthenticationService();
   final VideosService _videosService = VideosService();
   final TextEditingController _controller = TextEditingController();
   bool _showAddLinkField = false;
   bool _isSearching = false;
+  bool _isAdmin = false;
   bool _showDeleteIcons = false;
   String _searchQuery = '';
 
@@ -31,7 +34,21 @@ class _VideosState extends State<Videos> {
       if (videosProvider.videos.isEmpty) {
         videosProvider.fetchVideos();
       }
+      _checkIfAdmin();
     });
+  }
+
+  Future<void> _checkIfAdmin() async {
+    final bool isAdmin = await _shouldShowIcons();
+    if (mounted) {
+      setState(() {
+        _isAdmin = isAdmin;
+      });
+    }
+  }
+
+  Future<bool> _shouldShowIcons() async {
+    return _auth.isAdmin();
   }
 
   @override
@@ -75,27 +92,28 @@ class _VideosState extends State<Videos> {
             onPressed: () {
               setState(() {
                 _isSearching = !_isSearching;
-                _controller.clear();
                 _searchQuery = '';
               });
             },
           ),
-          IconButton(
-            icon: Icon(_showAddLinkField ? Icons.close : Icons.add),
-            onPressed: () {
-              setState(() {
-                _showAddLinkField = !_showAddLinkField;
-              });
-            },
-          ),
-          IconButton(
-            icon: Icon(_showDeleteIcons ? Icons.close : Icons.delete),
-            onPressed: () {
-              setState(() {
-                _showDeleteIcons = !_showDeleteIcons;
-              });
-            },
-          ),
+          if (_isAdmin) ...[
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                setState(() {
+                  _showAddLinkField = !_showAddLinkField;
+                });
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () {
+                setState(() {
+                  _showDeleteIcons = !_showDeleteIcons;
+                });
+              },
+            ),
+          ],
         ],
       ),
       body: Column(
@@ -289,67 +307,51 @@ class _VideosState extends State<Videos> {
     }
   }
 
-  Future<void> _deleteVideo(VideosProvider provider, String id) async {
+  Future<void> _deleteVideo(
+      VideosProvider videosProvider, String videoId) async {
     try {
-      await provider.deleteVideo(id);
+      await _videosService.deleteVideo(videoId);
+      if (!mounted) return;
+      videosProvider.fetchVideos();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vídeo deletado com sucesso!')),
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error deleting video')),
-        );
-      }
-    }
-  }
-
-  String _timeAgo(DateTime? dateTime) {
-    if (dateTime == null) return 'Desconhecido';
-    final now = DateTime.now();
-    final difference = now.difference(dateTime);
-    if (difference.inDays >= 365) {
-      return '${(difference.inDays / 365).floor()} anos atrás';
-    }
-    if (difference.inDays >= 30) {
-      return '${(difference.inDays / 30).floor()} meses atrás';
-    }
-    if (difference.inDays > 1) return '${difference.inDays} dias atrás';
-    if (difference.inDays == 1) return '1 dia atrás';
-    if (difference.inHours > 1) return '${difference.inHours} horas atrás';
-    if (difference.inHours == 1) return '1 hora atrás';
-    if (difference.inMinutes > 1) {
-      return '${difference.inMinutes} minutos atrás';
-    }
-    if (difference.inMinutes == 1) return '1 minuto atrás';
-    return 'Agora';
-  }
-
-  Duration _parseDuration(dynamic duration) {
-    if (duration is Duration) {
-      return duration;
-    } else if (duration is String) {
-      try {
-        List<String> parts =
-            duration.split(':').map((e) => e.padLeft(2, '0')).toList();
-        int hours = parts.length == 3 ? int.parse(parts[0]) : 0;
-        int minutes = int.parse(parts[parts.length - 2]);
-        int seconds = int.parse(parts.last);
-        return Duration(hours: hours, minutes: minutes, seconds: seconds);
-      } catch (e) {
-        return Duration.zero;
-      }
-    } else {
-      return Duration.zero;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao deletar vídeo: $e')),
+      );
     }
   }
 
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final hours = duration.inHours;
-    final minutes = duration.inMinutes.remainder(60);
-    final seconds = duration.inSeconds.remainder(60);
-    if (hours > 0) {
-      return '${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}';
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return '$twoDigitMinutes:$twoDigitSeconds';
+  }
+
+  Duration _parseDuration(String duration) {
+    final parts = duration.split(':');
+    final minutes = int.parse(parts[0]);
+    final seconds = int.parse(parts[1]);
+    return Duration(minutes: minutes, seconds: seconds);
+  }
+
+  String _timeAgo(DateTime? uploadDate) {
+    if (uploadDate == null) return '';
+    final duration = DateTime.now().difference(uploadDate);
+    if (duration.inDays > 365) {
+      return '${(duration.inDays / 365).floor()} ano(s) atrás';
+    } else if (duration.inDays > 30) {
+      return '${(duration.inDays / 30).floor()} mês(es) atrás';
+    } else if (duration.inDays > 0) {
+      return '${duration.inDays} dia(s) atrás';
+    } else if (duration.inHours > 0) {
+      return '${duration.inHours} hora(s) atrás';
+    } else if (duration.inMinutes > 0) {
+      return '${duration.inMinutes} minuto(s) atrás';
     } else {
-      return '${twoDigits(minutes)}:${twoDigits(seconds)}';
+      return '${duration.inSeconds} segundo(s) atrás';
     }
   }
 }
