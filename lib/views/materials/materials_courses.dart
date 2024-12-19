@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:churchapp/views/nav_bar/nav_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
@@ -185,6 +186,7 @@ class _CourseMaterialsPageState extends State<CourseMaterialsPage> {
           style: TextStyle(fontSize: 18),
         ),
       ),
+      drawer: const NavBar(),
       body: Container(
         color: isDarkMode ? Colors.black : Colors.white,
         child: Padding(
