@@ -94,6 +94,7 @@ class _VideosState extends State<Videos> {
               setState(() {
                 _isSearching = !_isSearching;
                 _searchQuery = '';
+                _controller.clear();
               });
             },
           ),
@@ -103,6 +104,9 @@ class _VideosState extends State<Videos> {
               onPressed: () {
                 setState(() {
                   _showAddLinkField = !_showAddLinkField;
+                  if (!_showAddLinkField) {
+                    _controller.clear();
+                  }
                 });
               },
             ),
