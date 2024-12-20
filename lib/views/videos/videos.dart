@@ -89,7 +89,7 @@ class _VideosState extends State<Videos> {
             : const Text('Videos'),
         actions: [
           IconButton(
-            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            icon: Icon(_isSearching ? Icons.cancel : Icons.search),
             onPressed: () {
               setState(() {
                 _isSearching = !_isSearching;
@@ -99,7 +99,7 @@ class _VideosState extends State<Videos> {
           ),
           if (_isAdmin) ...[
             IconButton(
-              icon: const Icon(Icons.add),
+              icon: Icon(_showAddLinkField ? Icons.cancel : Icons.add),
               onPressed: () {
                 setState(() {
                   _showAddLinkField = !_showAddLinkField;
@@ -107,7 +107,7 @@ class _VideosState extends State<Videos> {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.delete),
+              icon: Icon(_showDeleteIcons ? Icons.cancel : Icons.delete_sharp),
               onPressed: () {
                 setState(() {
                   _showDeleteIcons = !_showDeleteIcons;
