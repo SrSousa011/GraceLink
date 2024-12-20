@@ -55,16 +55,17 @@ class _VideosState extends State<Videos> {
   Widget build(BuildContext context) {
     final videosProvider = Provider.of<VideosProvider>(context);
     List<Map<String, dynamic>> filteredVideos = videosProvider.videos
-        .where((video) => video['title']
+        .where((video) => (video['title'] ?? '')
             .toString()
             .toLowerCase()
             .contains(_searchQuery.toLowerCase()))
         .toList();
 
     filteredVideos.sort((a, b) {
-      DateTime? aDate = a['uploadDate'];
-      DateTime? bDate = b['uploadDate'];
-      if (aDate == null || bDate == null) return 0;
+      DateTime aDate =
+          a['uploadDate'] ?? DateTime.fromMillisecondsSinceEpoch(0);
+      DateTime bDate =
+          b['uploadDate'] ?? DateTime.fromMillisecondsSinceEpoch(0);
       return bDate.compareTo(aDate);
     });
 
@@ -314,44 +315,63 @@ class _VideosState extends State<Videos> {
       if (!mounted) return;
       videosProvider.fetchVideos();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vídeo deletado com sucesso!')),
+        const SnackBar(content: Text('Vídeo excluído com sucesso!')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao deletar vídeo: $e')),
+        SnackBar(content: Text('Erro ao excluir vídeo: $e')),
       );
     }
   }
 
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return '$twoDigitMinutes:$twoDigitSeconds';
-  }
-
   Duration _parseDuration(String duration) {
     final parts = duration.split(':');
-    final minutes = int.parse(parts[0]);
-    final seconds = int.parse(parts[1]);
-    return Duration(minutes: minutes, seconds: seconds);
+    if (parts.length == 3) {
+      final hours = int.tryParse(parts[0]) ?? 0;
+      final minutes = int.tryParse(parts[1]) ?? 0;
+      final seconds = int.tryParse(parts[2]) ?? 0;
+      return Duration(hours: hours, minutes: minutes, seconds: seconds);
+    } else if (parts.length == 2) {
+      final minutes = int.tryParse(parts[0]) ?? 0;
+      final seconds = int.tryParse(parts[1]) ?? 0;
+      return Duration(minutes: minutes, seconds: seconds);
+    }
+    return Duration.zero;
   }
 
-  String _timeAgo(DateTime? uploadDate) {
-    if (uploadDate == null) return '';
-    final duration = DateTime.now().difference(uploadDate);
-    if (duration.inDays > 365) {
-      return '${(duration.inDays / 365).floor()} ano(s) atrás';
-    } else if (duration.inDays > 30) {
-      return '${(duration.inDays / 30).floor()} mês(es) atrás';
-    } else if (duration.inDays > 0) {
-      return '${duration.inDays} dia(s) atrás';
-    } else if (duration.inHours > 0) {
-      return '${duration.inHours} hora(s) atrás';
-    } else if (duration.inMinutes > 0) {
-      return '${duration.inMinutes} minuto(s) atrás';
+  String _formatDuration(Duration duration) {
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
+
+    if (hours > 0) {
+      return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    }
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  String _timeAgo(DateTime? date) {
+    if (date == null) return '';
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays >= 365) {
+      final years = difference.inDays ~/ 365;
+      return years == 1 ? '1 ano atrás' : '$years anos atrás';
+    } else if (difference.inDays >= 30) {
+      final months = difference.inDays ~/ 30;
+      return months == 1 ? '1 mês atrás' : '$months meses atrás';
+    } else if (difference.inDays > 0) {
+      final days = difference.inDays;
+      return days == 1 ? '1 dia atrás' : '$days dias atrás';
+    } else if (difference.inHours > 0) {
+      final hours = difference.inHours;
+      return hours == 1 ? '1 hora atrás' : '$hours horas atrás';
+    } else if (difference.inMinutes > 0) {
+      final minutes = difference.inMinutes;
+      return minutes == 1 ? '1 minuto atrás' : '$minutes minutos atrás';
     } else {
-      return '${duration.inSeconds} segundo(s) atrás';
+      return 'Agora mesmo';
     }
   }
 }
