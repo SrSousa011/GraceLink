@@ -128,24 +128,32 @@ class _VideosState extends State<Videos> {
                   Expanded(
                     child: TextField(
                       controller: _controller,
-                      decoration: const InputDecoration(
-                        labelText: 'Enter YouTube link',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: 'Insira o link do YouTube ',
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide(width: 1, color: Colors.black),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide(width: 1, color: Colors.black),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 12.0),
                       ),
+                      style: TextStyle(fontSize: 12.0),
+                      keyboardType:
+                          TextInputType.url, // Tipifica o campo para links
+                      onSubmitted: (url) async {
+                        await _addVideo();
+                      },
                     ),
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black, width: 1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      onPressed: () => _addVideo(),
-                      icon: const Icon(Icons.add),
-                      iconSize: 30,
-                      padding: const EdgeInsets.all(0),
-                      constraints: const BoxConstraints(),
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () async {
+                      await _addVideo();
+                    },
                   ),
                 ],
               ),
