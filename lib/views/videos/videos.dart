@@ -104,9 +104,6 @@ class _VideosState extends State<Videos> {
               onPressed: () {
                 setState(() {
                   _showAddLinkField = !_showAddLinkField;
-                  if (!_showAddLinkField) {
-                    _controller.clear();
-                  }
                 });
               },
             ),
@@ -137,12 +134,18 @@ class _VideosState extends State<Videos> {
                       ),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => _addVideo(),
-                    icon: const Icon(Icons.add),
-                    iconSize: 30,
-                    padding: const EdgeInsets.all(0),
-                    constraints: const BoxConstraints(),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black, width: 1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      onPressed: () => _addVideo(),
+                      icon: const Icon(Icons.add),
+                      iconSize: 30,
+                      padding: const EdgeInsets.all(0),
+                      constraints: const BoxConstraints(),
+                    ),
                   ),
                 ],
               ),
