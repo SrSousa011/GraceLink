@@ -50,15 +50,15 @@ android {
         multiDexEnabled true    
     }
 
-    signingConfigs {
-        release {
-            storeFile file("C:/_repos/GraceLink/android/app/my-release-key.keystore")
-            storePassword "956030" 
-            keyAlias "key"
-            keyPassword "96"
-            keyPassword "956030"
-        }
+signingConfigs {
+    release {
+        storeFile file("C:/_repos/GraceLink/android/app/my-release-key.keystore")
+        storePassword "956030" 
+        keyAlias "my-key-alias"
+        keyPassword "956030" 
     }
+}
+
 
    signingConfigs {
         release {
