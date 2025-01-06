@@ -54,7 +54,7 @@ android {
         release {
             storeFile file("C:/_repos/GraceLink/android/app/my-release-key.keystore")
             storePassword "956030" 
-            keyAlias "key0"
+            keyAlias "key"
             keyPassword "96"
             keyPassword "956030"
         }
