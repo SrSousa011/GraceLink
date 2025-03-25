@@ -68,7 +68,7 @@ class _DonationsState extends State<Donations> {
       try {
         String? fullName = await AuthenticationService().getCurrentUserName();
 
-        if (fullName != null && fullName.isNotEmpty) {
+        if (fullName!.isNotEmpty) {
           if (!context.mounted) return;
           Navigator.push(
             context,

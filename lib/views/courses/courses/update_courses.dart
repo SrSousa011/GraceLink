@@ -203,11 +203,9 @@ class _UpdateCourseScreenState extends State<UpdateCourseScreen> {
           firstDate: DateTime(2000),
           lastDate: DateTime(2101),
         );
-        if (selectedDate != null) {
-          _registrationDeadlineController.text =
-              _dateFormat.format(selectedDate);
-        }
-      },
+        _registrationDeadlineController.text =
+            _dateFormat.format(selectedDate!);
+            },
     );
   }
 

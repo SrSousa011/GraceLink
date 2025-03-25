@@ -89,16 +89,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       onTap: () async {
         if (!_isEmailVerified) {
           String? email = await _authService.getCurrentUserEmail();
-          if (email == null) {
-            if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('Não foi possível obter o e-mail do usuário.')),
-            );
-            return;
-          }
           if (!context.mounted) return;
-          _showEmailDialog(context, email);
+          _showEmailDialog(context, email!);
         }
       },
     );

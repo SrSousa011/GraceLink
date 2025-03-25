@@ -94,32 +94,23 @@ class SettingsScreen extends StatelessWidget {
                 final authService = AuthenticationService();
                 String? email = await authService.getCurrentUserEmail();
 
-                if (email != null) {
-                  try {
-                    await authService.sendPasswordResetMail(email);
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content:
-                              Text('E-mail de redefinição de senha enviado')),
-                    );
-                  } catch (e) {
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text(
-                              'Falha ao enviar e-mail de redefinição de senha: $e')),
-                    );
-                  }
-                } else {
+                try {
+                  await authService.sendPasswordResetMail(email!);
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                         content:
-                            Text('Nenhum e-mail encontrado para o usuário')),
+                            Text('E-mail de redefinição de senha enviado')),
+                  );
+                } catch (e) {
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text(
+                            'Falha ao enviar e-mail de redefinição de senha: $e')),
                   );
                 }
-              },
+                            },
             ),
           ],
         ),
